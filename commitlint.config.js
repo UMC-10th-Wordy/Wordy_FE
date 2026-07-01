@@ -8,5 +8,6 @@ export default {
     ],
     'subject-max-length': [2, 'always', 72],
     'subject-empty': [2, 'never'],
+    'subject-case': [0],
   },
 }
