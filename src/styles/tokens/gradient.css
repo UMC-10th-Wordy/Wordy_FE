@@ -1,0 +1,23 @@
+@layer base {
+  :root {
+    /* brand-dark: neutral-900 → primary-800 */
+    --gradient-brand-dark: linear-gradient(
+      to bottom,
+      var(--primitive-neutral-900),
+      var(--primitive-primary-800)
+    );
+
+    /* brand-medium: primary-800 → #AD87FF */
+    --gradient-brand-medium: linear-gradient(to bottom, var(--primitive-primary-800), #ad87ff);
+
+    /* brand-light: #EDE4FF → #D9E4FF(45%) → #D9F8FF */
+    --gradient-brand-light: linear-gradient(to bottom, #ede4ff, #d9e4ff 45.67%, #d9f8ff);
+
+    /* brand-subtle: primary-300 → primary-100 */
+    --gradient-brand-subtle: linear-gradient(
+      to bottom,
+      var(--primitive-primary-300),
+      var(--primitive-primary-100)
+    );
+  }
+}
