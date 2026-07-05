@@ -1,0 +1,51 @@
+@layer base {
+  :root {
+    /* Primary */
+    --primitive-primary-100: #fafafc;
+    --primitive-primary-200: #f4f4ff;
+    --primitive-primary-300: #ddddff;
+    --primitive-primary-400: #bebeff;
+    --primitive-primary-500: #a5a5ff;
+    --primitive-primary-600: #7d7dff;
+    --primitive-primary-700: #5d5df1;
+    --primitive-primary-800: #4040d2;
+    --primitive-primary-900: #1e27a4;
+
+    /* Secondary */
+    --primitive-secondary-100: #f5fbff;
+    --primitive-secondary-200: #e6f6ff;
+    --primitive-secondary-300: #d7f0ff;
+    --primitive-secondary-400: #b8e5ff;
+    --primitive-secondary-600: #80d1ff;
+    --primitive-secondary-800: #36b6ff;
+
+    /* Neutral */
+    --primitive-neutral-white: #ffffff;
+    --primitive-neutral-100: #fafafa;
+    --primitive-neutral-200: #f0f0f0;
+    --primitive-neutral-300: #e6e6e6;
+    --primitive-neutral-400: #cccccc;
+    --primitive-neutral-500: #a6a6a6;
+    --primitive-neutral-600: #727272;
+    --primitive-neutral-700: #4d4d4d;
+    --primitive-neutral-800: #383838;
+    --primitive-neutral-900: #111111;
+
+    /* Etc */
+    --primitive-red-200: #ffe9ec;
+    --primitive-red-700: #ff3f55;
+    --primitive-orange-200: #ffede6;
+    --primitive-orange-300: #ffcbb7;
+    --primitive-orange-700: #ff6d38;
+    --primitive-yellow-200: #fff5dd;
+    --primitive-yellow-700: #ffc42f;
+    --primitive-yellow-800: #f7ad00;
+    --primitive-green-200: #dcffe8;
+    --primitive-green-700: #14c369;
+    --primitive-blue-700: #2d96ff;
+    --primitive-pink-200: #ffeffb;
+    --primitive-pink-700: #ff5fd7;
+    --primitive-brown-200: #f8efef;
+    --primitive-brown-700: #a77979;
+  }
+}
