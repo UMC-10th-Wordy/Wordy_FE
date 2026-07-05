@@ -5,8 +5,13 @@ import trashIcon from '@/assets/icons/trash.svg'
 import chevronUpIcon from '@/assets/icons/Direction=top.svg'
 import chevronDownIcon from '@/assets/icons/Direction=bottom.svg'
 import ProjectTag from './ProjectTag'
+import type { Task } from '@/types/todo'
 
-export default function TaskCard() {
+interface TaskCardProps {
+  task: Task
+}
+
+export default function TaskCard({ task }: TaskCardProps) {
   const [isExpanded, setIsExpanded] = useState(true)
 
   return (
@@ -20,13 +25,13 @@ export default function TaskCard() {
             </button>
             {/* 공통 Checkbox 컴포넌트로 교체 */}
             <span className="size-6 shrink-0 rounded border border-[#ccc]" /> {/* Checkbox */}
-            <ProjectTag label="온보딩 리뉴얼" color="green" />
+            {task.tag && <ProjectTag label={task.tag.label} color={task.tag.color} />}
           </div>
           <p className="min-w-0 flex-1 font-['Pretendard'] text-lg font-semibold leading-[1.6] text-[#111111]">
-            Product Strategy Alignment 회의 준비
+            {task.title}
           </p>
         </div>
-        {/*아이콘 버튼*/}
+        {/* 아이콘 버튼 */}
         <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
@@ -58,14 +63,16 @@ export default function TaskCard() {
       {isExpanded && (
         <>
           {/* 메모 */}
-          <div className="flex w-full flex-col items-start gap-1 pb-2">
-            <p className="font-['Pretendard'] text-base font-medium leading-[1.6] text-[#727272]">
-              메모
-            </p>
-            <p className="w-full font-['Pretendard'] text-lg font-normal leading-[1.6] text-[#4d4d4d]">
-              지난 분기 OKR 정리 / 디자인 시스템 V_2 진행 현황 슬라이드 1장
-            </p>
-          </div>
+          {task.memo && (
+            <div className="flex w-full flex-col items-start gap-1 pb-2">
+              <p className="font-['Pretendard'] text-base font-medium leading-[1.6] text-[#727272]">
+                메모
+              </p>
+              <p className="w-full font-['Pretendard'] text-lg font-normal leading-[1.6] text-[#4d4d4d]">
+                {task.memo}
+              </p>
+            </div>
+          )}
 
           {/* 업무 결과 작성하기 */}
           {/* 공통 Button 컴포넌트로 교체 */}
