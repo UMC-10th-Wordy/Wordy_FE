@@ -1,2 +1,13 @@
 @import 'pretendard/dist/web/static/pretendard.css';
 @import 'tailwindcss';
+@import './styles/tokens/primitives.css';
+@import './styles/tokens/color.css';
+@import './styles/tokens/typography.css';
+@import './styles/tokens/scale.css';
+@import './styles/tokens/gradient.css';
+
+@layer base {
+  body {
+    font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  }
+}
