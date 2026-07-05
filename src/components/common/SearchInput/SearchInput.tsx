@@ -19,17 +19,15 @@ export function SearchInput({
   onRemoveKeyword,
   onClearAll,
   className,
+  onFocus,
+  onBlur,
+  onKeyDown,
+  onChange,
   ...rest
 }: SearchInputProps) {
   const [focused, setFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const showDropdown = focused && recentKeywords.length > 0
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      onSearch?.(e.currentTarget.value)
-    }
-  }
 
   return (
     <div className={['relative', className].filter(Boolean).join(' ')}>
@@ -44,9 +42,19 @@ export function SearchInput({
           type="text"
           autoComplete="off"
           className="flex-1 min-w-0 bg-transparent outline-none [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) caret-(--color-border-brand)"
-          onFocus={() => setFocused(true)}
-          onBlur={() => setTimeout(() => setFocused(false), 150)}
-          onKeyDown={handleKeyDown}
+          onChange={onChange}
+          onFocus={(e) => {
+            setFocused(true)
+            onFocus?.(e)
+          }}
+          onBlur={(e) => {
+            setTimeout(() => setFocused(false), 150)
+            onBlur?.(e)
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onSearch?.(e.currentTarget.value)
+            onKeyDown?.(e)
+          }}
           {...rest}
         />
         <MagnifierIcon width={32} height={32} className="shrink-0 text-(--color-icon-secondary)" />
@@ -76,7 +84,14 @@ export function SearchInput({
                   type="button"
                   className="flex-1 text-left [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-normal text-(--color-text-default)"
                   onClick={() => {
-                    if (inputRef.current) inputRef.current.value = keyword
+                    if (inputRef.current) {
+                      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                        window.HTMLInputElement.prototype,
+                        'value',
+                      )?.set
+                      nativeInputValueSetter?.call(inputRef.current, keyword)
+                      inputRef.current.dispatchEvent(new Event('input', { bubbles: true }))
+                    }
                     onSearch?.(keyword)
                     setFocused(false)
                   }}
