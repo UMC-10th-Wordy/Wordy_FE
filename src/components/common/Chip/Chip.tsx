@@ -60,7 +60,7 @@ export interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function Chip({ variant, className, children, ...rest }: ChipProps) {
   return (
-    <button className={chip({ variant, className })} {...rest}>
+    <button type="button" className={chip({ variant, className })} {...rest}>
       {children}
     </button>
   )

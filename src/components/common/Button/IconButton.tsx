@@ -71,7 +71,7 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
 
 export function IconButton({ variant, size, icon, className, ...rest }: IconButtonProps) {
   return (
-    <button className={iconButton({ variant, size, className })} {...rest}>
+    <button type="button" className={iconButton({ variant, size, className })} {...rest}>
       {icon}
     </button>
   )

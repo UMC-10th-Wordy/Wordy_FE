@@ -88,7 +88,7 @@ export function TextButton({
   ...rest
 }: TextButtonProps) {
   return (
-    <button className={button({ variant, size, fullWidth, className })} {...rest}>
+    <button type="button" className={button({ variant, size, fullWidth, className })} {...rest}>
       {iconLeft}
       {children}
       {iconRight}
