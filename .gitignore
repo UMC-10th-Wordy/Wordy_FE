@@ -32,3 +32,7 @@ dist-ssr
 .env.production.local
 
 docs/*
+
+# AI tools
+.playwright-mcp/
+.superpowers/
