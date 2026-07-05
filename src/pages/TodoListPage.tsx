@@ -2,11 +2,9 @@ import { useState } from 'react'
 import TaskForm from '@/components/todo/TaskForm'
 import TaskCard from '@/components/todo/TaskCard'
 import TodoTabs from '@/components/todo/TodoTabs'
-import PerformancePreviewPanel from '@/components/todo/PerformancePreviewPanel'
+import PerformancePreviewPanel from '@/components/performance-preview/PerformancePreviewPanel'
+import DateHeader from '@/components/header/DateHeader'
 import type { Task, TodoFilter, TodoFilterCounts } from '@/types/todo'
-import arrowLeftIcon from '@/assets/icons/Direction=left.svg'
-import arrowRightIcon from '@/assets/icons/Direction=right.svg'
-import calendarIcon from '@/assets/icons/calendar.svg'
 import errorIcon from '@/assets/icons/error.svg'
 import generateIcon from '@/assets/icons/generate.svg'
 import failIcon from '@/assets/icons/fail.svg'
@@ -61,8 +59,6 @@ export default function TodoListPage() {
 
   const filterCounts: TodoFilterCounts = { completed: 2, incomplete: incompleteTaskCount }
 
-  const formattedDate = `${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월 ${currentDate.getDate()}일`
-
   const shiftDate = (days: number) => {
     setCurrentDate((prev) => {
       const next = new Date(prev)
@@ -80,65 +76,15 @@ export default function TodoListPage() {
 
       <main className="h-screen flex-1 overflow-x-clip overflow-y-auto border-x-[0.5px] border-[#ddf] bg-white px-10 pt-10">
         <div className="flex w-full flex-col gap-12">
-          <div className="flex w-full items-start justify-between">
-            <div className="flex flex-col items-start whitespace-nowrap">
-              <h1 className="font-['Pretendard'] text-2xl font-bold leading-[1.6] text-black">
-                {formattedDate}
-              </h1>
-              <p className="font-['Pretendard'] text-lg font-normal leading-[1.6] text-[#727272]">
-                오늘은 어떤 업무를 하실 예정인가요?
-              </p>
-            </div>
-            <div className="flex shrink-0 items-center gap-1">
-              <button
-                type="button"
-                onClick={() => setIsPreviewOpen((prev) => !prev)}
-                aria-pressed={isPreviewOpen}
-                className={`flex h-11 shrink-0 items-center gap-1 rounded-lg px-3 ${
-                  isPreviewOpen ? 'bg-[#f4f4ff]' : ''
-                }`}
-              >
-                <span
-                  className={`font-['Pretendard'] text-base font-medium leading-[1.6] ${
-                    isPreviewOpen ? 'text-[#4040d2]' : 'text-[#5d5df1]'
-                  }`}
-                >
-                  성과 미리보기
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => shiftDate(-1)}
-                aria-label="이전 날짜"
-                className="flex size-8 shrink-0 items-center justify-center rounded-md"
-              >
-                <img src={arrowLeftIcon} alt="" className="size-6 shrink-0" />
-              </button>
-              <button
-                type="button"
-                onClick={goToToday}
-                className="flex h-11 shrink-0 items-center gap-1 rounded-lg px-3"
-              >
-                <span className="font-['Pretendard'] text-base font-medium leading-[1.6] text-[#4d4d4d]">
-                  오늘
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => shiftDate(1)}
-                aria-label="다음 날짜"
-                className="flex size-8 shrink-0 items-center justify-center rounded-md"
-              >
-                <img src={arrowRightIcon} alt="" className="size-6 shrink-0" />
-              </button>
-              <button
-                type="button"
-                className="flex size-8 shrink-0 items-center justify-center rounded-md"
-              >
-                <img src={calendarIcon} alt="" className="size-6 shrink-0" />
-              </button>
-            </div>
-          </div>
+          <DateHeader
+            date={currentDate}
+            subtitle="오늘은 어떤 업무를 하실 예정인가요?"
+            isPreviewOpen={isPreviewOpen}
+            onTogglePreview={() => setIsPreviewOpen((prev) => !prev)}
+            onPrevDay={() => shiftDate(-1)}
+            onNextDay={() => shiftDate(1)}
+            onToday={goToToday}
+          />
 
           <section className="flex w-full flex-col gap-2">
             <div className="flex w-full items-center justify-between">
