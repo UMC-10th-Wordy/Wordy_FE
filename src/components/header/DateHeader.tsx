@@ -1,6 +1,8 @@
-import arrowLeftIcon from '@/assets/icons/Direction=left.svg'
-import arrowRightIcon from '@/assets/icons/Direction=right.svg'
-import calendarIcon from '@/assets/icons/calendar.svg'
+import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
+import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
+import CalendarIcon from '@/assets/icons/calendar.svg?react'
+import { IconButton } from '@/components/common/Button/IconButton'
+import { TextButton } from '@/components/common/Button/TextButton'
 
 interface DateHeaderProps {
   date: Date
@@ -26,63 +28,51 @@ export default function DateHeader({
   return (
     <div className="flex w-full items-start justify-between">
       <div className="flex flex-col items-start whitespace-nowrap">
-        <h1 className="font-['Pretendard'] text-2xl font-bold leading-[1.6] text-black">
+        <h1 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-bold text-(--color-text-default)">
           {formattedDate}
         </h1>
-        <p className="font-['Pretendard'] text-lg font-normal leading-[1.6] text-[#727272]">
+        <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
           {subtitle}
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-1">
-        {/* 공통 Button(텍스트) 컴포넌트로 교체 - 성과 미리보기 토글 */}
-        <button
+        <TextButton
           type="button"
+          variant="text_only"
+          size="medium"
           onClick={onTogglePreview}
           aria-pressed={isPreviewOpen}
-          className={`flex h-11 shrink-0 items-center gap-1 rounded-lg px-3 ${
-            isPreviewOpen ? 'bg-[#f4f4ff]' : ''
-          }`}
+          className="aria-pressed:bg-(--color-bg-brand-light) aria-pressed:text-(--color-button-hover)"
         >
-          <span
-            className={`font-['Pretendard'] text-base font-medium leading-[1.6] ${
-              isPreviewOpen ? 'text-[#4040d2]' : 'text-[#5d5df1]'
-            }`}
-          >
-            성과 미리보기
-          </span>
-        </button>
-        <button
+          성과 미리보기
+        </TextButton>
+        <IconButton
           type="button"
-          onClick={onPrevDay}
+          variant="text_neutral"
+          size="small"
           aria-label="이전 날짜"
-          className="flex size-8 shrink-0 items-center justify-center rounded-md"
-        >
-          <img src={arrowLeftIcon} alt="" className="size-6 shrink-0" />
-        </button>
-        <button
+          onClick={onPrevDay}
+          icon={<ArrowLeftIcon aria-hidden className="size-6" />}
+        />
+        <TextButton type="button" variant="text_neutral" size="medium" onClick={onToday}>
+          오늘
+        </TextButton>
+        <IconButton
           type="button"
-          onClick={onToday}
-          className="flex h-11 shrink-0 items-center gap-1 rounded-lg px-3"
-        >
-          <span className="font-['Pretendard'] text-base font-medium leading-[1.6] text-[#4d4d4d]">
-            오늘
-          </span>
-        </button>
-        <button
-          type="button"
-          onClick={onNextDay}
+          variant="text_neutral"
+          size="small"
           aria-label="다음 날짜"
-          className="flex size-8 shrink-0 items-center justify-center rounded-md"
-        >
-          <img src={arrowRightIcon} alt="" className="size-6 shrink-0" />
-        </button>
-        {/* 캘린더 클릭 로직 구현 필요 */}
-        <button
+          onClick={onNextDay}
+          icon={<ArrowRightIcon aria-hidden className="size-6" />}
+        />
+        {/* 캘린더 선택 UI 구현 필요 */}
+        <IconButton
           type="button"
-          className="flex size-8 shrink-0 items-center justify-center rounded-md"
-        >
-          <img src={calendarIcon} alt="" className="size-6 shrink-0" />
-        </button>
+          variant="text_neutral"
+          size="small"
+          aria-label="캘린더 열기"
+          icon={<CalendarIcon aria-hidden className="size-6" />}
+        />
       </div>
     </div>
   )

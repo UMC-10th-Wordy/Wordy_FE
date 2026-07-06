@@ -7,15 +7,15 @@ interface ProjectTagProps {
 }
 
 const COLOR_CLASS_MAP: Record<ProjectTagColor, string> = {
-  black: 'bg-[#f0f0f0] text-[#4d4d4d]',
-  red: 'bg-[#ffe9ec] text-[#ff3f55]',
-  orange: 'bg-[#ffede6] text-[#ff6d38]',
-  yellow: 'bg-[#fff5dd] text-[#f7ad00]',
-  green: 'bg-[#dcffe8] text-[#14c369]',
-  blue: 'bg-[#e6f6ff] text-[#2d96ff]',
-  navy: 'bg-[#f4f4ff] text-[#5d5df1]',
-  pink: 'bg-[#ffeffb] text-[#ff5fd7]',
-  brown: 'bg-[#f8efef] text-[#a77979]',
+  black: 'bg-(--color-tag-black-bg) text-(--color-tag-black-text)',
+  red: 'bg-(--color-tag-red-bg) text-(--color-tag-red-text)',
+  orange: 'bg-(--color-tag-orange-bg) text-(--color-tag-orange-text)',
+  yellow: 'bg-(--color-tag-yellow-bg) text-(--color-tag-yellow-text)',
+  green: 'bg-(--color-tag-green-bg) text-(--color-tag-green-text)',
+  blue: 'bg-(--color-tag-blue-bg) text-(--color-tag-blue-text)',
+  navy: 'bg-(--color-bg-brand-light) text-(--color-text-brand)',
+  pink: 'bg-(--color-tag-pink-bg) text-(--color-tag-pink-text)',
+  brown: 'bg-(--color-tag-brown-bg) text-(--color-tag-brown-text)',
 }
 
 export default function ProjectTag({ label, color }: ProjectTagProps) {
@@ -23,7 +23,7 @@ export default function ProjectTag({ label, color }: ProjectTagProps) {
     <div
       className={`flex shrink-0 items-center justify-center rounded-lg px-2 py-1 ${COLOR_CLASS_MAP[color]}`}
     >
-      <span className="font-['Pretendard'] text-base font-semibold leading-[1.6] whitespace-nowrap">
+      <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-semibold whitespace-nowrap">
         {label}
       </span>
     </div>
