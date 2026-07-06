@@ -1,14 +1,14 @@
 @layer base {
   :root {
     /* Font Size */
-    --font-size-heading-4: 48px;
-    --font-size-heading-3: 32px;
-    --font-size-heading-2: 28px;
-    --font-size-heading-1: 24px;
-    --font-size-body-4: 20px;
-    --font-size-body-3: 18px;
-    --font-size-body-2: 16px;
-    --font-size-body-1: 14px;
+    --font-size-heading-1: 48px;
+    --font-size-heading-2: 32px;
+    --font-size-heading-3: 28px;
+    --font-size-heading-4: 24px;
+    --font-size-body-1: 20px;
+    --font-size-body-2: 18px;
+    --font-size-body-3: 16px;
+    --font-size-body-4: 14px;
     --font-size-caption-1: 12px;
 
     /* Line Height */
