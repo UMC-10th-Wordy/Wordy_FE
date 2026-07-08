@@ -80,8 +80,9 @@ export default function PrioritySelect({ value, onChange }: PrioritySelectProps)
           aria-label="우선순위 선택"
         >
           {PRIORITY_OPTIONS.map((option) => (
-            <label
+            <div
               key={option.value}
+              onClick={() => handleSelect(option.value)}
               className="flex w-full cursor-pointer flex-col items-start rounded-md p-1 hover:bg-(--color-bg-tertiary)"
             >
               <div className="flex w-full items-center gap-2">
@@ -99,7 +100,7 @@ export default function PrioritySelect({ value, onChange }: PrioritySelectProps)
                   {option.description}
                 </span>
               </div>
-            </label>
+            </div>
           ))}
         </div>
       )}

@@ -1,11 +1,5 @@
-import TodoListPage from './pages/TodoListPage'
-
 function App() {
-  return (
-    <div>
-      <TodoListPage />
-    </div>
-  )
+  return <div></div>
 }
 
 export default App

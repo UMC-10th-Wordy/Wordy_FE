@@ -20,6 +20,7 @@ interface UseVerticalDragReorderOptions {
 const DRAG_START_THRESHOLD = 4
 
 export function useVerticalDragReorder({ onDrop }: UseVerticalDragReorderOptions) {
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dragHeight, setDragHeight] = useState(42)
   const [pointerY, setPointerY] = useState<number | null>(null)
@@ -28,11 +29,12 @@ export function useVerticalDragReorder({ onDrop }: UseVerticalDragReorderOptions
     insertAfter: false,
   })
   const overInfoRef = useRef(overInfo)
-  const draggingIdRef = useRef<string | null>(null)
+  const onDropRef = useRef(onDrop)
   useEffect(() => {
     overInfoRef.current = overInfo
-    draggingIdRef.current = draggingId
+    onDropRef.current = onDrop
   })
+  const activeIdRef = useRef<string | null>(null)
   const rowsSnapshotRef = useRef<RowSnapshot[]>([])
   const startYRef = useRef<number | null>(null)
   const hasPassedThresholdRef = useRef(false)
@@ -55,23 +57,25 @@ export function useVerticalDragReorder({ onDrop }: UseVerticalDragReorderOptions
     const measuredHeight = draggedRow?.getBoundingClientRect().height
     setDragHeight(measuredHeight && measuredHeight > 0 ? measuredHeight : 42)
     setOverInfo({ itemId: null, insertAfter: false })
-    setPointerY(event.clientY)
     startYRef.current = event.clientY
     hasPassedThresholdRef.current = false
-    setDraggingId(id)
+    activeIdRef.current = id
+    setSessionId(id)
   }
 
   useEffect(() => {
-    if (!draggingId) return
+    if (!sessionId) return
 
     const handleMouseMove = (event: MouseEvent) => {
-      setPointerY(event.clientY)
-
       if (!hasPassedThresholdRef.current) {
         const startY = startYRef.current
         if (startY !== null && Math.abs(event.clientY - startY) < DRAG_START_THRESHOLD) return
         hasPassedThresholdRef.current = true
+        /* 임계값 통과 후 드래그 상태 켜기 - coderabbit수정 */
+        setDraggingId(activeIdRef.current)
       }
+
+      setPointerY(event.clientY)
 
       let closest: RowSnapshot | null = null
       let closestDistance = Infinity
@@ -97,11 +101,12 @@ export function useVerticalDragReorder({ onDrop }: UseVerticalDragReorderOptions
     }
 
     const handleMouseUp = () => {
-      const finishedId = draggingIdRef.current
+      const finishedId = activeIdRef.current
       const finalOver = overInfoRef.current
       if (finishedId && hasPassedThresholdRef.current) {
-        onDrop(finishedId, finalOver)
+        onDropRef.current(finishedId, finalOver)
       }
+      setSessionId(null)
       setDraggingId(null)
       setOverInfo({ itemId: null, insertAfter: false })
       setPointerY(null)
@@ -113,7 +118,7 @@ export function useVerticalDragReorder({ onDrop }: UseVerticalDragReorderOptions
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [draggingId, onDrop])
+  }, [sessionId])
 
   return { draggingId, dragHeight, overInfo, pointerY, startDrag }
 }

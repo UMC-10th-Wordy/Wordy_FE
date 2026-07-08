@@ -81,6 +81,7 @@ function findClosestRowInSection(
 }
 
 export function useDragReorder({ onDrop }: UseDragReorderOptions) {
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dragHeight, setDragHeight] = useState(160)
   const [pointer, setPointer] = useState<DragPointer | null>(null)
@@ -90,11 +91,12 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
     sectionKey: null,
   })
   const overInfoRef = useRef(overInfo)
-  const draggingIdRef = useRef<string | null>(null)
+  const onDropRef = useRef(onDrop)
   useEffect(() => {
     overInfoRef.current = overInfo
-    draggingIdRef.current = draggingId
+    onDropRef.current = onDrop
   })
+  const activeIdRef = useRef<string | null>(null)
   const rowsSnapshotRef = useRef<RowSnapshot[]>([])
   const sectionsSnapshotRef = useRef<SectionSnapshot[]>([])
   const startPointRef = useRef<DragPointer | null>(null)
@@ -124,18 +126,16 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
     const measuredHeight = draggedRow?.getBoundingClientRect().height
     setDragHeight(measuredHeight && measuredHeight > 0 ? measuredHeight : 160)
     setOverInfo({ itemId: null, insertAfter: false, sectionKey: null })
-    setPointer({ x: event.clientX, y: event.clientY })
     startPointRef.current = { x: event.clientX, y: event.clientY }
     hasPassedThresholdRef.current = false
-    setDraggingId(id)
+    activeIdRef.current = id
+    setSessionId(id)
   }
 
   useEffect(() => {
-    if (!draggingId) return
+    if (!sessionId) return
 
     const handleMouseMove = (event: MouseEvent) => {
-      setPointer({ x: event.clientX, y: event.clientY })
-
       if (!hasPassedThresholdRef.current) {
         const start = startPointRef.current
         if (start) {
@@ -144,7 +144,11 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
           if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD) return
         }
         hasPassedThresholdRef.current = true
+        /* 임계값 통과 후 드래그 상태 켜기 - coderabbit수정 */
+        setDraggingId(activeIdRef.current)
       }
+
+      setPointer({ x: event.clientX, y: event.clientY })
 
       const section = findSection(sectionsSnapshotRef.current, event.clientX, event.clientY)
       if (!section) {
@@ -183,11 +187,12 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
     }
 
     const handleMouseUp = () => {
-      const finishedId = draggingIdRef.current
+      const finishedId = activeIdRef.current
       const finalOver = overInfoRef.current
       if (finishedId && hasPassedThresholdRef.current && finalOver.sectionKey) {
-        onDrop(finishedId, finalOver)
+        onDropRef.current(finishedId, finalOver)
       }
+      setSessionId(null)
       setDraggingId(null)
       setOverInfo({ itemId: null, insertAfter: false, sectionKey: null })
       setPointer(null)
@@ -199,7 +204,7 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [draggingId, onDrop])
+  }, [sessionId])
 
   return { draggingId, dragHeight, overInfo, pointer, startDrag }
 }
