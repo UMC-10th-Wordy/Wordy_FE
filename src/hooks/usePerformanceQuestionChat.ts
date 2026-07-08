@@ -181,9 +181,9 @@ export const usePerformanceQuestionChat = ({
     isWordyTyping,
     isFinished,
     latestQuestionMessageId,
-    handleChangeAnswer,
-    handleSubmitAnswer,
-    handleSkipQuestion,
+    onChangeAnswer: handleChangeAnswer,
+    onSubmitAnswer: handleSubmitAnswer,
+    onSkipQuestion: handleSkipQuestion,
     resetQuestionChat,
   }
 }
