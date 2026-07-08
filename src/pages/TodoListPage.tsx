@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import TaskForm from '@/components/todo/TaskForm'
 import TaskCard from '@/components/todo/TaskCard'
 import TodoTabs from '@/components/todo/TodoTabs'
@@ -7,7 +7,16 @@ import DateHeader from '@/components/header/DateHeader'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { Input2 } from '@/components/common/Input/Input2'
-import type { Task, TodoFilter, TodoFilterCounts } from '@/types/todo'
+import { useDragReorder, type DragOverInfo } from '@/hooks/useDragReorder'
+import { useFlipAnimation } from '@/hooks/useFlipAnimation'
+import ProjectTag from '@/components/todo/ProjectTag'
+import type {
+  Task,
+  TaskDraftValues,
+  TaskPriority,
+  TodoFilter,
+  TodoFilterCounts,
+} from '@/types/todo'
 import ErrorIcon from '@/assets/icons/error.svg?react'
 import GenerateIcon from '@/assets/icons/generate.svg?react'
 import FailIcon from '@/assets/icons/fail.svg?react'
@@ -16,9 +25,60 @@ import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
 
 const MEMO_SAMPLE = '지난 분기 OKR 정리 / 디자인 시스템 V_2 진행 현황 슬라이드 1장'
 
-const mustDoTasks: Task[] = []
+function splitIntoColumns<T>(items: T[]): [T[], T[]] {
+  const left: T[] = []
+  const right: T[] = []
+  items.forEach((item, index) => {
+    if (index % 2 === 0) {
+      left.push(item)
+    } else {
+      right.push(item)
+    }
+  })
+  return [left, right]
+}
 
-const shouldDoTasks: Task[] = [
+type PreviewEntry = { kind: 'task'; task: Task } | { kind: 'placeholder' }
+
+/* 지금 커서가 올라가 있는 구역에만 빈 자리 만들기 */
+function buildSectionPreview(
+  sectionTasks: Task[],
+  sectionKey: TaskPriority,
+  draggingTask: Task | null,
+  overInfo: DragOverInfo,
+): PreviewEntry[] {
+  if (!draggingTask) {
+    return sectionTasks.map((task) => ({ kind: 'task', task }))
+  }
+
+  const entries: PreviewEntry[] = sectionTasks
+    .filter((task) => task.id !== draggingTask.id)
+    .map((task) => ({ kind: 'task', task }))
+
+  if (overInfo.sectionKey !== sectionKey) {
+    return entries
+  }
+
+  if (overInfo.itemId) {
+    const targetIndex = entries.findIndex(
+      (entry) => entry.kind === 'task' && entry.task.id === overInfo.itemId,
+    )
+    if (targetIndex === -1) {
+      entries.push({ kind: 'placeholder' })
+    } else {
+      entries.splice(overInfo.insertAfter ? targetIndex + 1 : targetIndex, 0, {
+        kind: 'placeholder',
+      })
+    }
+  } else {
+    entries.push({ kind: 'placeholder' })
+  }
+
+  return entries
+}
+
+/* 더미 데이터 */
+const INITIAL_TASKS: Task[] = [
   {
     id: 'should-1',
     title: 'Product Strategy Alignment 회의 준비',
@@ -26,9 +86,6 @@ const shouldDoTasks: Task[] = [
     priority: 'should',
     isCompleted: false,
   },
-]
-
-const couldDoTasks: Task[] = [
   {
     id: 'could-1',
     title: 'Product Strategy Alignment 회의 준비',
@@ -55,15 +112,100 @@ const couldDoTasks: Task[] = [
   },
 ]
 
-const incompleteTaskCount = mustDoTasks.length + shouldDoTasks.length + couldDoTasks.length
-
 export default function TodoListPage() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<TodoFilter>('incomplete')
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
+  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
+  const taskListRef = useRef<HTMLDivElement>(null)
+
+  const incompleteTasks = tasks.filter((task) => !task.isCompleted)
+  const mustDoTasks = incompleteTasks.filter((task) => task.priority === 'must')
+  const shouldDoTasks = incompleteTasks.filter((task) => task.priority === 'should')
+  const couldDoTasks = incompleteTasks.filter((task) => task.priority === 'could')
+  const incompleteTaskCount = incompleteTasks.length
 
   const filterCounts: TodoFilterCounts = { completed: 2, incomplete: incompleteTaskCount }
+
+  const handleAddTask = (values: TaskDraftValues) => {
+    const newTask: Task = {
+      id: crypto.randomUUID(),
+      title: values.title,
+      memo: values.memo,
+      tag: values.tag,
+      priority: values.priority,
+      isCompleted: false,
+    }
+    setTasks((prev) => [...prev, newTask])
+    setIsTaskFormOpen(false)
+  }
+
+  const handleDeleteTask = (id: string) => {
+    setTasks((prev) => prev.filter((task) => task.id !== id))
+  }
+
+  const handleEditTask = (id: string, values: TaskDraftValues) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              title: values.title,
+              memo: values.memo,
+              tag: values.tag,
+              priority: values.priority,
+            }
+          : task,
+      ),
+    )
+  }
+
+  const handleTaskDrop = (draggedId: string, over: DragOverInfo) => {
+    if (!over.sectionKey) return
+    const targetPriority = over.sectionKey as TaskPriority
+
+    setTasks((prev) => {
+      const draggedTask = prev.find((task) => task.id === draggedId)
+      if (!draggedTask) return prev
+
+      const rest = prev.filter((task) => task.id !== draggedId)
+      const movedTask: Task = { ...draggedTask, priority: targetPriority }
+
+      if (over.itemId) {
+        const targetIndex = rest.findIndex((task) => task.id === over.itemId)
+        if (targetIndex === -1) {
+          rest.push(movedTask)
+        } else {
+          rest.splice(over.insertAfter ? targetIndex + 1 : targetIndex, 0, movedTask)
+        }
+        return rest
+      }
+
+      let insertAt = rest.length
+      for (let i = rest.length - 1; i >= 0; i -= 1) {
+        if (rest[i].priority === targetPriority) {
+          insertAt = i + 1
+          break
+        }
+      }
+      rest.splice(insertAt, 0, movedTask)
+      return rest
+    })
+  }
+
+  const { draggingId, dragHeight, overInfo, pointer, startDrag } = useDragReorder({
+    onDrop: handleTaskDrop,
+  })
+  const draggingTask = draggingId ? (tasks.find((task) => task.id === draggingId) ?? null) : null
+
+  useFlipAnimation(taskListRef, [
+    tasks,
+    draggingId,
+    overInfo.itemId,
+    overInfo.insertAfter,
+    overInfo.sectionKey,
+  ])
 
   const shiftDate = (days: number) => {
     setCurrentDate((prev) => {
@@ -74,6 +216,74 @@ export default function TodoListPage() {
   }
 
   const goToToday = () => setCurrentDate(new Date())
+
+  const renderPreviewEntry = (entry: PreviewEntry) => {
+    if (entry.kind === 'placeholder') {
+      return (
+        <div
+          key="__placeholder__"
+          data-flip-id="__placeholder__"
+          style={{ height: dragHeight }}
+          className="w-full shrink-0 rounded-lg bg-(--color-bg-tertiary)"
+          aria-hidden
+        />
+      )
+    }
+
+    const { task } = entry
+    return (
+      <div
+        key={task.id}
+        data-flip-id={task.id}
+        data-drag-row="true"
+        data-drag-id={task.id}
+        data-drag-section={task.priority}
+      >
+        <TaskCard
+          task={task}
+          onHandleMouseDown={startDrag(task.id)}
+          onDelete={() => handleDeleteTask(task.id)}
+          onEdit={(values) => handleEditTask(task.id, values)}
+        />
+      </div>
+    )
+  }
+
+  const renderPrioritySection = (
+    priorityKey: TaskPriority,
+    title: string,
+    description: string,
+    sectionTasks: Task[],
+  ) => {
+    const previewEntries = buildSectionPreview(sectionTasks, priorityKey, draggingTask, overInfo)
+    const [leftColumn, rightColumn] = splitIntoColumns(previewEntries)
+    return (
+      <div className="flex w-full flex-col gap-2">
+        <div>
+          <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-semibold text-(--color-text-brand)">
+            {title}
+          </p>
+          <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
+            {description}
+          </p>
+        </div>
+        <div className="flex w-full flex-wrap items-start gap-4">
+          <div
+            className="flex min-h-2 min-w-[718px] flex-1 flex-col gap-4"
+            data-drag-section-drop={priorityKey}
+          >
+            {leftColumn.map(renderPreviewEntry)}
+          </div>
+          <div
+            className="flex min-h-2 min-w-[718px] flex-1 flex-col gap-4"
+            data-drag-section-drop={priorityKey}
+          >
+            {rightColumn.map(renderPreviewEntry)}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-screen w-full items-start bg-(--color-bg-default)">
@@ -105,14 +315,14 @@ export default function TodoListPage() {
                   aria-label="업무 추가"
                   aria-expanded={isTaskFormOpen}
                   onClick={() => setIsTaskFormOpen((prev) => !prev)}
-                  icon={<PlusIcon aria-hidden className="size-8 text-(--color-icon-secondary)" />}
+                  icon={<PlusIcon aria-hidden className="size-8 text-(--color-icon-brand)" />}
                 />
               </div>
               <TodoTabs activeTab={activeTab} counts={filterCounts} onChange={setActiveTab} />
             </div>
 
             {activeTab === 'incomplete' ? (
-              incompleteTaskCount === 0 && !isTaskFormOpen ? (
+              incompleteTaskCount === 0 && !isTaskFormOpen && !draggingId ? (
                 /* 미완료 업무 없음 */
                 <div className="flex h-[180px] w-full flex-col items-center justify-center gap-1 py-10">
                   <FailIcon aria-hidden className="size-8 shrink-0 text-(--color-icon-brand)" />
@@ -121,72 +331,23 @@ export default function TodoListPage() {
                   </p>
                 </div>
               ) : (
-                <div className="flex w-full flex-col gap-8">
-                  {isTaskFormOpen && <TaskForm onCancel={() => setIsTaskFormOpen(false)} />}
-
-                  <div className="flex w-full flex-col gap-2">
-                    <div>
-                      <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-semibold text-(--color-text-brand)">
-                        Must do
-                      </p>
-                      <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
-                        반드시 오늘 끝낼 거예요
-                      </p>
-                    </div>
-                    {mustDoTasks.length > 0 && (
-                      <div className="flex w-full flex-wrap items-start gap-4">
-                        {mustDoTasks.map((task) => (
-                          <div key={task.id} className="min-w-[718px] flex-1">
-                            <TaskCard task={task} />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {shouldDoTasks.length > 0 && (
-                    <div className="flex w-full flex-col gap-2">
-                      <div>
-                        <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-semibold text-(--color-text-brand)">
-                          Should do
-                        </p>
-                        <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
-                          가능하면 오늘 완료할 거예요
-                        </p>
-                      </div>
-                      <div className="flex w-full flex-wrap items-start gap-4">
-                        {shouldDoTasks.map((task) => (
-                          <div key={task.id} className="min-w-[718px] flex-1">
-                            <TaskCard task={task} />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                <div ref={taskListRef} className="flex w-full flex-col gap-8">
+                  {isTaskFormOpen && (
+                    <TaskForm onCancel={() => setIsTaskFormOpen(false)} onSubmit={handleAddTask} />
                   )}
 
-                  {couldDoTasks.length > 0 && (
-                    <div className="flex w-full flex-col gap-2">
-                      <div>
-                        <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-semibold text-(--color-text-brand)">
-                          Could do
-                        </p>
-                        <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
-                          여유가 있으면 진행할 거예요
-                        </p>
-                      </div>
-                      <div className="flex w-full flex-wrap items-start gap-4">
-                        <div className="flex min-w-[718px] flex-1 flex-col gap-4">
-                          {couldDoTasks.slice(0, 2).map((task) => (
-                            <TaskCard key={task.id} task={task} />
-                          ))}
-                        </div>
-                        <div className="min-w-[718px] flex-1">
-                          {couldDoTasks.slice(2).map((task) => (
-                            <TaskCard key={task.id} task={task} />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                  {renderPrioritySection('must', 'Must do', '반드시 오늘 끝낼 거예요', mustDoTasks)}
+                  {renderPrioritySection(
+                    'should',
+                    'Should do',
+                    '가능하면 오늘 완료할 거예요',
+                    shouldDoTasks,
+                  )}
+                  {renderPrioritySection(
+                    'could',
+                    'Could do',
+                    '여유가 있으면 진행할 거예요',
+                    couldDoTasks,
                   )}
                 </div>
               )
@@ -271,6 +432,20 @@ export default function TodoListPage() {
       </main>
 
       {isPreviewOpen && <PerformancePreviewPanel />}
+
+      {draggingTask && pointer && (
+        <div
+          style={{ position: 'fixed', top: pointer.y, left: pointer.x }}
+          className="pointer-events-none z-50 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-lg border border-(--color-border-brand-subtle) bg-(--color-bg-default) px-4 py-3 opacity-90 shadow-[0px_4px_16px_0px_rgba(0,0,0,0.2)]"
+        >
+          {draggingTask.tag && (
+            <ProjectTag label={draggingTask.tag.label} color={draggingTask.tag.color} />
+          )}
+          <span className="max-w-[240px] truncate [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-semibold text-(--color-text-default)">
+            {draggingTask.title}
+          </span>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,9 +1,12 @@
+import type { ReactNode } from 'react'
+
 export type ProjectTagColor =
   'black' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'navy' | 'pink' | 'brown'
 
 interface ProjectTagProps {
   label: string
   color: ProjectTagColor
+  trailingIcon?: ReactNode
 }
 
 const COLOR_CLASS_MAP: Record<ProjectTagColor, string> = {
@@ -18,14 +21,15 @@ const COLOR_CLASS_MAP: Record<ProjectTagColor, string> = {
   brown: 'bg-(--color-tag-brown-bg) text-(--color-tag-brown-text)',
 }
 
-export default function ProjectTag({ label, color }: ProjectTagProps) {
+export default function ProjectTag({ label, color, trailingIcon }: ProjectTagProps) {
   return (
     <div
-      className={`flex shrink-0 items-center justify-center rounded-lg px-2 py-1 ${COLOR_CLASS_MAP[color]}`}
+      className={`flex shrink-0 items-center justify-center gap-1 rounded-lg px-2 py-1 ${COLOR_CLASS_MAP[color]}`}
     >
       <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-semibold whitespace-nowrap">
         {label}
       </span>
+      {trailingIcon}
     </div>
   )
 }

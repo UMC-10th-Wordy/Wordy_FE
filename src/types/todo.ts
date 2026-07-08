@@ -18,12 +18,12 @@ export interface Task {
   isCompleted: boolean
 }
 
-/* 업무 추가 폼 입력 값 (TaskForm이 다루는 데이터) */
-export interface TaskFormValues {
-  priority: TaskPriority | null
-  projectTagId: string | null
+/* 업무 추가/수정 시 실제로 저장되는 값 (TaskForm, TaskCard 수정 모드가 공통으로 사용) */
+export interface TaskDraftValues {
+  priority: TaskPriority
+  tag?: TaskTag
   title: string
-  memo: string
+  memo?: string
 }
 
 /* 오늘의 업무 완료/미완료 탭 상태 */
