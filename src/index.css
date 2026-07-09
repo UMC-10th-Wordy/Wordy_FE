@@ -9,5 +9,7 @@
 @layer base {
   body {
     font-family: 'Pretendard Variable', Pretendard, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
