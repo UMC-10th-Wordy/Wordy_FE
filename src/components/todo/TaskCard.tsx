@@ -21,9 +21,16 @@ interface TaskCardProps {
   onDelete?: () => void
   onEdit?: (values: TaskDraftValues) => void
   onHandleMouseDown?: (event: MouseEvent<HTMLButtonElement>) => void
+  onToggleComplete?: () => void
 }
 
-export default function TaskCard({ task, onDelete, onEdit, onHandleMouseDown }: TaskCardProps) {
+export default function TaskCard({
+  task,
+  onDelete,
+  onEdit,
+  onHandleMouseDown,
+  onToggleComplete,
+}: TaskCardProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -32,7 +39,6 @@ export default function TaskCard({ task, onDelete, onEdit, onHandleMouseDown }: 
   const [draftTitle, setDraftTitle] = useState(task.title)
   const [draftMemo, setDraftMemo] = useState(task.memo ?? '')
 
-  /* 하나라도 수정되면 활성화 */
   const isDirty =
     draftPriority !== task.priority ||
     (draftTag?.label ?? null) !== (task.tag?.label ?? null) ||
@@ -119,7 +125,7 @@ export default function TaskCard({ task, onDelete, onEdit, onHandleMouseDown }: 
       ) : (
         <>
           {/* 드래그 핸들 / 체크박스 / 프로젝트 태그 / 업무명 */}
-          <div className="flex w-full items-center gap-2">
+          <div className="flex w-full items-start gap-2">
             <div className="flex min-w-0 flex-1 items-start gap-[9px]">
               <div className="flex shrink-0 items-center gap-[9px]">
                 <button
@@ -130,7 +136,11 @@ export default function TaskCard({ task, onDelete, onEdit, onHandleMouseDown }: 
                 >
                   <MoveIcon aria-hidden className="size-6 shrink-0" />
                 </button>
-                <Checkbox aria-label="업무 완료 여부" defaultChecked={task.isCompleted} />
+                <Checkbox
+                  aria-label="업무 완료 여부"
+                  checked={task.isCompleted}
+                  onChange={onToggleComplete}
+                />
                 {task.tag && <ProjectTag label={task.tag.label} color={task.tag.color} />}
               </div>
               <p className="min-w-0 flex-1 [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-semibold text-(--color-text-default)">
@@ -187,21 +197,32 @@ export default function TaskCard({ task, onDelete, onEdit, onHandleMouseDown }: 
                 </div>
               )}
 
-              {/* 업무 결과 작성하기 */}
-              <TextButton
-                type="button"
-                variant="text_only"
-                size="medium"
-                iconLeft={<PlusIcon aria-hidden className="size-7" />}
-              >
-                업무 결과 작성하기
-              </TextButton>
+              {/* 업무 결과 - 완료된 업무에서만 노출 */}
+              {task.isCompleted &&
+                (task.result ? (
+                  <div className="flex w-full flex-col items-start gap-1">
+                    <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
+                      업무 결과
+                    </p>
+                    <p className="w-full [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)">
+                      {task.result}
+                    </p>
+                  </div>
+                ) : (
+                  <TextButton
+                    type="button"
+                    variant="text_only"
+                    size="medium"
+                    iconLeft={<PlusIcon aria-hidden className="size-7" />}
+                  >
+                    업무 결과 작성하기
+                  </TextButton>
+                ))}
             </>
           )}
         </>
       )}
 
-      {/* 삭제 확인 #000000 opacity 15% */}
       {isDeleteConfirmOpen && (
         <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-(--color-bg-overlay)">
           <div className="flex flex-col items-center gap-5 rounded-(--scale-12) bg-(--color-bg-default) px-8 py-5 shadow-[0px_1px_7.5px_0px_rgba(0,0,0,0.1)]">

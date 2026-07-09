@@ -7,8 +7,10 @@ import DateHeader from '@/components/header/DateHeader'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { Input2 } from '@/components/common/Input/Input2'
+import { ToastViewport } from '@/components/todo/ToastViewport'
 import { useDragReorder, type DragOverInfo } from '@/hooks/useDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
+import { useToastQueue } from '@/hooks/useToastQueue'
 import ProjectTag from '@/components/todo/ProjectTag'
 import type {
   Task,
@@ -40,7 +42,6 @@ function splitIntoColumns<T>(items: T[]): [T[], T[]] {
 
 type PreviewEntry = { kind: 'task'; task: Task } | { kind: 'placeholder' }
 
-/* 지금 커서가 올라가 있는 구역에만 빈 자리 만들기 */
 function buildSectionPreview(
   sectionTasks: Task[],
   sectionKey: TaskPriority,
@@ -119,14 +120,19 @@ export default function TodoListPage() {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
   const taskListRef = useRef<HTMLDivElement>(null)
+  const { toasts, showToast } = useToastQueue()
 
+  const completedTasks = tasks.filter((task) => task.isCompleted)
   const incompleteTasks = tasks.filter((task) => !task.isCompleted)
-  const mustDoTasks = incompleteTasks.filter((task) => task.priority === 'must')
-  const shouldDoTasks = incompleteTasks.filter((task) => task.priority === 'should')
-  const couldDoTasks = incompleteTasks.filter((task) => task.priority === 'could')
-  const incompleteTaskCount = incompleteTasks.length
+  const activeTasks = activeTab === 'completed' ? completedTasks : incompleteTasks
+  const mustDoTasks = activeTasks.filter((task) => task.priority === 'must')
+  const shouldDoTasks = activeTasks.filter((task) => task.priority === 'should')
+  const couldDoTasks = activeTasks.filter((task) => task.priority === 'could')
 
-  const filterCounts: TodoFilterCounts = { completed: 2, incomplete: incompleteTaskCount }
+  const filterCounts: TodoFilterCounts = {
+    completed: completedTasks.length,
+    incomplete: incompleteTasks.length,
+  }
 
   const handleAddTask = (values: TaskDraftValues) => {
     const newTask: Task = {
@@ -135,7 +141,7 @@ export default function TodoListPage() {
       memo: values.memo,
       tag: values.tag,
       priority: values.priority,
-      isCompleted: false,
+      isCompleted: activeTab === 'completed',
     }
     setTasks((prev) => [...prev, newTask])
     setIsTaskFormOpen(false)
@@ -159,6 +165,17 @@ export default function TodoListPage() {
           : task,
       ),
     )
+  }
+
+  const handleToggleComplete = (id: string) => {
+    const target = tasks.find((task) => task.id === id)
+    if (!target) return
+    const nextCompleted = !target.isCompleted
+
+    setTasks((prev) =>
+      prev.map((task) => (task.id === id ? { ...task, isCompleted: nextCompleted } : task)),
+    )
+    showToast(nextCompleted ? '완료 업무로 이동되었어요.' : '미완료 업무로 이동되었어요.')
   }
 
   const handleTaskDrop = (draggedId: string, over: DragOverInfo) => {
@@ -201,6 +218,7 @@ export default function TodoListPage() {
 
   useFlipAnimation(taskListRef, [
     tasks,
+    activeTab,
     draggingId,
     overInfo.itemId,
     overInfo.insertAfter,
@@ -244,6 +262,7 @@ export default function TodoListPage() {
           onHandleMouseDown={startDrag(task.id)}
           onDelete={() => handleDeleteTask(task.id)}
           onEdit={(values) => handleEditTask(task.id, values)}
+          onToggleComplete={() => handleToggleComplete(task.id)}
         />
       </div>
     )
@@ -285,6 +304,9 @@ export default function TodoListPage() {
     )
   }
 
+  const hasAnyTaskEverToday = tasks.length > 0
+  const isActiveTabEmpty = activeTasks.length === 0
+
   return (
     <div className="flex h-screen w-full items-start bg-(--color-bg-default)">
       {/* 공통 Sidebar 컴포넌트로 교체 예정 */}
@@ -321,21 +343,26 @@ export default function TodoListPage() {
               <TodoTabs activeTab={activeTab} counts={filterCounts} onChange={setActiveTab} />
             </div>
 
-            {activeTab === 'incomplete' ? (
-              incompleteTaskCount === 0 && !isTaskFormOpen && !draggingId ? (
-                /* 미완료 업무 없음 */
-                <div className="flex h-[180px] w-full flex-col items-center justify-center gap-1 py-10">
-                  <FailIcon aria-hidden className="size-8 shrink-0 text-(--color-icon-brand)" />
-                  <p className="w-[504px] text-center [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
-                    오늘의 업무를 모두 완료했어요
-                  </p>
-                </div>
-              ) : (
-                <div ref={taskListRef} className="flex w-full flex-col gap-8">
-                  {isTaskFormOpen && (
-                    <TaskForm onCancel={() => setIsTaskFormOpen(false)} onSubmit={handleAddTask} />
-                  )}
+            <div ref={taskListRef} className="flex w-full flex-col gap-8">
+              {isTaskFormOpen && (
+                <TaskForm onCancel={() => setIsTaskFormOpen(false)} onSubmit={handleAddTask} />
+              )}
 
+              {isActiveTabEmpty ? (
+                !isTaskFormOpen && (
+                  <div className="flex h-[180px] w-full flex-col items-center justify-center gap-1 py-10">
+                    <FailIcon aria-hidden className="size-8 shrink-0 text-(--color-icon-brand)" />
+                    <p className="w-[504px] text-center [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
+                      {!hasAnyTaskEverToday
+                        ? '오늘의 업무를 시작해 볼까요?'
+                        : activeTab === 'incomplete'
+                          ? '오늘의 업무를 모두 완료했어요'
+                          : '오늘 완료한 업무가 없어요'}
+                    </p>
+                  </div>
+                )
+              ) : (
+                <>
                   {renderPrioritySection('must', 'Must do', '반드시 오늘 끝낼 거예요', mustDoTasks)}
                   {renderPrioritySection(
                     'should',
@@ -349,18 +376,9 @@ export default function TodoListPage() {
                     '여유가 있으면 진행할 거예요',
                     couldDoTasks,
                   )}
-                </div>
-              )
-            ) : (
-              <div className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-(--color-border-subtle) px-5 py-10">
-                <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
-                  완료된 업무 화면
-                </p>
-                <p className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) font-normal text-(--color-text-disabled)">
-                  구현 예정
-                </p>
-              </div>
-            )}
+                </>
+              )}
+            </div>
           </section>
 
           <section className="flex w-full flex-col gap-3">
@@ -446,6 +464,8 @@ export default function TodoListPage() {
           </span>
         </div>
       )}
+
+      <ToastViewport toasts={toasts} />
     </div>
   )
 }

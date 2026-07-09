@@ -16,6 +16,8 @@ export interface Task {
   tag?: TaskTag
   priority: TaskPriority
   isCompleted: boolean
+  /* 완료된 업무에 기록된 업무 결과 / 없으면 버튼 */
+  result?: string
 }
 
 /* 업무 추가/수정 시 실제로 저장되는 값 (TaskForm, TaskCard 수정 모드가 공통으로 사용) */
