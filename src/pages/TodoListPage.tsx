@@ -173,7 +173,7 @@ export default function TodoListPage() {
     const nextCompleted = !target.isCompleted
 
     setTasks((prev) =>
-      prev.map((task) => (task.id === id ? { ...task, isCompleted: nextCompleted } : task)),
+      prev.map((task) => (task.id === id ? { ...task, isCompleted: !task.isCompleted } : task)),
     )
     showToast(nextCompleted ? '완료 업무로 이동되었어요.' : '미완료 업무로 이동되었어요.')
   }

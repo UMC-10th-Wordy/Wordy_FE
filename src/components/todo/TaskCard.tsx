@@ -139,7 +139,7 @@ export default function TaskCard({
                 <Checkbox
                   aria-label="업무 완료 여부"
                   checked={task.isCompleted}
-                  onChange={onToggleComplete}
+                  onChange={() => onToggleComplete?.()}
                 />
                 {task.tag && <ProjectTag label={task.tag.label} color={task.tag.color} />}
               </div>
