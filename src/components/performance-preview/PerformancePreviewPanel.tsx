@@ -1,14 +1,16 @@
+import { PerformancePreviewResult } from './PerformancePreviewResult'
 import { PerformanceQuestionChat } from './PerformanceQuestionChat'
 import { PerformanceStatusNotice } from './PerformanceStatusNotice'
 
 import type { PerformanceQuestionChatProps } from './PerformanceQuestionChat'
+import type { PerformancePreviewResultData } from '@/types/performancePreviewResult'
 
 import GenerateIcon from '@/assets/icons/generate.svg?react'
 import emptyImage from '@/assets/icons/Layer 2.svg'
 
-export type PerformancePreviewStatus = 'empty' | 'converting' | 'questioning' | 'failed'
+export type PerformancePreviewStatus = 'empty' | 'converting' | 'questioning' | 'failed' | 'success'
 
-type PerformanceNoticeStatus = Exclude<PerformancePreviewStatus, 'questioning'>
+type PerformanceNoticeStatus = Exclude<PerformancePreviewStatus, 'questioning' | 'success'>
 
 interface PerformancePreviewPanelBaseProps {
   status?: PerformanceNoticeStatus
@@ -19,8 +21,19 @@ interface PerformancePreviewPanelQuestioningProps {
   questionChat: PerformanceQuestionChatProps
 }
 
+interface PerformancePreviewPanelSuccessProps {
+  status: 'success'
+  result: {
+    data: PerformancePreviewResultData
+    onSave?: (values: { summary: string; insight: string }) => void
+    onMoveTaskToTomorrow?: (taskId: string) => void
+  }
+}
+
 type PerformancePreviewPanelProps =
-  PerformancePreviewPanelBaseProps | PerformancePreviewPanelQuestioningProps
+  | PerformancePreviewPanelBaseProps
+  | PerformancePreviewPanelQuestioningProps
+  | PerformancePreviewPanelSuccessProps
 
 const STATUS_CONTENT = {
   empty: {
@@ -46,9 +59,15 @@ const STATUS_CONTENT = {
 >
 
 export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => {
+  const isSuccess = props.status === 'success'
+
   const renderContent = () => {
     if (props.status === 'questioning') {
       return <PerformanceQuestionChat {...props.questionChat} />
+    }
+
+    if (props.status === 'success') {
+      return <PerformancePreviewResult {...props.result} />
     }
 
     const status = props.status ?? 'empty'
@@ -63,7 +82,14 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
 
   return (
     <aside className="order-2 flex h-screen basis-1/2 grow overflow-y-auto bg-(--color-bg-brand-subtle) p-(--scale-40)">
-      <section className="flex h-full w-full flex-col overflow-hidden rounded-(--scale-16) border-[1.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-24) py-(--scale-20) shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]">
+      <section
+        className={[
+          'flex w-full flex-col rounded-(--scale-16) border-[1.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-24) py-(--scale-20) shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]',
+          isSuccess ? 'min-h-full self-start' : 'h-full overflow-hidden',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
         <div className="flex shrink-0 items-center gap-(--scale-4)">
           <h2 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
             오늘의 성과 미리보기
@@ -75,7 +101,11 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
           />
         </div>
 
-        <div className="mt-(--scale-48) min-h-0 w-full flex-1">{renderContent()}</div>
+        <div
+          className={isSuccess ? 'mt-(--scale-48) w-full' : 'mt-(--scale-48) min-h-0 w-full flex-1'}
+        >
+          {renderContent()}
+        </div>
       </section>
     </aside>
   )
