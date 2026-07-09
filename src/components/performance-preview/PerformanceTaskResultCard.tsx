@@ -78,8 +78,8 @@ const ResultSection = ({ title, content, className = '' }: ResultSectionProps) =
       </h5>
 
       <ul className="mt-(--scale-8) flex flex-col gap-(--scale-8)">
-        {items.map((item) => (
-          <li key={item} className="flex items-start">
+        {items.map((item, index) => (
+          <li key={`${title}-${item}-${index}`} className="flex items-start">
             <span className="flex shrink-0 px-(--scale-8) py-[13px]">
               <span className="h-[3px] w-[3px] rounded-(--scale-1000) bg-(--color-icon-default)" />
             </span>

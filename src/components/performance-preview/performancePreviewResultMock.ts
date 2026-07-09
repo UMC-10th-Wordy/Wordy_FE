@@ -6,25 +6,13 @@ export const PERFORMANCE_PREVIEW_RESULT_MOCK: PerformancePreviewResultData = {
   completedTaskCount: 3,
   incompleteTasks: [
     {
-      id: 'should-1',
-      title: 'Product Strategy Alignment 회의 준비',
+      id: 'incomplete-should-1',
+      title: '온보딩 리뉴얼 회의 액션 아이템 정리',
       priority: 'should',
       tag: { label: '온보딩 리뉴얼', color: 'green' },
     },
     {
-      id: 'could-1',
-      title: 'Product Strategy Alignment 회의 준비',
-      priority: 'could',
-      tag: { label: '디자인 시스템 V2', color: 'pink' },
-    },
-    {
-      id: 'could-2',
-      title: 'Product Strategy Alignment 회의 준비',
-      priority: 'could',
-      tag: { label: '리서치', color: 'navy' },
-    },
-    {
-      id: 'could-3',
+      id: 'incomplete-could-1',
       title:
         '긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트',
       priority: 'could',
@@ -41,24 +29,25 @@ export const PERFORMANCE_PREVIEW_RESULT_MOCK: PerformancePreviewResultData = {
   ],
   taskResults: [
     {
-      id: 'result-should-1',
-      taskId: 'should-1',
+      id: 'result-completed-1',
+      taskId: 'completed-1',
       title: 'Product Strategy Alignment 회의 준비',
       tag: { label: '온보딩 리뉴얼', color: 'green' },
       output: ['회의 아젠다 및 논의 자료 초안', '회의 아젠다 및 논의 자료 초안2'],
       impact: '프로젝트 방향성 논의를 위한 기준 마련',
     },
     {
-      id: 'result-could-1',
-      taskId: 'could-1',
-      title: 'Product Strategy Alignment 회의 준비',
+      id: 'result-completed-2',
+      taskId: 'completed-2',
+      title: '디자인 시스템 V2 컴포넌트 상태 점검',
       tag: { label: '디자인 시스템 V2', color: 'pink' },
       impact: '팀 내 디자인 시스템 개선 범위 공유',
     },
     {
-      id: 'result-could-2',
-      taskId: 'could-2',
-      title: 'Product Strategy Alignment 회의 준비',
+      id: 'result-completed-3',
+      taskId: 'completed-3',
+      title: '사용자 리서치 결과 정리',
+      tag: { label: '리서치', color: 'navy' },
     },
   ],
 }

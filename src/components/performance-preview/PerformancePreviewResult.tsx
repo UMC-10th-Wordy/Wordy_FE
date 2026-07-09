@@ -137,8 +137,8 @@ export const PerformancePreviewResult = ({
           </h3>
 
           <ul className="mt-[10px] flex w-full flex-col gap-(--scale-8)">
-            {data.nextTasks.map((nextTask) => (
-              <li key={nextTask} className="flex items-start">
+            {data.nextTasks.map((nextTask, index) => (
+              <li key={`${nextTask}-${index}`} className="flex items-start">
                 <span className="flex shrink-0 px-(--scale-8) py-[13px]">
                   <span className="h-[3px] w-[3px] rounded-(--scale-1000) bg-(--color-icon-default)" />
                 </span>
