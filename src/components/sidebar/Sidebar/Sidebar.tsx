@@ -29,6 +29,7 @@ export interface SidebarProps extends HTMLAttributes<HTMLDivElement> {
   onChangePage?: (page: SidebarPage) => void
   onChangeStatus?: (status: SidebarStatus) => void
   onProfileClick?: () => void
+  profileMenu?: ReactNode
 }
 
 export function Sidebar({
@@ -42,6 +43,7 @@ export function Sidebar({
   onChangePage,
   onChangeStatus,
   onProfileClick,
+  profileMenu,
   className,
   ...rest
 }: SidebarProps) {
@@ -52,7 +54,13 @@ export function Sidebar({
     <div
       className={[
         'relative bg-(--color-bg-brand-subtle) flex flex-col justify-between py-6 h-screen',
-        isOpen ? 'overflow-hidden' : hovering ? 'overflow-visible' : 'overflow-hidden',
+        isOpen
+          ? profileMenu
+            ? 'overflow-visible'
+            : 'overflow-hidden'
+          : hovering
+            ? 'overflow-visible'
+            : 'overflow-hidden',
         'transition-[width] duration-200 ease-out',
         isOpen ? 'items-start w-65' : 'items-center w-18',
         className,
@@ -131,12 +139,17 @@ export function Sidebar({
           </div>
 
           {/* 하단 프로필 */}
-          <SidebarProfile
-            name={userName}
-            plan={userPlan}
-            avatarSrc={avatarSrc}
-            onClick={onProfileClick}
-          />
+          <div className="relative w-full">
+            {profileMenu && (
+              <div className="absolute bottom-full left-0 z-40 px-2 pb-2">{profileMenu}</div>
+            )}
+            <SidebarProfile
+              name={userName}
+              plan={userPlan}
+              avatarSrc={avatarSrc}
+              onClick={onProfileClick}
+            />
+          </div>
         </>
       ) : (
         <>
