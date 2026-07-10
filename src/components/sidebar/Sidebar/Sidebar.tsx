@@ -20,7 +20,7 @@ export interface SidebarProps extends HTMLAttributes<HTMLDivElement> {
     page: SidebarPage
     icon: ReactNode
     badge?: number
-    category?: SidebarPageCategory
+    category: SidebarPageCategory
   }>
   workspaceName?: string
   userName?: string
@@ -49,7 +49,8 @@ export function Sidebar({
   return (
     <div
       className={[
-        'relative bg-(--color-bg-brand-subtle) flex flex-col justify-between py-6 h-screen overflow-hidden',
+        'relative bg-(--color-bg-brand-subtle) flex flex-col justify-between py-6 h-screen',
+        isOpen ? 'overflow-hidden' : hovering ? 'overflow-visible' : 'overflow-hidden',
         'transition-[width] duration-200 ease-out',
         isOpen ? 'items-start w-65' : 'items-center w-18',
         className,

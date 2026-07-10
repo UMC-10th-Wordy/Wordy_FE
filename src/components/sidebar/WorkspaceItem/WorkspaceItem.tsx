@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import type { ButtonHTMLAttributes } from 'react'
+import type { HTMLAttributes, KeyboardEvent, MouseEvent } from 'react'
 import { IconButton } from '@/components/common/Button/IconButton'
 import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
@@ -11,6 +11,7 @@ const workspaceItem = cva(
     'transition-colors duration-100 ease-out cursor-pointer',
     'bg-(--color-bg-default) border-(--color-border-subtle)',
     'hover:bg-(--color-sidebar-neutral-hover)',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)',
   ],
   {
     variants: {
@@ -23,7 +24,7 @@ const workspaceItem = cva(
   },
 )
 
-export interface WorkspaceItemProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface WorkspaceItemProps extends HTMLAttributes<HTMLDivElement> {
   name: string
   selected?: boolean
   onEdit?: () => void
@@ -35,11 +36,26 @@ export function WorkspaceItem({
   selected = false,
   onEdit,
   onDelete,
+  onClick,
   className,
   ...rest
 }: WorkspaceItemProps) {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onClick?.(e as unknown as MouseEvent<HTMLDivElement>)
+    }
+  }
+
   return (
-    <button type="button" className={workspaceItem({ selected, className })} {...rest}>
+    <div
+      role="button"
+      tabIndex={0}
+      className={workspaceItem({ selected, className })}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      {...rest}
+    >
       <span className="flex-1 min-w-0 [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-default) truncate">
         {name}
       </span>
@@ -65,6 +81,6 @@ export function WorkspaceItem({
           aria-label="워크스페이스 삭제"
         />
       </span>
-    </button>
+    </div>
   )
 }
