@@ -16,7 +16,7 @@
     --color-bg-default: var(--primitive-neutral-white);
     --color-bg-secondary: var(--primitive-neutral-100);
     --color-bg-tertiary: var(--primitive-neutral-200);
-    --color-bg-overlay: rgba(0, 0, 0, 0.15);
+    --color-bg-overlay: rgba(0, 0, 0, 0.25);
     --color-bg-brand-subtle: var(--primitive-primary-100);
     --color-bg-brand-light: var(--primitive-primary-200);
     --color-bg-dark: var(--primitive-neutral-900);
