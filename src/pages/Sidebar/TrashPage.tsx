@@ -194,7 +194,7 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-(--color-bg-default) rounded-[var(--scale-12)] shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] flex flex-col gap-5 items-center justify-center px-8 py-5">
               <div className="flex flex-col gap-3 items-center">
-                <ErrorIcon className="size-7 text-(--color-icon-error)" />
+                <ErrorIcon className="size-7 text-(--color-icon-brand)" />
                 <div className="flex flex-col items-center text-center">
                   <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-secondary)">
                     {items.find((i) => i.id === confirm.itemId)?.title}를 영원히 삭제할까요?
@@ -233,7 +233,7 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
               key={toast.id}
               className="bg-(--color-bg-default) rounded-[var(--scale-12)] shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] flex gap-2.5 items-center px-8 py-4 animate-[slideUp_0.2s_ease-out]"
             >
-              <SuccessIcon className="size-8 text-(--color-icon-success)" />
+              <SuccessIcon className="size-8 text-(--color-icon-brand)" />
               <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-secondary) whitespace-nowrap">
                 {toast.message}
               </span>
