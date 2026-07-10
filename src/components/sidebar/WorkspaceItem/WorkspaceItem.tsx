@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import type { HTMLAttributes, KeyboardEvent, MouseEvent } from 'react'
+import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { IconButton } from '@/components/common/Button/IconButton'
 import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
@@ -41,9 +41,10 @@ export function WorkspaceItem({
   ...rest
 }: WorkspaceItemProps) {
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      onClick?.(e as unknown as MouseEvent<HTMLDivElement>)
+      e.currentTarget.click()
     }
   }
 
