@@ -49,7 +49,7 @@ export function Input1({
         <input
           type={isPassword && showPassword ? 'text' : type}
           disabled={disabled}
-          className="flex-1 min-w-0 bg-transparent outline-none [font-size:var(--font-size-body-4)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) disabled:text-(--color-text-disabled) disabled:cursor-not-allowed"
+          className="flex-1 min-w-0 bg-transparent outline-none [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) disabled:text-(--color-text-disabled) disabled:cursor-not-allowed"
           {...rest}
         />
         {isPassword && (
