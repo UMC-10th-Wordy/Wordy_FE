@@ -42,6 +42,12 @@ export type { NotificationModalProps } from './NotificationModal/NotificationMod
 export { WorkspaceModal } from './WorkspaceModal/WorkspaceModal'
 export type { WorkspaceModalProps } from './WorkspaceModal/WorkspaceModal'
 
+export { ProfileModal } from './ProfileModal/ProfileModal'
+export type { ProfileModalProps } from './ProfileModal/ProfileModal'
+
+export { SettingModal } from './SettingModal/SettingModal'
+export type { SettingModalProps } from './SettingModal/SettingModal'
+
 // Phase 3 - 패널/전체 뷰
 export { SettingPanel } from './SettingPanel/SettingPanel'
 export type { SettingPanelProps, SettingTab } from './SettingPanel/SettingPanel'

@@ -28,6 +28,7 @@ export interface SidebarProps extends HTMLAttributes<HTMLDivElement> {
   avatarSrc?: string
   onChangePage?: (page: SidebarPage) => void
   onChangeStatus?: (status: SidebarStatus) => void
+  onProfileClick?: () => void
 }
 
 export function Sidebar({
@@ -40,6 +41,7 @@ export function Sidebar({
   avatarSrc,
   onChangePage,
   onChangeStatus,
+  onProfileClick,
   className,
   ...rest
 }: SidebarProps) {
@@ -129,7 +131,12 @@ export function Sidebar({
           </div>
 
           {/* 하단 프로필 */}
-          <SidebarProfile name={userName} plan={userPlan} avatarSrc={avatarSrc} />
+          <SidebarProfile
+            name={userName}
+            plan={userPlan}
+            avatarSrc={avatarSrc}
+            onClick={onProfileClick}
+          />
         </>
       ) : (
         <>
