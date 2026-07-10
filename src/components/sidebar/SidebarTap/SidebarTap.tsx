@@ -56,7 +56,7 @@ export function SidebarTap({
         <span className="flex flex-col items-start pr-2 shrink-0">
           <span className="flex items-center justify-center px-2 py-0.5 rounded-(--scale-1000) bg-(--color-icon-brand) w-full">
             <span className="[font-size:var(--font-size-caption-1)] leading-(--line-height-body) font-semibold text-(--color-text-inverse) text-center whitespace-nowrap">
-              {badge > 99 ? '99+' : badge}
+              {badge >= 99 ? '99+' : badge}
             </span>
           </span>
         </span>

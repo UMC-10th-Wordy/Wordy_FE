@@ -15,7 +15,7 @@ function App() {
   ]
 
   return (
-    <div className="flex min-h-screen bg-(--color-bg-secondary)">
+    <div className="flex min-h-screen bg-(--color-bg-default)">
       <Sidebar
         page="홈"
         status="open"

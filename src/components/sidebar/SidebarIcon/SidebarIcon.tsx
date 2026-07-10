@@ -22,18 +22,23 @@ export interface SidebarIconProps extends ButtonHTMLAttributes<HTMLButtonElement
   icon: ReactNode
   tooltip: string
   state?: SidebarIconState
+  dot?: boolean
 }
 
 export function SidebarIcon({
   icon,
   tooltip,
   state = 'default',
+  dot = false,
   className,
   ...rest
 }: SidebarIconProps) {
   return (
     <button type="button" className={sidebarIcon({ state, className })} {...rest}>
-      <span className="shrink-0 size-6">{icon}</span>
+      <span className="relative shrink-0 size-6">
+        {icon}
+        {dot && <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-[#FF3F55]" />}
+      </span>
       <span className="absolute left-full ml-1 hidden group-hover:flex items-center gap-0 z-10">
         {/* 말풍선 꼬리 */}
         <span className="w-0 h-0 border-y-[6px] border-y-transparent border-r-[7px] border-r-(--color-bg-dark)" />

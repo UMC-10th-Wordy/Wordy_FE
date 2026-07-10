@@ -7,7 +7,7 @@ export type SidebarPage = '홈' | '알림함' | '오늘의업무' | '일지모�
 
 export interface SidebarCollapsedHoverProps extends HTMLAttributes<HTMLDivElement> {
   activePage?: SidebarPage
-  pages?: Array<{ page: SidebarPage; icon: ReactNode }>
+  pages?: Array<{ page: SidebarPage; icon: ReactNode; badge?: number }>
   onNavigate?: (page: SidebarPage) => void
   onExpand?: () => void
   avatarSrc?: string
@@ -25,7 +25,7 @@ export function SidebarCollapsedHover({
   return (
     <div
       className={[
-        'bg-(--color-bg-brand-subtle) flex flex-col items-center justify-between pb-9 pt-5 size-full w-18',
+        'bg-(--color-bg-n) flex flex-col items-center justify-between pb-9 pt-5 size-full w-18',
         className,
       ].join(' ')}
       {...rest}
@@ -42,13 +42,14 @@ export function SidebarCollapsedHover({
         />
 
         {/* 페이지 아이콘들 */}
-        <div className="absolute flex flex-col gap-2 items-start left-[-20px] top-16 w-18">
-          {pages.map(({ page, icon }) => (
+        <div className="absolute flex flex-col gap-2 items-start -left-5 top-16 w-18">
+          {pages.map(({ page, icon, badge }) => (
             <SidebarIcon
               key={page}
               icon={icon}
               tooltip={page}
               state={page === activePage ? 'focused' : 'default'}
+              dot={badge != null && badge > 0}
               onClick={() => onNavigate?.(page)}
             />
           ))}
@@ -56,7 +57,7 @@ export function SidebarCollapsedHover({
       </div>
 
       {/* 하단 아바타 */}
-      <div className="shrink-0 size-12 rounded-[var(--scale-1000)] border border-(--color-border-opacity) overflow-hidden">
+      <div className="shrink-0 size-12 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden">
         {avatarSrc ? (
           <img src={avatarSrc} alt="프로필" className="size-full object-cover" />
         ) : (
