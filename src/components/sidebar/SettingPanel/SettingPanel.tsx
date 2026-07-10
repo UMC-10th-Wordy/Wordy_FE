@@ -64,7 +64,7 @@ export function SettingPanel({
     <div
       className={[
         'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]',
-        'flex items-center h-150 w-215',
+        'flex items-center h-150 w-215 max-h-full max-w-full',
         className,
       ].join(' ')}
       {...rest}

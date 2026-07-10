@@ -10,7 +10,7 @@ export function Toast({ message }: ToastProps) {
     <div
       role="status"
       aria-live="polite"
-      className="inline-flex items-center gap-[10px] px-8 py-4 rounded-(--scale-12) bg-(--color-bg-default) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]"
+      className="inline-flex items-center gap-2.5 px-8 py-4 rounded-(--scale-12) bg-(--color-bg-default) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]"
     >
       <SuccessIcon
         width={32}

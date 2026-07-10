@@ -20,7 +20,7 @@ export function NotificationModal({
     <div
       className={[
         'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_15px_rgba(0,0,0,0.1)]',
-        'flex flex-col gap-5 items-start px-3 py-5 w-[453px] h-[600px]',
+        'flex flex-col gap-5 items-start px-3 py-5 w-full max-w-113.25 h-full max-h-150',
         className,
       ].join(' ')}
       {...rest}

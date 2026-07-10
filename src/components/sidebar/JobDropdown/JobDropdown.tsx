@@ -12,7 +12,7 @@ export function JobDropdown({ options, value, onChange, className, ...rest }: Jo
     <div
       className={[
         'bg-(--color-bg-default) rounded-[var(--scale-12)] shadow-[0px_1px_15px_rgba(0,0,0,0.1)]',
-        'flex flex-col items-start p-3 w-[432px] h-[360px] overflow-y-auto',
+        'flex flex-col items-start p-3 w-full h-90 overflow-y-auto',
         className,
       ].join(' ')}
       {...rest}
