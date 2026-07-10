@@ -63,6 +63,10 @@ export function SidebarPage() {
                 setModal(null)
                 navigate('/trash')
               }}
+              onPlan={() => {
+                setModal(null)
+                navigate('/plan')
+              }}
               onSetting={() => setModal('setting')}
               onClose={() => setModal(null)}
             />

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import type { HTMLAttributes } from 'react'
 import { SidebarMenu } from '../SidebarMenu/SidebarMenu'
 import type { SidebarMenuItem } from '../SidebarMenu/SidebarMenu'
@@ -20,21 +20,11 @@ export function ProfileModal({
   onPlan,
   onSetting,
   onLogout,
-  onClose,
+  onClose: _onClose,
   className,
   ...rest
 }: ProfileModalProps) {
   const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handleMouseDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        onClose?.()
-      }
-    }
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => document.removeEventListener('mousedown', handleMouseDown)
-  }, [onClose])
 
   const items: SidebarMenuItem[] = [
     { icon: <TrashIcon width={28} height={28} />, label: '휴지통', onClick: onTrash },

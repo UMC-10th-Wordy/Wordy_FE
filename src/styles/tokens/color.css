@@ -23,17 +23,17 @@
     --color-bg-disabled: var(--primitive-neutral-200);
 
     /* Border */
-    --color-border-subtle: var(--primitive-neutral-400);
+    --color-border-default: var(--primitive-neutral-600);
     --color-border-light: var(--primitive-neutral-500);
-    --color-border-disabled: var(--primitive-neutral-500);
-    --color-border-pressed: var(--primitive-neutral-600);
+    --color-border-subtle: var(--primitive-neutral-400);
     --color-border-inverse: var(--primitive-neutral-white);
     --color-border-strong: var(--primitive-neutral-800);
     --color-border-brand: var(--primitive-primary-700);
     --color-border-brand-subtle: var(--primitive-primary-300);
+    --color-border-disabled: var(--primitive-neutral-500);
     --color-border-error: var(--primitive-red-700);
     --color-border-success: var(--primitive-green-700);
-    --color-border-default: rgba(17, 17, 17, 0.15);
+    --color-border-opacity: rgba(17, 17, 17, 0.15);
 
     /* Icon */
     --color-icon-default: var(--primitive-neutral-900);
