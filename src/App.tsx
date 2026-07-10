@@ -3,7 +3,7 @@ import HomeIcon from '@/assets/icons/home.svg?react'
 import BellIcon from '@/assets/icons/bell.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
 import DocumentIcon from '@/assets/icons/document.svg?react'
-import ChartIcon from '@/assets/icons/chart.svg?react'
+import DashboardIcon from '@/assets/icons/dashboard.svg?react'
 
 function App() {
   const pages = [
@@ -26,7 +26,7 @@ function App() {
     },
     {
       page: '성과대시보드' as const,
-      icon: <ChartIcon className="size-6" />,
+      icon: <DashboardIcon className="size-6" />,
       category: 'feature' as const,
     },
   ]
