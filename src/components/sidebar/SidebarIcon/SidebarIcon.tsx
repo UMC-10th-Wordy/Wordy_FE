@@ -4,6 +4,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react'
 const sidebarIcon = cva(
   [
     'group relative flex h-12 w-18 items-center justify-center transition-colors duration-100 ease-out cursor-pointer',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)',
   ],
   {
     variants: {

@@ -17,8 +17,8 @@ export function CareerDropdown({
   return (
     <div
       className={[
-        'bg-(--color-bg-default) rounded-[var(--scale-12)] shadow-[0px_1px_15px_rgba(0,0,0,0.1)]',
-        'flex items-start p-3 w-[432px] overflow-y-auto',
+        'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_15px_rgba(0,0,0,0.1)]',
+        'flex items-start p-3 w-108 max-h-90 overflow-y-auto',
         className,
       ].join(' ')}
       {...rest}

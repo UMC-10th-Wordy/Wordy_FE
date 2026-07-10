@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import type { HTMLAttributes } from 'react'
+import type { ButtonHTMLAttributes } from 'react'
 import { IconButton } from '@/components/common/Button/IconButton'
 import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
@@ -23,7 +23,7 @@ const workspaceItem = cva(
   },
 )
 
-export interface WorkspaceItemProps extends HTMLAttributes<HTMLDivElement> {
+export interface WorkspaceItemProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   name: string
   selected?: boolean
   onEdit?: () => void
@@ -39,7 +39,7 @@ export function WorkspaceItem({
   ...rest
 }: WorkspaceItemProps) {
   return (
-    <div className={workspaceItem({ selected, className })} {...rest}>
+    <button type="button" className={workspaceItem({ selected, className })} {...rest}>
       <span className="flex-1 min-w-0 [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-default) truncate">
         {name}
       </span>
@@ -65,6 +65,6 @@ export function WorkspaceItem({
           aria-label="워크스페이스 삭제"
         />
       </span>
-    </div>
+    </button>
   )
 }

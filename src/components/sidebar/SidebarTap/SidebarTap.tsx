@@ -6,6 +6,7 @@ const sidebarTap = cva(
     'flex items-center gap-2 h-12 pl-4 pr-2 py-2 w-full',
     'transition-colors duration-100 ease-out cursor-pointer',
     'hover:bg-(--color-sidebar-primary-hover)',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)',
   ],
   {
     variants: {

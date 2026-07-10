@@ -5,7 +5,6 @@ export interface SidebarMenuItem {
   icon?: ReactNode
   label: string
   onClick?: () => void
-  danger?: boolean
 }
 
 export interface SidebarMenuProps extends HTMLAttributes<HTMLDivElement> {
@@ -17,8 +16,8 @@ export function SidebarMenu({ email, items, className, ...rest }: SidebarMenuPro
   return (
     <div
       className={[
-        'bg-(--color-bg-default) rounded-[var(--scale-12)] shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]',
-        'flex flex-col gap-2.5 items-start justify-center px-4 py-5 w-[280px]',
+        'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]',
+        'flex flex-col gap-2.5 items-start justify-center px-4 py-5 w-70',
         className,
       ].join(' ')}
       {...rest}

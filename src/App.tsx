@@ -7,11 +7,28 @@ import ChartIcon from '@/assets/icons/chart.svg?react'
 
 function App() {
   const pages = [
-    { page: '홈' as const, icon: <HomeIcon className="size-6" /> },
-    { page: '알림함' as const, icon: <BellIcon className="size-6" />, badge: 99 },
-    { page: '오늘의업무' as const, icon: <CalendarIcon className="size-6" /> },
-    { page: '일지모아보기' as const, icon: <DocumentIcon className="size-6" /> },
-    { page: '성과대시보드' as const, icon: <ChartIcon className="size-6" /> },
+    { page: '홈' as const, icon: <HomeIcon className="size-6" />, category: 'general' as const },
+    {
+      page: '알림함' as const,
+      icon: <BellIcon className="size-6" />,
+      badge: 99,
+      category: 'general' as const,
+    },
+    {
+      page: '오늘의업무' as const,
+      icon: <CalendarIcon className="size-6" />,
+      category: 'feature' as const,
+    },
+    {
+      page: '일지모아보기' as const,
+      icon: <DocumentIcon className="size-6" />,
+      category: 'feature' as const,
+    },
+    {
+      page: '성과대시보드' as const,
+      icon: <ChartIcon className="size-6" />,
+      category: 'feature' as const,
+    },
   ]
 
   return (

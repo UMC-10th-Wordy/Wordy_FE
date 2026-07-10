@@ -11,10 +11,17 @@ import LogoIcon from '@/assets/icons/logo.svg?react'
 export type SidebarStatus = 'open' | 'closed'
 export type SidebarPage = '홈' | '알림함' | '오늘의업무' | '일지모아보기' | '성과대시보드'
 
+export type SidebarPageCategory = 'general' | 'feature'
+
 export interface SidebarProps extends HTMLAttributes<HTMLDivElement> {
   page?: SidebarPage
   status?: SidebarStatus
-  pages?: Array<{ page: SidebarPage; icon: ReactNode; badge?: number }>
+  pages?: Array<{
+    page: SidebarPage
+    icon: ReactNode
+    badge?: number
+    category?: SidebarPageCategory
+  }>
   workspaceName?: string
   userName?: string
   userPlan?: string
@@ -42,9 +49,9 @@ export function Sidebar({
   return (
     <div
       className={[
-        'bg-(--color-bg-brand-subtle) flex flex-col justify-between py-6 h-screen overflow-hidden',
+        'relative bg-(--color-bg-brand-subtle) flex flex-col justify-between py-6 h-screen overflow-hidden',
         'transition-[width] duration-200 ease-out',
-        isOpen ? 'items-start w-[260px]' : 'items-center w-18',
+        isOpen ? 'items-start w-65' : 'items-center w-18',
         className,
       ].join(' ')}
       onMouseEnter={() => !isOpen && setHovering(true)}
@@ -81,16 +88,18 @@ export function Sidebar({
                   </span>
                 </div>
                 <div className="flex flex-col gap-2 items-start shrink-0 w-full">
-                  {pages.slice(0, 2).map(({ page: p, icon, badge }) => (
-                    <SidebarTap
-                      key={p}
-                      icon={icon}
-                      label={p}
-                      badge={badge}
-                      state={page === p ? 'focused' : 'default'}
-                      onClick={() => onChangePage?.(p)}
-                    />
-                  ))}
+                  {pages
+                    .filter((p) => p.category === 'general')
+                    .map(({ page: p, icon, badge }) => (
+                      <SidebarTap
+                        key={p}
+                        icon={icon}
+                        label={p}
+                        badge={badge}
+                        state={page === p ? 'focused' : 'default'}
+                        onClick={() => onChangePage?.(p)}
+                      />
+                    ))}
                 </div>
               </div>
 
@@ -101,16 +110,18 @@ export function Sidebar({
                   </span>
                 </div>
                 <div className="flex flex-col gap-2 items-start shrink-0 w-full">
-                  {pages.slice(2).map(({ page: p, icon, badge }) => (
-                    <SidebarTap
-                      key={p}
-                      icon={icon}
-                      label={p}
-                      badge={badge}
-                      state={page === p ? 'focused' : 'default'}
-                      onClick={() => onChangePage?.(p)}
-                    />
-                  ))}
+                  {pages
+                    .filter((p) => p.category === 'feature')
+                    .map(({ page: p, icon, badge }) => (
+                      <SidebarTap
+                        key={p}
+                        icon={icon}
+                        label={p}
+                        badge={badge}
+                        state={page === p ? 'focused' : 'default'}
+                        onClick={() => onChangePage?.(p)}
+                      />
+                    ))}
                 </div>
               </div>
             </div>

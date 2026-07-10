@@ -36,7 +36,7 @@ export function WorkspaceModal({
     <div
       className={[
         'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_15px_rgba(0,0,0,0.1)]',
-        'flex flex-col gap-5 items-start px-3 py-5 w-[453px] h-[520px]',
+        'flex flex-col gap-5 items-start px-3 py-5 w-113.25 h-130',
         className,
       ].join(' ')}
       {...rest}
@@ -69,7 +69,7 @@ export function WorkspaceModal({
           ))}
 
           {isAdding ? (
-            <div className="bg-(--color-bg-brand-subtle) flex items-center p-3 w-full h-14 rounded-(--scale-12)">
+            <div className="bg-(--color-bg-brand-subtle) flex items-center p-3 w-full rounded-(--scale-12)">
               <Input1
                 placeholder="워크스페이스 이름을 작성해 주세요"
                 value={inputValue}

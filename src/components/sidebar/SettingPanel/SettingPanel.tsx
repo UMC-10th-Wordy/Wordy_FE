@@ -43,8 +43,7 @@ export function SettingPanel({
   const [name, setName] = useState(profileName)
   const [job, setJob] = useState(profileJob)
   const [career, setCareer] = useState(profileCareer)
-  const [showJobDropdown, setShowJobDropdown] = useState(false)
-  const [showCareerDropdown, setShowCareerDropdown] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState<'job' | 'career' | null>(null)
 
   const handleSave = () => {
     onSaveProfile?.({ name, job, career })
@@ -53,8 +52,8 @@ export function SettingPanel({
   return (
     <div
       className={[
-        'bg-(--color-bg-default) rounded-[var(--scale-12)] shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]',
-        'flex items-center h-[600px] w-[860px]',
+        'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]',
+        'flex items-center h-150 w-215',
         className,
       ].join(' ')}
       {...rest}
@@ -96,10 +95,10 @@ export function SettingPanel({
               <div className="flex gap-5 items-start shrink-0 w-full">
                 {/* 아바타 */}
                 <div className="relative shrink-0">
-                  <div className="size-[118px] rounded-[var(--scale-1000)] border border-(--color-border-opacity) overflow-hidden bg-(--color-bg-secondary)" />
+                  <div className="size-29.5 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden bg-(--color-bg-secondary)" />
                   <button
                     type="button"
-                    className="absolute bottom-0 right-0 size-[38px] rounded-full bg-(--color-icon-brand) border-2 border-(--color-border-inverse) flex items-center justify-center"
+                    className="absolute bottom-0 right-0 size-9.5 rounded-full bg-(--color-icon-brand) border-2 border-(--color-border-inverse) flex items-center justify-center"
                     aria-label="프로필 사진 변경"
                   >
                     <CameraIcon
@@ -134,10 +133,10 @@ export function SettingPanel({
                       label="직무"
                       value={job}
                       readOnly
-                      onClick={() => setShowJobDropdown((v) => !v)}
+                      onClick={() => setOpenDropdown((v) => (v === 'job' ? null : 'job'))}
                       className="cursor-pointer"
                     />
-                    {showJobDropdown && (
+                    {openDropdown === 'job' && (
                       <div className="absolute top-full left-0 mt-2 z-10">
                         <JobDropdown
                           options={[
@@ -150,7 +149,7 @@ export function SettingPanel({
                           value={job}
                           onChange={(value) => {
                             setJob(value)
-                            setShowJobDropdown(false)
+                            setOpenDropdown(null)
                           }}
                         />
                       </div>
@@ -161,17 +160,17 @@ export function SettingPanel({
                       label="재직 연차"
                       value={career}
                       readOnly
-                      onClick={() => setShowCareerDropdown((v) => !v)}
+                      onClick={() => setOpenDropdown((v) => (v === 'career' ? null : 'career'))}
                       className="cursor-pointer"
                     />
-                    {showCareerDropdown && (
+                    {openDropdown === 'career' && (
                       <div className="absolute top-full left-0 mt-2 z-10">
                         <CareerDropdown
                           options={['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과']}
                           value={career}
                           onChange={(value) => {
                             setCareer(value)
-                            setShowCareerDropdown(false)
+                            setOpenDropdown(null)
                           }}
                         />
                       </div>
