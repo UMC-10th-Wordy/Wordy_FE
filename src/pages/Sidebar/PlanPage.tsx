@@ -107,7 +107,7 @@ export function PlanPage() {
 
           {/* Pro 카드 */}
           <div
-            className="flex flex-1 flex-col justify-between border-[1.5px] border-(--primitive-primary-800) rounded-(--scale-16) shadow-[0px_1px_5px_rgba(0,0,0,0.1)] p-8 relative overflow-hidden"
+            className="flex flex-1 flex-col justify-between border-[1.5px] border-(--color-border-brand) rounded-(--scale-16) shadow-[0px_1px_5px_rgba(0,0,0,0.1)] p-8 relative overflow-hidden"
             style={{
               background:
                 'linear-gradient(132.9deg, rgba(221,221,255,0.3) 0%, rgba(250,250,252,0.3) 100%)',

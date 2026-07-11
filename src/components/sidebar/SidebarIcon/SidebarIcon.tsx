@@ -38,7 +38,9 @@ export function SidebarIcon({
     <button type="button" className={sidebarIcon({ state, className })} {...rest}>
       <span className="relative shrink-0 size-6">
         {icon}
-        {dot && <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-[#FF3F55]" />}
+        {dot && (
+          <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-(--color-status-error)" />
+        )}
       </span>
       <span className="absolute left-full ml-1 hidden group-hover:flex items-center gap-0 z-10">
         {/* 말풍선 꼬리 */}

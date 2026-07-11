@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes } from 'react'
 
 const sidebarNavItemText = cva(
   [
-    'flex items-center min-h-[52px] px-2 py-1 w-full',
+    'flex items-center min-h-13 px-2 py-1 w-full',
     'transition-colors duration-100 ease-out cursor-pointer',
     '[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)',
     'bg-(--color-bg-default)',
