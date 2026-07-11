@@ -30,6 +30,10 @@ const TERM_ITEMS: {
   },
 ]
 
+// 필수 약관 정의를 TERM_ITEMS 단일 소스로 관리하기 위한 헬퍼
+export const isRequiredTermsChecked = (terms: TermsState) =>
+  TERM_ITEMS.filter((item) => item.required).every((item) => terms[item.key])
+
 export const TermsSection = ({ terms, onChange }: TermsSectionProps) => {
   const allChecked = Object.values(terms).every(Boolean)
 

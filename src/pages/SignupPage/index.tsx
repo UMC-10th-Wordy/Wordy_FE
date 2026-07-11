@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Input1 } from '@/components/common/Input/Input1'
 import { TextButton } from '@/components/common/Button/TextButton'
-import { TermsSection } from '@/components/auth/TermsSection'
+import { TermsSection, isRequiredTermsChecked } from '@/components/auth/TermsSection'
 import type { TermsState } from '@/components/auth/TermsSection'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -40,7 +40,7 @@ export const SignupPage = () => {
       ? '비밀번호가 일치하지 않아요.'
       : ''
 
-  const requiredTermsChecked = terms.age && terms.service && terms.privacy
+  const requiredTermsChecked = isRequiredTermsChecked(terms)
   const isValid = !emailError && !passwordError && !passwordConfirmError && requiredTermsChecked
 
   const handleSubmit = () => {
