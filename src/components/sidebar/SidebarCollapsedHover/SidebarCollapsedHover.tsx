@@ -1,7 +1,7 @@
+import { useState } from 'react'
 import type { HTMLAttributes, ReactNode } from 'react'
-import { SidebarIcon } from '../SidebarIcon/SidebarIcon'
-import { IconButton } from '@/components/common/Button/IconButton'
-import SidebarIconSvg from '@/assets/icons/sidebar.svg?react'
+import LogoSmallIcon from '@/assets/icons/logo-small.svg?react'
+import SidebarIcon from '@/assets/icons/sidebar.svg?react'
 
 export type SidebarPage = '홈' | '알림함' | '오늘의업무' | '일지모아보기' | '성과대시보드'
 
@@ -22,37 +22,62 @@ export function SidebarCollapsedHover({
   className,
   ...rest
 }: SidebarCollapsedHoverProps) {
+  const [logoHovered, setLogoHovered] = useState(false)
+
   return (
     <div
       className={[
-        'bg-(--color-bg-n) flex flex-col items-center justify-between pb-9 pt-5 size-full w-18',
+        'bg-(--color-bg-brand-subtle) flex flex-col items-center justify-between pb-9 pt-6 size-full w-18',
         className,
       ].join(' ')}
       {...rest}
     >
-      <div className="flex flex-col gap-8 items-center shrink-0">
-        {/* 확장 버튼 */}
-        <IconButton
-          variant="text_neutral"
-          size="small"
-          icon={<SidebarIconSvg width={24} height={24} />}
+      <div className="flex flex-col gap-8 items-center shrink-0 relative">
+        {/* 로고 — hover 시 사이드바 접기 아이콘으로 교체, 클릭 시 사이드바 펼치기 */}
+        <button
+          type="button"
           onClick={onExpand}
-          className="bg-(--color-bg-tertiary)"
+          onMouseEnter={() => setLogoHovered(true)}
+          onMouseLeave={() => setLogoHovered(false)}
+          className="shrink-0 size-8 flex items-center justify-center rounded-md focus-visible:outline-none hover:bg-(--color-bg-tertiary) transition-colors duration-100"
           aria-label="사이드바 펼치기"
-        />
+        >
+          {logoHovered ? <SidebarIcon className="size-6" /> : <LogoSmallIcon className="size-8" />}
+        </button>
 
         {/* 페이지 아이콘들 */}
-        <div className="absolute flex flex-col gap-2 items-start -left-5 top-16 w-18">
-          {pages.map(({ page, icon, badge }) => (
-            <SidebarIcon
-              key={page}
-              icon={icon}
-              tooltip={page}
-              state={page === activePage ? 'focused' : 'default'}
-              dot={badge != null && badge > 0}
-              onClick={() => onNavigate?.(page)}
-            />
-          ))}
+        <div className="absolute flex flex-col gap-2 items-start top-17 -left-5 w-18">
+          {pages.map(({ page, icon, badge }) => {
+            const isFocused = page === activePage
+            return (
+              <button
+                key={page}
+                type="button"
+                onClick={() => onNavigate?.(page)}
+                className={[
+                  'group relative flex h-12 items-center justify-center w-18 transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none',
+                  isFocused
+                    ? 'bg-(--color-sidebar-primary-focused) border-r-2 border-(--color-border-brand)'
+                    : 'hover:bg-(--color-sidebar-primary-hover)',
+                ].join(' ')}
+                aria-label={page}
+              >
+                <span className="relative shrink-0 size-6">
+                  {icon}
+                  {badge != null && badge > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-(--color-status-error)" />
+                  )}
+                </span>
+                {/* 툴팁 */}
+                <span className="absolute left-full ml-3 hidden group-hover:flex items-center z-10 pointer-events-none">
+                  <span className="w-0 h-0 border-y-[6px] border-y-transparent border-r-[7px] border-r-(--color-bg-dark)" />
+                  <span className="bg-(--color-bg-dark) text-(--color-text-inverse) [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium px-2.5 py-1 rounded-lg whitespace-nowrap">
+                    {page}
+                  </span>
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
 

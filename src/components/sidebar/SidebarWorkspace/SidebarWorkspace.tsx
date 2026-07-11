@@ -20,7 +20,14 @@ export function SidebarWorkspace({
   ...rest
 }: SidebarWorkspaceProps) {
   return (
-    <button type="button" className={sidebarWorkspace({ className })} {...rest}>
+    <button
+      type="button"
+      className={[
+        sidebarWorkspace({ className }),
+        isOpen ? 'bg-(--color-sidebar-neutral-focused)' : '',
+      ].join(' ')}
+      {...rest}
+    >
       <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-secondary) whitespace-nowrap truncate">
         {workspaceName}
       </span>
