@@ -5,7 +5,7 @@ import { TextButton } from '@/components/common/Button/TextButton'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const LoginPage = () => {
+export const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -111,5 +111,3 @@ const LoginPage = () => {
     </div>
   )
 }
-
-export default LoginPage
