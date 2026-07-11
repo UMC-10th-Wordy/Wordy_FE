@@ -56,6 +56,7 @@ export const LoginPage = () => {
         >
           <Input1
             type="email"
+            aria-label="이메일"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, email: true }))}
@@ -65,6 +66,7 @@ export const LoginPage = () => {
 
           <Input1
             type="password"
+            aria-label="비밀번호"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, password: true }))}
