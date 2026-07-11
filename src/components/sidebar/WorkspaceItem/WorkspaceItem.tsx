@@ -1,28 +1,7 @@
-import { cva } from 'class-variance-authority'
 import type { HTMLAttributes, KeyboardEvent } from 'react'
 import { IconButton } from '@/components/common/Button/IconButton'
 import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
-
-const workspaceItem = cva(
-  [
-    'flex items-center gap-2 p-3 w-full',
-    'border border-solid rounded-(--scale-12)',
-    'transition-colors duration-100 ease-out cursor-pointer',
-    'bg-(--color-bg-default) border-(--color-border-subtle)',
-    'hover:bg-(--color-sidebar-neutral-hover)',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)',
-  ],
-  {
-    variants: {
-      selected: {
-        true: 'bg-(--color-bg-brand-light) border-(--color-border-brand)',
-        false: '',
-      },
-    },
-    defaultVariants: { selected: false },
-  },
-)
 
 export interface WorkspaceItemProps extends HTMLAttributes<HTMLDivElement> {
   name: string
@@ -48,11 +27,17 @@ export function WorkspaceItem({
     }
   }
 
+  const baseClass =
+    'flex items-center gap-2 p-3 w-full border border-solid rounded-(--scale-12) transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)'
+  const stateClass = selected
+    ? 'bg-(--color-bg-brand-light) border-(--color-border-brand)'
+    : 'bg-(--color-bg-default) border-(--color-border-subtle)'
+
   return (
     <div
       role="button"
       tabIndex={0}
-      className={workspaceItem({ selected, className })}
+      className={[baseClass, stateClass, className].filter(Boolean).join(' ')}
       onClick={onClick}
       onKeyDown={handleKeyDown}
       {...rest}
@@ -75,6 +60,7 @@ export function WorkspaceItem({
           variant="text_neutral"
           size="small"
           icon={<TrashIcon width={24} height={24} />}
+          disabled={!onDelete}
           onClick={(e) => {
             e.stopPropagation()
             onDelete?.()
