@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 import type { ButtonHTMLAttributes } from 'react'
 
 const sidebarProfile = cva([
-  'flex items-center gap-[13px] px-5 py-3 w-full',
+  'flex items-center gap-[13px] px-5 py-3 w-full text-left',
   'transition-colors duration-100 ease-out cursor-pointer',
   'hover:bg-(--color-sidebar-neutral-hover)',
   'focus-visible:bg-(--color-sidebar-neutral-focused)',

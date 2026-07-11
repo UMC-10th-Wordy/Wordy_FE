@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 const sidebarNavItem = cva(
   [
-    'flex items-center gap-2 min-h-[52px] px-1 w-full',
+    'flex items-center gap-2 h-[52px] p-[4px] w-full',
     'transition-colors duration-100 ease-out cursor-pointer',
     '[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)',
     'hover:bg-(--color-sidebar-neutral-hover)',
@@ -34,7 +34,7 @@ export function SidebarNavItem({
 }: SidebarNavItemProps) {
   return (
     <button type="button" className={sidebarNavItem({ selected, className })} {...rest}>
-      <span className="shrink-0 size-7">{icon}</span>
+      <span className="shrink-0 size-7 text-(--color-icon-secondary)">{icon}</span>
       <span className="truncate">{label}</span>
     </button>
   )

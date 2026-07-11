@@ -53,7 +53,7 @@ export function SidebarPage() {
         pages={pages}
         workspaceName="내 워크스페이스"
         userName="홍길동"
-        userPlan="Free"
+        userPlan="무료 요금제"
         onProfileClick={() => setModal((prev) => (prev === 'profile-menu' ? null : 'profile-menu'))}
         profileMenu={
           modal === 'profile-menu' ? (
