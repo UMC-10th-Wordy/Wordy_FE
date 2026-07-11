@@ -8,7 +8,7 @@ import SidebarIcon from '@/assets/icons/sidebar.svg?react'
 import LogoIcon from '@/assets/icons/logo.svg?react'
 
 export type SidebarStatus = 'open' | 'closed'
-export type SidebarPage = '홈' | '알림함' | '오늘의업무' | '일지모아보기' | '성과대시보드'
+export type SidebarPage = '홈' | '알림함' | '오늘의 업무' | '일지 모아보기' | '성과 대시보드'
 
 export type SidebarPageCategory = 'general' | 'feature'
 
@@ -60,7 +60,11 @@ export function Sidebar({
     <div
       className={[
         'relative transition-[width] duration-200 ease-out h-screen',
-        isOpen ? 'w-65 overflow-hidden' : 'w-18 overflow-visible',
+        isOpen
+          ? profileMenu || notificationMenu || workspaceMenu
+            ? 'w-65 overflow-visible'
+            : 'w-65 overflow-hidden'
+          : 'w-18 overflow-visible',
         className,
       ].join(' ')}
       {...rest}
@@ -173,13 +177,28 @@ export function Sidebar({
           </div>
         </div>
       ) : (
-        <SidebarCollapsedHover
-          activePage={page}
-          pages={pages}
-          onNavigate={onChangePage}
-          onExpand={() => onChangeStatus?.('open')}
-          avatarSrc={avatarSrc}
-        />
+        <>
+          <SidebarCollapsedHover
+            activePage={page}
+            pages={pages}
+            onNavigate={onChangePage}
+            onNotificationClick={onNotificationClick}
+            onProfileClick={onProfileClick}
+            onExpand={() => onChangeStatus?.('open')}
+            avatarSrc={avatarSrc}
+          />
+          {workspaceMenu && (
+            <div className="absolute top-full mt-4 left-5 z-40 pointer-events-auto">
+              {workspaceMenu}
+            </div>
+          )}
+          {notificationMenu && (
+            <div className="absolute top-33 left-full z-40 pl-3">{notificationMenu}</div>
+          )}
+          {profileMenu && (
+            <div className="absolute bottom-9 left-full z-40 pl-3">{profileMenu}</div>
+          )}
+        </>
       )}
     </div>
   )

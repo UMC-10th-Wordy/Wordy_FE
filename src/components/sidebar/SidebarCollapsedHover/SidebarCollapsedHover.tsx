@@ -3,12 +3,14 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import LogoSmallIcon from '@/assets/icons/logo-small.svg?react'
 import SidebarIcon from '@/assets/icons/sidebar.svg?react'
 
-export type SidebarPage = '홈' | '알림함' | '오늘의업무' | '일지모아보기' | '성과대시보드'
+export type SidebarPage = '홈' | '알림함' | '오늘의 업무' | '일지 모아보기' | '성과 대시보드'
 
 export interface SidebarCollapsedHoverProps extends HTMLAttributes<HTMLDivElement> {
   activePage?: SidebarPage
   pages?: Array<{ page: SidebarPage; icon: ReactNode; badge?: number }>
   onNavigate?: (page: SidebarPage) => void
+  onNotificationClick?: () => void
+  onProfileClick?: () => void
   onExpand?: () => void
   avatarSrc?: string
 }
@@ -17,6 +19,8 @@ export function SidebarCollapsedHover({
   activePage,
   pages = [],
   onNavigate,
+  onNotificationClick,
+  onProfileClick,
   onExpand,
   avatarSrc,
   className,
@@ -53,7 +57,7 @@ export function SidebarCollapsedHover({
               <button
                 key={page}
                 type="button"
-                onClick={() => onNavigate?.(page)}
+                onClick={() => (page === '알림함' ? onNotificationClick?.() : onNavigate?.(page))}
                 className={[
                   'group relative flex h-12 items-center justify-center w-18 transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none',
                   isFocused
@@ -82,13 +86,18 @@ export function SidebarCollapsedHover({
       </div>
 
       {/* 하단 아바타 */}
-      <div className="shrink-0 size-12 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden">
+      <button
+        type="button"
+        onClick={onProfileClick}
+        className="shrink-0 size-12 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden focus-visible:outline-none"
+        aria-label="프로필"
+      >
         {avatarSrc ? (
           <img src={avatarSrc} alt="프로필" className="size-full object-cover" />
         ) : (
           <div className="size-full bg-(--color-bg-secondary)" />
         )}
-      </div>
+      </button>
     </div>
   )
 }

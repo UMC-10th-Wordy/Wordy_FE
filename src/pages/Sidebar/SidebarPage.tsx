@@ -18,6 +18,9 @@ export function SidebarPage() {
   const navigate = useNavigate()
   const [modal, setModal] = useState<ModalState>(null)
   const [sidebarStatus, setSidebarStatus] = useState<'open' | 'closed'>('open')
+  const [currentPage, setCurrentPage] = useState<
+    '홈' | '알림함' | '오늘의 업무' | '일지 모아보기' | '성과 대시보드'
+  >('홈')
   const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
   const [notifications, setNotifications] = useState<Record<string, boolean>>({
@@ -58,17 +61,17 @@ export function SidebarPage() {
       category: 'general' as const,
     },
     {
-      page: '오늘의업무' as const,
+      page: '오늘의 업무' as const,
       icon: <CalendarIcon className="size-6" />,
       category: 'feature' as const,
     },
     {
-      page: '일지모아보기' as const,
+      page: '일지 모아보기' as const,
       icon: <DocumentIcon className="size-6" />,
       category: 'feature' as const,
     },
     {
-      page: '성과대시보드' as const,
+      page: '성과 대시보드' as const,
       icon: <DashboardIcon className="size-6" />,
       category: 'feature' as const,
     },
@@ -77,9 +80,13 @@ export function SidebarPage() {
   return (
     <>
       <Sidebar
-        page="홈"
+        page={currentPage}
         status={sidebarStatus}
-        onChangeStatus={setSidebarStatus}
+        onChangeStatus={(status) => {
+          setSidebarStatus(status)
+          if (status === 'closed') setModal(null)
+        }}
+        onChangePage={setCurrentPage}
         pages={pages}
         workspaceName="내 워크스페이스"
         userName="홍길동"
@@ -114,7 +121,7 @@ export function SidebarPage() {
                 ...item,
                 onClick: () => {
                   setModal(null)
-                  navigate('/성과대시보드')
+                  navigate('/성과 대시보드')
                 },
               }))}
               onClose={() => setModal(null)}
