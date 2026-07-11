@@ -24,6 +24,7 @@ export interface TrashPageProps {
 interface Toast {
   id: number
   message: string
+  exiting?: boolean
 }
 
 type ConfirmState = { type: 'delete'; itemId: string } | null
@@ -62,7 +63,10 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
       return next.slice(-3)
     })
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id))
+      setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, exiting: true } : t)))
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id))
+      }, 200)
     }, 2000)
   }
 
@@ -190,7 +194,7 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
       {/* 영구 삭제 확인 다이얼로그 */}
       {confirm && (
         <>
-          <div className="fixed inset-0 bg-(--color-bg-overlay) backdrop-blur-[4px] z-40" />
+          <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-40" />
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-(--color-bg-default) rounded-[var(--scale-12)] shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] flex flex-col gap-5 items-center justify-center px-8 py-5">
               <div className="flex flex-col gap-3 items-center">
@@ -231,7 +235,12 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
           {toasts.map((toast) => (
             <div
               key={toast.id}
-              className="bg-(--color-bg-default) rounded-[var(--scale-12)] shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] flex gap-2.5 items-center px-8 py-4 animate-[slideUp_0.2s_ease-out]"
+              className={[
+                'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] flex gap-2.5 items-center px-8 py-4',
+                toast.exiting
+                  ? 'animate-[slideDown_0.2s_ease-in_forwards]'
+                  : 'animate-[slideUp_0.2s_ease-out]',
+              ].join(' ')}
             >
               <SuccessIcon className="size-8 text-(--color-icon-brand)" />
               <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-secondary) whitespace-nowrap">
