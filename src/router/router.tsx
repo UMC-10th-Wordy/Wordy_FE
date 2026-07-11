@@ -9,6 +9,18 @@ export const router = createBrowserRouter([
     element: <SidebarPage />,
   },
   {
+    path: '/today',
+    element: <SidebarPage />,
+  },
+  {
+    path: '/records',
+    element: <SidebarPage />,
+  },
+  {
+    path: '/dashboard',
+    element: <SidebarPage />,
+  },
+  {
     path: '/trash',
     element: <TrashPage />,
   },

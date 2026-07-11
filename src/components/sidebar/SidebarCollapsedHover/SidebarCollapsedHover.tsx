@@ -43,7 +43,7 @@ export function SidebarCollapsedHover({
           onClick={onExpand}
           onMouseEnter={() => setLogoHovered(true)}
           onMouseLeave={() => setLogoHovered(false)}
-          className="shrink-0 size-8 flex items-center justify-center rounded-md focus-visible:outline-none hover:bg-(--color-bg-tertiary) transition-colors duration-100"
+          className="shrink-0 size-8 flex items-center justify-center rounded-md hover:bg-(--color-bg-tertiary) focus-visible:ring-2 focus-visible:ring-(--color-border-brand) focus-visible:outline-none transition-colors duration-100"
           aria-label="사이드바 펼치기"
         >
           {logoHovered ? <SidebarIcon className="size-6" /> : <LogoSmallIcon className="size-8" />}
@@ -59,7 +59,7 @@ export function SidebarCollapsedHover({
                 type="button"
                 onClick={() => (page === '알림함' ? onNotificationClick?.() : onNavigate?.(page))}
                 className={[
-                  'group relative flex h-12 items-center justify-center w-18 transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none',
+                  'group relative flex h-12 items-center justify-center w-18 transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--color-border-brand)',
                   isFocused
                     ? 'bg-(--color-sidebar-primary-focused) border-r-2 border-(--color-border-brand)'
                     : 'hover:bg-(--color-sidebar-primary-hover)',
@@ -73,7 +73,7 @@ export function SidebarCollapsedHover({
                   )}
                 </span>
                 {/* 툴팁 */}
-                <span className="absolute left-full ml-3 hidden group-hover:flex items-center z-10 pointer-events-none">
+                <span className="absolute left-full ml-3 hidden group-hover:flex group-focus-visible:flex items-center z-10 pointer-events-none">
                   <span className="w-0 h-0 border-y-[6px] border-y-transparent border-r-[7px] border-r-(--color-bg-dark)" />
                   <span className="bg-(--color-bg-dark) text-(--color-text-inverse) [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium px-2.5 py-1 rounded-lg whitespace-nowrap">
                     {page}
@@ -89,7 +89,7 @@ export function SidebarCollapsedHover({
       <button
         type="button"
         onClick={onProfileClick}
-        className="shrink-0 size-12 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden focus-visible:outline-none"
+        className="shrink-0 size-12 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)"
         aria-label="프로필"
       >
         {avatarSrc ? (

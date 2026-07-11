@@ -31,10 +31,10 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
     const { scrollHeight, clientHeight, scrollTop } = el
     const trackHeight = track.clientHeight
     const ratio = clientHeight / scrollHeight
-    const newThumbHeight = Math.max(trackHeight * ratio, 32)
+    const newThumbHeight = Math.min(Math.max(trackHeight * ratio, 32), trackHeight)
     const maxScroll = scrollHeight - clientHeight
     const maxThumbTop = trackHeight - newThumbHeight
-    const newThumbTop = maxScroll > 0 ? (scrollTop / maxScroll) * maxThumbTop : 0
+    const newThumbTop = maxScroll > 0 && maxThumbTop > 0 ? (scrollTop / maxScroll) * maxThumbTop : 0
 
     setIsScrollable(scrollHeight > clientHeight)
     setThumbHeight(newThumbHeight)
@@ -58,20 +58,25 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
     contentRef.current?.scrollBy({ top: amount })
   }, [])
 
-  const startScrollInterval = useCallback(
-    (amount: number) => {
-      scrollBy(amount)
-      scrollIntervalRef.current = setInterval(() => scrollBy(amount), 100)
-    },
-    [scrollBy],
-  )
-
   const stopScrollInterval = useCallback(() => {
     if (scrollIntervalRef.current) {
       clearInterval(scrollIntervalRef.current)
       scrollIntervalRef.current = null
     }
   }, [])
+
+  const startScrollInterval = useCallback(
+    (amount: number) => {
+      stopScrollInterval()
+      scrollBy(amount)
+      scrollIntervalRef.current = setInterval(() => scrollBy(amount), 100)
+    },
+    [scrollBy, stopScrollInterval],
+  )
+
+  useEffect(() => {
+    return () => stopScrollInterval()
+  }, [stopScrollInterval])
 
   const handleThumbMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
@@ -92,7 +97,9 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
       const delta = e.clientY - dragStartY.current
       const { scrollHeight, clientHeight } = el
       const trackHeight = track.clientHeight
-      const scrollRatio = (scrollHeight - clientHeight) / (trackHeight - thumbHeight)
+      const thumbRange = trackHeight - thumbHeight
+      if (thumbRange <= 0) return
+      const scrollRatio = (scrollHeight - clientHeight) / thumbRange
       el.scrollTop = dragStartScrollTop.current + delta * scrollRatio
     }
 
@@ -138,6 +145,7 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
           onMouseDown={() => startScrollInterval(-24)}
           onMouseUp={stopScrollInterval}
           onMouseLeave={stopScrollInterval}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && scrollBy(-24)}
           aria-label="위로 스크롤"
         >
           <ScrollbarUpIcon />
@@ -165,6 +173,7 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
           onMouseDown={() => startScrollInterval(24)}
           onMouseUp={stopScrollInterval}
           onMouseLeave={stopScrollInterval}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && scrollBy(24)}
           aria-label="아래로 스크롤"
         >
           <ScrollbarDownIcon />

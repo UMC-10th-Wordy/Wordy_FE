@@ -14,6 +14,13 @@ import DashboardIcon from '@/assets/icons/dashboard.svg?react'
 
 type ModalState = null | 'profile-menu' | 'setting' | 'notification' | 'workspace'
 
+const PAGE_ROUTES: Record<string, string> = {
+  홈: '/',
+  '오늘의 업무': '/today',
+  '일지 모아보기': '/records',
+  '성과 대시보드': '/dashboard',
+}
+
 export function SidebarPage() {
   const navigate = useNavigate()
   const [modal, setModal] = useState<ModalState>(null)
@@ -86,9 +93,13 @@ export function SidebarPage() {
           setSidebarStatus(status)
           if (status === 'closed') setModal(null)
         }}
-        onChangePage={setCurrentPage}
+        onChangePage={(page) => {
+          setCurrentPage(page)
+          const route = PAGE_ROUTES[page]
+          if (route) navigate(route)
+        }}
         pages={pages}
-        workspaceName="내 워크스페이스"
+        workspaceName={workspaces.find((w) => w.id === selectedWorkspaceId)?.name ?? ''}
         userName="홍길동"
         userPlan="무료 요금제"
         onWorkspaceClick={() => setModal((prev) => (prev === 'workspace' ? null : 'workspace'))}
@@ -105,7 +116,15 @@ export function SidebarPage() {
               onEdit={(id, name) =>
                 setWorkspaces((prev) => prev.map((w) => (w.id === id ? { ...w, name } : w)))
               }
-              onDelete={(id) => setWorkspaces((prev) => prev.filter((w) => w.id !== id))}
+              onDelete={(id) => {
+                setWorkspaces((prev) => {
+                  const next = prev.filter((w) => w.id !== id)
+                  if (selectedWorkspaceId === id) {
+                    setSelectedWorkspaceId(next[0]?.id ?? '')
+                  }
+                  return next
+                })
+              }}
               onSelectWorkspace={(id) => {
                 setSelectedWorkspaceId(id)
                 setModal(null)
