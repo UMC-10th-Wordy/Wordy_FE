@@ -16,7 +16,7 @@ const COLOR_CLASS_MAP: Record<ProjectTagColor, string> = {
   yellow: 'bg-(--color-tag-yellow-bg) text-(--color-tag-yellow-text)',
   green: 'bg-(--color-tag-green-bg) text-(--color-tag-green-text)',
   blue: 'bg-(--color-tag-blue-bg) text-(--color-tag-blue-text)',
-  navy: 'bg-(--color-bg-brand-light) text-(--color-text-brand)',
+  navy: 'bg-(--color-tag-navy-bg) text-(--color-tag-navy-text)',
   pink: 'bg-(--color-tag-pink-bg) text-(--color-tag-pink-text)',
   brown: 'bg-(--color-tag-brown-bg) text-(--color-tag-brown-text)',
 }

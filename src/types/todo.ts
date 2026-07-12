@@ -8,6 +8,20 @@ export interface TaskTag {
   color: ProjectTagColor
 }
 
+/* 업무 결과에 첨부된 파일 (url은 미리보기/다운로드용 objectURL) */
+export interface TaskResultFile {
+  id: string
+  name: string
+  url: string
+}
+
+/* 업무 결과에 첨부된 이미지 */
+export interface TaskResultImage {
+  id: string
+  name: string
+  url: string
+}
+
 /* 업무 항목 (TaskCard가 다루는 데이터) */
 export interface Task {
   id: string
@@ -18,6 +32,15 @@ export interface Task {
   isCompleted: boolean
   /* 완료된 업무에 기록된 업무 결과 / 없으면 버튼 */
   result?: string
+  resultFiles?: TaskResultFile[]
+  resultImages?: TaskResultImage[]
+}
+
+/* 업무 결과 작성/수정 시 저장되는 값 */
+export interface TaskResultValues {
+  result: string
+  resultFiles: TaskResultFile[]
+  resultImages: TaskResultImage[]
 }
 
 /* 업무 추가/수정 시 실제로 저장되는 값 (TaskForm, TaskCard 수정 모드가 공통으로 사용) */

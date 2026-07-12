@@ -55,7 +55,7 @@ export default function TaskForm({ onCancel, onSubmit }: TaskFormProps) {
         </p>
         <Input2
           placeholder="업무명을 입력해 주세요"
-          className="w-full"
+          className="w-full !min-h-0 h-[53px]"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -68,7 +68,7 @@ export default function TaskForm({ onCancel, onSubmit }: TaskFormProps) {
         </p>
         <Input2
           placeholder="업무와 관련한 내용을 자유롭게 적어주세요"
-          className="w-full"
+          className="w-full !min-h-0 h-[53px]"
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
         />
