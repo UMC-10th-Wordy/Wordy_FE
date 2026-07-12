@@ -3,6 +3,7 @@ import { Input1 } from '@/components/common/Input/Input1'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { TermsSection, isRequiredTermsChecked } from '@/components/auth/TermsSection'
 import type { TermsState } from '@/components/auth/TermsSection'
+import LogoIcon from '@/assets/icons/logo.svg?react'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 // 영문, 숫자, 특수문자 모두 포함 8자 이상 (피그마 힌트 문구 기준)
@@ -50,11 +51,11 @@ export const SignupPage = () => {
   }
 
   return (
-    <div className="flex min-h-screen justify-center bg-(--color-bg-default)">
-      <div className="flex w-full max-w-[800px] flex-col gap-[52px] px-[100px] py-[80px]">
+    <div className="flex min-h-screen justify-center bg-(--color-bg-secondary) px-6 py-16">
+      <div className="flex h-fit w-full max-w-[800px] flex-col gap-[52px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-[80px] shadow-xl shadow-black/5">
         <header>
           {/* TODO(#이슈번호): 로고 svg 에셋 받으면 교체 */}
-          <p className="mb-6 text-2xl font-extrabold text-(--color-button-default)">Wordy</p>
+          <LogoIcon className="mb-6 h-7 w-auto" />
           <h1 className="mb-2 text-3xl font-bold text-(--color-text-default)">회원가입</h1>
           <p className="text-(--color-text-tertiary)">환영합니다! 워디를 시작해볼까요?</p>
         </header>
