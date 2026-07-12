@@ -188,11 +188,7 @@ export function SettingPanel({
                       aria-label="프로필 사진 변경"
                       onClick={() => fileInputRef.current?.click()}
                     >
-                      <CameraIcon
-                        width={24}
-                        height={24}
-                        className="[&_path]:stroke-white [&_circle]:stroke-white"
-                      />
+                      <CameraIcon width={24} height={24} className="text-white" />
                     </button>
                     <input
                       ref={fileInputRef}
