@@ -140,7 +140,7 @@ export function SidebarPage() {
                 ...item,
                 onClick: () => {
                   setModal(null)
-                  navigate('/성과 대시보드')
+                  navigate(PAGE_ROUTES['성과 대시보드'])
                 },
               }))}
               onClose={() => setModal(null)}

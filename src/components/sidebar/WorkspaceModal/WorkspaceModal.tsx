@@ -158,7 +158,7 @@ export function WorkspaceModal({
               </span>
             </div>
             <div className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary) w-full">
-              <p>워크스페이스를 최대 2개까지 사용할 수 있어요.</p>
+              <p>워크스페이스를 최대 {maxWorkspaces}개까지 사용할 수 있어요.</p>
               <p>Pro로 업그레이드하고 무제한으로 활용하세요!</p>
             </div>
           </div>
