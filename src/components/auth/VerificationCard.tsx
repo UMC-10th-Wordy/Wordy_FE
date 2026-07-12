@@ -16,8 +16,8 @@ export const VerificationCard = ({
   footer,
 }: VerificationCardProps) => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-(--color-bg-default)">
-      <div className="flex w-full max-w-[800px] flex-col items-center gap-[60px] rounded-[32px] px-[100px] py-[80px]">
+    <div className="flex min-h-screen items-center justify-center bg-(--color-bg-secondary) px-6 py-16">
+      <div className="flex w-full max-w-[800px] flex-col items-center gap-[60px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-[80px] shadow-xl shadow-black/5">
         <div className="flex flex-col items-center gap-8">
           {illustration}
           <div className="flex flex-col items-center gap-4 text-center">

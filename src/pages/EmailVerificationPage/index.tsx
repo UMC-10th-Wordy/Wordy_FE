@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { VerificationCard } from '@/components/auth/VerificationCard'
+import EmailRequestIcon from '@/assets/icons/email-request.svg?react'
+import EmailSuccessIcon from '@/assets/icons/email-success.svg?react'
+import EmailFailIcon from '@/assets/icons/email-fail.svg?react'
 
 // TODO(#35): 라우팅 도입 시 URL 파라미터/서버 검증 결과로 상태 결정하도록 교체
 type VerificationStatus = 'request' | 'success' | 'fail'
@@ -15,12 +18,12 @@ export const EmailVerificationPage = () => {
     alert('인증 메일 재전송')
   }
 
-  // TODO(#35): 일러스트 svg 에셋 받으면 교체
-  const illustration = (
-    <div className="flex size-[120px] items-center justify-center rounded-full bg-(--color-bg-brand-subtle) text-5xl">
-      ✉️
-    </div>
-  )
+  const illustrationByStatus = {
+    request: <EmailRequestIcon width={180} height={180} />,
+    success: <EmailSuccessIcon width={180} height={180} />,
+    fail: <EmailFailIcon width={180} height={180} />,
+  }
+  const illustration = illustrationByStatus[status]
 
   if (status === 'success') {
     return (
