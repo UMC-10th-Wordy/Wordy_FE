@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Input1 } from '@/components/common/Input/Input1'
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
 import { TextButton } from '@/components/common/Button/TextButton'
+import LogoIcon from '@/assets/icons/logo.svg?react'
+import GoogleIcon from '@/assets/icons/google.svg?react'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -37,10 +39,10 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="flex min-h-screen justify-center bg-(--color-bg-default) px-6 py-16">
-      <div className="w-full max-w-lg">
+    <div className="flex min-h-screen items-center justify-center bg-(--color-bg-secondary) px-6 py-16">
+      <div className="w-full max-w-[800px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-[80px] shadow-xl shadow-black/5">
         {/* TODO: 로고 svg 에셋 받으면 교체 */}
-        <p className="mb-6 text-2xl font-extrabold text-(--color-button-default)">Wordy</p>
+        <LogoIcon className="mb-6 h-7 w-auto" />
 
         <h1 className="mb-2 text-3xl font-bold text-(--color-text-default)">로그인</h1>
         <p className="mb-10 text-(--color-text-tertiary)">
@@ -97,8 +99,13 @@ export const LoginPage = () => {
           <div className="h-px flex-1 bg-(--color-border-subtle)" />
         </div>
 
-        {/* TODO: 구글 G 로고 svg 에셋 받으면 교체 */}
-        <TextButton variant="stroke_neutral" size="large" fullWidth onClick={handleGoogleLogin}>
+        <TextButton
+          variant="stroke_neutral"
+          size="large"
+          fullWidth
+          iconLeft={<GoogleIcon width={20} height={20} />}
+          onClick={handleGoogleLogin}
+        >
           Google로 시작하기
         </TextButton>
 
