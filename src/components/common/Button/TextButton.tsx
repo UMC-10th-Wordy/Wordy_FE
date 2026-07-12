@@ -51,7 +51,7 @@ const button = cva(
       size: {
         small: 'h-8 px-2 gap-1 [font-size:var(--font-size-body-1)] rounded-md',
         medium: 'h-11 px-3 gap-1 [font-size:var(--font-size-body-2)] rounded-lg',
-        large: 'h-[60px] px-4 gap-2 [font-size:var(--font-size-body-4)] rounded-lg',
+        large: 'h-[60px] px-4 gap-2 [font-size:var(--font-size-body-1)] rounded-lg',
       },
       fullWidth: {
         true: 'w-full',
