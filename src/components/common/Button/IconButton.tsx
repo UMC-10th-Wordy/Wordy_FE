@@ -57,7 +57,7 @@ const iconButton = cva(
       size: {
         small: 'size-8 rounded-md',
         medium: 'size-11 rounded-lg',
-        large: 'size-[60px] rounded-lg',
+        large: 'size-15 rounded-lg',
       },
     },
     defaultVariants: {

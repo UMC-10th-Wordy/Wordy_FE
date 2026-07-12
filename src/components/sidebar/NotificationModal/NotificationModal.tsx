@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'react'
 import { NotificationItem, type NotificationItemProps } from '../NotificationItem/NotificationItem'
 import { IconButton } from '@/components/common/Button/IconButton'
+import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 
 export interface NotificationModalProps extends HTMLAttributes<HTMLDivElement> {
@@ -20,7 +21,7 @@ export function NotificationModal({
     <div
       className={[
         'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_15px_rgba(0,0,0,0.1)]',
-        'flex flex-col gap-5 items-start px-3 py-5 w-[453px] h-[600px]',
+        'flex flex-col gap-5 items-start px-3 py-5 w-md max-h-150',
         className,
       ].join(' ')}
       {...rest}
@@ -47,11 +48,11 @@ export function NotificationModal({
             알림이 오지 않았어요
           </div>
         ) : (
-          <div className="flex flex-col gap-2 items-start flex-1 min-h-0 overflow-y-auto">
+          <Scrollbar>
             {notifications.map((notification, index) => (
               <NotificationItem key={index} {...notification} />
             ))}
-          </div>
+          </Scrollbar>
         )}
       </div>
     </div>

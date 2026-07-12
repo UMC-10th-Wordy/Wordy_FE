@@ -16,7 +16,7 @@ export function TrashMoreMenu({
     <div
       className={[
         'bg-(--color-bg-default) rounded-[var(--scale-12)] shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]',
-        'flex flex-col items-start justify-center px-4 py-3 w-[220px]',
+        'flex flex-col items-start justify-center px-4 py-3 w-55',
         className,
       ].join(' ')}
       {...rest}

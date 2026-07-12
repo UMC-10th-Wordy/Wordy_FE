@@ -42,7 +42,7 @@ export function Input1({
       )}
       <div
         className={[
-          'flex items-center gap-2 h-[60px] px-5 rounded-lg border bg-(--color-bg-default) transition-colors duration-100',
+          'flex items-center gap-2 h-15 px-5 rounded-lg border bg-(--color-bg-default) transition-colors duration-100',
           disabled ? 'border-(--color-border-disabled)' : borderClass,
         ].join(' ')}
       >

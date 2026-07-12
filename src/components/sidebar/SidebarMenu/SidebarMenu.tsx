@@ -22,7 +22,7 @@ export function SidebarMenu({ email, items, className, ...rest }: SidebarMenuPro
       ].join(' ')}
       {...rest}
     >
-      <span className="flex items-center justify-center pl-1 shrink-0 w-full">
+      <span className="flex items-center pl-1 shrink-0 w-full">
         <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-semibold text-(--color-text-tertiary) whitespace-nowrap">
           {email}
         </span>

@@ -42,7 +42,7 @@ export function SidebarTap({
   return (
     <button type="button" className={sidebarTap({ state, className })} {...rest}>
       <span className="flex flex-1 items-center gap-2 min-w-0">
-        {icon && <span className="shrink-0 size-6">{icon}</span>}
+        {icon && <span className="shrink-0 size-6 text-(--color-icon-secondary)">{icon}</span>}
         <span
           className={[
             '[font-size:var(--font-size-body-2)] leading-(--line-height-body) truncate',

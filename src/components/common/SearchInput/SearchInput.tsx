@@ -33,8 +33,9 @@ export function SearchInput({
     <div className={['relative', className].filter(Boolean).join(' ')}>
       <div
         className={[
-          'flex items-center gap-2.5 px-5 py-3 rounded-(--scale-12) border bg-(--color-bg-default) transition-colors duration-100',
-          focused ? 'border-(--color-border-brand)' : 'border-(--color-border-light)',
+          'flex items-center gap-2.5 px-5 py-3 rounded-(--scale-12) bg-(--color-bg-default) transition-colors duration-100',
+          'ring-1',
+          focused ? 'ring-(--color-border-brand)' : 'ring-(--color-border-light)',
         ].join(' ')}
       >
         <input
@@ -61,7 +62,7 @@ export function SearchInput({
       </div>
 
       {showDropdown && (
-        <div className="absolute -left-px top-[calc(100%+8px)] w-[calc(100%+2px)] bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] px-4 py-5 flex flex-col gap-2.5 z-10">
+        <div className="absolute left-0 top-[calc(100%+8px)] w-full bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] px-4 py-5 flex flex-col gap-2.5 z-10">
           <div className="flex items-center justify-between pl-1">
             <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-semibold text-(--color-text-tertiary)">
               최근 검색어
