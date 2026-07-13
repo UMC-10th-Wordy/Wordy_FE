@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { OnboardingCard } from '@/components/auth/OnboardingCard'
 import { CAREER_OPTIONS, JOB_OPTIONS } from '@/components/auth/onboarding'
 import type { CareerOption, JobOption } from '@/components/auth/onboarding'
@@ -12,6 +12,13 @@ export const ProfileSetupPage = () => {
   const [career, setCareer] = useState<CareerOption | null>(null)
   const [job, setJob] = useState<JobOption | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // photoUrl 변경/언마운트 시 이전 blob URL 해제 (메모리 누수 방지)
+  useEffect(() => {
+    return () => {
+      if (photoUrl) URL.revokeObjectURL(photoUrl)
+    }
+  }, [photoUrl])
 
   const handlePhotoChange = (file: File | undefined) => {
     if (!file) return
