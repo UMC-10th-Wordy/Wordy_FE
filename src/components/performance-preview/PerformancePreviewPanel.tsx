@@ -1,13 +1,26 @@
+import { PerformanceQuestionChat } from './PerformanceQuestionChat'
 import { PerformanceStatusNotice } from './PerformanceStatusNotice'
+
+import type { PerformanceQuestionChatProps } from './PerformanceQuestionChat'
 
 import GenerateIcon from '@/assets/icons/generate.svg?react'
 import emptyImage from '@/assets/icons/Layer 2.svg'
 
-export type PerformancePreviewStatus = 'empty' | 'converting' | 'failed'
+export type PerformancePreviewStatus = 'empty' | 'converting' | 'questioning' | 'failed'
 
-interface PerformancePreviewPanelProps {
-  status?: PerformancePreviewStatus
+type PerformanceNoticeStatus = Exclude<PerformancePreviewStatus, 'questioning'>
+
+interface PerformancePreviewPanelBaseProps {
+  status?: PerformanceNoticeStatus
 }
+
+interface PerformancePreviewPanelQuestioningProps {
+  status: 'questioning'
+  questionChat: PerformanceQuestionChatProps
+}
+
+type PerformancePreviewPanelProps =
+  PerformancePreviewPanelBaseProps | PerformancePreviewPanelQuestioningProps
 
 const STATUS_CONTENT = {
   empty: {
@@ -25,15 +38,28 @@ const STATUS_CONTENT = {
     message: '성과 생성에 실패했어요\n업무 일지 내용을 보완해 다시 시도해 주세요',
   },
 } satisfies Record<
-  PerformancePreviewStatus,
+  PerformanceNoticeStatus,
   {
     imageSrc: string
     message: string
   }
 >
 
-export const PerformancePreviewPanel = ({ status = 'empty' }: PerformancePreviewPanelProps) => {
-  const currentStatusContent = STATUS_CONTENT[status]
+export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => {
+  const renderContent = () => {
+    if (props.status === 'questioning') {
+      return <PerformanceQuestionChat {...props.questionChat} />
+    }
+
+    const status = props.status ?? 'empty'
+    const currentStatusContent = STATUS_CONTENT[status]
+
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <PerformanceStatusNotice {...currentStatusContent} />
+      </div>
+    )
+  }
 
   return (
     <aside className="order-2 flex h-screen basis-1/2 grow overflow-y-auto bg-(--color-bg-brand-subtle) p-(--scale-40)">
@@ -49,11 +75,7 @@ export const PerformancePreviewPanel = ({ status = 'empty' }: PerformancePreview
           />
         </div>
 
-        <div className="mt-(--scale-48) min-h-0 w-full flex-1">
-          <div className="flex h-full w-full items-center justify-center">
-            <PerformanceStatusNotice {...currentStatusContent} />
-          </div>
-        </div>
+        <div className="mt-(--scale-48) min-h-0 w-full flex-1">{renderContent()}</div>
       </section>
     </aside>
   )
