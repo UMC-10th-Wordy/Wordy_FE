@@ -6,6 +6,7 @@ import { SettingModal } from '@/components/sidebar/SettingModal/SettingModal'
 import { NotificationModal } from '@/components/sidebar/NotificationModal/NotificationModal'
 import { WorkspaceModal } from '@/components/sidebar/WorkspaceModal/WorkspaceModal'
 import type { NotificationItemProps } from '@/components/sidebar/NotificationItem/NotificationItem'
+import TodoListPage from '@/pages/TodoListPage'
 import HomeIcon from '@/assets/icons/home.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
@@ -85,7 +86,7 @@ export function SidebarPage() {
   ]
 
   return (
-    <>
+    <div className="flex h-screen w-full items-start bg-(--color-bg-default)">
       <Sidebar
         page={currentPage}
         status={sidebarStatus}
@@ -166,6 +167,8 @@ export function SidebarPage() {
         }
       />
 
+      {currentPage === '오늘의 업무' && <TodoListPage />}
+
       {modal === 'setting' && (
         <SettingModal
           profileName="홍길동"
@@ -179,6 +182,6 @@ export function SidebarPage() {
           onClose={() => setModal(null)}
         />
       )}
-    </>
+    </div>
   )
 }

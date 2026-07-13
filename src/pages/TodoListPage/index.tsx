@@ -21,7 +21,7 @@ import type {
   TodoFilter,
   TodoFilterCounts,
 } from '@/types/todo'
-import { INITIAL_TASKS } from './TodoListPage.sampleData'
+import { INITIAL_TASKS } from './sampleData'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
@@ -167,10 +167,7 @@ export default function TodoListPage() {
   const isActiveTabEmpty = activeTasks.length === 0
 
   return (
-    <div className="flex h-screen w-full items-start bg-(--color-bg-default)">
-      {/* 공통 Sidebar 컴포넌트로 교체 예정 */}
-      <aside className="h-full w-[260px] shrink-0 bg-[#e5e5e5]" />
-
+    <div className="flex h-screen flex-1 items-start bg-(--color-bg-default)">
       <main className="h-screen flex-1 overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-10 pt-10">
         <div className="flex w-full flex-col gap-12">
           <DateHeader
