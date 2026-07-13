@@ -43,7 +43,7 @@ export function Radio({ label, className, id, disabled, ...rest }: RadioProps) {
       {label && (
         <span
           className={[
-            '[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-normal',
+            '[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal',
             disabled ? 'text-(--color-text-disabled)' : 'text-(--color-text-default)',
           ].join(' ')}
         >
