@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
 export interface ToastQueueItem {
@@ -16,6 +16,15 @@ const MAX_TOASTS = 3
 export function useToastQueue() {
   const [toasts, setToasts] = useState<ToastQueueItem[]>([])
   const timersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>())
+
+  /* 언마운트 시 예약된 타이머 정리 */
+  useEffect(() => {
+    const timers = timersRef.current
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer))
+      timers.clear()
+    }
+  }, [])
 
   const dismiss = useCallback((id: string) => {
     setToasts((prev) =>

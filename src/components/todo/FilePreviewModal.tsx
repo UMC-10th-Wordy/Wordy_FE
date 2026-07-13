@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { createPortal } from 'react-dom'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 import DownloadIcon from '@/assets/icons/download.svg?react'
@@ -5,6 +6,7 @@ import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { downloadFile, getExtension } from '@/utils/file'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
+import { useModalFocus } from '@/hooks/useModalFocus'
 import { UnsupportedPreviewContent } from './PreviewStateMessages'
 import { PdfPreviewContent } from './PdfPreviewContent'
 
@@ -16,6 +18,8 @@ interface FilePreviewModalProps {
 
 export function FilePreviewModal({ name, url, onClose }: FilePreviewModalProps) {
   useEscapeKey(onClose)
+  const containerRef = useModalFocus<HTMLDivElement>()
+  const titleId = useId()
   const isPdf = getExtension(name) === 'pdf'
 
   return createPortal(
@@ -26,9 +30,19 @@ export function FilePreviewModal({ name, url, onClose }: FilePreviewModalProps) 
         onClick={onClose}
         className="absolute inset-0 bg-black/25 backdrop-blur-[8px]"
       />
-      <div className="relative flex w-[800px] flex-col items-center gap-7 rounded-(--scale-12) bg-(--color-bg-default) px-5 pt-5 pb-7 shadow-[0px_1px_7.5px_0px_rgba(0,0,0,0.1)]">
+      <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="relative flex w-[min(800px,calc(100vw-2.5rem))] max-h-[90vh] flex-col items-center gap-7 overflow-y-auto rounded-(--scale-12) bg-(--color-bg-default) px-5 pt-5 pb-7 shadow-[0px_1px_7.5px_0px_rgba(0,0,0,0.1)]"
+      >
         <div className="flex w-full items-start justify-between">
-          <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-semibold text-(--color-text-default)">
+          <p
+            id={titleId}
+            className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-semibold text-(--color-text-default)"
+          >
             {name}
           </p>
           <IconButton

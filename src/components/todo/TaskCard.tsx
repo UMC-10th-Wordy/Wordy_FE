@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { TaskCardEditForm } from './TaskCardEditForm'
 import { TaskResultWriteForm } from './TaskResultWriteForm'
@@ -67,6 +67,23 @@ export default function TaskCard({
   const [writeResultFiles, setWriteResultFiles] = useState<TaskResultFile[]>([])
   const [writeResultImages, setWriteResultImages] = useState<TaskResultImage[]>([])
 
+  const newAttachmentUrlsRef = useRef(new Set<string>())
+
+  const trackNewUrls = (items: { url: string }[]) => {
+    items.forEach((item) => newAttachmentUrlsRef.current.add(item.url))
+  }
+
+  const releaseIfNew = (url: string) => {
+    if (newAttachmentUrlsRef.current.has(url)) {
+      URL.revokeObjectURL(url)
+      newAttachmentUrlsRef.current.delete(url)
+    }
+  }
+
+  const forgetNew = (url: string) => {
+    newAttachmentUrlsRef.current.delete(url)
+  }
+
   const isDirty =
     draftPriority !== task.priority ||
     (draftTag?.label ?? null) !== (task.tag?.label ?? null) ||
@@ -89,6 +106,8 @@ export default function TaskCard({
   }
 
   const handleCancelEdit = () => {
+    draftResultFiles.forEach((file) => releaseIfNew(file.url))
+    draftResultImages.forEach((image) => releaseIfNew(image.url))
     setIsEditing(false)
   }
 
@@ -107,6 +126,8 @@ export default function TaskCard({
         resultImages: draftResultImages,
       })
     }
+    draftResultFiles.forEach((file) => forgetNew(file.url))
+    draftResultImages.forEach((image) => forgetNew(image.url))
     setIsEditing(false)
   }
 
@@ -118,6 +139,8 @@ export default function TaskCard({
   }
 
   const handleCancelWriteResult = () => {
+    writeResultFiles.forEach((file) => releaseIfNew(file.url))
+    writeResultImages.forEach((image) => releaseIfNew(image.url))
     setIsWritingResult(false)
   }
 
@@ -128,6 +151,8 @@ export default function TaskCard({
       resultFiles: writeResultFiles,
       resultImages: writeResultImages,
     })
+    writeResultFiles.forEach((file) => forgetNew(file.url))
+    writeResultImages.forEach((image) => forgetNew(image.url))
     setIsWritingResult(false)
   }
 
@@ -149,19 +174,31 @@ export default function TaskCard({
           draftResultFiles={draftResultFiles}
           draftResultImages={draftResultImages}
           onAddResultFiles={(files) => {
-            setDraftResultFiles((prev) => [...prev, ...createResultFiles(files)])
+            const created = createResultFiles(files)
+            trackNewUrls(created)
+            setDraftResultFiles((prev) => [...prev, ...created])
             setIsAttachmentsDirty(true)
           }}
           onAddResultImages={(files) => {
-            setDraftResultImages((prev) => [...prev, ...createResultImages(files)])
+            const created = createResultImages(files)
+            trackNewUrls(created)
+            setDraftResultImages((prev) => [...prev, ...created])
             setIsAttachmentsDirty(true)
           }}
           onRemoveResultFile={(id) => {
-            setDraftResultFiles((prev) => prev.filter((file) => file.id !== id))
+            setDraftResultFiles((prev) => {
+              const removed = prev.find((file) => file.id === id)
+              if (removed) releaseIfNew(removed.url)
+              return prev.filter((file) => file.id !== id)
+            })
             setIsAttachmentsDirty(true)
           }}
           onRemoveResultImage={(id) => {
-            setDraftResultImages((prev) => prev.filter((image) => image.id !== id))
+            setDraftResultImages((prev) => {
+              const removed = prev.find((image) => image.id === id)
+              if (removed) releaseIfNew(removed.url)
+              return prev.filter((image) => image.id !== id)
+            })
             setIsAttachmentsDirty(true)
           }}
           isDirty={isDirty}
@@ -176,17 +213,29 @@ export default function TaskCard({
           onWriteResultChange={setWriteResult}
           writeResultFiles={writeResultFiles}
           writeResultImages={writeResultImages}
-          onAddResultFiles={(files) =>
-            setWriteResultFiles((prev) => [...prev, ...createResultFiles(files)])
-          }
-          onAddResultImages={(files) =>
-            setWriteResultImages((prev) => [...prev, ...createResultImages(files)])
-          }
+          onAddResultFiles={(files) => {
+            const created = createResultFiles(files)
+            trackNewUrls(created)
+            setWriteResultFiles((prev) => [...prev, ...created])
+          }}
+          onAddResultImages={(files) => {
+            const created = createResultImages(files)
+            trackNewUrls(created)
+            setWriteResultImages((prev) => [...prev, ...created])
+          }}
           onRemoveResultFile={(id) =>
-            setWriteResultFiles((prev) => prev.filter((file) => file.id !== id))
+            setWriteResultFiles((prev) => {
+              const removed = prev.find((file) => file.id === id)
+              if (removed) releaseIfNew(removed.url)
+              return prev.filter((file) => file.id !== id)
+            })
           }
           onRemoveResultImage={(id) =>
-            setWriteResultImages((prev) => prev.filter((image) => image.id !== id))
+            setWriteResultImages((prev) => {
+              const removed = prev.find((image) => image.id === id)
+              if (removed) releaseIfNew(removed.url)
+              return prev.filter((image) => image.id !== id)
+            })
           }
           onCancel={handleCancelWriteResult}
           onConfirm={handleConfirmWriteResult}

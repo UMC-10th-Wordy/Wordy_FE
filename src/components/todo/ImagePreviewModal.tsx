@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 import DownloadIcon from '@/assets/icons/download.svg?react'
 import ImageIcon from '@/assets/icons/image.svg?react'
 import { downloadFile } from '@/utils/file'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
+import { useModalFocus } from '@/hooks/useModalFocus'
 
 const IMAGE_MAX_SIZE = 600
 
@@ -16,6 +17,8 @@ interface ImagePreviewModalProps {
 
 export function ImagePreviewModal({ name, url, onClose }: ImagePreviewModalProps) {
   useEscapeKey(onClose)
+  const containerRef = useModalFocus<HTMLDivElement>()
+  const titleId = useId()
   const [displaySize, setDisplaySize] = useState<{ width: number; height: number } | null>(null)
   const [hasError, setHasError] = useState(false)
 
@@ -28,7 +31,14 @@ export function ImagePreviewModal({ name, url, onClose }: ImagePreviewModalProps
         className="absolute inset-0 bg-black/25 backdrop-blur-[8px]"
       />
       {/* 이미지만 가운데 정렬 -> 버튼은 absolute(영향 없음) */}
-      <div className="relative inline-block">
+      <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="relative inline-block"
+      >
         {hasError ? (
           <div className="flex h-[280px] w-[600px] flex-col items-center justify-center gap-4 rounded-(--scale-8) bg-black/50 pt-8 pb-7">
             <ImageIcon aria-hidden className="size-16 text-(--color-icon-inverse)" />
@@ -79,7 +89,10 @@ export function ImagePreviewModal({ name, url, onClose }: ImagePreviewModalProps
 
         {/* 파일 이름 */}
         <div className="absolute top-full left-1/2 mt-5 -translate-x-1/2">
-          <p className="rounded-(--scale-8) bg-black/50 px-3 py-1 [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-medium whitespace-nowrap text-(--color-text-inverse)">
+          <p
+            id={titleId}
+            className="rounded-(--scale-8) bg-black/50 px-3 py-1 [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-medium whitespace-nowrap text-(--color-text-inverse)"
+          >
             {name}
           </p>
         </div>
