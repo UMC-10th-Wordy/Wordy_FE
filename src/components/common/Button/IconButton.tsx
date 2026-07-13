@@ -46,11 +46,18 @@ const iconButton = cva(
           'active:bg-[var(--color-bg-tertiary)]',
           'disabled:text-[var(--color-text-disabled)]',
         ],
+        icon_inverse: [
+          'bg-[rgba(0,0,0,0.5)] text-[var(--color-text-inverse)]',
+          'hover:bg-[var(--color-bg-default)] hover:text-[var(--color-text-default)]',
+          'focus-visible:bg-[var(--color-bg-default)] focus-visible:text-[var(--color-text-default)]',
+          'active:bg-[var(--color-bg-secondary)] active:text-[var(--color-text-default)]',
+          'disabled:bg-[rgba(0,0,0,0.5)] disabled:text-[var(--color-text-disabled)]',
+        ],
       },
       size: {
         small: 'size-8 rounded-md',
         medium: 'size-11 rounded-lg',
-        large: 'size-[60px] rounded-lg',
+        large: 'size-15 rounded-lg',
       },
     },
     defaultVariants: {
