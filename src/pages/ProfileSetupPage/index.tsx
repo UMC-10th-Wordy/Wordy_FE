@@ -108,6 +108,7 @@ export const ProfileSetupPage = () => {
             <button
               key={option}
               type="button"
+              aria-pressed={career === option}
               onClick={() => setCareer(option)}
               className={[
                 'w-full rounded-lg py-4 text-center transition-colors',
@@ -146,6 +147,7 @@ export const ProfileSetupPage = () => {
           <button
             key={option}
             type="button"
+            aria-pressed={job === option}
             onClick={() => setJob(option)}
             className={[
               'rounded-lg px-4 py-2.5 transition-colors',
