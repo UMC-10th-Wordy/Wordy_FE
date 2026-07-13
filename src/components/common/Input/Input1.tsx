@@ -42,14 +42,14 @@ export function Input1({
       )}
       <div
         className={[
-          'flex items-center gap-2 h-[60px] px-5 rounded-lg border bg-(--color-bg-default) transition-colors duration-100',
+          'flex items-center gap-2 h-15 px-5 rounded-lg border bg-(--color-bg-default) transition-colors duration-100',
           disabled ? 'border-(--color-border-disabled)' : borderClass,
         ].join(' ')}
       >
         <input
           type={isPassword && showPassword ? 'text' : type}
           disabled={disabled}
-          className="flex-1 min-w-0 bg-transparent outline-none [font-size:var(--font-size-body-4)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) disabled:text-(--color-text-disabled) disabled:cursor-not-allowed"
+          className="flex-1 min-w-0 bg-transparent outline-none [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) disabled:text-(--color-text-disabled) disabled:cursor-not-allowed"
           {...rest}
         />
         {isPassword && (

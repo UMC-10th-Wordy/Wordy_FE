@@ -15,7 +15,7 @@ const chip = cva(
         round: [
           'rounded-(--scale-1000)',
           'h-14 px-5',
-          '[font-size:var(--font-size-body-4)] font-normal',
+          '[font-size:var(--font-size-body-1)] font-normal',
           'bg-(--color-chip-default) text-(--color-text-default)',
           'hover:bg-(--color-chip-hover)',
           'active:bg-(--color-chip-pressed)',
@@ -25,7 +25,7 @@ const chip = cva(
         rectangle: [
           'rounded-lg',
           'h-14 px-5',
-          '[font-size:var(--font-size-body-4)] font-normal',
+          '[font-size:var(--font-size-body-1)] font-normal',
           'bg-(--color-chip-default) text-(--color-text-default)',
           'hover:bg-(--color-chip-hover)',
           'active:bg-(--color-chip-pressed)',
