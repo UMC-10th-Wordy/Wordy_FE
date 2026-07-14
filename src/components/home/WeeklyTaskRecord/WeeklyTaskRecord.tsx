@@ -1,7 +1,6 @@
 import { Fragment } from 'react'
 import type { HTMLAttributes } from 'react'
-
-export type TaskPriority = 'must' | 'should' | 'could'
+import type { TaskPriority } from '@/components/home/TodayTaskCard/TodayTaskCard'
 
 export interface WeeklyTask {
   id: string
@@ -25,10 +24,10 @@ const PRIORITY_BG: Record<TaskPriority, string> = {
   could: 'bg-(--color-bg-tertiary)',
 }
 
-const LEGEND: { label: string; color: string }[] = [
-  { label: 'Must do', color: 'bg-[var(--primitive-primary-300)]' },
-  { label: 'Should do', color: 'bg-[var(--primitive-secondary-300)]' },
-  { label: 'Could do', color: 'bg-(--color-bg-tertiary)' },
+const LEGEND: { label: string; priority: TaskPriority }[] = [
+  { label: 'Must do', priority: 'must' },
+  { label: 'Should do', priority: 'should' },
+  { label: 'Could do', priority: 'could' },
 ]
 
 export function WeeklyTaskRecord({ days, className, ...rest }: WeeklyTaskRecordProps) {
@@ -51,9 +50,11 @@ export function WeeklyTaskRecord({ days, className, ...rest }: WeeklyTaskRecordP
           이번 주 업무 기록
         </span>
         <div className="flex items-center gap-2">
-          {LEGEND.map(({ label, color }) => (
+          {LEGEND.map(({ label, priority }) => (
             <div key={label} className="flex items-center gap-1">
-              <span className={['size-3.5 rounded-full shrink-0', color].join(' ')} />
+              <span
+                className={['size-3.5 rounded-full shrink-0', PRIORITY_BG[priority]].join(' ')}
+              />
               <span className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) font-semibold text-(--color-text-tertiary) whitespace-nowrap">
                 {label}
               </span>

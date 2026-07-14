@@ -3,9 +3,7 @@ import { motion } from 'framer-motion'
 import { TextButton } from '@/components/common/Button/TextButton'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
 import imgVectorLeftCorner from '@/assets/images/banner/vector_left_corner.svg'
-import { BannerIllustration } from './BannerIllustration'
-
-const EASE_SPRING: [number, number, number, number] = [0.585, 0, 0.004, 1]
+import { BannerIllustration, EASE_SPRING } from './BannerIllustration'
 
 export interface HomeBannerProps extends HTMLAttributes<HTMLDivElement> {
   onNavigate?: () => void

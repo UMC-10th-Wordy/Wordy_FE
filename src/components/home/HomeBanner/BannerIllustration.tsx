@@ -13,7 +13,8 @@ import imgFlowerR4 from '@/assets/images/banner/flower_r4.svg'
 import imgFlowerR5 from '@/assets/images/banner/flower_r5.svg'
 import imgFlowerR6 from '@/assets/images/banner/flower_r6.svg'
 
-const EASE_SPRING: [number, number, number, number] = [0.585, 0, 0.004, 1]
+export const EASE_SPRING: [number, number, number, number] = [0.585, 0, 0.004, 1]
+const EASE_SPRING_LINEAR = [EASE_SPRING, 'linear'] as never
 const EASE_BOUNCE: [number, number, number, number] = [0.07, 0.97, 0.58, 1]
 
 // 피그마 원본 캔버스
@@ -57,7 +58,7 @@ export function BannerIllustration({ className }: { className?: string }) {
             transition={{
               duration: 2,
               times: [0, 0.3959, 1],
-              ease: [EASE_SPRING, 'linear'] as never,
+              ease: EASE_SPRING_LINEAR,
             }}
           />
         )
@@ -68,7 +69,7 @@ export function BannerIllustration({ className }: { className?: string }) {
       <motion.g
         initial={{ x: 0 }}
         animate={{ x: [0, -21, -21] }}
-        transition={{ duration: 2, times: [0, 0.3959, 1], ease: [EASE_SPRING, 'linear'] as never }}
+        transition={{ duration: 2, times: [0, 0.3959, 1], ease: EASE_SPRING_LINEAR }}
       >
         {/* Ellipse122: 절대 px (피그마 코드: h-[144px] left-0 top-[196px] w-[718.265px]) */}
         <image href={imgEllipse122} x={0} y={196} width={718.265} height={144} />
@@ -164,7 +165,7 @@ export function BannerIllustration({ className }: { className?: string }) {
       <motion.g
         initial={{ x: 0 }}
         animate={{ x: [0, 30.01, 30.01] }}
-        transition={{ duration: 2, times: [0, 0.3959, 1], ease: [EASE_SPRING, 'linear'] as never }}
+        transition={{ duration: 2, times: [0, 0.3959, 1], ease: EASE_SPRING_LINEAR }}
       >
         {/* 우측 언덕 배경: inset [20.11% 0 0 53.5%] */}
         <image href={imgVector3} {...inset(20.11, 0, 0, 53.5)} />

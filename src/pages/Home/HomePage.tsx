@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { HomeBanner } from '@/components/home/HomeBanner/HomeBanner'
 import { TodayTaskCard } from '@/components/home/TodayTaskCard/TodayTaskCard'
-import { StreakCard } from '@/components/home/StreakCard/StreakCard'
+import { StreakCard, WEEK_DAYS } from '@/components/home/StreakCard/StreakCard'
 import { WeeklyTaskRecord } from '@/components/home/WeeklyTaskRecord/WeeklyTaskRecord'
 import { RecentRecordCard } from '@/components/home/RecentRecordCard/RecentRecordCard'
 import ArrowRightIcon from '@/assets/icons/Property 1=top_right.svg?react'
@@ -142,7 +142,7 @@ export interface HomePageProps extends HTMLAttributes<HTMLDivElement> {
 export function HomePage({ userName = 'Alex Kim', className, ...rest }: HomePageProps) {
   const navigate = useNavigate()
   const today = new Date()
-  const todayLabel = `${today.getMonth() + 1}월 ${today.getDate()}일 ${['일', '월', '화', '수', '목', '금', '토'][today.getDay()]}요일`
+  const todayLabel = `${today.getMonth() + 1}월 ${today.getDate()}일 ${WEEK_DAYS[today.getDay()]}요일`
 
   return (
     <div className={['flex-1 overflow-y-auto p-10', className].filter(Boolean).join(' ')} {...rest}>

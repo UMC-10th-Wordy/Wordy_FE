@@ -7,10 +7,12 @@ export type DayRecord = 'success' | 'success-dim' | 'fail' | 'none'
 
 export interface StreakCardProps extends HTMLAttributes<HTMLDivElement> {
   streak: number
-  weekRecord: DayRecord[]
+  weekRecord: readonly DayRecord[]
 }
 
-const WEEK_DAYS = ['일', '월', '화', '수', '목', '금', '토'] as const
+export const WEEK_DAYS = ['일', '월', '화', '수', '목', '금', '토'] as const
+
+const ICON_SIZE = { width: 32, height: 32 } as const
 
 export function StreakCard({ streak, weekRecord, className, ...rest }: StreakCardProps) {
   return (
@@ -35,7 +37,7 @@ export function StreakCard({ streak, weekRecord, className, ...rest }: StreakCar
         {/* 연속 기록 */}
         <div className="flex gap-2 items-start justify-center w-full">
           <FireIcon
-            style={{ color: 'var(--primitive-orange-700)', width: 32, height: 32 }}
+            style={{ color: 'var(--primitive-orange-700)', ...ICON_SIZE }}
             className="shrink-0"
           />
           <div className="flex flex-col items-center">
@@ -62,21 +64,21 @@ export function StreakCard({ streak, weekRecord, className, ...rest }: StreakCar
             <div key={day} className="flex flex-1 flex-col gap-2 items-center min-w-0">
               {weekRecord[i] === 'success' ? (
                 <SuccessIcon
-                  style={{ color: 'var(--primitive-orange-700)', width: 32, height: 32 }}
+                  style={{ color: 'var(--primitive-orange-700)', ...ICON_SIZE }}
                   className="shrink-0"
                 />
               ) : weekRecord[i] === 'success-dim' ? (
                 <SuccessIcon
-                  style={{ color: 'var(--primitive-orange-300)', width: 32, height: 32 }}
+                  style={{ color: 'var(--primitive-orange-300)', ...ICON_SIZE }}
                   className="shrink-0"
                 />
               ) : weekRecord[i] === 'fail' ? (
                 <FailIcon
-                  style={{ color: 'var(--color-icon-tertiary)', width: 32, height: 32 }}
+                  style={{ color: 'var(--color-icon-tertiary)', ...ICON_SIZE }}
                   className="shrink-0"
                 />
               ) : (
-                <div style={{ width: 32, height: 32 }} className="shrink-0" />
+                <div style={ICON_SIZE} className="shrink-0" />
               )}
               <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-default)">
                 {day}
