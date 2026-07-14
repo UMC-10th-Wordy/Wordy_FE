@@ -4,12 +4,14 @@ import { TextButton } from '@/components/common/Button/TextButton'
 import { TermsSection, isRequiredTermsChecked } from '@/components/auth/TermsSection'
 import type { TermsState } from '@/components/auth/TermsSection'
 import LogoIcon from '@/assets/icons/logo.svg?react'
+import { useNavigate } from 'react-router-dom'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 // 영문, 숫자, 특수문자 모두 포함 8자 이상 (피그마 힌트 문구 기준)
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/
 
 export const SignupPage = () => {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
@@ -46,15 +48,14 @@ export const SignupPage = () => {
 
   const handleSubmit = () => {
     if (!isValid) return
-    // TODO(#이슈번호): API 연동 시 회원가입 요청으로 교체
-    alert(`회원가입 시도: ${email}`)
+    // TODO(#18): API 연동 시 회원가입 요청 성공 응답 후 이동으로 교체
+    navigate('/email-verification', { state: { email } })
   }
 
   return (
     <div className="flex min-h-screen justify-center bg-(--color-bg-secondary) px-6 py-16">
       <div className="flex h-fit w-full max-w-[800px] flex-col gap-[52px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-[80px] shadow-xl shadow-black/5">
         <header>
-          {/* TODO(#이슈번호): 로고 svg 에셋 받으면 교체 */}
           <LogoIcon className="mb-6 h-7 w-auto" />
           <h1 className="mb-2 text-3xl font-bold text-(--color-text-default)">회원가입</h1>
           <p className="text-(--color-text-tertiary)">환영합니다! 워디를 시작해볼까요?</p>
