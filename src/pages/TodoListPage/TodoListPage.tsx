@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import TaskForm from '@/components/todo/TaskForm'
 import TodoTabs from '@/components/todo/TodoTabs'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
-import type { PerformancePreviewStatus } from '@/components/performance-preview/PerformancePreviewPanel'
 import DateHeader from '@/components/header/DateHeader'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
@@ -37,7 +36,7 @@ export default function TodoListPage() {
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
   const [retrospective, setRetrospective] = useState('')
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
-  const [previewStatus, setPreviewStatus] = useState<PerformancePreviewStatus>('empty')
+  const [previewStatus, setPreviewStatus] = useState<'empty' | 'converting' | 'failed'>('empty')
   const taskListRef = useRef<HTMLDivElement>(null)
   const { toasts, showToast } = useToastQueue()
 
