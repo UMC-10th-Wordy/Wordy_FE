@@ -127,7 +127,7 @@ export const SignupPage = () => {
         <div className="flex items-center justify-center gap-1 text-sm text-(--color-text-tertiary)">
           <span>이미 회원이신가요?</span>
           {/* TODO(#이슈번호): 로그인 페이지 라우팅 연결 */}
-          <TextButton variant="text_only" size="small">
+          <TextButton variant="text_only" size="small" onClick={() => navigate('/login')}>
             로그인
           </TextButton>
         </div>
