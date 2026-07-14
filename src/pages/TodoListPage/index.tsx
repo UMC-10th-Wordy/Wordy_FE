@@ -167,7 +167,7 @@ export default function TodoListPage() {
   const isActiveTabEmpty = activeTasks.length === 0
 
   return (
-    <div className="flex h-screen flex-1 items-start bg-(--color-bg-default)">
+    <div className="flex flex-1 items-start bg-(--color-bg-default)">
       <main className="h-screen flex-1 overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-10 pt-10">
         <div className="flex w-full flex-col gap-12">
           <DateHeader
