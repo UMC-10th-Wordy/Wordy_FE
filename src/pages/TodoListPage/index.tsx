@@ -13,6 +13,7 @@ import { ConversionNoticeSection } from '@/components/todo/ConversionNoticeSecti
 import { useDragReorder, type DragOverInfo } from '@/hooks/useDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
 import { useToastQueue } from '@/hooks/useToastQueue'
+import { toDateKey } from '@/utils/calendar'
 import type {
   Task,
   TaskDraftValues,
@@ -35,8 +36,11 @@ export default function TodoListPage() {
   const taskListRef = useRef<HTMLDivElement>(null)
   const { toasts, showToast } = useToastQueue()
 
-  const completedTasks = tasks.filter((task) => task.isCompleted)
-  const incompleteTasks = tasks.filter((task) => !task.isCompleted)
+  const currentDateKey = toDateKey(currentDate)
+  const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
+
+  const completedTasks = tasksForDate.filter((task) => task.isCompleted)
+  const incompleteTasks = tasksForDate.filter((task) => !task.isCompleted)
   const activeTasks = activeTab === 'completed' ? completedTasks : incompleteTasks
   const mustDoTasks = activeTasks.filter((task) => task.priority === 'must')
   const shouldDoTasks = activeTasks.filter((task) => task.priority === 'should')
@@ -50,6 +54,7 @@ export default function TodoListPage() {
   const handleAddTask = (values: TaskDraftValues) => {
     const newTask: Task = {
       id: crypto.randomUUID(),
+      date: currentDateKey,
       title: values.title,
       memo: values.memo,
       tag: values.tag,
@@ -163,7 +168,7 @@ export default function TodoListPage() {
 
   const goToToday = () => setCurrentDate(new Date())
 
-  const hasAnyTaskEverToday = tasks.length > 0
+  const hasAnyTaskEverToday = tasksForDate.length > 0
   const isActiveTabEmpty = activeTasks.length === 0
 
   return (
@@ -172,12 +177,14 @@ export default function TodoListPage() {
         <div className="flex w-full flex-col gap-12">
           <DateHeader
             date={currentDate}
+            tasks={tasks}
             subtitle="오늘은 어떤 업무를 하실 예정인가요?"
             isPreviewOpen={isPreviewOpen}
             onTogglePreview={() => setIsPreviewOpen((prev) => !prev)}
             onPrevDay={() => shiftDate(-1)}
             onNextDay={() => shiftDate(1)}
             onToday={goToToday}
+            onSelectDate={setCurrentDate}
           />
 
           <section className="flex w-full flex-col gap-2">
