@@ -1,0 +1,14 @@
+<svg width="180" height="195" viewBox="0 0 180 195" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect y="75" width="180" height="120" fill="#5D5DF1"/>
+<path d="M77.1963 10.6697C84.6132 4.48897 95.3868 4.48897 102.804 10.6697L180 75H0L77.1963 10.6697Z" fill="#7D7DFF"/>
+<path d="M25 36.75H155C160.385 36.75 164.75 41.1152 164.75 46.5V128C164.75 133.385 160.385 137.75 155 137.75H25C19.6152 137.75 15.25 133.385 15.25 128V46.5C15.25 41.1152 19.6152 36.75 25 36.75Z" fill="#FAFAFA" stroke="#E6E6E6" stroke-width="0.5"/>
+<rect x="25" y="53.5" width="40" height="6" rx="3" fill="#E6E6E6"/>
+<rect x="25" y="80.5" width="130" height="6" rx="3" fill="#E6E6E6"/>
+<rect x="25" y="95.5" width="130" height="6" rx="3" fill="#E6E6E6"/>
+<rect x="25" y="110.5" width="130" height="6" rx="3" fill="#E6E6E6"/>
+<rect x="25" y="125.5" width="130" height="6" rx="3" fill="#E6E6E6"/>
+<circle cx="147" cy="56.5" r="8" fill="#A5A5FF"/>
+<path d="M90 135L0 195V75L90 135Z" fill="#A5A5FF"/>
+<path d="M90 135L180 195V75L90 135Z" fill="#BEBEFF"/>
+<path d="M90 135L180 195H0L90 135Z" fill="#BEBEFF"/>
+</svg>
