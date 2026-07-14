@@ -44,6 +44,8 @@ export function CalendarDayCell({
         type="button"
         disabled={!isCurrentMonth}
         onClick={() => onSelect(date)}
+        aria-label={`${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`}
+        aria-pressed={isSelected}
         className={`flex size-[40px] shrink-0 items-center justify-center rounded-(--scale-8) [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-normal disabled:cursor-default ${squareClassName}`}
       >
         {date.getDate()}

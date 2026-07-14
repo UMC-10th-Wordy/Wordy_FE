@@ -34,7 +34,7 @@ export default function TodoListPage() {
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
-  const [retrospective, setRetrospective] = useState('')
+  const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
   const [previewStatus, setPreviewStatus] = useState<'empty' | 'converting' | 'failed'>('empty')
   const taskListRef = useRef<HTMLDivElement>(null)
@@ -42,6 +42,7 @@ export default function TodoListPage() {
 
   const currentDateKey = toDateKey(currentDate)
   const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
+  const retrospective = retrospectiveByDate[currentDateKey] ?? ''
 
   const completedTasks = tasksForDate.filter((task) => task.isCompleted)
   const incompleteTasks = tasksForDate.filter((task) => !task.isCompleted)
@@ -301,7 +302,12 @@ export default function TodoListPage() {
             </div>
             <Input2
               value={retrospective}
-              onChange={(event) => setRetrospective(event.target.value)}
+              onChange={(event) =>
+                setRetrospectiveByDate((prev) => ({
+                  ...prev,
+                  [currentDateKey]: event.target.value,
+                }))
+              }
               placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."
               className="w-full !min-h-[200px]"
             />
