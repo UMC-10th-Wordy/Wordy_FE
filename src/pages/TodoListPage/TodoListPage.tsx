@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import TaskForm from '@/components/todo/TaskForm'
 import TodoTabs from '@/components/todo/TodoTabs'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
+import type { PerformancePreviewStatus } from '@/components/performance-preview/PerformancePreviewPanel'
 import DateHeader from '@/components/header/DateHeader'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
@@ -10,6 +11,7 @@ import { ToastViewport } from '@/components/todo/ToastViewport'
 import { PrioritySection } from '@/components/todo/PrioritySection'
 import { DraggingTaskGhost } from '@/components/todo/DraggingTaskGhost'
 import { ConversionNoticeSection } from '@/components/todo/ConversionNoticeSection'
+import { RetrospectiveExampleModal } from '@/components/todo/RetrospectiveExampleModal'
 import { useDragReorder, type DragOverInfo } from '@/hooks/useDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
 import { useToastQueue } from '@/hooks/useToastQueue'
@@ -33,6 +35,9 @@ export default function TodoListPage() {
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
+  const [retrospective, setRetrospective] = useState('')
+  const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
+  const [previewStatus, setPreviewStatus] = useState<PerformancePreviewStatus>('empty')
   const taskListRef = useRef<HTMLDivElement>(null)
   const { toasts, showToast } = useToastQueue()
 
@@ -168,6 +173,12 @@ export default function TodoListPage() {
 
   const goToToday = () => setCurrentDate(new Date())
 
+  /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
+  const handleConvert = () => {
+    setPreviewStatus('converting')
+    setIsPreviewOpen(true)
+  }
+
   const hasAnyTaskEverToday = tasksForDate.length > 0
   const isActiveTabEmpty = activeTasks.length === 0
 
@@ -283,24 +294,34 @@ export default function TodoListPage() {
                 type="button"
                 variant="text_only"
                 size="medium"
+                onClick={() => setIsExampleModalOpen(true)}
                 iconRight={<ExpandIcon aria-hidden className="size-7" />}
               >
                 이렇게 작성해 보세요
               </TextButton>
             </div>
             <Input2
+              value={retrospective}
+              onChange={(event) => setRetrospective(event.target.value)}
               placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."
               className="w-full !min-h-[200px]"
             />
           </section>
 
-          <ConversionNoticeSection />
+          <ConversionNoticeSection
+            isEnabled={retrospective.trim().length > 0}
+            onConvert={handleConvert}
+          />
         </div>
       </main>
 
-      {isPreviewOpen && <PerformancePreviewPanel />}
+      {isPreviewOpen && <PerformancePreviewPanel status={previewStatus} />}
 
       {draggingTask && pointer && <DraggingTaskGhost task={draggingTask} pointer={pointer} />}
+
+      {isExampleModalOpen && (
+        <RetrospectiveExampleModal onClose={() => setIsExampleModalOpen(false)} />
+      )}
 
       <ToastViewport toasts={toasts} />
     </div>
