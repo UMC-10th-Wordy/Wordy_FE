@@ -7,6 +7,7 @@ import { NotificationModal } from '@/components/sidebar/NotificationModal/Notifi
 import { WorkspaceModal } from '@/components/sidebar/WorkspaceModal/WorkspaceModal'
 import type { NotificationItemProps } from '@/components/sidebar/NotificationItem/NotificationItem'
 import TodoListPage from '@/pages/TodoListPage'
+import { DiaryListPage } from '@/pages/DiaryListPage'
 import HomeIcon from '@/assets/icons/home.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
@@ -168,6 +169,7 @@ export function SidebarPage() {
       />
 
       {currentPage === '오늘의 업무' && <TodoListPage />}
+      {currentPage === '일지 모아보기' && <DiaryListPage />}
 
       {modal === 'setting' && (
         <SettingModal
