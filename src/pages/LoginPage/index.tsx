@@ -4,10 +4,12 @@ import { Checkbox } from '@/components/common/Checkbox/Checkbox'
 import { TextButton } from '@/components/common/Button/TextButton'
 import LogoIcon from '@/assets/icons/logo.svg?react'
 import GoogleIcon from '@/assets/icons/google.svg?react'
+import { useNavigate } from 'react-router-dom'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const LoginPage = () => {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -112,7 +114,7 @@ export const LoginPage = () => {
         <div className="mt-8 flex items-center justify-center gap-1 text-sm text-(--color-text-tertiary)">
           <span>아직 회원이 아니신가요?</span>
           {/* TODO: 회원가입 페이지 라우팅 연결 */}
-          <TextButton variant="text_only" size="small">
+          <TextButton variant="text_only" size="small" onClick={() => navigate('/signup')}>
             회원가입
           </TextButton>
         </div>
