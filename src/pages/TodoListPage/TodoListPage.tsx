@@ -9,6 +9,7 @@ import { Input2 } from '@/components/common/Input/Input2'
 import { ToastViewport } from '@/components/todo/ToastViewport'
 import { PrioritySection } from '@/components/todo/PrioritySection'
 import { DraggingTaskGhost } from '@/components/todo/DraggingTaskGhost'
+import { DragLineIndicator } from '@/components/todo/DragLineIndicator'
 import { ConversionNoticeSection } from '@/components/todo/ConversionNoticeSection'
 import { RetrospectiveExampleModal } from '@/components/todo/RetrospectiveExampleModal'
 import { useDragReorder, type DragOverInfo } from '@/hooks/useDragReorder'
@@ -149,19 +150,12 @@ export default function TodoListPage() {
     })
   }
 
-  const { draggingId, dragHeight, overInfo, pointer, startDrag } = useDragReorder({
+  const { draggingId, overInfo, pointer, startDrag } = useDragReorder({
     onDrop: handleTaskDrop,
   })
   const draggingTask = draggingId ? (tasks.find((task) => task.id === draggingId) ?? null) : null
 
-  useFlipAnimation(taskListRef, [
-    tasks,
-    activeTab,
-    draggingId,
-    overInfo.itemId,
-    overInfo.insertAfter,
-    overInfo.sectionKey,
-  ])
+  useFlipAnimation(taskListRef, [tasks, activeTab])
 
   const shiftDate = (days: number) => {
     setCurrentDate((prev) => {
@@ -243,8 +237,6 @@ export default function TodoListPage() {
                     description="반드시 오늘 끝낼 거예요"
                     sectionTasks={mustDoTasks}
                     draggingTask={draggingTask}
-                    overInfo={overInfo}
-                    dragHeight={dragHeight}
                     startDrag={startDrag}
                     onDeleteTask={handleDeleteTask}
                     onEditTask={handleEditTask}
@@ -257,8 +249,6 @@ export default function TodoListPage() {
                     description="가능하면 오늘 완료할 거예요"
                     sectionTasks={shouldDoTasks}
                     draggingTask={draggingTask}
-                    overInfo={overInfo}
-                    dragHeight={dragHeight}
                     startDrag={startDrag}
                     onDeleteTask={handleDeleteTask}
                     onEditTask={handleEditTask}
@@ -271,8 +261,6 @@ export default function TodoListPage() {
                     description="여유가 있으면 진행할 거예요"
                     sectionTasks={couldDoTasks}
                     draggingTask={draggingTask}
-                    overInfo={overInfo}
-                    dragHeight={dragHeight}
                     startDrag={startDrag}
                     onDeleteTask={handleDeleteTask}
                     onEditTask={handleEditTask}
@@ -323,6 +311,8 @@ export default function TodoListPage() {
       {isPreviewOpen && <PerformancePreviewPanel status={previewStatus} />}
 
       {draggingTask && pointer && <DraggingTaskGhost task={draggingTask} pointer={pointer} />}
+
+      {draggingTask && overInfo.line && <DragLineIndicator rect={overInfo.line} />}
 
       {isExampleModalOpen && (
         <RetrospectiveExampleModal onClose={() => setIsExampleModalOpen(false)} />

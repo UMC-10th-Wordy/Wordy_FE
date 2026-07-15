@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent as ReactMouseEvent } from 'react'
+import { computeLineIndicator, type LineRect, type RowSnapshot } from '@/utils/dragLineIndicator'
 
 export interface DragOverInfo {
   itemId: string | null
   insertAfter: boolean
   sectionKey: string | null
+  line: LineRect | null
 }
 
 export interface DragPointer {
@@ -12,15 +14,15 @@ export interface DragPointer {
   y: number
 }
 
-interface RowSnapshot {
-  id: string
+interface ColumnSnapshot {
   section: string
   rect: DOMRect
 }
 
-interface SectionSnapshot {
+interface SectionBand {
   section: string
-  rect: DOMRect
+  top: number
+  bottom: number
 }
 
 interface UseDragReorderOptions {
@@ -28,68 +30,22 @@ interface UseDragReorderOptions {
 }
 
 const DRAG_START_THRESHOLD = 4
-
-function findSection(sections: SectionSnapshot[], x: number, y: number): SectionSnapshot | null {
-  let inside: SectionSnapshot | null = null
-  let closest: SectionSnapshot | null = null
-  let closestDistance = Infinity
-
-  for (const section of sections) {
-    const { rect } = section
-    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-      inside = section
-      break
-    }
-    if (x < rect.left || x > rect.right) continue
-    const distance = y < rect.top ? rect.top - y : y - rect.bottom
-    if (distance < closestDistance) {
-      closestDistance = distance
-      closest = section
-    }
-  }
-
-  return inside ?? closest
+const EMPTY_OVER_INFO: DragOverInfo = {
+  itemId: null,
+  insertAfter: false,
+  sectionKey: null,
+  line: null,
 }
 
-function findClosestRowInSection(
-  rows: RowSnapshot[],
-  section: string,
-  x: number,
-  y: number,
-): RowSnapshot | null {
-  let inColumn: RowSnapshot | null = null
-  let inColumnDistance = Infinity
-  let any: RowSnapshot | null = null
-  let anyDistance = Infinity
-
-  for (const row of rows) {
-    if (row.section !== section) continue
-    const centerY = row.rect.top + row.rect.height / 2
-    const distance = Math.abs(y - centerY)
-
-    if (distance < anyDistance) {
-      anyDistance = distance
-      any = row
-    }
-    if (x >= row.rect.left && x <= row.rect.right && distance < inColumnDistance) {
-      inColumnDistance = distance
-      inColumn = row
-    }
-  }
-
-  return inColumn ?? any
+function findSection(bands: SectionBand[], y: number): string | null {
+  return bands.find((band) => y >= band.top && y < band.bottom)?.section ?? null
 }
 
 export function useDragReorder({ onDrop }: UseDragReorderOptions) {
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [draggingId, setDraggingId] = useState<string | null>(null)
-  const [dragHeight, setDragHeight] = useState(160)
   const [pointer, setPointer] = useState<DragPointer | null>(null)
-  const [overInfo, setOverInfo] = useState<DragOverInfo>({
-    itemId: null,
-    insertAfter: false,
-    sectionKey: null,
-  })
+  const [overInfo, setOverInfo] = useState<DragOverInfo>(EMPTY_OVER_INFO)
   const overInfoRef = useRef(overInfo)
   const onDropRef = useRef(onDrop)
   useEffect(() => {
@@ -98,35 +54,76 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
   })
   const activeIdRef = useRef<string | null>(null)
   const rowsSnapshotRef = useRef<RowSnapshot[]>([])
-  const sectionsSnapshotRef = useRef<SectionSnapshot[]>([])
+  const columnsSnapshotRef = useRef<ColumnSnapshot[]>([])
+  const sectionBandsRef = useRef<SectionBand[]>([])
+  const lastPointerRef = useRef<DragPointer | null>(null)
   const startPointRef = useRef<DragPointer | null>(null)
   const hasPassedThresholdRef = useRef(false)
 
-  const startDrag = (id: string) => (event: ReactMouseEvent) => {
-    event.preventDefault()
-
+  const captureSnapshots = (excludeId: string) => {
     const rowElements = Array.from(document.querySelectorAll<HTMLElement>('[data-drag-row="true"]'))
-    const draggedRow = rowElements.find((el) => el.dataset.dragId === id)
 
     rowsSnapshotRef.current = rowElements
-      .filter((el) => el.dataset.dragId !== id)
+      .filter((el) => el.dataset.dragId !== excludeId)
       .map((el) => ({
         id: el.dataset.dragId ?? '',
         section: el.dataset.dragSection ?? '',
         rect: el.getBoundingClientRect(),
       }))
 
-    sectionsSnapshotRef.current = Array.from(
+    columnsSnapshotRef.current = Array.from(
       document.querySelectorAll<HTMLElement>('[data-drag-section-drop]'),
     ).map((el) => ({
       section: el.dataset.dragSectionDrop ?? '',
       rect: el.getBoundingClientRect(),
     }))
 
-    const measuredHeight = draggedRow?.getBoundingClientRect().height
-    setDragHeight(measuredHeight && measuredHeight > 0 ? measuredHeight : 160)
-    setOverInfo({ itemId: null, insertAfter: false, sectionKey: null })
+    const sectionTops = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-drag-section-outer]'),
+    )
+      .map((el) => ({
+        section: el.dataset.dragSectionOuter ?? '',
+        top: el.getBoundingClientRect().top,
+      }))
+      .sort((a, b) => a.top - b.top)
+
+    sectionBandsRef.current = sectionTops.map((entry, index) => ({
+      section: entry.section,
+      top: entry.top,
+      bottom: sectionTops[index + 1]?.top ?? Infinity,
+    }))
+  }
+
+  const evaluatePointer = (x: number, y: number) => {
+    const sectionKey = findSection(sectionBandsRef.current, y)
+    if (!sectionKey) {
+      setOverInfo((prev) => (prev.sectionKey === null ? prev : EMPTY_OVER_INFO))
+      return
+    }
+
+    const columnRects = columnsSnapshotRef.current
+      .filter((s) => s.section === sectionKey)
+      .map((s) => s.rect)
+      .sort((a, b) => a.left - b.left)
+    const rows = rowsSnapshotRef.current.filter((row) => row.section === sectionKey)
+
+    const result = computeLineIndicator(rows, columnRects, x, y)
+    setOverInfo({
+      itemId: result.itemId,
+      insertAfter: result.insertAfter,
+      sectionKey,
+      line: result.line,
+    })
+  }
+
+  const startDrag = (id: string) => (event: ReactMouseEvent) => {
+    event.preventDefault()
+
+    captureSnapshots(id)
+
+    setOverInfo(EMPTY_OVER_INFO)
     startPointRef.current = { x: event.clientX, y: event.clientY }
+    lastPointerRef.current = { x: event.clientX, y: event.clientY }
     hasPassedThresholdRef.current = false
     activeIdRef.current = id
     setSessionId(id)
@@ -144,46 +141,20 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
           if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD) return
         }
         hasPassedThresholdRef.current = true
-        /* 임계값 통과 후 드래그 상태 켜기 - coderabbit수정 */
         setDraggingId(activeIdRef.current)
       }
 
-      setPointer({ x: event.clientX, y: event.clientY })
+      lastPointerRef.current = { x: event.clientX, y: event.clientY }
+      setPointer(lastPointerRef.current)
+      evaluatePointer(event.clientX, event.clientY)
+    }
 
-      const section = findSection(sectionsSnapshotRef.current, event.clientX, event.clientY)
-      if (!section) {
-        setOverInfo((prev) =>
-          prev.itemId === null && prev.sectionKey === null
-            ? prev
-            : { itemId: null, insertAfter: false, sectionKey: null },
-        )
-        return
-      }
-
-      const closestRow = findClosestRowInSection(
-        rowsSnapshotRef.current,
-        section.section,
-        event.clientX,
-        event.clientY,
-      )
-
-      if (closestRow) {
-        const isAfter = event.clientY > closestRow.rect.top + closestRow.rect.height / 2
-        setOverInfo((prev) =>
-          prev.itemId === closestRow.id &&
-          prev.sectionKey === closestRow.section &&
-          prev.insertAfter === isAfter
-            ? prev
-            : { itemId: closestRow.id, insertAfter: isAfter, sectionKey: closestRow.section },
-        )
-        return
-      }
-
-      setOverInfo((prev) =>
-        prev.itemId === null && prev.sectionKey === section.section
-          ? prev
-          : { itemId: null, insertAfter: false, sectionKey: section.section },
-      )
+    const handleScroll = () => {
+      const id = activeIdRef.current
+      const last = lastPointerRef.current
+      if (!id || !last) return
+      captureSnapshots(id)
+      if (hasPassedThresholdRef.current) evaluatePointer(last.x, last.y)
     }
 
     const handleMouseUp = () => {
@@ -194,17 +165,19 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
       }
       setSessionId(null)
       setDraggingId(null)
-      setOverInfo({ itemId: null, insertAfter: false, sectionKey: null })
+      setOverInfo(EMPTY_OVER_INFO)
       setPointer(null)
     }
 
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('scroll', handleScroll, true)
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('scroll', handleScroll, true)
     }
   }, [sessionId])
 
-  return { draggingId, dragHeight, overInfo, pointer, startDrag }
+  return { draggingId, overInfo, pointer, startDrag }
 }
