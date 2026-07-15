@@ -149,12 +149,17 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
       evaluatePointer(event.clientX, event.clientY)
     }
 
+    let scrollFrame: number | null = null
     const handleScroll = () => {
-      const id = activeIdRef.current
-      const last = lastPointerRef.current
-      if (!id || !last) return
-      captureSnapshots(id)
-      if (hasPassedThresholdRef.current) evaluatePointer(last.x, last.y)
+      if (scrollFrame !== null) return
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = null
+        const id = activeIdRef.current
+        const last = lastPointerRef.current
+        if (!id || !last) return
+        captureSnapshots(id)
+        if (hasPassedThresholdRef.current) evaluatePointer(last.x, last.y)
+      })
     }
 
     const handleMouseUp = () => {
@@ -176,6 +181,7 @@ export function useDragReorder({ onDrop }: UseDragReorderOptions) {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
       window.removeEventListener('scroll', handleScroll, true)
+      if (scrollFrame !== null) cancelAnimationFrame(scrollFrame)
     }
   }, [sessionId])
 

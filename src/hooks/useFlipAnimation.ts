@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 
 const TRANSITION_DURATION_MS = 320
@@ -62,4 +62,12 @@ export function useFlipAnimation(containerRef: RefObject<HTMLElement | null>, de
 
     prevRectsRef.current = nextRects
   }, deps)
+
+  useEffect(() => {
+    const pendingFrames = pendingFramesRef.current
+    return () => {
+      pendingFrames.forEach((frameId) => cancelAnimationFrame(frameId))
+      pendingFrames.clear()
+    }
+  }, [])
 }
