@@ -81,7 +81,7 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
   }
 
   return (
-    <aside className="order-2 flex h-screen basis-1/2 grow overflow-y-auto bg-(--color-bg-brand-subtle) p-(--scale-40)">
+    <aside className="order-2 flex h-screen w-[clamp(830px,50vw,924px)] shrink-0 overflow-y-auto bg-(--color-bg-brand-subtle) p-(--scale-40)">
       <section
         className={[
           'flex w-full flex-col rounded-(--scale-16) border-[1.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-24) py-(--scale-20) shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]',
