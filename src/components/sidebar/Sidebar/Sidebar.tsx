@@ -59,7 +59,7 @@ export function Sidebar({
   return (
     <div
       className={[
-        'relative transition-[width] duration-200 ease-out h-screen',
+        'relative transition-[width] duration-200 ease-out h-full',
         isOpen
           ? profileMenu || notificationMenu || workspaceMenu
             ? 'w-65 overflow-visible'
@@ -186,6 +186,7 @@ export function Sidebar({
             onProfileClick={onProfileClick}
             onExpand={() => onChangeStatus?.('open')}
             avatarSrc={avatarSrc}
+            userName={userName}
           />
           {workspaceMenu && (
             <div className="absolute top-full mt-4 left-5 z-40 pointer-events-auto">
