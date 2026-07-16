@@ -12,14 +12,15 @@ import type { DiaryEntry, WeeklyDashboardStatus } from './dashboard.types'
 
 // TODO(#번호): API 연동 시 실제 변환 완료 일지 데이터로 교체
 const DUMMY_ENTRIES: DiaryEntry[] = [
-  { id: '1', label: '2026년 6월 11일 월요일', converted: true },
-  { id: '2', label: '2026년 6월 12일 화요일', converted: true },
-  { id: '3', label: '2026년 6월 13일 수요일', converted: true },
-  { id: '4', label: '2026년 6월 15일 금요일', converted: true },
-  { id: '5', label: '2026년 6월 16일 토요일', converted: true },
+  { id: '1', label: '2026년 6월 11일 목요일', converted: true },
+  { id: '2', label: '2026년 6월 12일 금요일', converted: true },
+  { id: '3', label: '2026년 6월 13일 토요일', converted: true },
+  { id: '4', label: '2026년 6월 15일 월요일', converted: true },
+  { id: '5', label: '2026년 6월 16일 화요일', converted: true },
 ]
 
-const MIN_SELECTED = 3
+const totalDays = DUMMY_ENTRIES.length
+const requiredCount = totalDays > 0 ? Math.min(3, totalDays) : 3
 
 // TODO(#번호): API 연동 시 생성 결과 데이터로 교체
 const DUMMY_STATS = [
@@ -101,6 +102,10 @@ export const WeeklyDashboard = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>(DUMMY_ENTRIES.map((e) => e.id))
   const [generation, setGeneration] = useState<'idle' | 'generating' | 'complete'>('idle')
 
+  // TODO(#44): API 연동 시 주차별 일지 조회로 교체. 현재는 주차 라벨만 이동
+  const [weekOffset, setWeekOffset] = useState(0)
+  const weekLabel = weekOffset === 0 ? '2026년 6월 3주차' : `2026년 6월 ${3 + weekOffset}주차`
+
   const handleToggle = (id: string) => {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]))
   }
@@ -114,7 +119,7 @@ export const WeeklyDashboard = () => {
   const status: WeeklyDashboardStatus =
     generation !== 'idle'
       ? (generation as WeeklyDashboardStatus)
-      : selectedIds.length >= MIN_SELECTED
+      : selectedIds.length >= requiredCount
         ? 'ready'
         : 'insufficient'
 
@@ -143,13 +148,13 @@ export const WeeklyDashboard = () => {
       </nav>
 
       <div className="flex items-center gap-2 self-start rounded-full border border-(--color-border-subtle) px-4 py-2">
-        <button type="button" aria-label="이전 주차">
+        <button type="button" aria-label="이전 주차" onClick={() => setWeekOffset((v) => v - 1)}>
           <ArrowLeftIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
         </button>
         <span className="[font-size:var(--font-size-body-4)] text-(--color-text-default)">
-          2026년 6월 3주차
+          {weekLabel}
         </span>
-        <button type="button" aria-label="다음 주차">
+        <button type="button" aria-label="다음 주차" onClick={() => setWeekOffset((v) => v + 1)}>
           <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
         </button>
       </div>

@@ -27,8 +27,8 @@ interface TagWorkflowSectionProps {
 }
 
 export const TagWorkflowSection = ({ tags }: TagWorkflowSectionProps) => {
-  const [selectedId, setSelectedId] = useState(tags[0]?.id)
-  const selected = tags.find((t) => t.id === selectedId)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const selected = tags.find((t) => t.id === selectedId) ?? tags[0]
 
   if (!selected) return null
 
@@ -46,7 +46,7 @@ export const TagWorkflowSection = ({ tags }: TagWorkflowSectionProps) => {
       {/* 태그 칩 */}
       <div className="flex flex-wrap gap-2">
         {tags.map((tag) => {
-          const active = tag.id === selectedId
+          const active = tag.id === selected.id
           return (
             <button
               key={tag.id}
@@ -128,7 +128,7 @@ export const TagWorkflowSection = ({ tags }: TagWorkflowSectionProps) => {
             핵심 지표 진행 현황
           </p>
           <p className="[font-size:var(--font-size-caption-1)] text-(--color-text-tertiary)">
-            업무 기록를 바탕으로 설정한 평가 지표와 연결되어 도출돼요
+            업무 기록을 바탕으로 설정한 평가 지표와 연결되어 도출돼요
           </p>
         </div>
 

@@ -78,7 +78,10 @@ export const WeeklyRetrospective = () => {
     setEditing(null)
   }
 
-  const handleEditRow = (row: PlanRow) => setEditing({ ...row })
+  const handleEditRow = (row: PlanRow) => {
+    if (editing) return
+    setEditing({ ...row })
+  }
   const handleDeleteRow = (id: string) => setPlans((prev) => prev.filter((p) => p.id !== id))
 
   const handleTempSave = () => {
@@ -93,6 +96,7 @@ export const WeeklyRetrospective = () => {
   }
 
   const hasContent = Object.values(answers).some((v) => v.trim()) || plans.length > 0
+  const canSave = hasContent && !editing
 
   const editingIndex = editing
     ? plans.findIndex((p) => p.id === editing.id) === -1
@@ -113,12 +117,17 @@ export const WeeklyRetrospective = () => {
 
       {QUESTIONS.map((q, i) => (
         <div key={q.key} className="flex flex-col gap-3">
-          <p className="[font-size:var(--font-size-body-3)] font-bold text-(--color-text-default)">
+          <p
+            id={`retro-label-${q.key}`}
+            className="[font-size:var(--font-size-body-3)] font-bold text-(--color-text-default)"
+          >
             <span className="mr-2 text-(--color-text-brand)">{String(i + 1).padStart(2, '0')}</span>
             {q.label}
           </p>
           <Input2
             maxCharacter={800}
+            maxLength={800}
+            aria-labelledby={`retro-label-${q.key}`}
             placeholder={q.placeholder}
             value={answers[q.key]}
             onChange={(e) => handleAnswerChange(q.key, e.target.value)}
@@ -148,7 +157,7 @@ export const WeeklyRetrospective = () => {
               <span className="text-(--color-text-tertiary)">{String(i + 1).padStart(2, '0')}</span>
               <span>{row.content}</span>
               <span>{row.schedule}</span>
-              <span className="flex justify-end gap-3 opacity-0 transition-opacity group-hover:opacity-100">
+              <span className="flex justify-end gap-3 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                 <button type="button" aria-label="수정" onClick={() => handleEditRow(row)}>
                   <EditIcon width={18} height={18} className="text-(--color-icon-tertiary)" />
                 </button>
@@ -219,12 +228,7 @@ export const WeeklyRetrospective = () => {
               임시 저장됨: {savedAt}
             </span>
           )}
-          <TextButton
-            variant="stroke"
-            size="medium"
-            disabled={!hasContent}
-            onClick={handleTempSave}
-          >
+          <TextButton variant="stroke" size="medium" disabled={!canSave} onClick={handleTempSave}>
             임시 저장하기
           </TextButton>
           <TextButton variant="fill" size="medium" disabled={!hasContent} onClick={handleSave}>

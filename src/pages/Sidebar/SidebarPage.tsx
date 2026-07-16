@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Sidebar } from '@/components/sidebar'
 import { ProfileModal } from '@/components/sidebar/ProfileModal/ProfileModal'
 import { SettingModal } from '@/components/sidebar/SettingModal/SettingModal'
@@ -22,14 +22,23 @@ const PAGE_ROUTES: Record<string, string> = {
   '일지 모아보기': '/records',
   '성과 대시보드': '/dashboard',
 }
+type SidebarPageName = '홈' | '알림함' | '오늘의 업무' | '일지 모아보기' | '성과 대시보드'
+
+const PAGE_BY_PATH: Record<string, SidebarPageName> = {
+  '/': '홈',
+  '/today': '오늘의 업무',
+  '/records': '일지 모아보기',
+  '/dashboard': '성과 대시보드',
+}
 
 export function SidebarPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [modal, setModal] = useState<ModalState>(null)
   const [sidebarStatus, setSidebarStatus] = useState<'open' | 'closed'>('open')
-  const [currentPage, setCurrentPage] = useState<
-    '홈' | '알림함' | '오늘의 업무' | '일지 모아보기' | '성과 대시보드'
-  >('홈')
+  const [currentPage, setCurrentPage] = useState<SidebarPageName>(
+    PAGE_BY_PATH[location.pathname] ?? '홈',
+  )
   const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
   const [notifications, setNotifications] = useState<Record<string, boolean>>({
