@@ -115,7 +115,7 @@ export const DiarySummaryCard = ({
             </p>
           </div>
         ) : (
-          <div className="mt-(--scale-12) flex flex-col">
+          <div className="flex flex-col">
             <div className="flex h-[77px] items-end gap-[2px]">
               <strong className="[font-size:var(--font-size-heading-1)] leading-[77px] font-[var(--font-weight-semibold)] text-(--color-text-default)">
                 {value}
