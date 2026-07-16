@@ -27,9 +27,10 @@ const PAGE_ROUTES: Record<string, string> = {
 export function SidebarPage() {
   const navigate = useNavigate()
   const [modal, setModal] = useState<ModalState>(null)
-  const [sidebarStatus, setSidebarStatus] = useState<'open' | 'closed'>(
-    () => (localStorage.getItem('sidebarStatus') as 'open' | 'closed') ?? 'open',
-  )
+  const [sidebarStatus, setSidebarStatus] = useState<'open' | 'closed'>(() => {
+    const stored = localStorage.getItem('sidebarStatus')
+    return stored === 'open' || stored === 'closed' ? stored : 'open'
+  })
   const [currentPage, setCurrentPage] = useState<SidebarPage>('홈')
   const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
