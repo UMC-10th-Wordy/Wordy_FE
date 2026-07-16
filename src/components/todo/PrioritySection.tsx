@@ -1,7 +1,6 @@
 import type { MouseEvent } from 'react'
 import TaskCard from './TaskCard'
-import { buildSectionPreview, splitIntoColumns, type PreviewEntry } from '@/utils/taskSection'
-import type { DragOverInfo } from '@/hooks/useDragReorder'
+import { splitIntoColumns } from '@/utils/taskSection'
 import type { Task, TaskDraftValues, TaskPriority, TaskResultValues } from '@/types/todo'
 
 interface PrioritySectionProps {
@@ -10,8 +9,6 @@ interface PrioritySectionProps {
   description: string
   sectionTasks: Task[]
   draggingTask: Task | null
-  overInfo: DragOverInfo
-  dragHeight: number
   startDrag: (id: string) => (event: MouseEvent<HTMLButtonElement>) => void
   onDeleteTask: (id: string) => void
   onEditTask: (id: string, values: TaskDraftValues) => void
@@ -19,60 +16,43 @@ interface PrioritySectionProps {
   onToggleComplete: (id: string) => void
 }
 
-/* 우선순위 섹션 (+드래그 placeholder 렌더링) */
+/* 우선순위 섹션 (카드는 드래그 중에도 고정, 순서 변경은 드롭 시 반영) */
 export function PrioritySection({
   priorityKey,
   title,
   description,
   sectionTasks,
   draggingTask,
-  overInfo,
-  dragHeight,
   startDrag,
   onDeleteTask,
   onEditTask,
   onSaveResult,
   onToggleComplete,
 }: PrioritySectionProps) {
-  const previewEntries = buildSectionPreview(sectionTasks, priorityKey, draggingTask, overInfo)
-  const [leftColumn, rightColumn] = splitIntoColumns(previewEntries)
+  const [leftColumn, rightColumn] = splitIntoColumns(sectionTasks)
 
-  const renderEntry = (entry: PreviewEntry) => {
-    if (entry.kind === 'placeholder') {
-      return (
-        <div
-          key="__placeholder__"
-          data-flip-id="__placeholder__"
-          style={{ height: dragHeight }}
-          className="w-full shrink-0 rounded-lg bg-(--color-bg-tertiary)"
-          aria-hidden
-        />
-      )
-    }
-
-    const { task } = entry
-    return (
-      <div
-        key={task.id}
-        data-flip-id={task.id}
-        data-drag-row="true"
-        data-drag-id={task.id}
-        data-drag-section={task.priority}
-      >
-        <TaskCard
-          task={task}
-          onHandleMouseDown={startDrag(task.id)}
-          onDelete={() => onDeleteTask(task.id)}
-          onEdit={(values) => onEditTask(task.id, values)}
-          onSaveResult={(values) => onSaveResult(task.id, values)}
-          onToggleComplete={() => onToggleComplete(task.id)}
-        />
-      </div>
-    )
-  }
+  const renderEntry = (task: Task) => (
+    <div
+      key={task.id}
+      data-flip-id={task.id}
+      data-drag-row="true"
+      data-drag-id={task.id}
+      data-drag-section={task.priority}
+      className={draggingTask?.id === task.id ? 'opacity-40' : ''}
+    >
+      <TaskCard
+        task={task}
+        onHandleMouseDown={startDrag(task.id)}
+        onDelete={() => onDeleteTask(task.id)}
+        onEdit={(values) => onEditTask(task.id, values)}
+        onSaveResult={(values) => onSaveResult(task.id, values)}
+        onToggleComplete={() => onToggleComplete(task.id)}
+      />
+    </div>
+  )
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="flex w-full flex-col gap-2" data-drag-section-outer={priorityKey}>
       <div>
         <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-semibold text-(--color-text-brand)">
           {title}
