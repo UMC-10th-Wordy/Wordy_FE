@@ -1,28 +1,40 @@
+import { useRef, useState } from 'react'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
+import { CalendarModal } from './CalendarModal'
+import { useOutsideClick } from '@/hooks/useOutsideClick'
+import type { Task } from '@/types/todo'
 
 interface DateHeaderProps {
   date: Date
+  tasks: Task[]
   subtitle: string
   isPreviewOpen: boolean
   onTogglePreview: () => void
   onPrevDay: () => void
   onNextDay: () => void
   onToday: () => void
+  onSelectDate: (date: Date) => void
 }
 
 export default function DateHeader({
   date,
+  tasks,
   subtitle,
   isPreviewOpen,
   onTogglePreview,
   onPrevDay,
   onNextDay,
   onToday,
+  onSelectDate,
 }: DateHeaderProps) {
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const calendarRef = useRef<HTMLDivElement>(null)
+  useOutsideClick(calendarRef, () => setIsCalendarOpen(false), isCalendarOpen)
+
   const formattedDate = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
 
   return (
@@ -65,14 +77,27 @@ export default function DateHeader({
           onClick={onNextDay}
           icon={<ArrowRightIcon aria-hidden className="size-6" />}
         />
-        {/* 캘린더 선택 UI 구현 필요 */}
-        <IconButton
-          type="button"
-          variant="text_neutral"
-          size="small"
-          aria-label="캘린더 열기"
-          icon={<CalendarIcon aria-hidden className="size-6" />}
-        />
+        <div ref={calendarRef} className="relative">
+          <IconButton
+            type="button"
+            variant="text_neutral"
+            size="small"
+            aria-label="캘린더 열기"
+            aria-expanded={isCalendarOpen}
+            onClick={() => setIsCalendarOpen((prev) => !prev)}
+            icon={<CalendarIcon aria-hidden className="size-6" />}
+          />
+          {isCalendarOpen && (
+            <CalendarModal
+              selectedDate={date}
+              tasks={tasks}
+              onSelectDate={(selected) => {
+                onSelectDate(selected)
+                setIsCalendarOpen(false)
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   )
