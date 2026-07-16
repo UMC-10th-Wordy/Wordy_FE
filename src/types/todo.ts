@@ -25,6 +25,8 @@ export interface TaskResultImage {
 /* 업무 항목 (TaskCard가 다루는 데이터) */
 export interface Task {
   id: string
+  /* 이 업무가 속한 날짜 (YYYY-MM-DD) */
+  date: string
   title: string
   memo?: string
   tag?: TaskTag

@@ -9,10 +9,13 @@ import { Input2 } from '@/components/common/Input/Input2'
 import { ToastViewport } from '@/components/todo/ToastViewport'
 import { PrioritySection } from '@/components/todo/PrioritySection'
 import { DraggingTaskGhost } from '@/components/todo/DraggingTaskGhost'
+import { DragLineIndicator } from '@/components/todo/DragLineIndicator'
 import { ConversionNoticeSection } from '@/components/todo/ConversionNoticeSection'
+import { RetrospectiveExampleModal } from '@/components/todo/RetrospectiveExampleModal'
 import { useDragReorder, type DragOverInfo } from '@/hooks/useDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
 import { useToastQueue } from '@/hooks/useToastQueue'
+import { toDateKey } from '@/utils/calendar'
 import type {
   Task,
   TaskDraftValues,
@@ -32,11 +35,18 @@ export default function TodoListPage() {
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
+  const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
+  const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
+  const [previewStatus, setPreviewStatus] = useState<'empty' | 'converting' | 'failed'>('empty')
   const taskListRef = useRef<HTMLDivElement>(null)
   const { toasts, showToast } = useToastQueue()
 
-  const completedTasks = tasks.filter((task) => task.isCompleted)
-  const incompleteTasks = tasks.filter((task) => !task.isCompleted)
+  const currentDateKey = toDateKey(currentDate)
+  const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
+  const retrospective = retrospectiveByDate[currentDateKey] ?? ''
+
+  const completedTasks = tasksForDate.filter((task) => task.isCompleted)
+  const incompleteTasks = tasksForDate.filter((task) => !task.isCompleted)
   const activeTasks = activeTab === 'completed' ? completedTasks : incompleteTasks
   const mustDoTasks = activeTasks.filter((task) => task.priority === 'must')
   const shouldDoTasks = activeTasks.filter((task) => task.priority === 'should')
@@ -50,6 +60,7 @@ export default function TodoListPage() {
   const handleAddTask = (values: TaskDraftValues) => {
     const newTask: Task = {
       id: crypto.randomUUID(),
+      date: currentDateKey,
       title: values.title,
       memo: values.memo,
       tag: values.tag,
@@ -139,19 +150,12 @@ export default function TodoListPage() {
     })
   }
 
-  const { draggingId, dragHeight, overInfo, pointer, startDrag } = useDragReorder({
+  const { draggingId, overInfo, pointer, startDrag } = useDragReorder({
     onDrop: handleTaskDrop,
   })
   const draggingTask = draggingId ? (tasks.find((task) => task.id === draggingId) ?? null) : null
 
-  useFlipAnimation(taskListRef, [
-    tasks,
-    activeTab,
-    draggingId,
-    overInfo.itemId,
-    overInfo.insertAfter,
-    overInfo.sectionKey,
-  ])
+  useFlipAnimation(taskListRef, [tasks, activeTab])
 
   const shiftDate = (days: number) => {
     setCurrentDate((prev) => {
@@ -163,7 +167,13 @@ export default function TodoListPage() {
 
   const goToToday = () => setCurrentDate(new Date())
 
-  const hasAnyTaskEverToday = tasks.length > 0
+  /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
+  const handleConvert = () => {
+    setPreviewStatus('converting')
+    setIsPreviewOpen(true)
+  }
+
+  const hasAnyTaskEverToday = tasksForDate.length > 0
   const isActiveTabEmpty = activeTasks.length === 0
 
   return (
@@ -172,12 +182,14 @@ export default function TodoListPage() {
         <div className="flex w-full flex-col gap-12">
           <DateHeader
             date={currentDate}
+            tasks={tasks}
             subtitle="오늘은 어떤 업무를 하실 예정인가요?"
             isPreviewOpen={isPreviewOpen}
             onTogglePreview={() => setIsPreviewOpen((prev) => !prev)}
             onPrevDay={() => shiftDate(-1)}
             onNextDay={() => shiftDate(1)}
             onToday={goToToday}
+            onSelectDate={setCurrentDate}
           />
 
           <section className="flex w-full flex-col gap-2">
@@ -225,8 +237,6 @@ export default function TodoListPage() {
                     description="반드시 오늘 끝낼 거예요"
                     sectionTasks={mustDoTasks}
                     draggingTask={draggingTask}
-                    overInfo={overInfo}
-                    dragHeight={dragHeight}
                     startDrag={startDrag}
                     onDeleteTask={handleDeleteTask}
                     onEditTask={handleEditTask}
@@ -239,8 +249,6 @@ export default function TodoListPage() {
                     description="가능하면 오늘 완료할 거예요"
                     sectionTasks={shouldDoTasks}
                     draggingTask={draggingTask}
-                    overInfo={overInfo}
-                    dragHeight={dragHeight}
                     startDrag={startDrag}
                     onDeleteTask={handleDeleteTask}
                     onEditTask={handleEditTask}
@@ -253,8 +261,6 @@ export default function TodoListPage() {
                     description="여유가 있으면 진행할 거예요"
                     sectionTasks={couldDoTasks}
                     draggingTask={draggingTask}
-                    overInfo={overInfo}
-                    dragHeight={dragHeight}
                     startDrag={startDrag}
                     onDeleteTask={handleDeleteTask}
                     onEditTask={handleEditTask}
@@ -276,24 +282,41 @@ export default function TodoListPage() {
                 type="button"
                 variant="text_only"
                 size="medium"
+                onClick={() => setIsExampleModalOpen(true)}
                 iconRight={<ExpandIcon aria-hidden className="size-7" />}
               >
                 이렇게 작성해 보세요
               </TextButton>
             </div>
             <Input2
+              value={retrospective}
+              onChange={(event) =>
+                setRetrospectiveByDate((prev) => ({
+                  ...prev,
+                  [currentDateKey]: event.target.value,
+                }))
+              }
               placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."
               className="w-full !min-h-[200px]"
             />
           </section>
 
-          <ConversionNoticeSection />
+          <ConversionNoticeSection
+            isEnabled={retrospective.trim().length > 0}
+            onConvert={handleConvert}
+          />
         </div>
       </main>
 
-      {isPreviewOpen && <PerformancePreviewPanel />}
+      {isPreviewOpen && <PerformancePreviewPanel status={previewStatus} />}
 
       {draggingTask && pointer && <DraggingTaskGhost task={draggingTask} pointer={pointer} />}
+
+      {draggingTask && overInfo.line && <DragLineIndicator rect={overInfo.line} />}
+
+      {isExampleModalOpen && (
+        <RetrospectiveExampleModal onClose={() => setIsExampleModalOpen(false)} />
+      )}
 
       <ToastViewport toasts={toasts} />
     </div>
