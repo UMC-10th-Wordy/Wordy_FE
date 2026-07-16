@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { EASE_SPRING } from './constants'
 import imgVector from '@/assets/images/banner/vector.svg'
 import imgEllipse122 from '@/assets/images/banner/ellipse122.svg'
 import imgVector1 from '@/assets/images/banner/vector1.svg'
@@ -13,8 +14,7 @@ import imgFlowerR4 from '@/assets/images/banner/flower_r4.svg'
 import imgFlowerR5 from '@/assets/images/banner/flower_r5.svg'
 import imgFlowerR6 from '@/assets/images/banner/flower_r6.svg'
 
-export const EASE_SPRING: [number, number, number, number] = [0.585, 0, 0.004, 1]
-const EASE_SPRING_LINEAR = [EASE_SPRING, 'linear'] as never
+const EASE_SPRING_LINEAR: [typeof EASE_SPRING, 'linear'] = [EASE_SPRING, 'linear']
 const EASE_BOUNCE: [number, number, number, number] = [0.07, 0.97, 0.58, 1]
 
 // 피그마 원본 캔버스
