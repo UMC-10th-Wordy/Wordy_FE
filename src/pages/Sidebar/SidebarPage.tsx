@@ -12,6 +12,7 @@ import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
 import DocumentIcon from '@/assets/icons/document.svg?react'
 import DashboardIcon from '@/assets/icons/dashboard.svg?react'
+import { WeeklyDashboard } from '@/components/dashboard/WeeklyDashboard'
 
 type ModalState = null | 'profile-menu' | 'setting' | 'notification' | 'workspace'
 
@@ -168,6 +169,7 @@ export function SidebarPage() {
       />
 
       {currentPage === '오늘의 업무' && <TodoListPage />}
+      {currentPage === '성과 대시보드' && <WeeklyDashboard />}
 
       {modal === 'setting' && (
         <SettingModal
