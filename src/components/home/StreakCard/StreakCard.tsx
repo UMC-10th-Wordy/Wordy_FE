@@ -1,4 +1,5 @@
 import type { HTMLAttributes } from 'react'
+import { WEEK_DAYS } from '@/components/home/constants'
 import SuccessIcon from '@/assets/icons/success.svg?react'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import FireIcon from '@/assets/icons/fire.svg?react'
@@ -10,7 +11,7 @@ export interface StreakCardProps extends HTMLAttributes<HTMLDivElement> {
   weekRecord: readonly DayRecord[]
 }
 
-export const WEEK_DAYS = ['일', '월', '화', '수', '목', '금', '토'] as const
+export { WEEK_DAYS } from '@/components/home/constants'
 
 const ICON_SIZE = { width: 32, height: 32 } as const
 
