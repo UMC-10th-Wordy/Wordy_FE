@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+
 import { IconButton } from '@/components/common/Button/IconButton'
 import ProjectTag from '@/components/todo/ProjectTag'
 
@@ -10,10 +12,12 @@ interface DiaryMonthlyEntryProps {
 }
 
 export const DiaryMonthlyEntry = ({ entry }: DiaryMonthlyEntryProps) => {
+  const navigate = useNavigate()
   const remainingTaskCount = Math.max(entry.totalTaskCount - 1, 0)
 
   const handleEntryClick = () => {
-    // TODO(#57): 업무 일지 자세히 보기 페이지 연결
+    // TODO(#65): 업무 일지 조회 API 연결 시 date 대신 diaryId 사용
+    navigate(`/records/${entry.date}`)
   }
 
   return (

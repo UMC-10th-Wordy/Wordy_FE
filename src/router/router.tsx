@@ -22,6 +22,10 @@ export const router = createBrowserRouter([
     element: <SidebarPage />,
   },
   {
+    path: '/records/:diaryId',
+    element: <SidebarPage />,
+  },
+  {
     path: '/dashboard',
     element: <SidebarPage />,
   },

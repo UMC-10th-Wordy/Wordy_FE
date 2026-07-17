@@ -4,6 +4,7 @@ import { TextButton } from '@/components/common/Button/TextButton'
 
 import { PerformanceEditableSection } from './PerformanceEditableSection'
 import { PerformanceIncompleteTaskList } from './PerformanceIncompleteTaskList'
+import { PerformanceReadOnlySection } from './PerformanceReadOnlySection'
 import { PerformanceResultProgress } from './PerformanceResultProgress'
 import { PerformanceTaskResultCard } from './PerformanceTaskResultCard'
 import { PerformanceToastViewport } from './PerformanceToastViewport'
@@ -15,6 +16,7 @@ import type {
 
 interface PerformancePreviewResultProps {
   data: PerformancePreviewResultData
+  readOnly?: boolean
   onSave?: (values: { summary: string; insight: string }) => void
   onMoveTaskToTomorrow?: (taskId: string) => void
 }
@@ -43,6 +45,7 @@ const formatInsightWithBullet = (insight: string) => {
 
 export const PerformancePreviewResult = ({
   data,
+  readOnly = false,
   onSave,
   onMoveTaskToTomorrow,
 }: PerformancePreviewResultProps) => {
@@ -98,7 +101,11 @@ export const PerformancePreviewResult = ({
   }
 
   return (
-    <div className="flex w-full flex-col">
+    <div
+      className={['flex w-full flex-col', readOnly ? 'pb-(--scale-40)' : '']
+        .filter(Boolean)
+        .join(' ')}
+    >
       <PerformanceResultProgress
         totalTaskCount={data.totalTaskCount}
         completedTaskCount={data.completedTaskCount}
@@ -109,25 +116,34 @@ export const PerformancePreviewResult = ({
           tasks={data.incompleteTasks}
           movedTaskIds={movedTaskIds}
           onMoveToTomorrow={handleMoveTaskToTomorrow}
+          readOnly={readOnly}
         />
       </div>
 
       <div className="mt-(--scale-48)">
-        <PerformanceEditableSection
-          title="오늘의 성과 요약"
-          value={summary}
-          placeholder="오늘의 성과 요약을 작성해 주세요."
-          onChangeValue={handleChangeSummary}
-        />
+        {readOnly ? (
+          <PerformanceReadOnlySection title="오늘의 성과 요약" value={summary} />
+        ) : (
+          <PerformanceEditableSection
+            title="오늘의 성과 요약"
+            value={summary}
+            placeholder="오늘의 성과 요약을 작성해 주세요."
+            onChangeValue={handleChangeSummary}
+          />
+        )}
       </div>
 
       <div className="mt-(--scale-48)">
-        <PerformanceEditableSection
-          title="성장 인사이트"
-          value={insight}
-          placeholder="성장 인사이트를 작성해 주세요."
-          onChangeValue={handleChangeInsight}
-        />
+        {readOnly ? (
+          <PerformanceReadOnlySection title="성장 인사이트" value={insight} showBullet />
+        ) : (
+          <PerformanceEditableSection
+            title="성장 인사이트"
+            value={insight}
+            placeholder="성장 인사이트를 작성해 주세요."
+            onChangeValue={handleChangeInsight}
+          />
+        )}
       </div>
 
       {data.nextTasks.length > 0 && (
@@ -164,20 +180,21 @@ export const PerformancePreviewResult = ({
         </div>
       </section>
 
-      <div className="mt-[60px] mb-(--scale-40)">
-        <TextButton
-          type="button"
-          variant="fill"
-          size="large"
-          fullWidth
-          disabled={isSaved}
-          onClick={handleSaveDiary}
-          className="![font-size:var(--font-size-body-1)] font-[var(--font-weight-medium)]"
-        >
-          업무 일지 저장하기
-        </TextButton>
-      </div>
-
+      {!readOnly && (
+        <div className="mt-[60px] mb-(--scale-40)">
+          <TextButton
+            type="button"
+            variant="fill"
+            size="large"
+            fullWidth
+            disabled={isSaved}
+            onClick={handleSaveDiary}
+            className="[font-size:var(--font-size-body-1)] font-[var(--font-weight-medium)]"
+          >
+            업무 성과 저장하기
+          </TextButton>
+        </div>
+      )}
       <PerformanceToastViewport toasts={toasts} />
     </div>
   )

@@ -7,12 +7,14 @@ interface PerformanceIncompleteTaskListProps {
   tasks: PerformanceIncompleteTask[]
   movedTaskIds: string[]
   onMoveToTomorrow: (taskId: string) => void
+  readOnly?: boolean
 }
 
 export const PerformanceIncompleteTaskList = ({
   tasks,
   movedTaskIds,
   onMoveToTomorrow,
+  readOnly = false,
 }: PerformanceIncompleteTaskListProps) => {
   if (tasks.length === 0) {
     return null
@@ -41,17 +43,18 @@ export const PerformanceIncompleteTaskList = ({
                   {task.title}
                 </p>
               </div>
-
-              <TextButton
-                type="button"
-                variant="text_only"
-                size="small"
-                disabled={isMoved}
-                onClick={() => onMoveToTomorrow(task.id)}
-                className="h-(--scale-32) w-(--scale-64) shrink-0 px-(--scale-8) py-[5px] [font-size:var(--font-size-body-4)] font-[var(--font-weight-medium)] text-(--color-button-default) disabled:text-(--color-text-disabled) disabled:pointer-events-none"
-              >
-                내일하기
-              </TextButton>
+              {!readOnly && (
+                <TextButton
+                  type="button"
+                  variant="text_only"
+                  size="small"
+                  disabled={isMoved}
+                  onClick={() => onMoveToTomorrow(task.id)}
+                  className="h-(--scale-32) w-(--scale-64) shrink-0 px-(--scale-8) py-[5px] [font-size:var(--font-size-body-4)] font-[var(--font-weight-medium)] text-(--color-button-default) disabled:text-(--color-text-disabled) disabled:pointer-events-none"
+                >
+                  내일하기
+                </TextButton>
+              )}
             </div>
           )
         })}
