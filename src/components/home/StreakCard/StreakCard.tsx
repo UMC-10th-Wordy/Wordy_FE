@@ -1,7 +1,7 @@
 import type { HTMLAttributes } from 'react'
 import { WEEK_DAYS } from '@/components/home/constants'
 import SuccessIcon from '@/assets/icons/success.svg?react'
-import FailIcon from '@/assets/icons/fail.svg?react'
+import FailIcon from '@/assets/icons/minus.svg?react'
 import FireIcon from '@/assets/icons/fire.svg?react'
 
 export type DayRecord = 'success' | 'success-dim' | 'fail' | 'none'

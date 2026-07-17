@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { TextButton } from '@/components/common/Button/TextButton'
 import ErrorIcon from '@/assets/icons/error.svg?react'
@@ -17,10 +18,21 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') onConfirm?.()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onConfirm])
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-60 flex items-center justify-center">
       {/* dim */}
-      <div className="absolute inset-0 bg-black/25 backdrop-blur-sm" onClick={onCancel} />
+      <div
+        className="absolute inset-0 bg-(--color-bg-overlay) backdrop-blur-xs"
+        onClick={onCancel}
+      />
 
       {/* dialog */}
       <div className="relative z-10 flex flex-col gap-5 items-center justify-center px-8 py-5 bg-(--color-bg-default) rounded-(--scale-12) drop-shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]">
