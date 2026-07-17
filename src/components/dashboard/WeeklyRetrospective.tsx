@@ -13,27 +13,86 @@ interface PlanRow {
   schedule: string
 }
 
-const QUESTIONS = [
-  {
-    key: 'work',
-    label: '이번 주의 업무 내용 정리',
-    placeholder: '이번 주 진행한 주요 업무를 자유롭게 정리해 주세요',
-  },
-  {
-    key: 'resource',
-    label: '이번 주에 주로 사용한 시간 또는 리소스',
-    placeholder: '어떤 일에 시간이 가장 많이 들어갔나요?',
-  },
-  {
-    key: 'learning',
-    label: '이번 주에 배우고 느낀 점',
-    placeholder: '새로 배운 점, 깨달은 점, 다음에 다르게 해보고 싶은 점이 있나요?',
-  },
-] as const
+type RetrospectivePeriod = 'weekly' | 'monthly'
 
-type QuestionKey = (typeof QUESTIONS)[number]['key']
+interface RetrospectiveQuestion {
+  key: 'work' | 'resource' | 'learning'
+  label: string
+  placeholder: string
+}
 
-export const WeeklyRetrospective = () => {
+interface RetrospectiveTexts {
+  title: string
+  description: string
+  questions: RetrospectiveQuestion[]
+  planLabel: string
+  planPlaceholder: string
+  toastTempSaved: string
+  toastSaved: string
+}
+
+const TEXTS: Record<RetrospectivePeriod, RetrospectiveTexts> = {
+  weekly: {
+    title: '주간 회고',
+    description: '이번 주를 정리하고 다음 주를 준비해보세요!',
+    questions: [
+      {
+        key: 'work',
+        label: '이번 주의 업무 내용 정리',
+        placeholder: '이번 주 진행한 주요 업무를 자유롭게 정리해 주세요',
+      },
+      {
+        key: 'resource',
+        label: '이번 주에 주로 사용한 시간 또는 리소스',
+        placeholder: '어떤 일에 시간이 가장 많이 들어갔나요?',
+      },
+      {
+        key: 'learning',
+        label: '이번 주에 배우고 느낀 점',
+        placeholder: '새로 배운 점, 깨달은 점, 다음에 다르게 해보고 싶은 점이 있나요?',
+      },
+    ],
+    planLabel: '다음 주 업무 계획',
+    planPlaceholder: '다음 주 진행할 업무 내용을 작성해 주세요',
+    toastTempSaved: '주간 회고가 임시 저장되었어요.',
+    toastSaved: '주간 회고가 저장되었어요.',
+  },
+  monthly: {
+    title: '월간 회고',
+    description: '이번 달을 정리하고 다음 달을 준비해보세요!',
+    questions: [
+      {
+        key: 'work',
+        label: '이번 달의 업무 내용 정리',
+        placeholder: '이번 달 진행한 주요 업무를 자유롭게 정리해 주세요',
+      },
+      {
+        key: 'resource',
+        label: '이번 달에 주로 사용한 시간 또는 리소스',
+        placeholder: '어떤 일에 시간이 가장 많이 들어갔나요?',
+      },
+      {
+        key: 'learning',
+        label: '이번 달에 배우고 느낀 점',
+        placeholder: '새로 배운 점, 깨달은 점, 다음에 다르게 해보고 싶은 점이 있나요?',
+      },
+    ],
+    planLabel: '다음 달 업무 계획',
+    planPlaceholder: '다음 달 진행할 업무 내용을 작성해 주세요',
+    toastTempSaved: '월간 회고가 임시 저장되었어요.',
+    toastSaved: '월간 회고가 저장되었어요.',
+  },
+}
+
+type QuestionKey = 'work' | 'resource' | 'learning'
+
+interface WeeklyRetrospectiveProps {
+  period?: RetrospectivePeriod
+}
+
+export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectiveProps) => {
+  const texts = TEXTS[period]
+
   const [answers, setAnswers] = useState<Record<QuestionKey, string>>({
     work: '',
     resource: '',
@@ -87,12 +146,12 @@ export const WeeklyRetrospective = () => {
   const handleTempSave = () => {
     // TODO(#번호): API 연동 시 임시 저장 요청으로 교체
     setSavedAt(new Date().toLocaleString('ko-KR'))
-    showToast('주간 회고가 임시 저장되었어요.')
+    showToast(texts.toastTempSaved)
   }
 
   const handleSave = () => {
-    // TODO(#45): API 연동 시 회고 저장 요청으로 교체
-    showToast('주간 회고가 저장되었어요.')
+    // TODO(#번호): API 연동 시 회고 저장 요청으로 교체
+    showToast(texts.toastSaved)
   }
 
   const hasContent = Object.values(answers).some((v) => v.trim()) || plans.length > 0
@@ -108,17 +167,17 @@ export const WeeklyRetrospective = () => {
     <section className="flex flex-col gap-6 rounded-2xl border border-(--color-border-subtle) bg-(--color-bg-default) p-7">
       <div className="flex flex-col gap-1">
         <h2 className="[font-size:var(--font-size-body-2)] font-bold text-(--color-text-default)">
-          주간 회고
+          {texts.title}
         </h2>
         <p className="[font-size:var(--font-size-body-4)] text-(--color-text-tertiary)">
-          이번 주를 정리하고 다음 주를 준비해보세요!
+          {texts.description}
         </p>
       </div>
 
-      {QUESTIONS.map((q, i) => (
+      {texts.questions.map((q, i) => (
         <div key={q.key} className="flex flex-col gap-3">
           <p
-            id={`retro-label-${q.key}`}
+            id={`retro-label-${period}-${q.key}`}
             className="[font-size:var(--font-size-body-3)] font-bold text-(--color-text-default)"
           >
             <span className="mr-2 text-(--color-text-brand)">{String(i + 1).padStart(2, '0')}</span>
@@ -127,7 +186,7 @@ export const WeeklyRetrospective = () => {
           <Input2
             maxCharacter={800}
             maxLength={800}
-            aria-labelledby={`retro-label-${q.key}`}
+            aria-labelledby={`retro-label-${period}-${q.key}`}
             placeholder={q.placeholder}
             value={answers[q.key]}
             onChange={(e) => handleAnswerChange(q.key, e.target.value)}
@@ -135,10 +194,10 @@ export const WeeklyRetrospective = () => {
         </div>
       ))}
 
-      {/* 다음 주 업무 계획 */}
       <div className="flex flex-col gap-3">
         <p className="[font-size:var(--font-size-body-3)] font-bold text-(--color-text-default)">
-          <span className="mr-2 text-(--color-text-brand)">04</span>다음 주 업무 계획
+          <span className="mr-2 text-(--color-text-brand)">04</span>
+          {texts.planLabel}
         </p>
 
         <div className="grid grid-cols-[40px_1fr_360px_80px] items-center gap-x-4 rounded-md bg-(--color-bg-brand-subtle) px-4 py-3 [font-size:var(--font-size-body-4)] font-medium text-(--color-text-default)">
@@ -178,7 +237,7 @@ export const WeeklyRetrospective = () => {
               type="text"
               value={editing.content}
               onChange={(e) => setEditing((prev) => prev && { ...prev, content: e.target.value })}
-              placeholder="다음 주 진행할 업무 내용을 작성해 주세요"
+              placeholder={texts.planPlaceholder}
               aria-label="업무 내용"
               className="rounded-lg bg-(--color-bg-secondary) px-4 py-3 [font-size:var(--font-size-body-4)] outline-none placeholder:text-(--color-text-tertiary)"
             />
@@ -231,7 +290,7 @@ export const WeeklyRetrospective = () => {
           <TextButton variant="stroke" size="medium" disabled={!canSave} onClick={handleTempSave}>
             임시 저장하기
           </TextButton>
-          <TextButton variant="fill" size="medium" disabled={!hasContent} onClick={handleSave}>
+          <TextButton variant="fill" size="medium" disabled={!canSave} onClick={handleSave}>
             회고 저장하기
           </TextButton>
         </div>

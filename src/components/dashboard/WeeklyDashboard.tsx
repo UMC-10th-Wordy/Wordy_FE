@@ -7,10 +7,12 @@ import { WeeklySummaryInsight } from './WeeklySummaryInsight'
 import { TagWorkflowSection } from './TagWorkflowSection'
 import { WeeklyHighlights } from './WeeklyHighlights'
 import { WeeklyRetrospective } from './WeeklyRetrospective'
+import { MonthlyDashboard } from './MonthlyDashboard'
 import type { TagWorkflow } from './TagWorkflowSection'
 import type { DiaryEntry, WeeklyDashboardStatus } from './dashboard.types'
 
-// TODO(#번호): API 연동 시 실제 변환 완료 일지 데이터로 교체
+// TODO(#44): API 연동 시 실제 변환 완료 일지 데이터로 교체
+// 일지 0개 상태 테스트: 아래 배열을 [] 로 바꾸면 빈 패널 + 미충족 화면 확인 가능
 const DUMMY_ENTRIES: DiaryEntry[] = [
   { id: '1', label: '2026년 6월 11일 목요일', converted: true },
   { id: '2', label: '2026년 6월 12일 금요일', converted: true },
@@ -19,10 +21,7 @@ const DUMMY_ENTRIES: DiaryEntry[] = [
   { id: '5', label: '2026년 6월 16일 화요일', converted: true },
 ]
 
-const totalDays = DUMMY_ENTRIES.length
-const requiredCount = totalDays > 0 ? Math.min(3, totalDays) : 3
-
-// TODO(#번호): API 연동 시 생성 결과 데이터로 교체
+// TODO(#44): API 연동 시 생성 결과 데이터로 교체
 const DUMMY_STATS = [
   { label: '일지 기록', value: '4', unit: '일' },
   { label: '업무 완료율', value: '65', unit: '%' },
@@ -30,7 +29,7 @@ const DUMMY_STATS = [
 ]
 
 const DUMMY_AI_SUMMARY =
-  '이번 주에는 온보딩 리뉴얼과 디자인 시스템 정비를 중심으로 구조 정리과 개선 기준을 수립했어요.'
+  '이번 주에는 온보딩 리뉴얼과 디자인 시스템 정비를 중심으로 구조 정리와 개선 기준을 수립했어요.'
 
 const DUMMY_TAGS: TagWorkflow[] = [
   {
@@ -99,12 +98,16 @@ const DUMMY_HIGHLIGHTS = [
 ]
 
 export const WeeklyDashboard = () => {
+  const [activeTab, setActiveTab] = useState<'weekly' | 'monthly'>('weekly')
   const [selectedIds, setSelectedIds] = useState<string[]>(DUMMY_ENTRIES.map((e) => e.id))
   const [generation, setGeneration] = useState<'idle' | 'generating' | 'complete'>('idle')
-
   // TODO(#44): API 연동 시 주차별 일지 조회로 교체. 현재는 주차 라벨만 이동
   const [weekOffset, setWeekOffset] = useState(0)
+
   const weekLabel = weekOffset === 0 ? '2026년 6월 3주차' : `2026년 6월 ${3 + weekOffset}주차`
+
+  const totalDays = DUMMY_ENTRIES.length
+  const requiredCount = totalDays > 0 ? Math.min(3, totalDays) : 3
 
   const handleToggle = (id: string) => {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]))
@@ -112,7 +115,7 @@ export const WeeklyDashboard = () => {
 
   const handleGenerate = () => {
     setGeneration('generating')
-    // TODO(#번호): API 연동 시 생성 완료 응답으로 교체. 데모: 2초 후 완료
+    // TODO(#44): API 연동 시 생성 완료 응답으로 교체. 데모: 2초 후 완료
     setTimeout(() => setGeneration('complete'), 2000)
   }
 
@@ -137,53 +140,96 @@ export const WeeklyDashboard = () => {
       <nav className="flex gap-6 border-b border-(--color-border-subtle)">
         <button
           type="button"
-          className="border-b-2 border-(--color-text-default) pb-2 font-semibold text-(--color-text-default)"
+          onClick={() => setActiveTab('weekly')}
+          className={
+            activeTab === 'weekly'
+              ? 'border-b-2 border-(--color-text-default) pb-2 font-semibold text-(--color-text-default)'
+              : 'pb-2 text-(--color-text-tertiary)'
+          }
         >
           주간
         </button>
-        {/* TODO(#월간번호): 월간 대시보드 연결 */}
-        <button type="button" className="pb-2 text-(--color-text-tertiary)">
+        <button
+          type="button"
+          onClick={() => setActiveTab('monthly')}
+          className={
+            activeTab === 'monthly'
+              ? 'border-b-2 border-(--color-text-default) pb-2 font-semibold text-(--color-text-default)'
+              : 'pb-2 text-(--color-text-tertiary)'
+          }
+        >
           월간
         </button>
       </nav>
 
-      <div className="flex items-center gap-2 self-start rounded-full border border-(--color-border-subtle) px-4 py-2">
-        <button type="button" aria-label="이전 주차" onClick={() => setWeekOffset((v) => v - 1)}>
-          <ArrowLeftIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
-        </button>
-        <span className="[font-size:var(--font-size-body-4)] text-(--color-text-default)">
-          {weekLabel}
-        </span>
-        <button type="button" aria-label="다음 주차" onClick={() => setWeekOffset((v) => v + 1)}>
-          <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
-        </button>
-      </div>
-
-      <div className="flex gap-7 overflow-x-auto">
-        {status === 'complete' ? (
-          <div className="flex flex-1 flex-col gap-7">
-            <WeeklySummaryInsight stats={DUMMY_STATS} aiSummary={DUMMY_AI_SUMMARY} />
-            <TagWorkflowSection tags={DUMMY_TAGS} />
-            <WeeklyHighlights items={DUMMY_HIGHLIGHTS} />
-            <WeeklyRetrospective />
+      {activeTab === 'weekly' ? (
+        <>
+          <div className="flex items-center gap-2 self-start rounded-full border border-(--color-border-subtle) px-4 py-2">
+            <button
+              type="button"
+              aria-label="이전 주차"
+              onClick={() => setWeekOffset((v) => v - 1)}
+            >
+              <ArrowLeftIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
+            </button>
+            <span className="[font-size:var(--font-size-body-4)] text-(--color-text-default)">
+              {weekLabel}
+            </span>
+            <button
+              type="button"
+              aria-label="다음 주차"
+              onClick={() => setWeekOffset((v) => v + 1)}
+            >
+              <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
+            </button>
           </div>
-        ) : (
-          <>
-            <WeeklyStatusCard
-              status={status === 'generating' ? 'generating' : status}
-              convertedCount={selectedIds.length}
-              onGenerate={handleGenerate}
-            />
-            <DiaryChecklistPanel
-              entries={DUMMY_ENTRIES}
-              totalDays={5}
-              selectedIds={selectedIds}
-              onToggle={handleToggle}
-              disabled={status === 'generating'}
-            />
-          </>
-        )}
-      </div>
+
+          <div className="flex gap-7 overflow-x-auto">
+            {status === 'complete' ? (
+              <div className="flex flex-1 flex-col gap-7">
+                <WeeklySummaryInsight stats={DUMMY_STATS} aiSummary={DUMMY_AI_SUMMARY} />
+                <TagWorkflowSection tags={DUMMY_TAGS} />
+                <WeeklyHighlights items={DUMMY_HIGHLIGHTS} />
+                <WeeklyRetrospective />
+              </div>
+            ) : (
+              <>
+                <WeeklyStatusCard
+                  status={status === 'generating' ? 'generating' : status}
+                  convertedCount={selectedIds.length}
+                  onGenerate={handleGenerate}
+                />
+                <DiaryChecklistPanel
+                  entries={DUMMY_ENTRIES}
+                  totalDays={totalDays}
+                  selectedIds={selectedIds}
+                  onToggle={handleToggle}
+                  disabled={status === 'generating'}
+                />
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          {/* TODO(#66): API 연동 시 월 이동에 따른 데이터 갱신 */}
+          <div className="flex items-center gap-2 self-start rounded-full border border-(--color-border-subtle) px-4 py-2">
+            <button type="button" aria-label="이전 달">
+              <ArrowLeftIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
+            </button>
+            <span className="[font-size:var(--font-size-body-4)] text-(--color-text-default)">
+              2026년 6월
+            </span>
+            <button type="button" aria-label="다음 달">
+              <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
+            </button>
+          </div>
+
+          <div className="flex gap-7 overflow-x-auto">
+            <MonthlyDashboard onGoWeekly={() => setActiveTab('weekly')} />
+          </div>
+        </>
+      )}
     </div>
   )
 }
