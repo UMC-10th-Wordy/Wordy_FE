@@ -4,8 +4,10 @@ import { CAREER_OPTIONS, JOB_OPTIONS } from '@/components/auth/onboarding'
 import type { CareerOption, JobOption } from '@/components/auth/onboarding'
 import ProfileDefaultIcon from '@/assets/icons/profile-default.svg?react'
 import CameraBadgeIcon from '@/assets/icons/camera-badge.svg?react'
+import { useNavigate } from 'react-router-dom'
 
 export const ProfileSetupPage = () => {
+  const navigate = useNavigate()
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
@@ -28,7 +30,7 @@ export const ProfileSetupPage = () => {
 
   const handleComplete = () => {
     // TODO(#40): API 연동 시 프로필 저장 요청 후 홈으로 이동
-    alert(`온보딩 완료: ${name} / ${career} / ${job}`)
+    navigate('/')
   }
 
   if (step === 0) {

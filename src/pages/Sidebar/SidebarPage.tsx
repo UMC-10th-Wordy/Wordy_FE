@@ -10,6 +10,7 @@ import {
 import type { SidebarPage, NotificationItemProps } from '@/components/sidebar'
 import TodoListPage from '@/pages/TodoListPage'
 import { HomePage } from '@/pages/Home/HomePage'
+import { DiaryListPage } from '@/pages/DiaryListPage'
 import HomeIcon from '@/assets/icons/home.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
@@ -173,6 +174,7 @@ export function SidebarPage() {
 
       {currentPage === '홈' && <HomePage className="flex-1" userName="홍길동" />}
       {currentPage === '오늘의 업무' && <TodoListPage />}
+      {currentPage === '일지 모아보기' && <DiaryListPage />}
 
       {modal === 'setting' && (
         <SettingModal

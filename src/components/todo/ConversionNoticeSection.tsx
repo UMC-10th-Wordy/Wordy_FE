@@ -9,8 +9,13 @@ const NOTICE_ITEMS = [
   '입력된 데이터는 성과 분석 결과 생성을 위해 일시적으로 처리되며, 사용자의 동의 없이 외부에 공개되거나 제3자에게 제공되지 않습니다.',
 ]
 
+interface ConversionNoticeSectionProps {
+  isEnabled: boolean
+  onConvert: () => void
+}
+
 /* 업무일지 -> 성과 변환 전 주의 사항 안내 + 변환 버튼 */
-export function ConversionNoticeSection() {
+export function ConversionNoticeSection({ isEnabled, onConvert }: ConversionNoticeSectionProps) {
   return (
     <section className="flex w-full flex-col items-center gap-5 pb-[60px]">
       <div className="flex w-full flex-col gap-1">
@@ -35,7 +40,8 @@ export function ConversionNoticeSection() {
         variant="fill"
         size="large"
         fullWidth
-        disabled
+        disabled={!isEnabled}
+        onClick={onConvert}
         iconLeft={<GenerateIcon aria-hidden className="size-8" />}
       >
         동의하고 성과로 변환하기
