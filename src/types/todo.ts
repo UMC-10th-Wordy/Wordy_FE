@@ -2,10 +2,20 @@ import type { ProjectTagColor } from '@/components/todo/ProjectTag'
 
 export type TaskPriority = 'must' | 'should' | 'could'
 
+export interface ProjectTagMeta {
+  projectName: string
+  purpose: string
+  expectedOutcome: string
+  startDate?: string
+  endDate?: string
+  kpis: string[]
+}
+
 /* 업무 카드에 표시되는 프로젝트 태그 */
 export interface TaskTag {
   label: string
   color: ProjectTagColor
+  meta?: ProjectTagMeta
 }
 
 /* 업무 결과에 첨부된 파일 (url은 미리보기/다운로드용 objectURL) */
