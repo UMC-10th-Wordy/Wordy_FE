@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import type { HTMLAttributes, ReactNode } from 'react'
+import type { SidebarPage } from '../Sidebar/Sidebar'
 import LogoSmallIcon from '@/assets/icons/logo-small.svg?react'
 import SidebarIcon from '@/assets/icons/sidebar.svg?react'
-
-export type SidebarPage = '홈' | '알림함' | '오늘의 업무' | '일지 모아보기' | '성과 대시보드'
 
 export interface SidebarCollapsedHoverProps extends HTMLAttributes<HTMLDivElement> {
   activePage?: SidebarPage
@@ -13,6 +12,7 @@ export interface SidebarCollapsedHoverProps extends HTMLAttributes<HTMLDivElemen
   onProfileClick?: () => void
   onExpand?: () => void
   avatarSrc?: string
+  userName?: string
 }
 
 export function SidebarCollapsedHover({
@@ -23,6 +23,7 @@ export function SidebarCollapsedHover({
   onProfileClick,
   onExpand,
   avatarSrc,
+  userName = '',
   className,
   ...rest
 }: SidebarCollapsedHoverProps) {
@@ -89,13 +90,15 @@ export function SidebarCollapsedHover({
       <button
         type="button"
         onClick={onProfileClick}
-        className="shrink-0 size-12 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)"
+        className="shrink-0 size-12 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)"
         aria-label="프로필"
       >
         {avatarSrc ? (
           <img src={avatarSrc} alt="프로필" className="size-full object-cover" />
         ) : (
-          <div className="size-full bg-(--color-bg-secondary)" />
+          <div className="flex size-full items-center justify-center bg-(--color-bg-secondary) [font-size:var(--font-size-body-3)] font-semibold text-(--color-text-secondary)">
+            {userName.charAt(0)}
+          </div>
         )}
       </button>
     </div>

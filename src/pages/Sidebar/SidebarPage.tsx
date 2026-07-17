@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Sidebar,
   ProfileModal,
@@ -16,6 +16,7 @@ import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
 import DocumentIcon from '@/assets/icons/document.svg?react'
 import DashboardIcon from '@/assets/icons/dashboard.svg?react'
+import { WeeklyDashboard } from '@/components/dashboard/WeeklyDashboard'
 
 type ModalState = null | 'profile-menu' | 'setting' | 'notification' | 'workspace'
 
@@ -25,14 +26,26 @@ const PAGE_ROUTES: Record<string, string> = {
   '일지 모아보기': '/records',
   '성과 대시보드': '/dashboard',
 }
+type SidebarPageName = '홈' | '알림함' | '오늘의 업무' | '일지 모아보기' | '성과 대시보드'
+
+const PAGE_BY_PATH: Record<string, SidebarPageName> = {
+  '/': '홈',
+  '/today': '오늘의 업무',
+  '/records': '일지 모아보기',
+  '/dashboard': '성과 대시보드',
+}
 
 export function SidebarPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [modal, setModal] = useState<ModalState>(null)
-  const [sidebarStatus, setSidebarStatus] = useState<'open' | 'closed'>(
-    () => (localStorage.getItem('sidebarStatus') as 'open' | 'closed') ?? 'open',
+  const [sidebarStatus, setSidebarStatus] = useState<'open' | 'closed'>(() => {
+    const stored = localStorage.getItem('sidebarStatus')
+    return stored === 'open' || stored === 'closed' ? stored : 'open'
+  })
+  const [currentPage, setCurrentPage] = useState<SidebarPage>(
+    () => PAGE_BY_PATH[location.pathname] ?? '홈',
   )
-  const [currentPage, setCurrentPage] = useState<SidebarPage>('홈')
   const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
   const [notifications, setNotifications] = useState<Record<string, boolean>>({
@@ -174,6 +187,7 @@ export function SidebarPage() {
 
       {currentPage === '홈' && <HomePage className="flex-1" userName="홍길동" />}
       {currentPage === '오늘의 업무' && <TodoListPage />}
+      {currentPage === '성과 대시보드' && <WeeklyDashboard />}
       {currentPage === '일지 모아보기' && <DiaryListPage />}
 
       {modal === 'setting' && (
