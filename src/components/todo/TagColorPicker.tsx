@@ -33,7 +33,7 @@ export default function TagColorPicker({
   const ref = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState({ top: 0, left: 0 })
 
-  useOutsideClick(ref, onClose, true)
+  useOutsideClick(ref, onClose, true, anchorRef)
 
   useLayoutEffect(() => {
     const calc = () => {
@@ -45,16 +45,10 @@ export default function TagColorPicker({
       const vh = window.innerHeight
 
       const spaceBelow = vh - anchor.bottom
-      const top =
-        spaceBelow >= pickerH + GAP
-          ? anchor.bottom + window.scrollY + GAP
-          : anchor.top + window.scrollY - pickerH - GAP
+      const top = spaceBelow >= pickerH + GAP ? anchor.bottom + GAP : anchor.top - pickerH - GAP
 
-      const leftRaw = anchor.left + window.scrollX - 20
-      const left = Math.max(
-        window.scrollX + GAP,
-        Math.min(leftRaw, window.scrollX + vw - pickerW - GAP),
-      )
+      const leftRaw = anchor.left - 20
+      const left = Math.max(GAP, Math.min(leftRaw, vw - pickerW - GAP))
 
       setPos({ top, left })
     }

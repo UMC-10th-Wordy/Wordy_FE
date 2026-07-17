@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { TextButton } from '@/components/common/Button/TextButton'
 import ErrorIcon from '@/assets/icons/error.svg?react'
@@ -17,6 +18,14 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') onConfirm?.()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onConfirm])
+
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center">
       {/* dim */}

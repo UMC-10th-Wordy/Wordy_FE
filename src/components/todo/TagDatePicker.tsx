@@ -42,7 +42,7 @@ export default function TagDatePicker({ anchorRef, value, onChange, onClose }: T
   )
   const [pos, setPos] = useState({ top: 0, left: 0 })
 
-  useOutsideClick(ref, onClose, true)
+  useOutsideClick(ref, onClose, true, anchorRef)
 
   useLayoutEffect(() => {
     const calcPos = () => {
@@ -54,12 +54,9 @@ export default function TagDatePicker({ anchorRef, value, onChange, onClose }: T
       const vh = window.innerHeight
 
       const spaceBelow = vh - anchor.bottom
-      const top =
-        spaceBelow >= pickerH + GAP
-          ? anchor.bottom + window.scrollY + GAP
-          : anchor.top + window.scrollY - pickerH - GAP
+      const top = spaceBelow >= pickerH + GAP ? anchor.bottom + GAP : anchor.top - pickerH - GAP
 
-      const left = Math.min(anchor.left + window.scrollX, window.scrollX + vw - pickerW - GAP)
+      const left = Math.max(GAP, Math.min(anchor.left, vw - pickerW - GAP))
 
       setPos({ top, left })
     }

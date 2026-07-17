@@ -183,6 +183,14 @@ export default function TagSettingsModal({
       setShowEditColorPicker(false)
       return
     }
+    if (showEditStartDatePicker) {
+      setShowEditStartDatePicker(false)
+      return
+    }
+    if (showEditEndDatePicker) {
+      setShowEditEndDatePicker(false)
+      return
+    }
     if (showStartDatePicker) {
       setShowStartDatePicker(false)
       return
@@ -237,8 +245,12 @@ export default function TagSettingsModal({
 
   const handleConfirmEdit = () => {
     if (!editingLabel || !hasEditChanges()) return
+    const isDuplicate = tags.some(
+      (t) => t.label === editDraft.label.trim() && t.label !== editingLabel,
+    )
+    if (isDuplicate) return
     const original = getEditOriginal()
-    onEditTag(editingLabel, {
+    const updated: TaskTag = {
       label: editDraft.label,
       color: editDraft.color,
       meta: original?.meta
@@ -252,7 +264,9 @@ export default function TagSettingsModal({
             kpis: editDraft.kpis.filter((k) => k.trim() !== ''),
           }
         : undefined,
-    })
+    }
+    onEditTag(editingLabel, updated)
+    if (selectedTag?.label === editingLabel) setSelectedTag(updated)
     setEditingLabel(null)
     setExpandedLabel(null)
   }
@@ -290,7 +304,8 @@ export default function TagSettingsModal({
     newProjectName.trim() !== '' &&
     newPurpose.trim() !== '' &&
     newOutcome.trim() !== '' &&
-    newKpis.some((k) => k.trim() !== '')
+    newKpis.some((k) => k.trim() !== '') &&
+    !tags.some((t) => t.label === newLabel.trim())
 
   const handleAddTag = () => {
     if (!canAddNewTag) return

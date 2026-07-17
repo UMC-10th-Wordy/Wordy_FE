@@ -12,6 +12,7 @@ export function PillTabs<T extends string>({ tabs, value, onChange }: PillTabsPr
           key={tab.value}
           type="button"
           onClick={() => onChange(tab.value)}
+          aria-pressed={value === tab.value}
           className={[
             'flex shrink-0 items-center justify-center gap-1.5 rounded-lg px-3 py-2 [font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) whitespace-nowrap transition-colors',
             value === tab.value
