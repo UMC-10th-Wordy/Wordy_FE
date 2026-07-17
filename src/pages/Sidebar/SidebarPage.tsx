@@ -11,6 +11,7 @@ import type { SidebarPage, NotificationItemProps } from '@/components/sidebar'
 import TodoListPage from '@/pages/TodoListPage/TodoListPage'
 import { HomePage } from '@/pages/Home/HomePage'
 import { DiaryListPage } from '@/pages/DiaryListPage'
+import { DiaryDetailPage } from '@/pages/DiaryDetailPage'
 import HomeIcon from '@/assets/icons/home.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
@@ -35,6 +36,14 @@ const PAGE_BY_PATH: Record<string, SidebarPageName> = {
   '/dashboard': '성과 대시보드',
 }
 
+const getPageByPath = (pathname: string): SidebarPageName => {
+  if (pathname.startsWith('/records/')) {
+    return '일지 모아보기'
+  }
+
+  return PAGE_BY_PATH[pathname] ?? '홈'
+}
+
 export function SidebarPage() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -43,8 +52,8 @@ export function SidebarPage() {
     const stored = localStorage.getItem('sidebarStatus')
     return stored === 'open' || stored === 'closed' ? stored : 'open'
   })
-  const [currentPage, setCurrentPage] = useState<SidebarPage>(
-    () => PAGE_BY_PATH[location.pathname] ?? '홈',
+  const [currentPage, setCurrentPage] = useState<SidebarPage>(() =>
+    getPageByPath(location.pathname),
   )
   const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
@@ -53,6 +62,9 @@ export function SidebarPage() {
     '업무 완료 알림': false,
     '코멘트 알림': true,
   })
+
+  const isDiaryListPage = location.pathname === '/records'
+  const isDiaryDetailPage = location.pathname.startsWith('/records/')
 
   const notificationItems: NotificationItemProps[] = [
     {
@@ -188,7 +200,8 @@ export function SidebarPage() {
       {currentPage === '홈' && <HomePage className="flex-1" userName="홍길동" />}
       {currentPage === '오늘의 업무' && <TodoListPage />}
       {currentPage === '성과 대시보드' && <WeeklyDashboard />}
-      {currentPage === '일지 모아보기' && <DiaryListPage />}
+      {currentPage === '일지 모아보기' && isDiaryListPage && <DiaryListPage />}
+      {currentPage === '일지 모아보기' && isDiaryDetailPage && <DiaryDetailPage />}
 
       {modal === 'setting' && (
         <SettingModal

@@ -1,0 +1,100 @@
+import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+
+import { DeleteDiaryDialog } from '@/components/diary-detail/DeleteDiaryDialog'
+import { DiaryDetailHeader } from '@/components/diary-detail/DiaryDetailHeader'
+import { DiaryRetrospective } from '@/components/diary-detail/DiaryRetrospective'
+import { ReadOnlyTaskCard } from '@/components/diary-detail/ReadOnlyTaskCard'
+import { DIARY_DETAIL_MOCK } from '@/components/diary-detail/diaryDetailMock'
+import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
+import TodoTabs from '@/components/todo/TodoTabs'
+
+import type { TodoFilter, TodoFilterCounts } from '@/types/todo'
+
+const formatDateLabel = (date: string) => {
+  const [year, month, day] = date.split('-').map(Number)
+
+  return `${year}년 ${month}월 ${day}일`
+}
+
+export const DiaryDetailPage = () => {
+  const navigate = useNavigate()
+  const { diaryId } = useParams<{ diaryId: string }>()
+
+  const [activeTab, setActiveTab] = useState<TodoFilter>('completed')
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+  // TODO(#65): diaryId를 이용한 업무 일지 상세 조회 API 연결
+  const diary = {
+    ...DIARY_DETAIL_MOCK,
+    id: diaryId ?? DIARY_DETAIL_MOCK.id,
+    date: diaryId ?? DIARY_DETAIL_MOCK.date,
+  }
+
+  const completedTasks = diary.tasks.filter((task) => task.isCompleted)
+  const incompleteTasks = diary.tasks.filter((task) => !task.isCompleted)
+
+  const activeTasks = activeTab === 'completed' ? completedTasks : incompleteTasks
+
+  const filterCounts: TodoFilterCounts = {
+    completed: completedTasks.length,
+    incomplete: incompleteTasks.length,
+  }
+
+  const handleBack = () => {
+    navigate(-1)
+  }
+
+  const handleDeleteDiary = () => {
+    // TODO(#65): 해당 업무 일지 삭제 API 연결 후 목록 데이터 갱신
+    setIsDeleteDialogOpen(false)
+    navigate('/records')
+  }
+
+  return (
+    <div className="flex min-w-0 flex-1 items-start bg-(--color-bg-default)">
+      <main className="h-screen min-w-0 flex-1 overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-40) pt-(--scale-40)">
+        <DiaryDetailHeader
+          dateLabel={formatDateLabel(diary.date)}
+          onBack={handleBack}
+          onDelete={() => setIsDeleteDialogOpen(true)}
+        />
+
+        <section className="mt-(--scale-48) flex w-full flex-col gap-(--scale-8)">
+          <div className="flex w-full items-center justify-between">
+            <h2 className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-[var(--font-weight-semibold)] text-(--color-text-default)">
+              오늘의 업무 일지
+            </h2>
+
+            <TodoTabs activeTab={activeTab} counts={filterCounts} onChange={setActiveTab} />
+          </div>
+
+          <div className="flex w-full flex-col gap-(--scale-16)">
+            {activeTasks.map((task) => (
+              <ReadOnlyTaskCard key={task.id} task={task} />
+            ))}
+          </div>
+        </section>
+
+        <div className="mt-(--scale-48)">
+          <DiaryRetrospective content={diary.retrospective} />
+        </div>
+      </main>
+
+      <PerformancePreviewPanel
+        status="success"
+        result={{
+          data: diary.performance,
+          readOnly: true,
+        }}
+      />
+
+      {isDeleteDialogOpen && (
+        <DeleteDiaryDialog
+          onCancel={() => setIsDeleteDialogOpen(false)}
+          onConfirm={handleDeleteDiary}
+        />
+      )}
+    </div>
+  )
+}
