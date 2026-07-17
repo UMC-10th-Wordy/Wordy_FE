@@ -8,7 +8,7 @@ import {
   WorkspaceModal,
 } from '@/components/sidebar'
 import type { SidebarPage, NotificationItemProps } from '@/components/sidebar'
-import TodoListPage from '@/pages/TodoListPage'
+import TodoListPage from '@/pages/TodoListPage/TodoListPage'
 import { HomePage } from '@/pages/Home/HomePage'
 import { DiaryListPage } from '@/pages/DiaryListPage'
 import HomeIcon from '@/assets/icons/home.svg?react'
