@@ -7,7 +7,7 @@ import { useOutsideClick } from '@/hooks/useOutsideClick'
 import { WEEKDAY_LABELS, getMonthGridDates, isSameDay } from '@/utils/calendar'
 
 interface TagDatePickerProps {
-  anchorRef: React.RefObject<HTMLElement>
+  anchorRef: React.RefObject<HTMLElement | null>
   value: string
   onChange: (value: string) => void
   onClose: () => void
