@@ -53,7 +53,7 @@ export const WeeklyStatusCard = ({ status, convertedCount, onGenerate }: WeeklyS
             </h2>
             <p className="[font-size:var(--font-size-body-3)] text-(--color-text-secondary)">
               저장된{' '}
-              <span className="font-semibold text-(--color-text-brand)">
+              <span className="font-semibold text-(--color-text-brand) tabular-nums">
                 업무일지 {convertedCount}개
               </span>
               를 바탕으로 이번 주의 업무 및 KPI 추적 결과를 정리해드릴게요
