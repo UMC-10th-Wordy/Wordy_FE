@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { Sidebar } from '@/components/sidebar'
-import { ProfileModal } from '@/components/sidebar/ProfileModal/ProfileModal'
-import { SettingModal } from '@/components/sidebar/SettingModal/SettingModal'
-import { NotificationModal } from '@/components/sidebar/NotificationModal/NotificationModal'
-import { WorkspaceModal } from '@/components/sidebar/WorkspaceModal/WorkspaceModal'
-import type { NotificationItemProps } from '@/components/sidebar/NotificationItem/NotificationItem'
+import { useNavigate } from 'react-router-dom'
+import {
+  Sidebar,
+  ProfileModal,
+  SettingModal,
+  NotificationModal,
+  WorkspaceModal,
+} from '@/components/sidebar'
+import type { SidebarPage, NotificationItemProps } from '@/components/sidebar'
 import TodoListPage from '@/pages/TodoListPage/TodoListPage'
 import { DiaryListPage } from '@/pages/DiaryListPage'
 import HomeIcon from '@/assets/icons/home.svg?react'
@@ -36,10 +38,11 @@ export function SidebarPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [modal, setModal] = useState<ModalState>(null)
-  const [sidebarStatus, setSidebarStatus] = useState<'open' | 'closed'>('open')
-  const [currentPage, setCurrentPage] = useState<SidebarPageName>(
-    PAGE_BY_PATH[location.pathname] ?? '홈',
-  )
+  const [sidebarStatus, setSidebarStatus] = useState<'open' | 'closed'>(() => {
+    const stored = localStorage.getItem('sidebarStatus')
+    return stored === 'open' || stored === 'closed' ? stored : 'open'
+  })
+  const [currentPage, setCurrentPage] = useState<SidebarPage>('홈')
   const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
   const [notifications, setNotifications] = useState<Record<string, boolean>>({
@@ -97,12 +100,13 @@ export function SidebarPage() {
   ]
 
   return (
-    <div className="flex h-screen w-full items-start bg-(--color-bg-default)">
+    <div className="flex h-screen w-full items-stretch">
       <Sidebar
         page={currentPage}
         status={sidebarStatus}
         onChangeStatus={(status) => {
           setSidebarStatus(status)
+          localStorage.setItem('sidebarStatus', status)
           if (status === 'closed') setModal(null)
         }}
         onChangePage={(page) => {
