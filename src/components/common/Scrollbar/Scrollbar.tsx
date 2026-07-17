@@ -10,6 +10,7 @@ export interface ScrollbarProps {
 
 export function Scrollbar({ children, className }: ScrollbarProps) {
   const contentRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
   const thumbRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
 
@@ -43,11 +44,14 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
 
   useEffect(() => {
     const el = contentRef.current
+    const track = trackRef.current
     if (!el) return
     updateThumb()
     el.addEventListener('scroll', updateThumb)
     const ro = new ResizeObserver(updateThumb)
     ro.observe(el)
+    if (track) ro.observe(track)
+    if (innerRef.current) ro.observe(innerRef.current)
     return () => {
       el.removeEventListener('scroll', updateThumb)
       ro.disconnect()
@@ -128,7 +132,7 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
         ref={contentRef}
         className="flex flex-col flex-1 min-w-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden"
       >
-        {children}
+        <div ref={innerRef}>{children}</div>
       </div>
 
       {/* 커스텀 스크롤바 — 항상 렌더, 스크롤 불가 시 invisible */}
