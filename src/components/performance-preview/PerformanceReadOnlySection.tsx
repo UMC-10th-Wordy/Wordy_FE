@@ -34,7 +34,10 @@ export const PerformanceReadOnlySection = ({
         <ul className="mt-(--scale-4) flex w-full flex-col">
           {contentLines.map((line, index) => (
             <li key={`${line}-${index}`} className="flex items-start">
-              <span className="shrink-0 [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-regular)] text-(--color-text-default)">
+              <span
+                aria-hidden="true"
+                className="shrink-0 [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-regular)] text-(--color-text-default)"
+              >
                 -&nbsp;
               </span>
 

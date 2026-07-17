@@ -52,9 +52,7 @@ export function SidebarPage() {
     const stored = localStorage.getItem('sidebarStatus')
     return stored === 'open' || stored === 'closed' ? stored : 'open'
   })
-  const [currentPage, setCurrentPage] = useState<SidebarPage>(() =>
-    getPageByPath(location.pathname),
-  )
+  const currentPage = getPageByPath(location.pathname)
   const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
   const [notifications, setNotifications] = useState<Record<string, boolean>>({
@@ -125,7 +123,6 @@ export function SidebarPage() {
           if (status === 'closed') setModal(null)
         }}
         onChangePage={(page) => {
-          setCurrentPage(page)
           const route = PAGE_ROUTES[page]
           if (route) navigate(route)
         }}

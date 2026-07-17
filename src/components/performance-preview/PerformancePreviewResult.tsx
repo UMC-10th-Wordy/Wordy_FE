@@ -189,7 +189,7 @@ export const PerformancePreviewResult = ({
             fullWidth
             disabled={isSaved}
             onClick={handleSaveDiary}
-            className="![font-size:var(--font-size-body-1)] font-[var(--font-weight-medium)]"
+            className="[font-size:var(--font-size-body-1)] font-[var(--font-weight-medium)]"
           >
             업무 성과 저장하기
           </TextButton>

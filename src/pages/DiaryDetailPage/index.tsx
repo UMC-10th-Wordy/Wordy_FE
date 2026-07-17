@@ -48,7 +48,7 @@ export const DiaryDetailPage = () => {
   const handleDeleteDiary = () => {
     // TODO(#65): 해당 업무 일지 삭제 API 연결 후 목록 데이터 갱신
     setIsDeleteDialogOpen(false)
-    navigate('/records')
+    navigate('/records', { replace: true })
   }
 
   return (
@@ -82,6 +82,7 @@ export const DiaryDetailPage = () => {
       </main>
 
       <PerformancePreviewPanel
+        key={diary.id}
         status="success"
         result={{
           data: diary.performance,
