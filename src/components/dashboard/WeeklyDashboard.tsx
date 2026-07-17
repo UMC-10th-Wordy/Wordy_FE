@@ -7,7 +7,8 @@ import { WeeklySummaryInsight } from './WeeklySummaryInsight'
 import { TagWorkflowSection } from './TagWorkflowSection'
 import { WeeklyHighlights } from './WeeklyHighlights'
 import { WeeklyRetrospective } from './WeeklyRetrospective'
-import { MonthlyDashboard } from './MonthlyDashboard'
+import { DUMMY_WEEKS, MonthlyDashboard } from './MonthlyDashboard'
+import type { MonthlyGeneration } from './MonthlyDashboard'
 import type { TagWorkflow } from './TagWorkflowSection'
 import type { DiaryEntry, WeeklyDashboardStatus } from './dashboard.types'
 
@@ -99,12 +100,16 @@ const DUMMY_HIGHLIGHTS = [
 
 export const WeeklyDashboard = () => {
   const [activeTab, setActiveTab] = useState<'weekly' | 'monthly'>('weekly')
+  // 기본: 전체 선택 상태에서 시작
   const [selectedIds, setSelectedIds] = useState<string[]>(DUMMY_ENTRIES.map((e) => e.id))
   const [generation, setGeneration] = useState<'idle' | 'generating' | 'complete'>('idle')
   // TODO(#44): API 연동 시 주차별 일지 조회로 교체. 현재는 주차 라벨만 이동
   const [weekOffset, setWeekOffset] = useState(0)
 
-  const weekLabel = weekOffset === 0 ? '2026년 6월 3주차' : `2026년 6월 ${3 + weekOffset}주차`
+  // 월간 생성 상태 — 탭 전환 시 유실되지 않도록 부모에서 소유 (리뷰 반영)
+  const [monthlyGeneration, setMonthlyGeneration] = useState<MonthlyGeneration>('idle')
+
+  const weekLabel = `2026년 6월 ${3 + weekOffset}주차`
 
   const totalDays = DUMMY_ENTRIES.length
   const requiredCount = totalDays > 0 ? Math.min(3, totalDays) : 3
@@ -119,6 +124,20 @@ export const WeeklyDashboard = () => {
     setTimeout(() => setGeneration('complete'), 2000)
   }
 
+  const handleMonthlyGenerate = () => {
+    setMonthlyGeneration('generating')
+    // TODO(#66): API 연동 시 생성 완료 응답으로 교체. 데모: 2초 후 완료
+    setTimeout(() => setMonthlyGeneration('complete'), 2000)
+  }
+
+  // 미생성 주차 "생성하기" → 해당 주차로 이동하며 주간 탭 전환 (리뷰 반영)
+  const handleGoWeekly = (weekId: string) => {
+    const index = DUMMY_WEEKS.findIndex((w) => w.id === weekId)
+    if (index !== -1) setWeekOffset(index + 1 - 3) // 3주차가 offset 0 기준
+    setActiveTab('weekly')
+  }
+
+  // 선택 requiredCount개 이상이면 충족, 미만이면 미충족. 생성 진행/완료가 우선
   const status: WeeklyDashboardStatus =
     generation !== 'idle'
       ? (generation as WeeklyDashboardStatus)
@@ -226,7 +245,11 @@ export const WeeklyDashboard = () => {
           </div>
 
           <div className="flex gap-7 overflow-x-auto">
-            <MonthlyDashboard onGoWeekly={() => setActiveTab('weekly')} />
+            <MonthlyDashboard
+              generation={monthlyGeneration}
+              onGenerate={handleMonthlyGenerate}
+              onGoWeekly={handleGoWeekly}
+            />
           </div>
         </>
       )}

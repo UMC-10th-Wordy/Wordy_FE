@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { MonthlyStatusCard } from './MonthlyStatusCard'
 import { MonthlyWeekListPanel } from './MonthlyWeekListPanel'
 import { WeeklySummaryInsight } from './WeeklySummaryInsight'
@@ -8,8 +7,8 @@ import { WeeklyRetrospective } from './WeeklyRetrospective'
 import type { WeeklyBoardStatus } from './MonthlyWeekListPanel'
 import type { TagWorkflow } from './TagWorkflowSection'
 
-// TODO(#번호): API 연동 시 실제 주간 대시보드 현황으로 교체
-const DUMMY_WEEKS: WeeklyBoardStatus[] = [
+// TODO(#66): API 연동 시 실제 주간 대시보드 현황으로 교체
+export const DUMMY_WEEKS: WeeklyBoardStatus[] = [
   { id: 'w1', weekLabel: '6월 1주차', rangeLabel: '6월 1일 - 6월 6일', generated: true },
   { id: 'w2', weekLabel: '6월 2주차', rangeLabel: '6월 7일 - 6월 13일', generated: true },
   { id: 'w3', weekLabel: '6월 3주차', rangeLabel: '6월 14일 - 6월 20일', generated: true },
@@ -17,7 +16,7 @@ const DUMMY_WEEKS: WeeklyBoardStatus[] = [
   { id: 'w5', weekLabel: '6월 5주차', rangeLabel: '6월 28일 - 6월 30일', generated: true },
 ]
 
-// TODO(#번호): API 연동 시 월간 생성 결과로 교체
+// TODO(#66): API 연동 시 월간 생성 결과로 교체
 const DUMMY_MONTHLY_STATS = [
   { label: '일지 기록', value: '26', unit: '일' },
   { label: '업무 완료율', value: '85', unit: '%' },
@@ -34,7 +33,7 @@ const DUMMY_FOCUS_AREAS = [
   { label: '디자인 시스템', color: 'pink' as const },
 ]
 
-// TODO(#번호): 주간과 동일 더미 재사용. API 연동 시 월간 집계로 교체
+// TODO(#66): 주간과 동일 더미 재사용. API 연동 시 월간 집계로 교체
 const DUMMY_MONTHLY_TAGS: TagWorkflow[] = [
   {
     id: 'onboarding',
@@ -103,20 +102,16 @@ const DUMMY_MONTHLY_HIGHLIGHTS = [
 
 const REQUIRED_WEEKLY_COUNT = 3
 
+export type MonthlyGeneration = 'idle' | 'generating' | 'complete'
+
 interface MonthlyDashboardProps {
+  generation: MonthlyGeneration
+  onGenerate: () => void
   onGoWeekly: (weekId: string) => void
 }
 
-export const MonthlyDashboard = ({ onGoWeekly }: MonthlyDashboardProps) => {
-  const [generation, setGeneration] = useState<'idle' | 'generating' | 'complete'>('idle')
-
+export const MonthlyDashboard = ({ generation, onGenerate, onGoWeekly }: MonthlyDashboardProps) => {
   const generatedCount = DUMMY_WEEKS.filter((w) => w.generated).length
-
-  const handleGenerate = () => {
-    setGeneration('generating')
-    // TODO(#번호): API 연동 시 생성 완료 응답으로 교체. 데모: 2초 후 완료
-    setTimeout(() => setGeneration('complete'), 2000)
-  }
 
   const status =
     generation !== 'idle'
@@ -135,7 +130,7 @@ export const MonthlyDashboard = ({ onGoWeekly }: MonthlyDashboardProps) => {
           monthlyHighlight={DUMMY_MONTHLY_HIGHLIGHT}
           focusAreas={DUMMY_FOCUS_AREAS}
         />
-        <TagWorkflowSection tags={DUMMY_MONTHLY_TAGS} />
+        <TagWorkflowSection tags={DUMMY_MONTHLY_TAGS} period="monthly" />
         <WeeklyHighlights
           items={DUMMY_MONTHLY_HIGHLIGHTS}
           title="이번 달 성과 요약"
@@ -151,7 +146,7 @@ export const MonthlyDashboard = ({ onGoWeekly }: MonthlyDashboardProps) => {
       <MonthlyStatusCard
         status={status === 'generating' ? 'generating' : status}
         generatedCount={generatedCount}
-        onGenerate={handleGenerate}
+        onGenerate={onGenerate}
       />
       <MonthlyWeekListPanel
         weeks={DUMMY_WEEKS}
