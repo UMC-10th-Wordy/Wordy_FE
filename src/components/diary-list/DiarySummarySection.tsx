@@ -7,6 +7,8 @@ interface DiarySummarySectionProps {
 }
 
 export const DiarySummarySection = ({ summary }: DiarySummarySectionProps) => {
+  const mostUsedTagName = summary.mostUsedTagName.trim() || '-'
+
   return (
     <section className="mt-(--scale-48) flex w-full flex-col">
       <h2 className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-[var(--font-weight-semibold)] text-(--color-text-default)">
@@ -34,7 +36,7 @@ export const DiarySummarySection = ({ summary }: DiarySummarySectionProps) => {
         <DiarySummaryCard
           variant="tag"
           title="최다 기록 카테고리"
-          value={summary.mostUsedTagName}
+          value={mostUsedTagName}
           mostUsedTagRatio={summary.mostUsedTagRatio}
         />
       </div>

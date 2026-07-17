@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { TextButton } from '@/components/common/Button/TextButton'
 
+import { DiaryListEmptyState } from './DiaryListEmptyState'
 import { DiaryMonthlyAccordion } from './DiaryMonthlyAccordion'
 
 import type { MonthlyDiaryRecord } from '@/types/diaryList'
@@ -25,6 +26,7 @@ export const DiaryMonthlySection = ({ records }: DiaryMonthlySectionProps) => {
   })
 
   const visibleRecords = sortedRecords.slice(0, visibleMonthCount)
+  const hasRecords = sortedRecords.length > 0
   const hasMoreRecords = visibleMonthCount < sortedRecords.length
 
   const handleToggleRecord = (recordId: string) => {
@@ -46,32 +48,38 @@ export const DiaryMonthlySection = ({ records }: DiaryMonthlySectionProps) => {
   }
 
   return (
-    <section className="mt-(--scale-48)">
-      <h2 className="h-(--scale-32) [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-(--font-weight-semibold) text-(--color-text-default)">
+    <section className="mt-(--scale-48) flex min-h-0 flex-1 flex-col">
+      <h2 className="h-(--scale-32) shrink-0 [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-(--font-weight-semibold) text-(--color-text-default)">
         월별 기록
       </h2>
 
-      <div className="mt-(--scale-12) flex flex-col gap-(--scale-20)">
-        {visibleRecords.map((record) => (
-          <DiaryMonthlyAccordion
-            key={record.id}
-            record={record}
-            isOpen={openRecordIds.includes(record.id)}
-            onToggle={() => handleToggleRecord(record.id)}
-          />
-        ))}
-      </div>
+      {hasRecords ? (
+        <>
+          <div className="mt-(--scale-12) flex flex-col gap-(--scale-20)">
+            {visibleRecords.map((record) => (
+              <DiaryMonthlyAccordion
+                key={record.id}
+                record={record}
+                isOpen={openRecordIds.includes(record.id)}
+                onToggle={() => handleToggleRecord(record.id)}
+              />
+            ))}
+          </div>
 
-      {hasMoreRecords && (
-        <TextButton
-          variant="stroke"
-          size="large"
-          fullWidth
-          className="mt-(--scale-20)"
-          onClick={handleLoadMore}
-        >
-          이전 기록 더 보기
-        </TextButton>
+          {hasMoreRecords && (
+            <TextButton
+              variant="stroke"
+              size="large"
+              fullWidth
+              className="mt-(--scale-20)"
+              onClick={handleLoadMore}
+            >
+              이전 기록 더 보기
+            </TextButton>
+          )}
+        </>
+      ) : (
+        <DiaryListEmptyState />
       )}
     </section>
   )

@@ -47,7 +47,7 @@ const renderMonthlyDescription = (
   previousMonthCount: number,
   highlightClassName: string,
 ) => {
-  if (previousMonthCount === 0) {
+  if (currentMonthCount === 0 || previousMonthCount === 0) {
     return '이번 달의 기록을 열심히 작성해 볼까요?'
   }
 
@@ -89,6 +89,9 @@ export const DiarySummaryCard = ({
   const Icon = SUMMARY_ICON[variant]
   const style = SUMMARY_CARD_STYLE[variant]
 
+  const displayedBestStreakDays = bestStreakDays ?? 0
+  const displayedMostUsedTagRatio = mostUsedTagRatio ?? 0
+
   return (
     <article
       className={`relative h-[152px] min-w-0 overflow-hidden rounded-(--scale-12) ${style.backgroundClassName}`}
@@ -109,7 +112,7 @@ export const DiarySummaryCard = ({
             <p className="-mt-[3px] h-[26px] whitespace-nowrap [font-size:var(--font-size-body-3)] leading-[26px] font-[var(--font-weight-regular)] text-(--color-text-secondary)">
               전체의{' '}
               <span className={`font-[var(--font-weight-medium)] ${style.highlightClassName}`}>
-                {mostUsedTagRatio}%
+                {displayedMostUsedTagRatio}%
               </span>
               를 차지하고 있어요
             </p>
@@ -142,7 +145,7 @@ export const DiarySummaryCard = ({
                 <>
                   최고 기록은{' '}
                   <span className={`font-[var(--font-weight-medium)] ${style.highlightClassName}`}>
-                    {bestStreakDays}일
+                    {displayedBestStreakDays}일
                   </span>
                   이었어요
                 </>
