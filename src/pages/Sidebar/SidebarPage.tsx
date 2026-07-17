@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Sidebar,
   ProfileModal,
@@ -42,7 +42,9 @@ export function SidebarPage() {
     const stored = localStorage.getItem('sidebarStatus')
     return stored === 'open' || stored === 'closed' ? stored : 'open'
   })
-  const [currentPage, setCurrentPage] = useState<SidebarPage>('홈')
+  const [currentPage, setCurrentPage] = useState<SidebarPage>(
+    () => PAGE_BY_PATH[location.pathname] ?? '홈',
+  )
   const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
   const [notifications, setNotifications] = useState<Record<string, boolean>>({
