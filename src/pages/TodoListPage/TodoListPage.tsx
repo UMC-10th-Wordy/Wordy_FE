@@ -178,7 +178,7 @@ export default function TodoListPage() {
   const isActiveTabEmpty = activeTasks.length === 0
 
   return (
-    <div className="relative flex min-w-0 flex-1 items-start bg-(--color-bg-default)">
+    <div className="relative flex min-w-0 flex-1 items-start overflow-x-hidden bg-(--color-bg-default)">
       <motion.main
         initial={false}
         animate={{

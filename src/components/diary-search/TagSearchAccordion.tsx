@@ -59,6 +59,7 @@ export const TagSearchAccordion = ({ result, keyword, onDetailClick }: TagSearch
       <AnimatePresence initial={false}>
         {expanded && (
           <motion.div
+            key="tag-search-results"
             initial={{ height: 0 }}
             animate={{ height: 'auto' }}
             exit={{ height: 0 }}
