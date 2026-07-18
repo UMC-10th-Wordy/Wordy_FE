@@ -138,7 +138,7 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
       {/* 커스텀 스크롤바 — 항상 렌더, 스크롤 불가 시 invisible */}
       <div
         className={[
-          'flex flex-col items-center shrink-0 h-full',
+          'flex flex-col items-center shrink-0 h-full pt-2 pr-1',
           isScrollable ? '' : 'invisible',
         ].join(' ')}
       >
