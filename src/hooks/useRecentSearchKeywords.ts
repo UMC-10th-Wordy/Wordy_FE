@@ -1,16 +1,16 @@
 import { useState } from 'react'
 
 const RECENT_SEARCH_STORAGE_KEY = 'wordy-recent-diary-search-keywords'
-const MAX_RECENT_SEARCH_COUNT = 5
+const MAX_RECENT_SEARCH_KEYWORDS = 5
 
 const getStoredKeywords = (): string[] => {
-  const storedKeywords = localStorage.getItem(RECENT_SEARCH_STORAGE_KEY)
-
-  if (!storedKeywords) {
-    return []
-  }
-
   try {
+    const storedKeywords = localStorage.getItem(RECENT_SEARCH_STORAGE_KEY)
+
+    if (!storedKeywords) {
+      return []
+    }
+
     const parsedKeywords: unknown = JSON.parse(storedKeywords)
 
     if (!Array.isArray(parsedKeywords)) {
@@ -23,20 +23,16 @@ const getStoredKeywords = (): string[] => {
   }
 }
 
-export interface UseRecentSearchKeywordsReturn {
-  recentKeywords: string[]
-  addRecentKeyword: (keyword: string) => void
-  removeRecentKeyword: (keyword: string) => void
-  clearRecentKeywords: () => void
+const saveStoredKeywords = (keywords: string[]) => {
+  try {
+    localStorage.setItem(RECENT_SEARCH_STORAGE_KEY, JSON.stringify(keywords))
+  } catch {
+    // localStorage 사용이 제한된 환경에서는 현재 세션의 상태만 유지
+  }
 }
 
-export const useRecentSearchKeywords = (): UseRecentSearchKeywordsReturn => {
+export const useRecentSearchKeywords = () => {
   const [recentKeywords, setRecentKeywords] = useState<string[]>(getStoredKeywords)
-
-  const updateRecentKeywords = (keywords: string[]) => {
-    setRecentKeywords(keywords)
-    localStorage.setItem(RECENT_SEARCH_STORAGE_KEY, JSON.stringify(keywords))
-  }
 
   const addRecentKeyword = (keyword: string) => {
     const trimmedKeyword = keyword.trim()
@@ -45,22 +41,31 @@ export const useRecentSearchKeywords = (): UseRecentSearchKeywordsReturn => {
       return
     }
 
-    const nextKeywords = [
-      trimmedKeyword,
-      ...recentKeywords.filter((recentKeyword) => recentKeyword !== trimmedKeyword),
-    ].slice(0, MAX_RECENT_SEARCH_COUNT)
+    setRecentKeywords((previousKeywords) => {
+      const nextKeywords = [
+        trimmedKeyword,
+        ...previousKeywords.filter((recentKeyword) => recentKeyword !== trimmedKeyword),
+      ].slice(0, MAX_RECENT_SEARCH_KEYWORDS)
 
-    updateRecentKeywords(nextKeywords)
+      saveStoredKeywords(nextKeywords)
+
+      return nextKeywords
+    })
   }
 
   const removeRecentKeyword = (keyword: string) => {
-    const nextKeywords = recentKeywords.filter((recentKeyword) => recentKeyword !== keyword)
+    setRecentKeywords((previousKeywords) => {
+      const nextKeywords = previousKeywords.filter((recentKeyword) => recentKeyword !== keyword)
 
-    updateRecentKeywords(nextKeywords)
+      saveStoredKeywords(nextKeywords)
+
+      return nextKeywords
+    })
   }
 
   const clearRecentKeywords = () => {
-    updateRecentKeywords([])
+    setRecentKeywords([])
+    saveStoredKeywords([])
   }
 
   return {

@@ -16,13 +16,25 @@ import { useRecentSearchKeywords } from '@/hooks/useRecentSearchKeywords'
 
 import type { DiarySearchSort, DiarySearchTab } from '@/types/diarySearch'
 
+interface SearchInputState {
+  baseKeyword: string
+  value: string
+}
+
 export const DiarySearchPage = () => {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const searchedKeyword = searchParams.get('keyword') ?? ''
 
-  const [searchKeyword, setSearchKeyword] = useState(searchedKeyword)
+  const [searchInputState, setSearchInputState] = useState<SearchInputState>({
+    baseKeyword: searchedKeyword,
+    value: searchedKeyword,
+  })
+
+  const searchKeyword =
+    searchInputState.baseKeyword === searchedKeyword ? searchInputState.value : searchedKeyword
+
   const [activeTab, setActiveTab] = useState<DiarySearchTab>('diary')
   const [sort, setSort] = useState<DiarySearchSort>('latest')
   const [showRecentDropdown, setShowRecentDropdown] = useState(false)
@@ -77,7 +89,10 @@ export const DiarySearchPage = () => {
     }
 
     setShowRecentDropdown(false)
-    setSearchKeyword(trimmedKeyword)
+    setSearchInputState({
+      baseKeyword: trimmedKeyword,
+      value: trimmedKeyword,
+    })
     addRecentKeyword(trimmedKeyword)
     setSearchParams({ keyword: trimmedKeyword })
 
@@ -125,7 +140,12 @@ export const DiarySearchPage = () => {
         >
           <SearchInput
             value={searchKeyword}
-            onChange={(event) => setSearchKeyword(event.target.value)}
+            onChange={(event) =>
+              setSearchInputState({
+                baseKeyword: searchedKeyword,
+                value: event.target.value,
+              })
+            }
             onFocus={() => {
               setIsSearchFocused(true)
               setShowRecentDropdown(true)
