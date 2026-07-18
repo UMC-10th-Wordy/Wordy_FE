@@ -132,7 +132,9 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
         ref={contentRef}
         className="flex flex-col flex-1 min-w-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden"
       >
-        <div ref={innerRef}>{children}</div>
+        <div ref={innerRef} className="min-h-full">
+          {children}
+        </div>
       </div>
 
       {/* 커스텀 스크롤바 — 항상 렌더, 스크롤 불가 시 invisible */}

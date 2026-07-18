@@ -30,7 +30,7 @@ export function PlanPage() {
   const navigate = useNavigate()
 
   return (
-    <div className="flex flex-col gap-10 items-start p-10 min-h-screen w-full bg-(--color-bg-brand-subtle)">
+    <div className="flex flex-col gap-10 items-start p-10 min-h-full w-full bg-(--color-bg-brand-subtle)">
       {/* 뒤로 가기 */}
       <div className="flex gap-2 items-center shrink-0">
         <IconButton

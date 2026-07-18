@@ -146,7 +146,7 @@ export function HomePage({ userName = 'Alex Kim', className, ...rest }: HomePage
   const todayLabel = `${today.getMonth() + 1}월 ${today.getDate()}일 ${WEEK_DAYS[today.getDay()]}요일`
 
   return (
-    <div className={['flex-1 overflow-y-auto p-10', className].filter(Boolean).join(' ')} {...rest}>
+    <div className={['p-10', className].filter(Boolean).join(' ')} {...rest}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 1920 1080"

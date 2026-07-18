@@ -82,7 +82,7 @@ export function WorkspaceModal({
               editingId === workspace.id ? (
                 <div
                   key={workspace.id}
-                  className="bg-(--color-bg-brand-subtle) flex items-center px-5 h-14 w-full rounded-lg border-[0.5px_solid_var(--color-border-brand)] shrink-0"
+                  className="bg-(--color-bg-brand-subtle) flex items-center p-3 h-14 w-full rounded-(--scale-12) border border-(--color-border-brand) shrink-0"
                 >
                   <input
                     autoFocus
@@ -112,7 +112,7 @@ export function WorkspaceModal({
             )}
 
             {isAdding ? (
-              <div className="bg-(--color-bg-brand-subtle) flex items-center px-5 h-14 w-full rounded-lg border-[0.5px_solid_var(--color-border-brand-subtle)] focus-within:border-[0.5px_solid_var(--color-border-brand)] transition-colors duration-100 shrink-0">
+              <div className="bg-(--color-bg-brand-subtle) flex items-center p-3 h-14 w-full rounded-(--scale-12) shrink-0">
                 <input
                   autoFocus
                   placeholder="워크스페이스 이름을 작성해 주세요"
@@ -129,7 +129,7 @@ export function WorkspaceModal({
                       setIsAdding(false)
                     }
                   }}
-                  className="flex-1 bg-transparent outline-none [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary)"
+                  className="flex-1 bg-transparent outline-none [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-default) placeholder:text-(--color-text-tertiary) placeholder:font-normal"
                 />
               </div>
             ) : currentUsage < maxWorkspaces ? (
