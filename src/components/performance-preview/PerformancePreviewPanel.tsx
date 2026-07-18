@@ -1,3 +1,4 @@
+import { PerformanceConvertingNotice } from './PerformanceConvertingNotice'
 import { PerformancePreviewResult } from './PerformancePreviewResult'
 import { PerformanceQuestionChat } from './PerformanceQuestionChat'
 import { PerformanceStatusNotice } from './PerformanceStatusNotice'
@@ -6,14 +7,15 @@ import type { PerformanceQuestionChatProps } from './PerformanceQuestionChat'
 import type { PerformancePreviewResultData } from '@/types/performancePreviewResult'
 
 import GenerateIcon from '@/assets/icons/generate.svg?react'
-import emptyImage from '@/assets/icons/Layer 2.svg'
+import emptyImage from '@/assets/icons/wordy-performance-empty.svg'
+import failedImage from '@/assets/icons/wordy-performance-failed.svg'
 
 export type PerformancePreviewStatus = 'empty' | 'converting' | 'questioning' | 'failed' | 'success'
 
-type PerformanceNoticeStatus = Exclude<PerformancePreviewStatus, 'questioning' | 'success'>
+type PerformanceNoticeStatus = Extract<PerformancePreviewStatus, 'empty' | 'failed'>
 
 interface PerformancePreviewPanelBaseProps {
-  status?: PerformanceNoticeStatus
+  status?: 'empty' | 'converting' | 'failed'
 }
 
 interface PerformancePreviewPanelQuestioningProps {
@@ -39,23 +41,22 @@ type PerformancePreviewPanelProps =
 const STATUS_CONTENT = {
   empty: {
     imageSrc: emptyImage,
+    imageClassName: 'h-[129px] w-[253px]',
     message: '아직 작성된 내용이 없어요\n업무 일지를 작성하고 성과로 변환해 주세요',
   },
-  converting: {
-    // TODO(#10): 성과 변환 중 상태 이미지 에셋 수령 후 교체
-    imageSrc: emptyImage,
-    message: '워디가 열심히 변환하고 있어요\n잠시만 기다려 주세요',
-  },
   failed: {
-    // TODO(#10): 성과 변환 실패 상태 이미지 에셋 수령 후 교체
-    imageSrc: emptyImage,
+    imageSrc: failedImage,
+    imageClassName: 'h-[153.77px] w-[253px]',
     message: '성과 생성에 실패했어요\n업무 일지 내용을 보완해 다시 시도해 주세요',
+    bottomSpacingClassName: 'pb-(--scale-32)',
   },
 } satisfies Record<
   PerformanceNoticeStatus,
   {
     imageSrc: string
+    imageClassName: string
     message: string
+    bottomSpacingClassName?: string
   }
 >
 
@@ -71,14 +72,14 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
       return <PerformancePreviewResult {...props.result} />
     }
 
+    if (props.status === 'converting') {
+      return <PerformanceConvertingNotice />
+    }
+
     const status = props.status ?? 'empty'
     const currentStatusContent = STATUS_CONTENT[status]
 
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <PerformanceStatusNotice {...currentStatusContent} />
-      </div>
-    )
+    return <PerformanceStatusNotice {...currentStatusContent} />
   }
 
   return (
@@ -105,8 +106,8 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
         <div
           className={
             isSuccess
-              ? 'mt-(--scale-48) min-w-0 w-full'
-              : 'mt-(--scale-48) min-h-0 min-w-0 w-full flex-1'
+              ? 'mt-(--scale-48) w-full min-w-0'
+              : 'mt-(--scale-48) flex min-h-0 w-full min-w-0 flex-1 items-center justify-center'
           }
         >
           {renderContent()}

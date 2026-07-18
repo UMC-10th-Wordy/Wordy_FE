@@ -1,19 +1,27 @@
 interface PerformanceStatusNoticeProps {
   imageSrc: string
   imageAlt?: string
+  imageClassName: string
   message: string
+  bottomSpacingClassName?: string
 }
 
 export const PerformanceStatusNotice = ({
   imageSrc,
   imageAlt = '',
+  imageClassName,
   message,
+  bottomSpacingClassName,
 }: PerformanceStatusNoticeProps) => {
-  return (
-    <div className="flex flex-col items-center justify-center gap-(--scale-16)">
-      <img src={imageSrc} alt={imageAlt} className="h-[129px] w-[253px] shrink-0" />
+  const containerClassName = ['flex flex-col items-center justify-center', bottomSpacingClassName]
+    .filter(Boolean)
+    .join(' ')
 
-      <p className="max-w-full whitespace-pre-line text-center [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-secondary)">
+  return (
+    <div className={containerClassName}>
+      <img src={imageSrc} alt={imageAlt} className={`shrink-0 ${imageClassName}`} />
+
+      <p className="mt-(--scale-16) max-w-full whitespace-pre-line text-center [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-secondary)">
         {message}
       </p>
     </div>
