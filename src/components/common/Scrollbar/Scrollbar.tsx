@@ -138,14 +138,14 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
       {/* 커스텀 스크롤바 — 항상 렌더, 스크롤 불가 시 invisible */}
       <div
         className={[
-          'flex flex-col items-center shrink-0 h-full',
+          'flex flex-col items-center shrink-0 h-full pt-2 pr-1',
           isScrollable ? '' : 'invisible',
         ].join(' ')}
       >
         {/* 위 버튼 */}
         <button
           type="button"
-          className="shrink-0 flex items-center justify-center text-(--color-icon-tertiary) hover:text-(--color-icon-secondary) cursor-pointer"
+          className="shrink-0 flex items-center justify-center text-(--color-icon-tertiary) hover:text-(--color-icon-secondary) cursor-pointer transition-colors duration-100 ease-out"
           onMouseDown={() => startScrollInterval(-24)}
           onMouseUp={stopScrollInterval}
           onMouseLeave={stopScrollInterval}
@@ -160,7 +160,7 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
           <div
             ref={thumbRef}
             className={[
-              'absolute w-2 rounded-full cursor-pointer transition-colors duration-100',
+              'absolute w-2 rounded-full cursor-pointer transition-colors duration-100 ease-out',
               thumbColor,
             ].join(' ')}
             style={{ height: thumbHeight, top: thumbTop }}
@@ -173,7 +173,7 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
         {/* 아래 버튼 */}
         <button
           type="button"
-          className="shrink-0 flex items-center justify-center text-(--color-icon-tertiary) hover:text-(--color-icon-secondary) cursor-pointer"
+          className="shrink-0 flex items-center justify-center text-(--color-icon-tertiary) hover:text-(--color-icon-secondary) cursor-pointer transition-colors duration-100 ease-out"
           onMouseDown={() => startScrollInterval(24)}
           onMouseUp={stopScrollInterval}
           onMouseLeave={stopScrollInterval}
