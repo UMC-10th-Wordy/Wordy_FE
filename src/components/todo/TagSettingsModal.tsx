@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
-import { PillTabs } from '@/components/common/PillTabs/PillTabs'
+import { PillTabs } from '@/components/todo/PillTabs'
 import { useModalFocus } from '@/hooks/useModalFocus'
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
