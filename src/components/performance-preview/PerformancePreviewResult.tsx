@@ -1,18 +1,16 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { TextButton } from '@/components/common/Button/TextButton'
+import { useToast } from '@/components/common/Toast/useToast'
+import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 
 import { PerformanceEditableSection } from './PerformanceEditableSection'
 import { PerformanceIncompleteTaskList } from './PerformanceIncompleteTaskList'
 import { PerformanceReadOnlySection } from './PerformanceReadOnlySection'
 import { PerformanceResultProgress } from './PerformanceResultProgress'
 import { PerformanceTaskResultCard } from './PerformanceTaskResultCard'
-import { PerformanceToastViewport } from './PerformanceToastViewport'
 
-import type {
-  PerformancePreviewResultData,
-  PerformanceToast,
-} from '@/types/performancePreviewResult'
+import type { PerformancePreviewResultData } from '@/types/performancePreviewResult'
 
 interface PerformancePreviewResultProps {
   data: PerformancePreviewResultData
@@ -20,9 +18,6 @@ interface PerformancePreviewResultProps {
   onSave?: (values: { summary: string; insight: string }) => void
   onMoveTaskToTomorrow?: (taskId: string) => void
 }
-
-const TOAST_VISIBLE_TIME = 2000
-const MAX_TOAST_COUNT = 3
 
 const formatInsightWithBullet = (insight: string) => {
   return insight
@@ -53,26 +48,7 @@ export const PerformancePreviewResult = ({
   const [insight, setInsight] = useState(() => formatInsightWithBullet(data.insight))
   const [isSaved, setIsSaved] = useState(false)
   const [movedTaskIds, setMovedTaskIds] = useState<string[]>([])
-  const [toasts, setToasts] = useState<PerformanceToast[]>([])
-  const toastTimerIdsRef = useRef<number[]>([])
-
-  useEffect(() => {
-    return () => {
-      toastTimerIdsRef.current.forEach((timerId) => window.clearTimeout(timerId))
-    }
-  }, [])
-
-  const showToast = (message: string) => {
-    const toastId = crypto.randomUUID()
-
-    setToasts((prev) => [...prev.slice(-(MAX_TOAST_COUNT - 1)), { id: toastId, message }])
-
-    const timerId = window.setTimeout(() => {
-      setToasts((prev) => prev.filter((toast) => toast.id !== toastId))
-    }, TOAST_VISIBLE_TIME)
-
-    toastTimerIdsRef.current.push(timerId)
-  }
+  const { toasts, addToast } = useToast()
 
   const handleChangeSummary = (value: string) => {
     setSummary(value)
@@ -91,13 +67,13 @@ export const PerformancePreviewResult = ({
 
     setMovedTaskIds((prev) => [...prev, taskId])
     onMoveTaskToTomorrow?.(taskId)
-    showToast('내일 업무로 변경했어요')
+    addToast('내일 업무로 변경했어요')
   }
 
   const handleSaveDiary = () => {
     onSave?.({ summary, insight })
     setIsSaved(true)
-    showToast('업무 일지가 저장되었어요')
+    addToast('업무 일지가 저장되었어요')
   }
 
   return (
@@ -195,7 +171,7 @@ export const PerformancePreviewResult = ({
           </TextButton>
         </div>
       )}
-      <PerformanceToastViewport toasts={toasts} />
+      <ToastContainer toasts={toasts} />
     </div>
   )
 }
