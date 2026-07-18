@@ -8,7 +8,7 @@ import ArrowDownIcon from '@/assets/icons/Direction=bottom.svg?react'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
 import ErrorIcon from '@/assets/icons/error.svg?react'
 import SuccessIcon from '@/assets/icons/success.svg?react'
-import EmptyImage from '@/assets/icons/Layer 2.svg?react'
+import EmptyImage from '@/assets/icons/wordy-performance-empty.svg?react'
 
 export interface TrashItem {
   id: string
