@@ -7,6 +7,7 @@ import {
   NotificationModal,
   WorkspaceModal,
 } from '@/components/sidebar'
+import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 import type { SidebarPage, NotificationItemProps } from '@/components/sidebar'
 import TodoListPage from '@/pages/TodoListPage/TodoListPage'
 import { HomePage } from '@/pages/Home/HomePage'
@@ -194,11 +195,31 @@ export function SidebarPage() {
         }
       />
 
-      {currentPage === '홈' && <HomePage className="flex-1" userName="홍길동" />}
-      {currentPage === '오늘의 업무' && <TodoListPage />}
-      {currentPage === '성과 대시보드' && <WeeklyDashboard />}
-      {currentPage === '일지 모아보기' && isDiaryListPage && <DiaryListPage />}
-      {currentPage === '일지 모아보기' && isDiaryDetailPage && <DiaryDetailPage />}
+      {currentPage === '홈' && (
+        <Scrollbar className="flex-1">
+          <HomePage userName="홍길동" />
+        </Scrollbar>
+      )}
+      {currentPage === '오늘의 업무' && (
+        <Scrollbar className="flex-1">
+          <TodoListPage />
+        </Scrollbar>
+      )}
+      {currentPage === '성과 대시보드' && (
+        <Scrollbar className="flex-1">
+          <WeeklyDashboard />
+        </Scrollbar>
+      )}
+      {currentPage === '일지 모아보기' && isDiaryListPage && (
+        <Scrollbar className="flex-1">
+          <DiaryListPage />
+        </Scrollbar>
+      )}
+      {currentPage === '일지 모아보기' && isDiaryDetailPage && (
+        <Scrollbar className="flex-1">
+          <DiaryDetailPage />
+        </Scrollbar>
+      )}
 
       {modal === 'setting' && (
         <SettingModal

@@ -3,14 +3,18 @@ import type { ReactNode } from 'react'
 
 export interface ToastProps {
   message: ReactNode
+  exiting?: boolean
 }
 
-export function Toast({ message }: ToastProps) {
+export function Toast({ message, exiting }: ToastProps) {
   return (
     <div
       role="status"
       aria-live="polite"
-      className="inline-flex items-center gap-2.5 px-8 py-4 rounded-(--scale-12) bg-(--color-bg-default) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]"
+      className={[
+        'inline-flex items-center gap-2.5 px-8 py-4 rounded-(--scale-12) bg-(--color-bg-default) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]',
+        exiting ? 'animate-[fadeOut_0.3s_ease-out_forwards]' : 'animate-[slideUp_0.3s_ease-out]',
+      ].join(' ')}
     >
       <SuccessIcon
         width={32}

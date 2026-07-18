@@ -59,7 +59,7 @@ export function Sidebar({
   return (
     <div
       className={[
-        'relative transition-[width] duration-200 ease-out h-full shrink-0',
+        'relative transition-[width] duration-200 ease-in-out h-full shrink-0',
         isOpen
           ? profileMenu || notificationMenu || workspaceMenu
             ? 'w-65 overflow-visible'

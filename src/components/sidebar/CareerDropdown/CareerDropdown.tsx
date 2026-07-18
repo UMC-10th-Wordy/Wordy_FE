@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from 'react'
 import { SidebarNavItemText } from '../SidebarNavItemText/SidebarNavItemText'
+import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 
 export interface CareerDropdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   options: string[]
@@ -18,12 +19,12 @@ export function CareerDropdown({
     <div
       className={[
         'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_15px_rgba(0,0,0,0.1)]',
-        'flex items-start p-3 w-108 max-h-90 overflow-y-auto',
+        'flex flex-col p-3 w-full max-h-90 overflow-hidden',
         className,
       ].join(' ')}
       {...rest}
     >
-      <div className="flex flex-col items-start flex-1 min-w-0">
+      <Scrollbar>
         {options.map((option) => (
           <SidebarNavItemText
             key={option}
@@ -32,7 +33,7 @@ export function CareerDropdown({
             onClick={() => onChange?.(option)}
           />
         ))}
-      </div>
+      </Scrollbar>
     </div>
   )
 }
