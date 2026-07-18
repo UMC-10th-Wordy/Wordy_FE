@@ -177,8 +177,13 @@ export default function TodoListPage() {
   const isActiveTabEmpty = activeTasks.length === 0
 
   return (
-    <div className="flex flex-1 items-start bg-(--color-bg-default)">
-      <main className="h-screen flex-1 overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-10 pt-10">
+    <div className="flex min-w-0 flex-1 items-start bg-(--color-bg-default)">
+      <main
+        className={[
+          'h-screen min-w-0 overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-10 pt-10',
+          isPreviewOpen ? 'basis-1/2 flex-none' : 'flex-1',
+        ].join(' ')}
+      >
         <div className="flex w-full flex-col gap-12">
           <DateHeader
             date={currentDate}
@@ -308,7 +313,11 @@ export default function TodoListPage() {
         </div>
       </main>
 
-      {isPreviewOpen && <PerformancePreviewPanel status={previewStatus} />}
+      {isPreviewOpen && (
+        <div className="h-screen min-w-0 basis-1/2 flex-none overflow-hidden">
+          <PerformancePreviewPanel status={previewStatus} />
+        </div>
+      )}
 
       {draggingTask && pointer && <DraggingTaskGhost task={draggingTask} pointer={pointer} />}
 

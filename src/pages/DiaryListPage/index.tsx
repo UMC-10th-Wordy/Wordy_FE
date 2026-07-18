@@ -8,7 +8,7 @@ import { DiarySummarySection } from '@/components/diary-list/DiarySummarySection
 import { DIARY_SUMMARY_MOCK, EMPTY_DIARY_SUMMARY_MOCK } from '@/components/diary-list/diaryListMock'
 
 // 업무 일지 기록이 없는 상태를 테스트하기 위한 코드, 실제 서비스에서는 API 호출 결과에 따라 결정
-const IS_EMPTY_STATE = true
+const IS_EMPTY_STATE = false
 
 export const DiaryListPage = () => {
   const summary = IS_EMPTY_STATE ? EMPTY_DIARY_SUMMARY_MOCK : DIARY_SUMMARY_MOCK

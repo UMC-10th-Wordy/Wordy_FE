@@ -82,10 +82,10 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
   }
 
   return (
-    <aside className="order-2 flex h-screen w-[clamp(830px,50%,924px)] shrink-0 grow-0 overflow-y-auto bg-(--color-bg-brand-subtle) p-(--scale-40)">
+    <aside className="order-2 flex h-screen min-w-0 w-full overflow-y-auto bg-(--color-bg-brand-subtle) p-(--scale-40)">
       <section
         className={[
-          'flex w-full flex-col rounded-(--scale-16) border-[1.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-24) py-(--scale-20) shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]',
+          'flex min-w-0 w-full flex-col rounded-(--scale-16) border-[1.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-24) py-(--scale-20) shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]',
           isSuccess ? 'min-h-full self-start' : 'h-full overflow-hidden',
         ]
           .filter(Boolean)
@@ -103,7 +103,11 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
         </div>
 
         <div
-          className={isSuccess ? 'mt-(--scale-48) w-full' : 'mt-(--scale-48) min-h-0 w-full flex-1'}
+          className={
+            isSuccess
+              ? 'mt-(--scale-48) min-w-0 w-full'
+              : 'mt-(--scale-48) min-h-0 min-w-0 w-full flex-1'
+          }
         >
           {renderContent()}
         </div>
