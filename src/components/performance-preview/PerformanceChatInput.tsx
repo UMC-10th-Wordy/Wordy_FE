@@ -20,6 +20,10 @@ const CHAT_INPUT_LAYER_MAX_HEIGHT = 112
 const CHAT_INPUT_DEFAULT_VERTICAL_PADDING = 31
 const CHAT_INPUT_MAX_HEIGHT_BOTTOM_PADDING = 12
 
+const CHAT_INPUT_TEXTAREA_DEFAULT_VERTICAL_PADDING = 8
+const CHAT_INPUT_TEXTAREA_DEFAULT_PADDING = 4
+const CHAT_INPUT_TEXTAREA_EXPANDED_PADDING = 0
+
 const CHAT_INPUT_TEXTAREA_MIN_HEIGHT =
   CHAT_INPUT_LAYER_MIN_HEIGHT - CHAT_INPUT_DEFAULT_VERTICAL_PADDING
 
@@ -48,7 +52,8 @@ export const PerformanceChatInput = ({
 
     textarea.style.height = `${CHAT_INPUT_TEXTAREA_MIN_HEIGHT}px`
 
-    const textareaVerticalPadding = inputHeight === CHAT_INPUT_LAYER_MIN_HEIGHT ? 8 : 0
+    const textareaVerticalPadding =
+      inputHeight === CHAT_INPUT_LAYER_MIN_HEIGHT ? CHAT_INPUT_TEXTAREA_DEFAULT_VERTICAL_PADDING : 0
 
     const contentHeight = textarea.value
       ? textarea.scrollHeight - textareaVerticalPadding
@@ -105,8 +110,8 @@ export const PerformanceChatInput = ({
           className={[
             '!h-full !min-h-[60px] !max-h-[112px] w-full overflow-hidden',
             isMaxHeight
-              ? '![padding-top:0px] ![padding-bottom:12px]'
-              : '![padding-top:15.5px] ![padding-bottom:15.5px]',
+              ? '[padding-top:0px]! [padding-bottom:12px]!'
+              : '[padding-top:15.5px]! [padding-bottom:15.5px]!',
             'border-[0.5px] border-(--color-border-brand-subtle)',
             'bg-(--color-bg-brand-subtle)',
             'focus-within:border-(--color-border-brand)',
@@ -122,8 +127,14 @@ export const PerformanceChatInput = ({
             msOverflowStyle: 'none',
             lineHeight: '21px',
             caretColor: '#5D5DF1',
-            paddingTop: inputHeight === CHAT_INPUT_LAYER_MIN_HEIGHT ? 4 : 0,
-            paddingBottom: inputHeight === CHAT_INPUT_LAYER_MIN_HEIGHT ? 4 : 0,
+            paddingTop:
+              inputHeight === CHAT_INPUT_LAYER_MIN_HEIGHT
+                ? CHAT_INPUT_TEXTAREA_DEFAULT_PADDING
+                : CHAT_INPUT_TEXTAREA_EXPANDED_PADDING,
+            paddingBottom:
+              inputHeight === CHAT_INPUT_LAYER_MIN_HEIGHT
+                ? CHAT_INPUT_TEXTAREA_DEFAULT_PADDING
+                : CHAT_INPUT_TEXTAREA_EXPANDED_PADDING,
             boxSizing: 'border-box',
             flex: 'none',
             cursor: disabled ? 'default' : undefined,
