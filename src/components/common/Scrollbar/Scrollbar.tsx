@@ -126,11 +126,11 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
       : 'bg-(--color-icon-tertiary)'
 
   return (
-    <div className={['flex gap-2 min-h-0 flex-1 w-full', className].filter(Boolean).join(' ')}>
+    <div className={['relative min-h-0 flex-1 w-full', className].filter(Boolean).join(' ')}>
       {/* 스크롤 콘텐츠 */}
       <div
         ref={contentRef}
-        className="flex flex-col flex-1 min-w-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden"
+        className="flex flex-col h-full min-w-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden pr-2"
       >
         <div ref={innerRef} className="min-h-full">
           {children}
@@ -140,7 +140,7 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
       {/* 커스텀 스크롤바 — 항상 렌더, 스크롤 불가 시 invisible */}
       <div
         className={[
-          'flex flex-col items-center shrink-0 h-full pt-2 pr-1',
+          'absolute right-0 top-0 flex flex-col items-center h-full pt-2 pr-1',
           isScrollable ? '' : 'invisible',
         ].join(' ')}
       >
