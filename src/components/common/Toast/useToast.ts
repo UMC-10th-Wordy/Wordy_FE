@@ -9,28 +9,45 @@ export interface ToastItem {
 export function useToast() {
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const idRef = useRef(0)
+  const toastsRef = useRef<ToastItem[]>([])
 
   const addToast = useCallback((message: string) => {
     const id = ++idRef.current
+    const prev = toastsRef.current
 
-    setToasts((prev) => {
-      if (prev.length >= 3) {
-        const oldestId = prev[0].id
-        setTimeout(() => {
-          setToasts((cur) => cur.filter((t) => t.id !== oldestId))
-        }, 300)
-        return [
-          ...prev.map((t) => (t.id === oldestId ? { ...t, exiting: true } : t)),
-          { id, message },
-        ]
-      }
-      return [...prev, { id, message }]
-    })
+    if (prev.length >= 3) {
+      const evictId = prev[0].id
+      const next = [
+        ...prev.map((t) => (t.id === evictId ? { ...t, exiting: true } : t)),
+        { id, message },
+      ]
+      toastsRef.current = next
+      setToasts(next)
+      setTimeout(() => {
+        setToasts((cur) => {
+          const updated = cur.filter((t) => t.id !== evictId)
+          toastsRef.current = updated
+          return updated
+        })
+      }, 300)
+    } else {
+      const next = [...prev, { id, message }]
+      toastsRef.current = next
+      setToasts(next)
+    }
 
     setTimeout(() => {
-      setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, exiting: true } : t)))
+      setToasts((prev) => {
+        const updated = prev.map((t) => (t.id === id ? { ...t, exiting: true } : t))
+        toastsRef.current = updated
+        return updated
+      })
       setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id))
+        setToasts((prev) => {
+          const updated = prev.filter((t) => t.id !== id)
+          toastsRef.current = updated
+          return updated
+        })
       }, 300)
     }, 2000)
   }, [])
