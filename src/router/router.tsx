@@ -8,8 +8,18 @@ import { EmailVerificationPage } from '@/pages/EmailVerificationPage'
 import { MailNoticePage } from '@/pages/MailNoticePage'
 import { ProfileSetupPage } from '@/pages/ProfileSetupPage'
 import { DiarySearchPage } from '@/pages/DiarySearchPage'
+import { LandingPreview } from '@/pages/LandingPreview/LandingPreview'
+import { LandingPage } from '@/pages/LandingPage/LandingPage'
 
 export const router = createBrowserRouter([
+  {
+    path: '/landing-preview',
+    element: <LandingPreview />,
+  },
+  {
+    path: '/landing',
+    element: <LandingPage />,
+  },
   {
     path: '/',
     element: <SidebarPage />,
