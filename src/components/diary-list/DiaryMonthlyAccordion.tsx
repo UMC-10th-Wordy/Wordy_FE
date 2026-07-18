@@ -1,3 +1,5 @@
+import { AnimatePresence, motion } from 'framer-motion'
+
 import { IconButton } from '@/components/common/Button/IconButton'
 import ProjectTag from '@/components/todo/ProjectTag'
 
@@ -76,32 +78,46 @@ export const DiaryMonthlyAccordion = ({ record, isOpen, onToggle }: DiaryMonthly
         onClick={onToggle}
       />
 
-      {isOpen && (
-        <div className="mt-[33px] rounded-(--scale-16) bg-(--color-bg-brand-subtle) p-(--scale-20)">
-          <div className="grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] gap-x-2.5">
-            <div className="flex min-w-0 flex-col gap-(--scale-24)">
-              {leftEntries.map((entry) => (
-                <DiaryMonthlyEntry key={entry.id} entry={entry} />
-              ))}
-            </div>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="monthly-entries"
+            initial={{ height: 0 }}
+            animate={{ height: 'auto' }}
+            exit={{ height: 0 }}
+            transition={{
+              duration: 0.2,
+              ease: 'easeOut',
+            }}
+            className="overflow-hidden"
+          >
+            <div className="mt-[33px] rounded-(--scale-16) bg-(--color-bg-brand-subtle) p-(--scale-20)">
+              <div className="grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] gap-x-2.5">
+                <div className="flex min-w-0 flex-col gap-(--scale-24)">
+                  {leftEntries.map((entry) => (
+                    <DiaryMonthlyEntry key={entry.id} entry={entry} />
+                  ))}
+                </div>
 
-            <div
-              className="my-(--scale-8) w-px self-stretch"
-              style={{
-                backgroundImage:
-                  'repeating-linear-gradient(to bottom, var(--color-border-subtle) 0 2px, transparent 2px 4px)',
-              }}
-              aria-hidden="true"
-            />
+                <div
+                  className="my-(--scale-8) w-px self-stretch"
+                  style={{
+                    backgroundImage:
+                      'repeating-linear-gradient(to bottom, var(--color-border-subtle) 0 2px, transparent 2px 4px)',
+                  }}
+                  aria-hidden="true"
+                />
 
-            <div className="flex min-w-0 flex-col gap-(--scale-24)">
-              {rightEntries.map((entry) => (
-                <DiaryMonthlyEntry key={entry.id} entry={entry} />
-              ))}
+                <div className="flex min-w-0 flex-col gap-(--scale-24)">
+                  {rightEntries.map((entry) => (
+                    <DiaryMonthlyEntry key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </article>
   )
 }

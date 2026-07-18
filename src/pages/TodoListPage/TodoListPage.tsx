@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { useRef, useState } from 'react'
 import TaskForm from '@/components/todo/TaskForm'
 import TodoTabs from '@/components/todo/TodoTabs'
@@ -177,12 +178,17 @@ export default function TodoListPage() {
   const isActiveTabEmpty = activeTasks.length === 0
 
   return (
-    <div className="flex min-w-0 flex-1 items-start bg-(--color-bg-default)">
-      <main
-        className={[
-          'h-screen min-w-0 overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-10 pt-10',
-          isPreviewOpen ? 'basis-1/2 flex-none' : 'flex-1',
-        ].join(' ')}
+    <div className="relative flex min-w-0 flex-1 items-start bg-(--color-bg-default)">
+      <motion.main
+        initial={false}
+        animate={{
+          width: isPreviewOpen ? '50%' : '100%',
+        }}
+        transition={{
+          duration: 0.2,
+          ease: 'easeOut',
+        }}
+        className="h-screen min-w-0 flex-none overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-10 pt-10"
       >
         <div className="flex w-full flex-col gap-12">
           <DateHeader
@@ -311,13 +317,25 @@ export default function TodoListPage() {
             onConvert={handleConvert}
           />
         </div>
-      </main>
+      </motion.main>
 
-      {isPreviewOpen && (
-        <div className="h-screen min-w-0 basis-1/2 flex-none overflow-hidden">
-          <PerformancePreviewPanel status={previewStatus} />
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {isPreviewOpen && (
+          <motion.div
+            key="performance-preview"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{
+              duration: 0.2,
+              ease: 'easeOut',
+            }}
+            className="absolute top-0 right-0 h-screen w-1/2 overflow-hidden"
+          >
+            <PerformancePreviewPanel status={previewStatus} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {draggingTask && pointer && <DraggingTaskGhost task={draggingTask} pointer={pointer} />}
 

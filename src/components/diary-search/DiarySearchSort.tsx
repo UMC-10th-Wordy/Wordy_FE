@@ -19,10 +19,14 @@ const SortButton = ({ selected, label, onClick }: SortButtonProps) => {
       onClick={onClick}
       className={[
         '[font-size:var(--font-size-body-3)] leading-(--line-height-body)',
-        'font-[var(--font-weight-medium)] transition-colors duration-100',
+        'font-[var(--font-weight-medium)] transition-colors duration-100 ease-out',
         selected
           ? 'text-(--color-text-default)'
-          : 'text-(--color-text-tertiary) hover:text-(--color-text-secondary)',
+          : [
+              'text-(--color-text-tertiary)',
+              'hover:text-(--color-text-secondary)',
+              'active:text-(--color-text-default)',
+            ].join(' '),
       ].join(' ')}
     >
       {label}
