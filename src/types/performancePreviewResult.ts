@@ -25,8 +25,3 @@ export interface PerformancePreviewResultData {
   nextTasks: string[]
   taskResults: PerformanceTaskResult[]
 }
-
-export interface PerformanceToast {
-  id: string
-  message: string
-}

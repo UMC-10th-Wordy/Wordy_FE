@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
 
 import DirectionBottomIcon from '@/assets/icons/Direction=bottom.svg?react'
@@ -55,44 +56,58 @@ export const TagSearchAccordion = ({ result, keyword, onDetailClick }: TagSearch
         </div>
       </div>
 
-      {expanded && (
-        <div className="mt-[33px] flex flex-col gap-[33px]">
-          {result.diaries.map((diary) => (
-            <article key={diary.id} className="w-full py-(--scale-8)">
-              <time className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)">
-                {diary.displayDate}
-              </time>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            key="tag-search-results"
+            initial={{ height: 0 }}
+            animate={{ height: 'auto' }}
+            exit={{ height: 0 }}
+            transition={{
+              duration: 0.2,
+              ease: 'easeOut',
+            }}
+            className="overflow-hidden"
+          >
+            <div className="mt-[33px] flex flex-col gap-[33px]">
+              {result.diaries.map((diary) => (
+                <article key={diary.id} className="w-full py-(--scale-8)">
+                  <time className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)">
+                    {diary.displayDate}
+                  </time>
 
-              <div className="mt-[7px] flex min-w-0 items-center">
-                {diary.tag && (
-                  <div className="mr-[9px] shrink-0">
-                    <ProjectTag label={diary.tag.name} color={diary.tag.color} />
-                  </div>
-                )}
+                  <div className="mt-[7px] flex min-w-0 items-center">
+                    {diary.tag && (
+                      <div className="mr-[9px] shrink-0">
+                        <ProjectTag label={diary.tag.name} color={diary.tag.color} />
+                      </div>
+                    )}
 
-                <p className="min-w-0 flex-1 truncate [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-semibold)] text-(--color-text-default)">
-                  {highlightSearchKeyword(diary.title, keyword)}
-                </p>
+                    <p className="min-w-0 flex-1 truncate [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-semibold)] text-(--color-text-default)">
+                      {highlightSearchKeyword(diary.title, keyword)}
+                    </p>
 
-                <div className="ml-[9px] shrink-0">
-                  <IconButton
-                    variant="text_neutral"
-                    size="small"
-                    icon={
-                      <DirectionRightIcon
-                        aria-hidden
-                        className="size-(--scale-24) text-(--color-icon-secondary)"
+                    <div className="ml-[9px] shrink-0">
+                      <IconButton
+                        variant="text_neutral"
+                        size="small"
+                        icon={
+                          <DirectionRightIcon
+                            aria-hidden
+                            className="size-(--scale-24) text-(--color-icon-secondary)"
+                          />
+                        }
+                        onClick={() => onDetailClick(diary.id)}
+                        aria-label={`${diary.displayDate} 업무 일지 자세히 보기`}
                       />
-                    }
-                    onClick={() => onDetailClick(diary.id)}
-                    aria-label={`${diary.displayDate} 업무 일지 자세히 보기`}
-                  />
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </article>
   )
 }
