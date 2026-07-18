@@ -24,9 +24,10 @@ export interface TagWorkflow {
 
 interface TagWorkflowSectionProps {
   tags: TagWorkflow[]
+  period?: 'weekly' | 'monthly'
 }
 
-export const TagWorkflowSection = ({ tags }: TagWorkflowSectionProps) => {
+export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSectionProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = tags.find((t) => t.id === selectedId) ?? tags[0]
 
@@ -39,7 +40,8 @@ export const TagWorkflowSection = ({ tags }: TagWorkflowSectionProps) => {
           태그별 업무 흐름 추적
         </h2>
         <p className="[font-size:var(--font-size-body-4)] text-(--color-text-tertiary)">
-          프로젝트 태그별로 한 주 간 어떤 결과가 있었는지 정리했어요
+          프로젝트 태그별로 {period === 'monthly' ? '한 달' : '한 주'} 간 어떤 결과가 있었는지
+          정리했어요
         </p>
       </div>
 
