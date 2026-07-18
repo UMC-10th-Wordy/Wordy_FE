@@ -9,7 +9,7 @@ export function ToastContainer({ toasts }: ToastContainerProps) {
   if (toasts.length === 0) return null
 
   return (
-    <div className="fixed bottom-8 right-8 flex flex-col gap-3 items-end z-50">
+    <div className="fixed bottom-8 right-6 flex flex-col gap-3 items-end z-50">
       {toasts.map((toast) => (
         <Toast key={toast.id} message={toast.message} exiting={toast.exiting} />
       ))}
