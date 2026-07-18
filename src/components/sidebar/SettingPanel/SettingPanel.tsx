@@ -101,7 +101,7 @@ export function SettingPanel({
         </div>
 
         {/* 우측 콘텐츠 */}
-        <div className="flex flex-1 flex-col h-full isolate items-start justify-between min-w-0 p-5">
+        <div className="flex flex-1 flex-col h-full isolate items-start justify-between min-w-0 min-h-0 overflow-y-auto p-5">
           {currentTab === 'profile' && innerView === 'password' ? (
             <>
               <div className="flex flex-col gap-6 items-start shrink-0 w-full">
@@ -245,6 +245,7 @@ export function SettingPanel({
                         <SettingAccordion
                           label={job || '선택'}
                           className="w-full"
+                          aria-expanded={openDropdown === 'job'}
                           onClick={() => setOpenDropdown((v) => (v === 'job' ? null : 'job'))}
                         />
                         {openDropdown === 'job' && (
@@ -283,6 +284,7 @@ export function SettingPanel({
                         <SettingAccordion
                           label={career || '선택'}
                           className="w-full"
+                          aria-expanded={openDropdown === 'career'}
                           onClick={() => setOpenDropdown((v) => (v === 'career' ? null : 'career'))}
                         />
                         {openDropdown === 'career' && (

@@ -11,46 +11,39 @@ export function useToast() {
   const idRef = useRef(0)
   const toastsRef = useRef<ToastItem[]>([])
 
-  const addToast = useCallback((message: string) => {
-    const id = ++idRef.current
-    const prev = toastsRef.current
-
-    if (prev.length >= 3) {
-      const evictId = prev[0].id
-      const next = [
-        ...prev.map((t) => (t.id === evictId ? { ...t, exiting: true } : t)),
-        { id, message },
-      ]
-      toastsRef.current = next
-      setToasts(next)
-      setTimeout(() => {
-        setToasts((cur) => {
-          const updated = cur.filter((t) => t.id !== evictId)
-          toastsRef.current = updated
-          return updated
-        })
-      }, 300)
-    } else {
-      const next = [...prev, { id, message }]
-      toastsRef.current = next
-      setToasts(next)
-    }
-
-    setTimeout(() => {
-      setToasts((prev) => {
-        const updated = prev.map((t) => (t.id === id ? { ...t, exiting: true } : t))
-        toastsRef.current = updated
-        return updated
-      })
-      setTimeout(() => {
-        setToasts((prev) => {
-          const updated = prev.filter((t) => t.id !== id)
-          toastsRef.current = updated
-          return updated
-        })
-      }, 300)
-    }, 2000)
+  const update = useCallback((next: ToastItem[]) => {
+    toastsRef.current = next
+    setToasts(next)
   }, [])
+
+  const addToast = useCallback(
+    (message: string) => {
+      const id = ++idRef.current
+      const prev = toastsRef.current
+      const activeToasts = prev.filter((t) => !t.exiting)
+
+      if (activeToasts.length >= 3) {
+        const evictId = activeToasts[0].id
+        update([
+          ...prev.map((t) => (t.id === evictId ? { ...t, exiting: true } : t)),
+          { id, message },
+        ])
+        setTimeout(() => {
+          update(toastsRef.current.filter((t) => t.id !== evictId))
+        }, 300)
+      } else {
+        update([...prev, { id, message }])
+      }
+
+      setTimeout(() => {
+        update(toastsRef.current.map((t) => (t.id === id ? { ...t, exiting: true } : t)))
+        setTimeout(() => {
+          update(toastsRef.current.filter((t) => t.id !== id))
+        }, 300)
+      }, 2000)
+    },
+    [update],
+  )
 
   return { toasts, addToast }
 }
