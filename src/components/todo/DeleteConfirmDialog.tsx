@@ -9,7 +9,7 @@ interface DeleteConfirmDialogProps {
 /* 업무 카드 삭제 확인 오버레이 */
 export function DeleteConfirmDialog({ onCancel, onConfirm }: DeleteConfirmDialogProps) {
   return (
-    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-(--color-bg-overlay)">
+    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/15">
       <div className="flex flex-col items-center gap-5 rounded-(--scale-12) bg-(--color-bg-default) px-8 py-5 shadow-[0px_1px_7.5px_0px_rgba(0,0,0,0.1)]">
         <div className="flex flex-col items-center gap-3">
           <ErrorIcon aria-hidden className="size-7 text-(--color-icon-brand)" />

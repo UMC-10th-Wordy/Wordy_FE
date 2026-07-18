@@ -8,9 +8,9 @@ import { IconButton } from '@/components/common/Button/IconButton'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
 import { JobDropdown } from '../JobDropdown/JobDropdown'
 import { CareerDropdown } from '../CareerDropdown/CareerDropdown'
+import { SettingAccordion } from '../SettingAccordion/SettingAccordion'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 import CameraIcon from '@/assets/icons/camera.svg?react'
-import DirectionBottomIcon from '@/assets/icons/Direction=bottom.svg?react'
 
 export type SettingTab = 'profile' | 'notification'
 type InnerView = 'main' | 'password'
@@ -101,11 +101,11 @@ export function SettingPanel({
         </div>
 
         {/* 우측 콘텐츠 */}
-        <div className="flex flex-1 flex-col h-full items-start justify-between min-w-0 overflow-y-auto p-5">
+        <div className="flex flex-1 flex-col h-full isolate items-start justify-between min-w-0 p-5">
           {currentTab === 'profile' && innerView === 'password' ? (
             <>
               <div className="flex flex-col gap-6 items-start shrink-0 w-full">
-                <div className="flex items-start justify-between shrink-0 w-full">
+                <div className="flex items-center justify-between shrink-0 w-full">
                   <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-semibold text-(--color-text-secondary) whitespace-nowrap">
                     비밀번호 변경
                   </span>
@@ -117,7 +117,7 @@ export function SettingPanel({
                     aria-label="닫기"
                   />
                 </div>
-                <div className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col gap-6 w-full">
                   <Input1
                     label="현재 비밀번호"
                     type="password"
@@ -160,7 +160,7 @@ export function SettingPanel({
             <>
               <div className="flex flex-col gap-6 items-start shrink-0 w-full">
                 {/* 헤더 */}
-                <div className="flex items-start justify-between shrink-0 w-full">
+                <div className="flex items-center justify-between shrink-0 w-full">
                   <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-semibold text-(--color-text-secondary) whitespace-nowrap">
                     프로필 설정
                   </span>
@@ -200,7 +200,7 @@ export function SettingPanel({
                   </div>
 
                   {/* 입력 필드 */}
-                  <div className="flex flex-col gap-3 flex-1 min-w-0">
+                  <div className="flex flex-col gap-3 flex-1 min-w-0 isolate">
                     {/* 닉네임 */}
                     <div className="flex items-center gap-5">
                       <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-tertiary) text-right w-17 shrink-0">
@@ -237,74 +237,67 @@ export function SettingPanel({
                       </TextButton>
                     </div>
                     {/* 직무 */}
-                    <div className="flex items-center gap-5 relative">
+                    <div className="flex items-center gap-5 z-2">
                       <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-tertiary) text-right w-17 shrink-0">
                         직무
                       </span>
-                      <button
-                        type="button"
-                        className="flex-1 flex items-center justify-between bg-(--color-bg-default) border border-(--color-border-subtle) rounded-lg pl-5 pr-4 py-2.5 cursor-pointer"
-                        onClick={() => setOpenDropdown((v) => (v === 'job' ? null : 'job'))}
-                      >
-                        <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)">
-                          {job || '선택'}
-                        </span>
-                        <DirectionBottomIcon
-                          width={24}
-                          height={24}
-                          className="shrink-0 text-(--color-icon-secondary)"
+                      <div className="relative flex-1 min-w-0">
+                        <SettingAccordion
+                          label={job || '선택'}
+                          className="w-full"
+                          onClick={() => setOpenDropdown((v) => (v === 'job' ? null : 'job'))}
                         />
-                      </button>
-                      {openDropdown === 'job' && (
-                        <div className="absolute top-full left-22 mt-2 z-10">
-                          <JobDropdown
-                            options={[
-                              '서비스·제품 기획',
-                              '프론트엔드·백엔드 개발',
-                              '디자인',
-                              '마케팅·세일즈',
-                              '데이터 분석',
-                            ]}
-                            value={job}
-                            onChange={(value) => {
-                              setJob(value)
-                              setOpenDropdown(null)
-                            }}
-                          />
-                        </div>
-                      )}
+                        {openDropdown === 'job' && (
+                          <div className="absolute top-full left-0 mt-2 z-10 w-full">
+                            <JobDropdown
+                              options={[
+                                '서비스·제품 기획',
+                                '프론트엔드·백엔드 개발',
+                                '디자인',
+                                '마케팅·세일즈',
+                                '데이터 분석',
+                                '고객 지원·CS',
+                                '인사·HR',
+                                '재무·회계',
+                                '교육·연구',
+                                '개인·프리랜서',
+                                '학생',
+                                '기타',
+                              ]}
+                              value={job}
+                              onChange={(value) => {
+                                setJob(value)
+                                setOpenDropdown(null)
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                     {/* 재직 연차 */}
-                    <div className="flex items-center gap-5 relative">
+                    <div className="flex items-center gap-5 z-1">
                       <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-tertiary) text-right w-17 shrink-0">
                         재직 연차
                       </span>
-                      <button
-                        type="button"
-                        className="flex-1 flex items-center justify-between bg-(--color-bg-default) border border-(--color-border-subtle) rounded-lg pl-5 pr-4 py-2.5 cursor-pointer"
-                        onClick={() => setOpenDropdown((v) => (v === 'career' ? null : 'career'))}
-                      >
-                        <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)">
-                          {career || '선택'}
-                        </span>
-                        <DirectionBottomIcon
-                          width={24}
-                          height={24}
-                          className="shrink-0 text-(--color-icon-secondary)"
+                      <div className="relative flex-1 min-w-0">
+                        <SettingAccordion
+                          label={career || '선택'}
+                          className="w-full"
+                          onClick={() => setOpenDropdown((v) => (v === 'career' ? null : 'career'))}
                         />
-                      </button>
-                      {openDropdown === 'career' && (
-                        <div className="absolute top-full left-22 mt-2 z-10">
-                          <CareerDropdown
-                            options={['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과']}
-                            value={career}
-                            onChange={(value) => {
-                              setCareer(value)
-                              setOpenDropdown(null)
-                            }}
-                          />
-                        </div>
-                      )}
+                        {openDropdown === 'career' && (
+                          <div className="absolute top-full left-0 mt-2 z-10 w-full">
+                            <CareerDropdown
+                              options={['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과']}
+                              value={career}
+                              onChange={(value) => {
+                                setCareer(value)
+                                setOpenDropdown(null)
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -333,7 +326,7 @@ export function SettingPanel({
             <>
               {/* 알림 탭 */}
               <div className="flex flex-col gap-6 items-start shrink-0 w-full">
-                <div className="flex items-start justify-between shrink-0 w-full">
+                <div className="flex items-center justify-between shrink-0 w-full">
                   <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-semibold text-(--color-text-secondary) whitespace-nowrap">
                     알림 설정
                   </span>

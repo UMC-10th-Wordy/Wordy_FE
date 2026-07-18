@@ -28,7 +28,7 @@ export function WorkspaceItem({
   }
 
   const baseClass =
-    'flex items-center gap-2 p-3 w-full border border-solid rounded-(--scale-12) transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)'
+    'flex items-center gap-2 p-3 w-full border border-solid rounded-(--scale-12) transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand) hover:bg-(--color-sidebar-neutral-hover)'
   const stateClass = selected
     ? 'bg-(--color-bg-brand-light) border-(--color-border-brand)'
     : 'bg-(--color-bg-default) border-(--color-border-subtle)'

@@ -3,14 +3,15 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 const sidebarIcon = cva(
   [
-    'group relative flex h-12 w-18 items-center justify-center transition-colors duration-100 ease-out cursor-pointer',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)',
+    'group relative flex h-12 w-18 items-center justify-center cursor-pointer transition-colors duration-100 ease-out',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--color-border-brand)',
   ],
   {
     variants: {
       state: {
-        default: '',
-        focused: 'bg-(--color-sidebar-primary-focused) border-r-2 border-(--color-border-brand)',
+        default: 'hover:bg-(--color-sidebar-primary-hover)',
+        focused:
+          'bg-(--color-sidebar-primary-focused) border-r-2 border-(--color-border-brand) hover:bg-(--color-sidebar-primary-focused)',
       },
     },
     defaultVariants: { state: 'default' },
@@ -42,7 +43,7 @@ export function SidebarIcon({
           <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-(--color-status-error)" />
         )}
       </span>
-      <span className="absolute left-full ml-1 hidden group-hover:flex items-center gap-0 z-10">
+      <span className="absolute left-full ml-3 hidden group-hover:flex items-center z-10 pointer-events-none">
         {/* 말풍선 꼬리 */}
         <span className="w-0 h-0 border-y-[6px] border-y-transparent border-r-[7px] border-r-(--color-bg-dark)" />
         <span className="bg-(--color-bg-dark) text-(--color-text-inverse) [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium px-2.5 py-1 rounded-lg whitespace-nowrap">
