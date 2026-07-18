@@ -14,17 +14,17 @@ interface PerformanceChatInputProps {
   onSubmitAnswer: () => void
 }
 
-const CHAT_INPUT_LAYER_MIN_HEIGHT = 53
+const CHAT_INPUT_LAYER_MIN_HEIGHT = 60
 const CHAT_INPUT_LAYER_MAX_HEIGHT = 112
 
-const CHAT_INPUT_DEFAULT_VERTICAL_PADDING = 24
-const CHAT_INPUT_MAX_HEIGHT_VERTICAL_PADDING = 12
+const CHAT_INPUT_DEFAULT_VERTICAL_PADDING = 31
+const CHAT_INPUT_MAX_HEIGHT_BOTTOM_PADDING = 12
 
 const CHAT_INPUT_TEXTAREA_MIN_HEIGHT =
   CHAT_INPUT_LAYER_MIN_HEIGHT - CHAT_INPUT_DEFAULT_VERTICAL_PADDING
 
 const CHAT_INPUT_TEXTAREA_MAX_HEIGHT =
-  CHAT_INPUT_LAYER_MAX_HEIGHT - CHAT_INPUT_MAX_HEIGHT_VERTICAL_PADDING
+  CHAT_INPUT_LAYER_MAX_HEIGHT - CHAT_INPUT_MAX_HEIGHT_BOTTOM_PADDING
 
 export const PerformanceChatInput = ({
   answer,
@@ -90,7 +90,7 @@ export const PerformanceChatInput = ({
   }
 
   return (
-    <div className="flex shrink-0 items-end gap-(--scale-16) py-(--scale-12)">
+    <div className="flex w-full shrink-0 items-end gap-(--scale-16) py-(--scale-12)">
       <div className="min-w-0 flex-1" style={{ height: inputHeight }}>
         <Input2
           value={answer}
@@ -103,10 +103,10 @@ export const PerformanceChatInput = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           className={[
-            '!h-full !min-h-[53px] !max-h-[112px] w-full overflow-hidden',
+            '!h-full !min-h-[60px] !max-h-[112px] w-full overflow-hidden',
             isMaxHeight
               ? '![padding-top:0px] ![padding-bottom:12px]'
-              : '![padding-top:12px] ![padding-bottom:12px]',
+              : '![padding-top:15.5px] ![padding-bottom:15.5px]',
             'border-[0.5px] border-(--color-border-brand-subtle)',
             'bg-(--color-bg-brand-subtle)',
             'focus-within:border-(--color-border-brand)',

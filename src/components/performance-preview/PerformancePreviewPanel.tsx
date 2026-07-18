@@ -62,6 +62,7 @@ const STATUS_CONTENT = {
 
 export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => {
   const isSuccess = props.status === 'success'
+  const isQuestioning = props.status === 'questioning'
 
   const renderContent = () => {
     if (props.status === 'questioning') {
@@ -107,7 +108,9 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
           className={
             isSuccess
               ? 'mt-(--scale-48) w-full min-w-0'
-              : 'mt-(--scale-48) flex min-h-0 w-full min-w-0 flex-1 items-center justify-center'
+              : isQuestioning
+                ? 'mt-(--scale-48) flex min-h-0 w-full min-w-0 flex-1'
+                : 'mt-(--scale-48) flex min-h-0 w-full min-w-0 flex-1 items-center justify-center'
           }
         >
           {renderContent()}
