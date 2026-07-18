@@ -7,6 +7,7 @@ import { SignupPage } from '@/pages/SignupPage'
 import { EmailVerificationPage } from '@/pages/EmailVerificationPage'
 import { MailNoticePage } from '@/pages/MailNoticePage'
 import { ProfileSetupPage } from '@/pages/ProfileSetupPage'
+import { DiarySearchPage } from '@/pages/DiarySearchPage'
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
   {
     path: '/records',
     element: <SidebarPage />,
+  },
+  {
+    path: '/records/search',
+    element: <DiarySearchPage />,
   },
   {
     path: '/records/:diaryId',

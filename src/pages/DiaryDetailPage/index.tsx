@@ -52,8 +52,8 @@ export const DiaryDetailPage = () => {
   }
 
   return (
-    <div className="flex min-w-0 flex-1 items-start bg-(--color-bg-default)">
-      <main className="h-screen min-w-0 flex-1 overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-40) pt-(--scale-40)">
+    <div className="grid min-w-0 flex-1 grid-cols-2 bg-(--color-bg-default)">
+      <main className="h-screen min-w-0 w-full overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-40) pt-(--scale-40)">
         <DiaryDetailHeader
           dateLabel={formatDateLabel(diary.date)}
           onBack={handleBack}
@@ -81,14 +81,16 @@ export const DiaryDetailPage = () => {
         </div>
       </main>
 
-      <PerformancePreviewPanel
-        key={diary.id}
-        status="success"
-        result={{
-          data: diary.performance,
-          readOnly: true,
-        }}
-      />
+      <div className="h-screen min-w-0 overflow-hidden">
+        <PerformancePreviewPanel
+          key={diary.id}
+          status="success"
+          result={{
+            data: diary.performance,
+            readOnly: true,
+          }}
+        />
+      </div>
 
       {isDeleteDialogOpen && (
         <DeleteDiaryDialog
