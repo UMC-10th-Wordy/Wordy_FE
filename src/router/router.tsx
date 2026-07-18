@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom'
+import { AppLayout } from '@/components/common/Layout/AppLayout'
 import { SidebarPage } from '@/pages/Sidebar/SidebarPage'
 import { TrashPage } from '@/pages/Sidebar/TrashPage'
 import { PlanPage } from '@/pages/Sidebar/PlanPage'
@@ -45,12 +46,17 @@ export const router = createBrowserRouter([
     element: <SidebarPage />,
   },
   {
-    path: '/trash',
-    element: <TrashPage />,
-  },
-  {
-    path: '/plan',
-    element: <PlanPage />,
+    element: <AppLayout />,
+    children: [
+      {
+        path: '/trash',
+        element: <TrashPage />,
+      },
+      {
+        path: '/plan',
+        element: <PlanPage />,
+      },
+    ],
   },
   {
     path: '/login',
