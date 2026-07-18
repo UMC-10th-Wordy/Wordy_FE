@@ -53,7 +53,7 @@ export const DiaryDetailPage = () => {
 
   return (
     <div className="grid min-w-0 flex-1 grid-cols-2 bg-(--color-bg-default)">
-      <main className="h-screen min-w-0 w-full overflow-x-clip overflow-y-auto border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-40) pt-(--scale-40)">
+      <main className="h-full min-w-0 w-full overflow-x-clip border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-40) pt-(--scale-40)">
         <DiaryDetailHeader
           dateLabel={formatDateLabel(diary.date)}
           onBack={handleBack}
@@ -81,7 +81,7 @@ export const DiaryDetailPage = () => {
         </div>
       </main>
 
-      <div className="h-screen min-w-0 overflow-hidden">
+      <div className="h-full min-w-0 overflow-hidden">
         <PerformancePreviewPanel
           key={diary.id}
           status="success"
