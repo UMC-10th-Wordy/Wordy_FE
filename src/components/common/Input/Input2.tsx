@@ -29,7 +29,7 @@ export function Input2({ maxCharacter, className, onChange, value, ...rest }: In
         'bg-(--color-bg-brand-subtle) rounded-lg border-[0.5px] px-5 py-3',
         maxCharacter !== undefined ? 'min-h-40' : 'min-h-30',
         'border-(--color-border-brand-subtle) focus-within:border-(--color-border-brand)',
-        'transition-colors duration-100',
+        'transition-colors duration-100 ease-out',
         className,
       ]
         .filter(Boolean)

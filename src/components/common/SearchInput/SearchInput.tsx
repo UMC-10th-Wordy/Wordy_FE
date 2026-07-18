@@ -33,7 +33,7 @@ export function SearchInput({
     <div className={['relative', className].filter(Boolean).join(' ')}>
       <div
         className={[
-          'flex items-center gap-2.5 px-5 py-3 rounded-(--scale-12) bg-(--color-bg-default) transition-colors duration-100',
+          'flex items-center gap-2.5 px-5 py-3 rounded-(--scale-12) bg-(--color-bg-default) transition-colors duration-100 ease-out',
           'ring-1',
           focused ? 'ring-(--color-border-brand)' : 'ring-(--color-border-light)',
         ].join(' ')}
@@ -70,7 +70,7 @@ export function SearchInput({
             <button
               type="button"
               onClick={onClearAll}
-              className="h-8 px-2 rounded-md [font-size:var(--font-size-body-4)] leading-(--line-height-body) font-medium text-(--color-button-default) hover:bg-(--color-bg-brand-subtle) transition-colors duration-100"
+              className="h-8 px-2 rounded-md [font-size:var(--font-size-body-4)] leading-(--line-height-body) font-medium text-(--color-button-default) hover:bg-(--color-bg-brand-subtle) transition-colors duration-100 ease-out"
             >
               모두 지우기
             </button>
@@ -79,7 +79,7 @@ export function SearchInput({
             {recentKeywords.slice(0, 5).map((keyword) => (
               <li
                 key={keyword}
-                className="flex items-center justify-between h-13 px-1 hover:bg-(--color-sidebar-neutral-hover) rounded-md transition-colors duration-100"
+                className="flex items-center justify-between h-13 px-1 hover:bg-(--color-sidebar-neutral-hover) rounded-md transition-colors duration-100 ease-out"
               >
                 <button
                   type="button"
@@ -102,7 +102,7 @@ export function SearchInput({
                 <button
                   type="button"
                   onClick={() => onRemoveKeyword?.(keyword)}
-                  className="flex items-center justify-center size-8 rounded-md text-(--color-icon-secondary) hover:bg-(--color-bg-tertiary) transition-colors duration-100"
+                  className="flex items-center justify-center size-8 rounded-md text-(--color-icon-secondary) hover:bg-(--color-bg-tertiary) transition-colors duration-100 ease-out"
                 >
                   <XMarkIcon width={24} height={24} />
                 </button>
