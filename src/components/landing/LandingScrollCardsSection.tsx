@@ -155,7 +155,7 @@ export function LandingScrollCardsSection() {
 
       {/* 무한 스크롤 카드 트랙 */}
       <div
-        className="absolute flex gap-5 will-change-transform"
+        className="absolute flex gap-5 pr-5 will-change-transform"
         style={{ top: '182px', animation: 'landing-scroll 35s linear infinite' }}
       >
         {duplicated.map((card, i) => (

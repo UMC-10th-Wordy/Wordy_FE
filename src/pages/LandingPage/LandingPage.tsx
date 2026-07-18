@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { LandingHeader } from '@/components/landing/LandingHeader'
 import { LandingHeroSection } from '@/components/landing/LandingHeroSection'
 import { LandingScrollCardsSection } from '@/components/landing/LandingScrollCardsSection'
@@ -11,6 +12,7 @@ import type { FeatureKey } from '@/components/landing/LandingFeatureSection'
 type LandingPage = '홈' | '기능 소개' | '요금제 안내'
 
 export function LandingPage() {
+  const navigate = useNavigate()
   const featureRef = useRef<HTMLElement>(null)
   const pricingRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
@@ -74,8 +76,13 @@ export function LandingPage() {
           ].join(', '),
         }}
       >
-        <LandingHeader currentPage={currentPage} onNavigate={handleNavigate} />
-        <LandingHeroSection />
+        <LandingHeader
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+          onSignup={() => navigate('/signup')}
+          onLogin={() => navigate('/login')}
+        />
+        <LandingHeroSection onStart={() => navigate('/signup')} />
       </div>
 
       <LandingScrollCardsSection />
@@ -96,10 +103,10 @@ export function LandingPage() {
       </section>
 
       <div ref={pricingRef}>
-        <LandingPricingSection />
+        <LandingPricingSection onStart={() => navigate('/signup')} />
       </div>
 
-      <LandingCTASection />
+      <LandingCTASection onStart={() => navigate('/signup')} />
       <LandingFooter onNavigate={handleNavigate} onNavigateToFeature={handleNavigateToFeature} />
     </div>
   )
