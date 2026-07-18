@@ -449,3 +449,5 @@ export const DIARY_MONTHLY_RECORDS: MonthlyDiaryRecord[] = [
     ],
   },
 ]
+
+export const EMPTY_DIARY_MONTHLY_RECORDS: MonthlyDiaryRecord[] = []
