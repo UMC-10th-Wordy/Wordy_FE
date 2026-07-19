@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { animate } from 'framer-motion'
+import { animate, type AnimationPlaybackControls } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { LandingHeader } from '@/components/landing/LandingHeader'
 import { LandingHeroSection } from '@/components/landing/LandingHeroSection'
@@ -19,6 +19,7 @@ export function LandingPage() {
   const heroRef = useRef<HTMLDivElement>(null)
   const [currentPage, setCurrentPage] = useState<LandingPage>('홈')
   const [activeFeature, setActiveFeature] = useState<FeatureKey>('업무 일지')
+  const scrollAnimationRef = useRef<AnimationPlaybackControls | null>(null)
 
   const scrollToSection = useCallback(
     (ref: React.RefObject<HTMLElement | HTMLDivElement | null>) => {
@@ -33,11 +34,13 @@ export function LandingPage() {
       }
       if (!container) return
 
+      scrollAnimationRef.current?.stop()
+
       const targetY =
         container.scrollTop +
         target.getBoundingClientRect().top -
         container.getBoundingClientRect().top
-      animate(container.scrollTop, targetY, {
+      scrollAnimationRef.current = animate(container.scrollTop, targetY, {
         duration: 0.3,
         ease: 'easeOut',
         onUpdate: (v) => {
@@ -68,14 +71,17 @@ export function LandingPage() {
 
   // 스크롤 위치 기반으로 헤더 active 자동 변경
   useEffect(() => {
+    const visibilityMap = new Map<Element, boolean>()
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
-          if (entry.target === pricingRef.current) setCurrentPage('요금제 안내')
-          else if (entry.target === featureRef.current) setCurrentPage('기능 소개')
-          else if (entry.target === heroRef.current) setCurrentPage('홈')
+          visibilityMap.set(entry.target, entry.isIntersecting)
         })
+
+        if (visibilityMap.get(pricingRef.current!)) setCurrentPage('요금제 안내')
+        else if (visibilityMap.get(featureRef.current!)) setCurrentPage('기능 소개')
+        else if (visibilityMap.get(heroRef.current!)) setCurrentPage('홈')
       },
       { threshold: 0.3 },
     )
