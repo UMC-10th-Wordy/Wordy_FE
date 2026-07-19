@@ -110,7 +110,7 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
           isSuccess
             ? 'mt-(--scale-48) w-full min-w-0'
             : isQuestioning
-              ? 'mt-(--scale-48) flex min-h-0 w-full min-w-0 flex-1'
+              ? 'mt-(--scale-48) -mr-(--scale-24) flex min-h-0 w-[calc(100%+var(--scale-24))] min-w-0 flex-1'
               : 'mt-(--scale-48) flex min-h-0 w-full min-w-0 flex-1 items-center justify-center'
         }
       >

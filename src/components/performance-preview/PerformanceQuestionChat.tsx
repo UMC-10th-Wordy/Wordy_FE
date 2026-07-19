@@ -39,7 +39,7 @@ export const PerformanceQuestionChat = ({
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col">
-      <div className="-mr-(--scale-24) flex min-h-0 w-[calc(100%+var(--scale-24))] flex-1 pb-(--scale-48)">
+      <div className="flex min-h-0 w-full flex-1 pb-(--scale-48)">
         <Scrollbar>
           <div className="flex min-h-full w-full flex-col pr-(--scale-16)">
             {messages.map((message, index) => {
@@ -83,12 +83,14 @@ export const PerformanceQuestionChat = ({
         </Scrollbar>
       </div>
 
-      <PerformanceChatInput
-        answer={answer}
-        disabled={isWordyTyping || isFinished}
-        onChangeAnswer={onChangeAnswer}
-        onSubmitAnswer={onSubmitAnswer}
-      />
+      <div className="pr-(--scale-24)">
+        <PerformanceChatInput
+          answer={answer}
+          disabled={isWordyTyping || isFinished}
+          onChangeAnswer={onChangeAnswer}
+          onSubmitAnswer={onSubmitAnswer}
+        />
+      </div>
     </div>
   )
 }
