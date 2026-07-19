@@ -122,7 +122,7 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
   return (
     <aside className="order-2 flex h-full min-h-0 w-full min-w-0 bg-(--color-bg-brand-subtle)">
       {isSuccess ? (
-        <Scrollbar>
+        <Scrollbar scrollbarClassName="pt-2 pr-1">
           <div className="flex min-h-full w-full p-(--scale-40)">{panelContent}</div>
         </Scrollbar>
       ) : (
