@@ -19,7 +19,7 @@ const formatDateLabel = (date: string) => {
   return `${year}년 ${month}월 ${day}일`
 }
 
-export const DiaryDetailPage = () => {
+export const DiaryDetailPage = ({ hideDelete }: { hideDelete?: boolean }) => {
   const navigate = useNavigate()
   const { diaryId } = useParams<{ diaryId: string }>()
 
@@ -62,6 +62,7 @@ export const DiaryDetailPage = () => {
               dateLabel={formatDateLabel(diary.date)}
               onBack={handleBack}
               onDelete={() => setIsDeleteDialogOpen(true)}
+              hideDelete={hideDelete}
             />
 
             <section className="mt-(--scale-48) flex w-full flex-col gap-(--scale-8)">
