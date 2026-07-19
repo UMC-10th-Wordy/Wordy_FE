@@ -32,6 +32,7 @@ export interface SettingPanelProps extends HTMLAttributes<HTMLDivElement> {
   profileJob?: string
   profileCareer?: string
   onSaveProfile?: (data: { name: string; job: string; career: string }) => void
+  onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void
   // 알림
   notificationSettings?: NotificationSettings
   onChangeNotification?: (key: keyof NotificationSettings, value: boolean) => void
@@ -52,6 +53,7 @@ export function SettingPanel({
   profileJob = '',
   profileCareer = '',
   onSaveProfile,
+  onChangePassword,
   notificationSettings = DEFAULT_NOTIFICATION_SETTINGS,
   onChangeNotification,
   onClose,
@@ -79,6 +81,22 @@ export function SettingPanel({
     if (openDropdown === 'career' && careerAnchorRef.current) {
       setCareerRect(careerAnchorRef.current.getBoundingClientRect())
     }
+  }, [openDropdown])
+
+  useEffect(() => {
+    if (!openDropdown) return
+    const handleMouseDown = (e: MouseEvent) => {
+      const jobAnchor = jobAnchorRef.current
+      const careerAnchor = careerAnchorRef.current
+      if (
+        (jobAnchor && jobAnchor.contains(e.target as Node)) ||
+        (careerAnchor && careerAnchor.contains(e.target as Node))
+      )
+        return
+      setOpenDropdown(null)
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [openDropdown])
 
   const [currentPassword, setCurrentPassword] = useState('')
@@ -195,7 +213,12 @@ export function SettingPanel({
                 </div>
               </div>
               <div className="flex justify-end shrink-0 w-full">
-                <TextButton variant="fill" size="large" disabled={!passwordReady}>
+                <TextButton
+                  variant="fill"
+                  size="large"
+                  disabled={!passwordReady}
+                  onClick={() => onChangePassword?.({ currentPassword, newPassword })}
+                >
                   비밀번호 변경하기
                 </TextButton>
               </div>
