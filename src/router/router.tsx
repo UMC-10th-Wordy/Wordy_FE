@@ -9,6 +9,7 @@ import { EmailVerificationPage } from '@/pages/EmailVerificationPage'
 import { MailNoticePage } from '@/pages/MailNoticePage'
 import { ProfileSetupPage } from '@/pages/ProfileSetupPage'
 import { DiarySearchPage } from '@/pages/DiarySearchPage'
+import { TrashDiaryDetailPage } from '@/pages/TrashDiaryDetailPage'
 import { LandingPreview } from '@/pages/LandingPreview/LandingPreview'
 import { LandingPage } from '@/pages/LandingPage/LandingPage'
 
@@ -40,6 +41,7 @@ export const router = createBrowserRouter([
       { path: '/landing', element: <LandingPage /> },
       { path: '/records/search', element: <DiarySearchPage /> },
       { path: '/trash', element: <TrashPage /> },
+      { path: '/trash/:diaryId', element: <TrashDiaryDetailPage /> },
       { path: '/plan', element: <PlanPage /> },
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignupPage /> },
