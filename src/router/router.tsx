@@ -11,6 +11,7 @@ import { ProfileSetupPage } from '@/pages/ProfileSetupPage'
 import { DiarySearchPage } from '@/pages/DiarySearchPage'
 import { LandingPreview } from '@/pages/LandingPreview/LandingPreview'
 import { LandingPage } from '@/pages/LandingPage/LandingPage'
+import { SocialSignupPage } from '@/pages/SocialSignupPage'
 
 export const router = createBrowserRouter([
   {
@@ -65,6 +66,10 @@ export const router = createBrowserRouter([
   {
     path: '/signup',
     element: <SignupPage />,
+  },
+  {
+    path: '/social-signup',
+    element: <SocialSignupPage />,
   },
   {
     path: '/email-verification',

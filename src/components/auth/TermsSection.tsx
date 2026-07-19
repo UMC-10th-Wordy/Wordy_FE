@@ -1,6 +1,4 @@
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
-import { TextButton } from '@/components/common/Button/TextButton'
-
 export interface TermsState {
   age: boolean
   service: boolean
@@ -77,9 +75,12 @@ export const TermsSection = ({ terms, onChange }: TermsSectionProps) => {
           />
           {hasDetail && (
             // TODO(#18): 약관 전문 모달/페이지 연결
-            <TextButton variant="text_only" size="small">
+            <button
+              type="button"
+              className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-button-default)"
+            >
               전체보기
-            </TextButton>
+            </button>
           )}
         </div>
       ))}

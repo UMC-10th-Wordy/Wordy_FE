@@ -57,8 +57,8 @@ export const OnboardingCard = ({
               <span
                 key={i}
                 className={[
-                  'size-2 rounded-full',
-                  i === step ? 'bg-(--color-button-default)' : 'bg-(--color-border-subtle)',
+                  'h-2 rounded-full transition-all duration-100 ease-out',
+                  i === step ? 'w-4 bg-(--color-icon-secondary)' : 'w-2 bg-(--color-border-subtle)',
                 ].join(' ')}
               />
             ))}
