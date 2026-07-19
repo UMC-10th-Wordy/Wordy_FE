@@ -19,7 +19,7 @@ const PRO_FEATURES: { text: string; medium?: boolean }[] = [
 export function LandingPricingSection({ onStart }: { onStart?: () => void }) {
   return (
     <section className="flex w-full flex-col items-center bg-(--color-bg-default) px-10 py-15">
-      <div className="flex w-full max-w-330 flex-col gap-12">
+      <div className="flex w-full max-w-7xl flex-col gap-12">
         {/* 타이틀 */}
         <div className="flex w-full flex-col items-center gap-1 whitespace-nowrap">
           <p className="[font-size:var(--font-size-heading-2)] font-semibold leading-(--line-height-body) text-(--color-text-default)">
@@ -82,14 +82,12 @@ export function LandingPricingSection({ onStart }: { onStart?: () => void }) {
                 'linear-gradient(137.46deg, rgba(221,221,255,0.3) 0%, rgba(250,250,252,0.3) 100%)',
             }}
           >
-            {/* COMING SOON 배너 — 우측 상단 코너 고정 */}
-            <div className="pointer-events-none absolute right-0 top-0 z-5 flex size-[319.612px] translate-x-20 -translate-y-20 items-center justify-center">
-              <div className="flex-none rotate-45">
-                <div className="flex w-101.75 items-center justify-center bg-(--color-icon-brand) px-3 py-2">
-                  <span className="[font-size:var(--font-size-body-2)] font-semibold leading-(--line-height-body) text-(--color-text-inverse) whitespace-nowrap">
-                    COMING SOON
-                  </span>
-                </div>
+            {/* COMING SOON 배너 */}
+            <div className="pointer-events-none absolute top-0 right-0 z-5 overflow-hidden size-50">
+              <div className="absolute top-10 -right-20 w-70 rotate-45 flex items-center justify-center bg-(--color-icon-brand) px-3 py-2">
+                <span className="[font-size:var(--font-size-body-2)] font-semibold leading-(--line-height-body) text-(--color-text-inverse) whitespace-nowrap">
+                  COMING SOON
+                </span>
               </div>
             </div>
 

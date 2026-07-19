@@ -1,9 +1,10 @@
-import { useState } from 'react'
-import type { HTMLAttributes } from 'react'
+import { useRef, useState } from 'react'
+import type { HTMLAttributes, RefObject } from 'react'
 import { WorkspaceItem } from '../WorkspaceItem/WorkspaceItem'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
+import { useOutsideClick } from '@/hooks/useOutsideClick'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 import ErrorIcon from '@/assets/icons/error.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
@@ -17,6 +18,7 @@ export interface WorkspaceModalProps extends HTMLAttributes<HTMLDivElement> {
   onDelete?: (id: string) => void
   onSelectWorkspace?: (id: string) => void
   onClose?: () => void
+  triggerRef?: RefObject<HTMLElement | null>
 }
 
 export function WorkspaceModal({
@@ -28,14 +30,17 @@ export function WorkspaceModal({
   onDelete,
   onSelectWorkspace,
   onClose,
+  triggerRef,
   className,
   ...rest
 }: WorkspaceModalProps) {
+  const ref = useRef<HTMLDivElement>(null)
   const [inputValue, setInputValue] = useState('')
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingValue, setEditingValue] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  useOutsideClick(ref, () => onClose?.(), !deletingId, triggerRef)
   const currentUsage = workspaces.length
 
   function startEdit(id: string, name: string) {
@@ -54,6 +59,7 @@ export function WorkspaceModal({
   return (
     <>
       <div
+        ref={ref}
         className={[
           'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_15px_rgba(0,0,0,0.1)] overflow-clip',
           'flex flex-col gap-5 items-start px-3 py-5 w-113.25 min-h-130',
@@ -128,6 +134,13 @@ export function WorkspaceModal({
                       setInputValue('')
                       setIsAdding(false)
                     }
+                  }}
+                  onBlur={() => {
+                    if (inputValue.trim()) {
+                      onAdd?.(inputValue.trim())
+                    }
+                    setInputValue('')
+                    setIsAdding(false)
                   }}
                   className="flex-1 bg-transparent outline-none [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-default) placeholder:text-(--color-text-tertiary) placeholder:font-normal"
                 />

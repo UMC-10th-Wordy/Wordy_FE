@@ -95,7 +95,7 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
       </div>
 
       {/* 컨텐츠 */}
-      <div className="flex flex-col gap-10 items-start px-10 w-full max-w-230 mx-auto">
+      <div className="flex flex-col gap-10 items-start w-full max-w-7xl mx-auto">
         {/* 헤더 */}
         <div className="flex flex-col gap-1 items-start shrink-0">
           <h2 className="[font-size:var(--font-size-heading-2)] leading-(--line-height-body) font-semibold text-(--color-text-default) whitespace-nowrap">
