@@ -133,7 +133,7 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
       {/* 스크롤 콘텐츠 */}
       <div
         ref={contentRef}
-        className="flex flex-col h-full min-w-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden pr-2"
+        className="flex flex-col h-full min-w-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden"
       >
         <div ref={innerRef} className="min-h-full">
           {children}
