@@ -199,22 +199,22 @@ export function SidebarPage() {
       />
 
       {currentPage === '홈' && (
-        <Scrollbar className="flex-1" scrollbarClassName="pt-2 pr-1">
+        <Scrollbar className="flex-1" scrollbarClassName="py-2 pr-1">
           <HomePage userName="홍길동" />
         </Scrollbar>
       )}
       {currentPage === '오늘의 업무' && (
-        <Scrollbar className="flex-1" scrollbarClassName="pt-2 pr-1">
+        <Scrollbar className="flex-1" scrollbarClassName="py-2 pr-1">
           <TodoListPage />
         </Scrollbar>
       )}
       {currentPage === '성과 대시보드' && (
-        <Scrollbar className="flex-1" scrollbarClassName="pt-2 pr-1">
+        <Scrollbar className="flex-1" scrollbarClassName="py-2 pr-1">
           <WeeklyDashboard />
         </Scrollbar>
       )}
       {currentPage === '일지 모아보기' && isDiaryListPage && (
-        <Scrollbar className="flex-1" scrollbarClassName="pt-2 pr-1">
+        <Scrollbar className="flex-1" scrollbarClassName="py-2 pr-1">
           <DiaryListPage />
         </Scrollbar>
       )}
