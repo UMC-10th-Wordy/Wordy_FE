@@ -59,12 +59,9 @@ export function LandingFeatureSection({
   onActiveChange,
 }: LandingFeatureSectionProps) {
   const [internalActive, setInternalActive] = useState<FeatureKey>('업무 일지')
-  const [transitionDuration, setTransitionDuration] = useState<'duration-100' | 'duration-200'>(
-    'duration-200',
-  )
   const active = activeFeature ?? internalActive
+  const transitionDuration = active === '업무 일지' ? 'duration-100' : 'duration-200'
   const setActive = (key: FeatureKey) => {
-    setTransitionDuration(key === '업무 일지' ? 'duration-100' : 'duration-200')
     setInternalActive(key)
     onActiveChange?.(key)
   }
