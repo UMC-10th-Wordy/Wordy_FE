@@ -7,7 +7,6 @@ import { useToast } from '@/components/common/Toast/useToast'
 import { TrashMoreMenu } from '@/components/sidebar/TrashMoreMenu/TrashMoreMenu'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 import MeatballIcon from '@/assets/icons/meatball.svg?react'
-import ArrowDownIcon from '@/assets/icons/Direction=bottom.svg?react'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
 import EmptyImage from '@/assets/icons/wordy-performance-empty.svg?react'
 
@@ -15,7 +14,6 @@ export interface TrashItem {
   id: string
   title: string
   deletedAt: string
-  expanded?: boolean
 }
 
 export interface TrashPageProps {
@@ -28,9 +26,21 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
   const navigate = useNavigate()
   const [items, setItems] = useState<TrashItem[]>(
     initialItems ?? [
-      { id: '1', title: '2026년 2월 18일의 업무 일지', deletedAt: '2026년 5월 10일에 삭제함' },
-      { id: '2', title: '2026년 2월 17일의 업무 일지', deletedAt: '2026년 5월 9일에 삭제함' },
-      { id: '3', title: '2026년 2월 16일의 업무 일지', deletedAt: '2026년 5월 8일에 삭제함' },
+      {
+        id: '2026-02-18',
+        title: '2026년 2월 18일의 업무 일지',
+        deletedAt: '2026년 5월 10일에 삭제함',
+      },
+      {
+        id: '2026-02-17',
+        title: '2026년 2월 17일의 업무 일지',
+        deletedAt: '2026년 5월 9일에 삭제함',
+      },
+      {
+        id: '2026-02-16',
+        title: '2026년 2월 16일의 업무 일지',
+        deletedAt: '2026년 5월 8일에 삭제함',
+      },
     ],
   )
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
@@ -66,10 +76,6 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
     setItems((prev) => prev.filter((i) => i.id !== confirm.itemId))
     setConfirm(null)
     addToast('업무 일지가 영구 삭제되었어요')
-  }
-
-  function toggleExpand(itemId: string) {
-    setItems((prev) => prev.map((i) => (i.id === itemId ? { ...i, expanded: !i.expanded } : i)))
   }
 
   return (
@@ -148,15 +154,9 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
                         <IconButton
                           variant="text_neutral"
                           size="medium"
-                          icon={
-                            item.expanded ? (
-                              <ArrowDownIcon className="size-8" />
-                            ) : (
-                              <ArrowRightIcon className="size-8" />
-                            )
-                          }
-                          onClick={() => toggleExpand(item.id)}
-                          aria-label={item.expanded ? '접기' : '펼치기'}
+                          icon={<ArrowRightIcon className="size-8" />}
+                          onClick={() => navigate(`/trash/${item.id}`)}
+                          aria-label="일지 더보기"
                         />
                       </div>
                       <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary) whitespace-nowrap">
