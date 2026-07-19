@@ -6,9 +6,10 @@ import ScrollbarDownIcon from '@/assets/icons/scrollbar-down.svg?react'
 export interface ScrollbarProps {
   children: ReactNode
   className?: string
+  scrollbarClassName?: string
 }
 
-export function Scrollbar({ children, className }: ScrollbarProps) {
+export function Scrollbar({ children, className, scrollbarClassName }: ScrollbarProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const thumbRef = useRef<HTMLDivElement>(null)
@@ -141,9 +142,12 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
 
       <div
         className={[
-          'absolute top-0 right-0 h-full z-10 flex flex-col items-center pt-2 pr-1',
+          'absolute top-0 right-0 h-full z-10 flex flex-col items-center',
+          scrollbarClassName,
           isScrollable ? '' : 'invisible',
-        ].join(' ')}
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
         {/* 위 버튼 */}
         <button
