@@ -474,7 +474,7 @@ export default function TagSettingsModal({
                     </button>
                   )}
                 </div>
-                <Scrollbar className="min-h-0 flex-1">
+                <Scrollbar inline scrollbarClassName="pl-3" className="min-h-0 flex-1">
                   <div className="flex flex-col gap-3 pb-1">
                     {isSearching ? (
                       Array.from({ length: 5 }).map((_, i) => (
@@ -708,9 +708,7 @@ export default function TagSettingsModal({
                                           />
                                         )}
                                       </div>
-                                      <span className="shrink-0 [font-size:var(--font-size-body-1)] text-(--color-text-tertiary)">
-                                        -
-                                      </span>
+                                      <div className="h-[1.5px] w-2 shrink-0 bg-(--color-text-tertiary)" />
                                       <div className="relative flex-1">
                                         <button
                                           ref={editEndDateBtnRef}
@@ -894,7 +892,7 @@ export default function TagSettingsModal({
 
           {/* 새 태그 탭 */}
           {tab === 'new' && (
-            <Scrollbar className="min-h-0 flex-1">
+            <Scrollbar inline scrollbarClassName="pl-3" className="min-h-0 flex-1">
               <div className="flex flex-col gap-4 pb-1">
                 {/* 태그명 + 색상 */}
                 <div className="flex items-start gap-5">
@@ -1003,9 +1001,7 @@ export default function TagSettingsModal({
                         />
                       )}
                     </div>
-                    <span className="shrink-0 [font-size:var(--font-size-body-1)] leading-(--line-height-body) text-(--color-text-tertiary)">
-                      -
-                    </span>
+                    <div className="h-[1.5px] w-2 shrink-0 bg-(--color-text-tertiary)" />
                     <div className="relative flex-1">
                       <button
                         ref={endDateBtnRef}
