@@ -9,6 +9,7 @@ import {
 } from '@/components/sidebar'
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 import type { SidebarPage, NotificationItemProps } from '@/components/sidebar'
+import type { NotificationSettings } from '@/components/sidebar/SettingPanel/SettingPanel'
 import TodoListPage from '@/pages/TodoListPage/TodoListPage'
 import { HomePage } from '@/pages/Home/HomePage'
 import { DiaryListPage } from '@/pages/DiaryListPage'
@@ -56,10 +57,11 @@ export function SidebarPage() {
   const currentPage = getPageByPath(location.pathname)
   const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
-  const [notifications, setNotifications] = useState<Record<string, boolean>>({
-    '새 업무 알림': true,
-    '업무 완료 알림': false,
-    '코멘트 알림': true,
+  const [notifications, setNotifications] = useState<NotificationSettings>({
+    emailMarketing: false,
+    inboxMarketing: false,
+    inboxPerformanceReady: false,
+    inboxPerformanceNudge: false,
   })
 
   const isDiaryListPage = location.pathname === '/records'
@@ -131,6 +133,7 @@ export function SidebarPage() {
         workspaceName={workspaces.find((w) => w.id === selectedWorkspaceId)?.name ?? ''}
         userName="홍길동"
         userPlan="무료 요금제"
+        onLogoClick={() => navigate('/')}
         onWorkspaceClick={() => setModal((prev) => (prev === 'workspace' ? null : 'workspace'))}
         onNotificationClick={() =>
           setModal((prev) => (prev === 'notification' ? null : 'notification'))
