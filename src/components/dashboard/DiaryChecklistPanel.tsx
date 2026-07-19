@@ -67,7 +67,7 @@ export const DiaryChecklistPanel = ({
                       ].join(' ')}
                     >
                       {checked && (
-                        <CheckIcon width={22} height={22} className="text-(--color-text-inverse)" />
+                        <CheckIcon width={24} height={24} className="text-(--color-text-inverse)" />
                       )}
                     </span>
                     <span
