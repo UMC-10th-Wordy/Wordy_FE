@@ -3,6 +3,8 @@ import { PerformancePreviewResult } from './PerformancePreviewResult'
 import { PerformanceQuestionChat } from './PerformanceQuestionChat'
 import { PerformanceStatusNotice } from './PerformanceStatusNotice'
 
+import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
+
 import type { PerformanceQuestionChatProps } from './PerformanceQuestionChat'
 import type { PerformancePreviewResultData } from '@/types/performancePreviewResult'
 
@@ -83,39 +85,49 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
     return <PerformanceStatusNotice {...currentStatusContent} />
   }
 
-  return (
-    <aside className="order-2 flex h-screen min-w-0 w-full bg-(--color-bg-brand-subtle) p-(--scale-40)">
-      <section
-        className={[
-          'flex min-w-0 w-full flex-col rounded-(--scale-16) border-[1.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-24) py-(--scale-20) shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]',
-          isSuccess ? 'min-h-full self-start' : 'h-full overflow-hidden',
-        ]
-          .filter(Boolean)
-          .join(' ')}
+  const panelContent = (
+    <section
+      className={[
+        'flex min-w-0 w-full flex-col rounded-(--scale-16) border-[1.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-(--scale-24) py-(--scale-20) shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]',
+        isSuccess ? 'min-h-full self-start' : 'h-full overflow-hidden',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <div className="flex shrink-0 items-center gap-(--scale-4)">
+        <h2 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
+          오늘의 성과 미리보기
+        </h2>
+
+        <GenerateIcon
+          aria-hidden
+          className="size-(--scale-32) shrink-0 text-(--color-icon-brand)"
+        />
+      </div>
+
+      <div
+        className={
+          isSuccess
+            ? 'mt-(--scale-48) w-full min-w-0'
+            : isQuestioning
+              ? 'mt-(--scale-48) -mr-(--scale-24) flex min-h-0 w-[calc(100%+var(--scale-24))] min-w-0 flex-1'
+              : 'mt-(--scale-48) flex min-h-0 w-full min-w-0 flex-1 items-center justify-center'
+        }
       >
-        <div className="flex shrink-0 items-center gap-(--scale-4)">
-          <h2 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
-            오늘의 성과 미리보기
-          </h2>
+        {renderContent()}
+      </div>
+    </section>
+  )
 
-          <GenerateIcon
-            aria-hidden
-            className="size-(--scale-32) shrink-0 text-(--color-icon-brand)"
-          />
-        </div>
-
-        <div
-          className={
-            isSuccess
-              ? 'mt-(--scale-48) w-full min-w-0'
-              : isQuestioning
-                ? 'mt-(--scale-48) flex min-h-0 w-full min-w-0 flex-1'
-                : 'mt-(--scale-48) flex min-h-0 w-full min-w-0 flex-1 items-center justify-center'
-          }
-        >
-          {renderContent()}
-        </div>
-      </section>
+  return (
+    <aside className="order-2 flex h-full min-h-0 w-full min-w-0 bg-(--color-bg-brand-subtle)">
+      {isSuccess ? (
+        <Scrollbar>
+          <div className="flex min-h-full w-full p-(--scale-40)">{panelContent}</div>
+        </Scrollbar>
+      ) : (
+        <div className="flex h-full min-h-0 w-full p-(--scale-40)">{panelContent}</div>
+      )}
     </aside>
   )
 }
