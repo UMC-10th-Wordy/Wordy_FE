@@ -30,6 +30,7 @@ export interface SidebarProps extends HTMLAttributes<HTMLDivElement> {
   onProfileClick?: () => void
   onNotificationClick?: () => void
   onWorkspaceClick?: () => void
+  onLogoClick?: () => void
   profileMenu?: ReactNode
   notificationMenu?: ReactNode
   workspaceMenu?: ReactNode
@@ -48,6 +49,7 @@ export function Sidebar({
   onProfileClick,
   onNotificationClick,
   onWorkspaceClick,
+  onLogoClick,
   profileMenu,
   notificationMenu,
   workspaceMenu,
@@ -82,9 +84,14 @@ export function Sidebar({
           <div className="flex flex-col gap-4 items-start shrink-0 w-full">
             {/* 로고 + 토글 */}
             <div className="flex items-center justify-between pl-4 pr-2 shrink-0 w-full">
-              <div className="flex items-center justify-center shrink-0">
+              <button
+                type="button"
+                onClick={onLogoClick}
+                className="flex items-center justify-center shrink-0"
+                aria-label="홈으로 이동"
+              >
                 <LogoIcon className="h-8 w-[110.857px]" />
-              </div>
+              </button>
               <IconButton
                 variant="text_neutral"
                 size="small"

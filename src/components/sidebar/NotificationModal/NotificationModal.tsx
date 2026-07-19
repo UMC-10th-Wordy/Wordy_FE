@@ -1,27 +1,35 @@
-import type { HTMLAttributes } from 'react'
+import { useRef } from 'react'
+import type { HTMLAttributes, RefObject } from 'react'
 import { NotificationItem, type NotificationItemProps } from '../NotificationItem/NotificationItem'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
+import { useOutsideClick } from '@/hooks/useOutsideClick'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 
 export interface NotificationModalProps extends HTMLAttributes<HTMLDivElement> {
   isEmpty?: boolean
   notifications?: NotificationItemProps[]
   onClose?: () => void
+  triggerRef?: RefObject<HTMLElement | null>
 }
 
 export function NotificationModal({
   isEmpty = false,
   notifications = [],
   onClose,
+  triggerRef,
   className,
   ...rest
 }: NotificationModalProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  useOutsideClick(ref, () => onClose?.(), true, triggerRef)
+
   return (
     <div
+      ref={ref}
       className={[
         'bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_15px_rgba(0,0,0,0.1)]',
-        'flex flex-col gap-5 items-start px-3 py-5 w-113.25 max-h-150',
+        'flex flex-col gap-2 items-start px-3 py-5 w-113.25 max-h-150',
         className,
       ].join(' ')}
       {...rest}
@@ -48,7 +56,7 @@ export function NotificationModal({
             알림이 오지 않았어요
           </div>
         ) : (
-          <Scrollbar>
+          <Scrollbar inline scrollbarClassName="pl-2">
             {notifications.map((notification, index) => (
               <NotificationItem key={index} {...notification} />
             ))}
