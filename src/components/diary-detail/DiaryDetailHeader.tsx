@@ -5,10 +5,16 @@ import { IconButton } from '@/components/common/Button/IconButton'
 interface DiaryDetailHeaderProps {
   dateLabel: string
   onBack: () => void
-  onDelete: () => void
+  onDelete?: () => void
+  hideDelete?: boolean
 }
 
-export const DiaryDetailHeader = ({ dateLabel, onBack, onDelete }: DiaryDetailHeaderProps) => {
+export const DiaryDetailHeader = ({
+  dateLabel,
+  onBack,
+  onDelete,
+  hideDelete,
+}: DiaryDetailHeaderProps) => {
   return (
     <header className="flex w-full items-start justify-between">
       <div className="flex items-center gap-(--scale-8)">
@@ -26,14 +32,18 @@ export const DiaryDetailHeader = ({ dateLabel, onBack, onDelete }: DiaryDetailHe
         </h1>
       </div>
 
-      <IconButton
-        type="button"
-        variant="text_neutral"
-        size="small"
-        aria-label="업무 일지 삭제"
-        onClick={onDelete}
-        icon={<TrashIcon aria-hidden className="size-(--scale-24) text-(--color-icon-secondary)" />}
-      />
+      {!hideDelete && (
+        <IconButton
+          type="button"
+          variant="text_neutral"
+          size="small"
+          aria-label="업무 일지 삭제"
+          onClick={onDelete}
+          icon={
+            <TrashIcon aria-hidden className="size-(--scale-24) text-(--color-icon-secondary)" />
+          }
+        />
+      )}
     </header>
   )
 }
