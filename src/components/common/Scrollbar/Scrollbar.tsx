@@ -7,9 +7,10 @@ export interface ScrollbarProps {
   children: ReactNode
   className?: string
   scrollbarClassName?: string
+  inline?: boolean
 }
 
-export function Scrollbar({ children, className, scrollbarClassName }: ScrollbarProps) {
+export function Scrollbar({ children, className, scrollbarClassName, inline }: ScrollbarProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const thumbRef = useRef<HTMLDivElement>(null)
@@ -130,10 +131,17 @@ export function Scrollbar({ children, className, scrollbarClassName }: Scrollbar
       : 'bg-(--color-icon-tertiary)'
 
   return (
-    <div className={['relative min-h-0 flex-1 w-full', className].filter(Boolean).join(' ')}>
+    <div
+      className={[inline ? 'flex min-h-0 flex-1' : 'relative min-h-0 flex-1 w-full', className]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <div
         ref={contentRef}
-        className="flex flex-col h-full overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden"
+        className={[
+          'overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden',
+          inline ? 'flex-1 min-w-0' : 'flex flex-col h-full',
+        ].join(' ')}
       >
         <div ref={innerRef} className="min-h-full">
           {children}
@@ -142,7 +150,9 @@ export function Scrollbar({ children, className, scrollbarClassName }: Scrollbar
 
       <div
         className={[
-          'absolute top-0 right-0 h-full z-10 flex flex-col items-center',
+          inline
+            ? 'flex shrink-0 flex-col items-center'
+            : 'absolute top-0 right-0 h-full z-10 flex flex-col items-center',
           scrollbarClassName,
           isScrollable ? '' : 'invisible',
         ]
