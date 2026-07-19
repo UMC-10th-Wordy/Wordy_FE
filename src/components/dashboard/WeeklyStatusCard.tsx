@@ -13,7 +13,7 @@ interface WeeklyStatusCardProps {
 
 export const WeeklyStatusCard = ({ status, convertedCount, onGenerate }: WeeklyStatusCardProps) => {
   return (
-    <section className="flex h-[748px] min-w-[1047px] max-w-[1172px] flex-1 shrink-0 flex-col items-center justify-center gap-[56px] rounded-xl border border-(--color-border-subtle) bg-(--color-bg-default) px-5 py-10">
+    <section className="flex h-[748px] min-w-0 max-w-[1172px] flex-[2] flex-col items-center justify-center gap-[56px] rounded-xl border border-(--color-border-subtle) bg-(--color-bg-default) px-5 py-10">
       {status === 'insufficient' && (
         <div className="flex flex-col items-center gap-8">
           <WordySleepingIcon width={220} height={220} className="shrink-0" />
@@ -73,7 +73,11 @@ export const WeeklyStatusCard = ({ status, convertedCount, onGenerate }: WeeklyS
 
       {status === 'generating' && (
         <div className="flex flex-col items-center gap-8">
-          <WordyGeneratingIcon width={220} height={220} className="shrink-0" />
+          <WordyGeneratingIcon
+            width={220}
+            height={220}
+            className="shrink-0 animate-bounce [animation-duration:1.2s]"
+          />
           <div className="flex flex-col items-center gap-2 text-center">
             <h2 className="[font-size:var(--font-size-heading-4)] font-bold text-(--color-text-default)">
               워디가 열심히 만들고 있어요.

@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Input2 } from '@/components/common/Input/Input2'
 import { TextButton } from '@/components/common/Button/TextButton'
-import { Toast } from '@/components/common/Toast/Toast'
+import { useToast } from '@/components/common/Toast/useToast'
+import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
 import CheckIcon from '@/assets/icons/check.svg?react'
@@ -103,20 +104,7 @@ export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectivePr
     null,
   )
   const [savedAt, setSavedAt] = useState<string | null>(null)
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const toastTimerRef = useRef<number | null>(null)
-
-  const showToast = (message: string) => {
-    setToastMessage(message)
-    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current)
-    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 3000)
-  }
-
-  useEffect(() => {
-    return () => {
-      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current)
-    }
-  }, [])
+  const { toasts, addToast } = useToast()
 
   const handleAnswerChange = (key: QuestionKey, value: string) => {
     if (value.length > 800) return
@@ -146,12 +134,12 @@ export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectivePr
   const handleTempSave = () => {
     // TODO(#번호): API 연동 시 임시 저장 요청으로 교체
     setSavedAt(new Date().toLocaleString('ko-KR'))
-    showToast(texts.toastTempSaved)
+    addToast(texts.toastTempSaved)
   }
 
   const handleSave = () => {
     // TODO(#번호): API 연동 시 회고 저장 요청으로 교체
-    showToast(texts.toastSaved)
+    addToast(texts.toastSaved)
   }
 
   const hasContent = Object.values(answers).some((v) => v.trim()) || plans.length > 0
@@ -200,7 +188,7 @@ export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectivePr
           {texts.planLabel}
         </p>
 
-        <div className="grid grid-cols-[40px_1fr_360px_80px] items-center gap-x-4 rounded-md bg-(--color-bg-brand-subtle) px-4 py-3 [font-size:var(--font-size-body-4)] font-medium text-(--color-text-default)">
+        <div className="grid grid-cols-[40px_1fr_360px_80px] items-center gap-x-4 rounded-md bg-(--color-bg-brand-light) px-4 py-3 [font-size:var(--font-size-body-4)] font-medium text-(--color-text-default)">
           <span />
           <span>업무 내용</span>
           <span>예상 시점</span>
@@ -227,41 +215,54 @@ export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectivePr
             </div>
           ),
         )}
-
-        {editing && (
-          <div className="grid min-w-[943px] grid-cols-[40px_1fr_360px_80px] items-center gap-x-4 px-4 py-2">
-            <span className="[font-size:var(--font-size-body-4)] text-(--color-text-tertiary)">
-              {String(editingIndex).padStart(2, '0')}
-            </span>
-            <input
-              type="text"
-              value={editing.content}
-              onChange={(e) => setEditing((prev) => prev && { ...prev, content: e.target.value })}
-              placeholder={texts.planPlaceholder}
-              aria-label="업무 내용"
-              className="rounded-lg bg-(--color-bg-secondary) px-4 py-3 [font-size:var(--font-size-body-4)] outline-none placeholder:text-(--color-text-tertiary)"
-            />
-            <input
-              type="text"
-              value={editing.schedule}
-              onChange={(e) => setEditing((prev) => prev && { ...prev, schedule: e.target.value })}
-              placeholder="언제 진행하실 예정인가요?"
-              aria-label="예상 시점"
-              className="rounded-lg bg-(--color-bg-secondary) px-4 py-3 [font-size:var(--font-size-body-4)] outline-none placeholder:text-(--color-text-tertiary)"
-            />
-            <span className="flex justify-end">
-              <button
-                type="button"
-                aria-label="확정"
-                onClick={handleConfirmRow}
-                disabled={!editing.content.trim()}
-                className="rounded-lg bg-(--color-button-default) p-2.5 text-(--color-text-inverse) disabled:bg-(--color-button-disabled)"
-              >
-                <CheckIcon width={16} height={16} />
-              </button>
-            </span>
+        <div
+          className={[
+            'grid transition-[grid-template-rows] duration-300 ease-out',
+            editing ? 'grid-template-rows-[1fr]' : 'grid-template-rows-[0fr]',
+          ].join(' ')}
+          style={{ gridTemplateRows: editing ? '1fr' : '0fr' }}
+        >
+          <div className="overflow-hidden">
+            {editing && (
+              <div className="grid min-w-[943px] grid-cols-[40px_1fr_360px_80px] items-center gap-x-4 px-4 py-2">
+                <span className="[font-size:var(--font-size-body-4)] text-(--color-text-tertiary)">
+                  {String(editingIndex).padStart(2, '0')}
+                </span>
+                <input
+                  type="text"
+                  value={editing.content}
+                  onChange={(e) =>
+                    setEditing((prev) => prev && { ...prev, content: e.target.value })
+                  }
+                  placeholder={texts.planPlaceholder}
+                  aria-label="업무 내용"
+                  className="rounded-lg bg-(--color-bg-secondary) px-4 py-3 [font-size:var(--font-size-body-4)] outline-none placeholder:text-(--color-text-tertiary)"
+                />
+                <input
+                  type="text"
+                  value={editing.schedule}
+                  onChange={(e) =>
+                    setEditing((prev) => prev && { ...prev, schedule: e.target.value })
+                  }
+                  placeholder="언제 진행하실 예정인가요?"
+                  aria-label="예상 시점"
+                  className="rounded-lg bg-(--color-bg-secondary) px-4 py-3 [font-size:var(--font-size-body-4)] outline-none placeholder:text-(--color-text-tertiary)"
+                />
+                <span className="flex justify-end">
+                  <button
+                    type="button"
+                    aria-label="확정"
+                    onClick={handleConfirmRow}
+                    disabled={!editing.content.trim()}
+                    className="rounded-lg bg-(--color-button-default) p-2.5 text-(--color-text-inverse) disabled:bg-(--color-button-disabled)"
+                  >
+                    <CheckIcon width={16} height={16} />
+                  </button>
+                </span>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         <button
           type="button"
@@ -276,10 +277,10 @@ export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectivePr
         <div
           className={[
             'transition-opacity duration-500',
-            toastMessage ? 'opacity-100' : 'opacity-0',
+            toasts.length > 0 ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         >
-          {toastMessage && <Toast message={toastMessage} />}
+          <ToastContainer toasts={toasts} />
         </div>
         <div className="flex items-center gap-4">
           {savedAt && (
