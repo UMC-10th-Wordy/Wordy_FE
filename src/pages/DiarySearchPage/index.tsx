@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
+import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
+
 import { SearchInput } from '@/components/common/SearchInput/SearchInput'
 import { DiarySearchBackButton } from '@/components/diary-search/DiarySearchBackButton'
 import { DiarySearchEmptyState } from '@/components/diary-search/DiarySearchEmptyState'
@@ -118,92 +120,96 @@ export const DiarySearchPage = () => {
     activeTab === 'diary' ? searchedDiaries.length : searchedTagResults.length
 
   return (
-    <main className="flex h-screen min-w-[900px] flex-col overflow-y-auto bg-(--color-bg-default) px-(--scale-40) pt-(--scale-40)">
-      <DiarySearchBackButton onClick={handleBack} />
+    <main className="flex h-screen min-h-0 min-w-[900px] flex-col overflow-hidden bg-(--color-bg-default)">
+      <Scrollbar key={activeTab}>
+        <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-[60px]">
+          <DiarySearchBackButton onClick={handleBack} />
 
-      <div className="mt-(--scale-48) flex min-h-0 flex-1 flex-col items-center">
-        <div
-          className="relative z-50 w-[580px]"
-          onMouseDownCapture={(event) => {
-            const target = event.target as HTMLElement
+          <div className="mt-(--scale-48) flex min-h-0 flex-1 flex-col items-center">
+            <div
+              className="relative z-50 w-[580px]"
+              onMouseDownCapture={(event) => {
+                const target = event.target as HTMLElement
 
-            if (target.closest('button')) {
-              event.preventDefault()
-            }
-          }}
-          onKeyDownCapture={(event) => {
-            if (event.key === 'Enter' && event.nativeEvent.isComposing) {
-              event.preventDefault()
-              event.stopPropagation()
-            }
-          }}
-        >
-          <SearchInput
-            value={searchKeyword}
-            onChange={(event) =>
-              setSearchInputState({
-                baseKeyword: searchedKeyword,
-                value: event.target.value,
-              })
-            }
-            onFocus={() => {
-              setIsSearchFocused(true)
-              setShowRecentDropdown(true)
-            }}
-            onBlur={() => setIsSearchFocused(false)}
-            onSearch={handleSearch}
-            recentKeywords={recentKeywords}
-            onRemoveKeyword={removeRecentKeyword}
-            onClearAll={handleClearRecentKeywords}
-            placeholder={isSearchFocused ? '' : '업무 내용 또는 키워드를 검색해 보세요'}
-            aria-label="업무 일지 검색"
-            className={[
-              'w-full',
-              '[&>div:nth-child(2)]:top-[calc(100%+12px)]',
-              '[&>div:nth-child(2)]:left-1/2',
-              '[&>div:nth-child(2)]:z-50',
-              '[&>div:nth-child(2)]:w-[580px]',
-              '[&>div:nth-child(2)]:-translate-x-1/2',
-              !showRecentDropdown && '[&>div:nth-child(2)]:hidden',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-          />
-        </div>
-
-        {isLoading ? (
-          <DiarySearchSkeleton />
-        ) : (
-          <>
-            <div className="mt-(--scale-48)">
-              <DiarySearchHeader
-                activeTab={activeTab}
-                diaryCount={searchedDiaries.length}
-                projectTagCount={searchedTagResults.length}
-                onTabChange={setActiveTab}
+                if (target.closest('button')) {
+                  event.preventDefault()
+                }
+              }}
+              onKeyDownCapture={(event) => {
+                if (event.key === 'Enter' && event.nativeEvent.isComposing) {
+                  event.preventDefault()
+                  event.stopPropagation()
+                }
+              }}
+            >
+              <SearchInput
+                value={searchKeyword}
+                onChange={(event) =>
+                  setSearchInputState({
+                    baseKeyword: searchedKeyword,
+                    value: event.target.value,
+                  })
+                }
+                onFocus={() => {
+                  setIsSearchFocused(true)
+                  setShowRecentDropdown(true)
+                }}
+                onBlur={() => setIsSearchFocused(false)}
+                onSearch={handleSearch}
+                recentKeywords={recentKeywords}
+                onRemoveKeyword={removeRecentKeyword}
+                onClearAll={handleClearRecentKeywords}
+                placeholder={isSearchFocused ? '' : '업무 내용 또는 키워드를 검색해 보세요'}
+                aria-label="업무 일지 검색"
+                className={[
+                  'w-full',
+                  '[&>div:nth-child(2)]:top-[calc(100%+12px)]',
+                  '[&>div:nth-child(2)]:left-1/2',
+                  '[&>div:nth-child(2)]:z-50',
+                  '[&>div:nth-child(2)]:w-[580px]',
+                  '[&>div:nth-child(2)]:-translate-x-1/2',
+                  !showRecentDropdown && '[&>div:nth-child(2)]:hidden',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
               />
             </div>
 
-            {activeResultCount === 0 ? (
-              <DiarySearchEmptyState type={activeTab} />
-            ) : activeTab === 'diary' ? (
-              <DiarySearchList
-                diaries={searchedDiaries}
-                keyword={searchedKeyword}
-                sort={sort}
-                onSortChange={setSort}
-                onDetailClick={handleDetailClick}
-              />
+            {isLoading ? (
+              <DiarySearchSkeleton />
             ) : (
-              <TagSearchList
-                results={searchedTagResults}
-                keyword={searchedKeyword}
-                onDetailClick={handleDetailClick}
-              />
+              <>
+                <div className="mt-(--scale-48)">
+                  <DiarySearchHeader
+                    activeTab={activeTab}
+                    diaryCount={searchedDiaries.length}
+                    projectTagCount={searchedTagResults.length}
+                    onTabChange={setActiveTab}
+                  />
+                </div>
+
+                {activeResultCount === 0 ? (
+                  <DiarySearchEmptyState type={activeTab} />
+                ) : activeTab === 'diary' ? (
+                  <DiarySearchList
+                    diaries={searchedDiaries}
+                    keyword={searchedKeyword}
+                    sort={sort}
+                    onSortChange={setSort}
+                    onDetailClick={handleDetailClick}
+                  />
+                ) : (
+                  <TagSearchList
+                    results={searchedTagResults}
+                    keyword={searchedKeyword}
+                    onDetailClick={handleDetailClick}
+                  />
+                )}
+              </>
             )}
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      </Scrollbar>
     </main>
   )
 }

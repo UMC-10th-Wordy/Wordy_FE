@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react'
 
+import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
+
 import { PerformanceChatBubble } from './PerformanceChatBubble'
 import { PerformanceChatInput } from './PerformanceChatInput'
 import { PerformanceTypingIndicator } from './PerformanceTypingIndicator'
@@ -37,46 +39,48 @@ export const PerformanceQuestionChat = ({
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col">
-      <div className="min-h-0 w-full flex-1 overflow-y-auto pb-(--scale-48) [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex w-full flex-col">
-          {messages.map((message, index) => {
-            const previousMessage = messages[index - 1]
+      <div className="-mr-(--scale-24) flex min-h-0 w-[calc(100%+var(--scale-24))] flex-1 pb-(--scale-48)">
+        <Scrollbar>
+          <div className="flex min-h-full w-full flex-col pr-(--scale-16)">
+            {messages.map((message, index) => {
+              const previousMessage = messages[index - 1]
 
-            const showProfile = message.role === 'wordy' && previousMessage?.role !== 'wordy'
+              const showProfile = message.role === 'wordy' && previousMessage?.role !== 'wordy'
 
-            const messageGapClass =
-              index === 0
-                ? ''
-                : previousMessage?.role !== message.role
-                  ? 'mt-[28px]'
-                  : 'mt-(--scale-16)'
+              const messageGapClass =
+                index === 0
+                  ? ''
+                  : previousMessage?.role !== message.role
+                    ? 'mt-[28px]'
+                    : 'mt-(--scale-16)'
 
-            const shouldShowSkipButton =
-              message.role === 'wordy' &&
-              message.isQuestion === true &&
-              message.id === latestQuestionMessageId &&
-              !isWordyTyping
+              const shouldShowSkipButton =
+                message.role === 'wordy' &&
+                message.isQuestion === true &&
+                message.id === latestQuestionMessageId &&
+                !isWordyTyping
 
-            return (
-              <div key={message.id} className={messageGapClass}>
-                <PerformanceChatBubble
-                  message={message}
-                  shouldShowSkipButton={shouldShowSkipButton}
-                  showProfile={showProfile}
-                  onSkipQuestion={onSkipQuestion}
-                />
+              return (
+                <div key={message.id} className={messageGapClass}>
+                  <PerformanceChatBubble
+                    message={message}
+                    shouldShowSkipButton={shouldShowSkipButton}
+                    showProfile={showProfile}
+                    onSkipQuestion={onSkipQuestion}
+                  />
+                </div>
+              )
+            })}
+
+            {isWordyTyping && (
+              <div className={lastMessage?.role === 'user' ? 'mt-[28px]' : 'mt-(--scale-16)'}>
+                <PerformanceTypingIndicator showProfile={showTypingProfile} />
               </div>
-            )
-          })}
+            )}
 
-          {isWordyTyping && (
-            <div className={lastMessage?.role === 'user' ? 'mt-[28px]' : 'mt-(--scale-16)'}>
-              <PerformanceTypingIndicator showProfile={showTypingProfile} />
-            </div>
-          )}
-
-          <div ref={chatEndRef} />
-        </div>
+            <div ref={chatEndRef} />
+          </div>
+        </Scrollbar>
       </div>
 
       <PerformanceChatInput
