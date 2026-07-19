@@ -14,14 +14,6 @@ import { LandingPage } from '@/pages/LandingPage/LandingPage'
 
 export const router = createBrowserRouter([
   {
-    path: '/landing-preview',
-    element: <LandingPreview />,
-  },
-  {
-    path: '/landing',
-    element: <LandingPage />,
-  },
-  {
     path: '/',
     element: <SidebarPage />,
   },
@@ -34,10 +26,6 @@ export const router = createBrowserRouter([
     element: <SidebarPage />,
   },
   {
-    path: '/records/search',
-    element: <DiarySearchPage />,
-  },
-  {
     path: '/records/:diaryId',
     element: <SidebarPage />,
   },
@@ -48,34 +36,16 @@ export const router = createBrowserRouter([
   {
     element: <AppLayout />,
     children: [
-      {
-        path: '/trash',
-        element: <TrashPage />,
-      },
-      {
-        path: '/plan',
-        element: <PlanPage />,
-      },
+      { path: '/landing-preview', element: <LandingPreview /> },
+      { path: '/landing', element: <LandingPage /> },
+      { path: '/records/search', element: <DiarySearchPage /> },
+      { path: '/trash', element: <TrashPage /> },
+      { path: '/plan', element: <PlanPage /> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/signup', element: <SignupPage /> },
+      { path: '/email-verification', element: <EmailVerificationPage /> },
+      { path: '/mail-notice', element: <MailNoticePage /> },
+      { path: '/profile-setup', element: <ProfileSetupPage /> },
     ],
-  },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/signup',
-    element: <SignupPage />,
-  },
-  {
-    path: '/email-verification',
-    element: <EmailVerificationPage />,
-  },
-  {
-    path: '/mail-notice',
-    element: <MailNoticePage />,
-  },
-  {
-    path: '/profile-setup',
-    element: <ProfileSetupPage />,
   },
 ])

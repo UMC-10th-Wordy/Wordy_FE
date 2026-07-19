@@ -82,7 +82,6 @@ export const DIARY_DETAIL_MOCK: DiaryDetailData = {
       isCompleted: false,
     },
   ],
-  retrospective:
-    '오늘은 회의 준비와 프로젝트 진행 현황 정리를 중심으로 업무를 진행했다.\n자료를 미리 구조화해 둔 덕분에 다음 논의에 필요한 기준을 빠르게 마련할 수 있었다.\n자료를 미리 구조화해 둔 덕분에 다음 논의에 필요한 기준을 빠르게 마련할 수 있었다.\n자료를 미리 구조화해 둔 덕분에 다음 논의에 필요한 기준을 빠르게 마련할 수 있었다.\n자료를 미리 구조화해 둔 덕분에 다음 논의에 필요한 기준을 빠르게 마련할 수 있었다.',
+  retrospective: '오늘은 회의 준비와 프로젝트 진행 현황 정리를 중심으로 업무를 진행했다.',
   performance: PERFORMANCE_PREVIEW_RESULT_MOCK,
 }
