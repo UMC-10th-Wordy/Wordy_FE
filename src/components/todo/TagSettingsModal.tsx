@@ -351,7 +351,7 @@ export default function TagSettingsModal({
             type="button"
             aria-label="닫기"
             onClick={onClose}
-            className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) hover:bg-(--color-bg-tertiary)"
+            className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
           >
             <XMarkIcon aria-hidden className="size-6" />
           </button>
@@ -406,7 +406,7 @@ export default function TagSettingsModal({
                       type="button"
                       aria-label="검색어 지우기"
                       onClick={() => handleSearchChange('')}
-                      className="flex size-8 shrink-0 items-center justify-center text-(--color-icon-secondary) hover:text-(--color-icon-default)"
+                      className="flex size-8 shrink-0 items-center justify-center text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:text-(--color-icon-default)"
                     >
                       <XMarkIcon aria-hidden className="size-6" />
                     </button>
@@ -447,7 +447,7 @@ export default function TagSettingsModal({
                             onClick={() =>
                               updateRecentSearches(recentSearches.filter((item) => item !== q))
                             }
-                            className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) hover:bg-(--color-bg-tertiary)"
+                            className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
                           >
                             <XMarkIcon aria-hidden className="size-6" />
                           </button>
@@ -550,7 +550,7 @@ export default function TagSettingsModal({
                                   onClick={() => {
                                     if (editingLabel !== tag.label) handleStartEdit(tag)
                                   }}
-                                  className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) hover:bg-(--color-bg-tertiary)"
+                                  className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
                                 >
                                   <EditIcon aria-hidden className="size-6" />
                                 </button>
@@ -560,7 +560,7 @@ export default function TagSettingsModal({
                                   onClick={() => {
                                     if (editingLabel !== tag.label) setDeletingLabel(tag.label)
                                   }}
-                                  className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) hover:bg-(--color-bg-tertiary)"
+                                  className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
                                 >
                                   <TrashIcon aria-hidden className="size-6" />
                                 </button>
@@ -576,7 +576,7 @@ export default function TagSettingsModal({
                                       setSelectedTag(isExpanding ? tag : null)
                                     }
                                   }}
-                                  className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) hover:bg-(--color-bg-tertiary)"
+                                  className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
                                 >
                                   {expandedLabel === tag.label ? (
                                     <DirectionTopIcon aria-hidden className="size-6" />
@@ -786,7 +786,7 @@ export default function TagSettingsModal({
                                               kpis: d.kpis.filter((_, ki) => ki !== i),
                                             }))
                                           }
-                                          className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) hover:text-(--color-icon-secondary)"
+                                          className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-icon-secondary)"
                                         >
                                           <TrashIcon aria-hidden className="size-6" />
                                         </button>
@@ -1076,7 +1076,7 @@ export default function TagSettingsModal({
                           type="button"
                           onClick={() => handleRemoveKpi(i)}
                           aria-label="KPI 삭제"
-                          className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) hover:text-(--color-status-error)"
+                          className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-status-error)"
                         >
                           <TrashIcon aria-hidden className="size-6" />
                         </button>

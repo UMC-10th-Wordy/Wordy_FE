@@ -115,7 +115,7 @@ export default function TodoListPage() {
     setTasks((prev) =>
       prev.map((task) => (task.id === id ? { ...task, isCompleted: !task.isCompleted } : task)),
     )
-    showToast(nextCompleted ? '완료 업무로 이동되었어요.' : '미완료 업무로 이동되었어요.')
+    showToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
   }
 
   const handleTaskDrop = (draggedId: string, over: DragOverInfo) => {
@@ -227,59 +227,67 @@ export default function TodoListPage() {
                 <TaskForm onCancel={() => setIsTaskFormOpen(false)} onSubmit={handleAddTask} />
               )}
 
-              {isActiveTabEmpty ? (
-                !isTaskFormOpen && (
-                  <div className="flex h-[180px] w-full flex-col items-center justify-center gap-1 py-10">
-                    <FailIcon aria-hidden className="size-8 shrink-0 text-(--color-icon-brand)" />
-                    <p className="w-[504px] text-center [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
-                      {!hasAnyTaskEverToday
-                        ? '오늘의 업무를 시작해 볼까요?'
-                        : activeTab === 'incomplete'
-                          ? '오늘의 업무를 모두 완료했어요'
-                          : '오늘 완료한 업무가 없어요'}
-                    </p>
-                  </div>
-                )
-              ) : (
-                <>
-                  <PrioritySection
-                    priorityKey="must"
-                    title="Must do"
-                    description="반드시 오늘 끝낼 거예요"
-                    sectionTasks={mustDoTasks}
-                    draggingTask={draggingTask}
-                    startDrag={startDrag}
-                    onDeleteTask={handleDeleteTask}
-                    onEditTask={handleEditTask}
-                    onSaveResult={handleSaveResult}
-                    onToggleComplete={handleToggleComplete}
-                  />
-                  <PrioritySection
-                    priorityKey="should"
-                    title="Should do"
-                    description="가능하면 오늘 완료할 거예요"
-                    sectionTasks={shouldDoTasks}
-                    draggingTask={draggingTask}
-                    startDrag={startDrag}
-                    onDeleteTask={handleDeleteTask}
-                    onEditTask={handleEditTask}
-                    onSaveResult={handleSaveResult}
-                    onToggleComplete={handleToggleComplete}
-                  />
-                  <PrioritySection
-                    priorityKey="could"
-                    title="Could do"
-                    description="여유가 있으면 진행할 거예요"
-                    sectionTasks={couldDoTasks}
-                    draggingTask={draggingTask}
-                    startDrag={startDrag}
-                    onDeleteTask={handleDeleteTask}
-                    onEditTask={handleEditTask}
-                    onSaveResult={handleSaveResult}
-                    onToggleComplete={handleToggleComplete}
-                  />
-                </>
-              )}
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.1, ease: 'easeOut' }}
+                className="flex w-full flex-col gap-8"
+              >
+                {isActiveTabEmpty ? (
+                  !isTaskFormOpen && (
+                    <div className="flex h-[180px] w-full flex-col items-center justify-center gap-1 py-10">
+                      <FailIcon aria-hidden className="size-8 shrink-0 text-(--color-icon-brand)" />
+                      <p className="w-[504px] text-center [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
+                        {!hasAnyTaskEverToday
+                          ? '오늘의 업무를 시작해 볼까요?'
+                          : activeTab === 'incomplete'
+                            ? '오늘의 업무를 모두 완료했어요'
+                            : '오늘 완료한 업무가 없어요'}
+                      </p>
+                    </div>
+                  )
+                ) : (
+                  <>
+                    <PrioritySection
+                      priorityKey="must"
+                      title="Must do"
+                      description="반드시 오늘 끝낼 거예요"
+                      sectionTasks={mustDoTasks}
+                      draggingTask={draggingTask}
+                      startDrag={startDrag}
+                      onDeleteTask={handleDeleteTask}
+                      onEditTask={handleEditTask}
+                      onSaveResult={handleSaveResult}
+                      onToggleComplete={handleToggleComplete}
+                    />
+                    <PrioritySection
+                      priorityKey="should"
+                      title="Should do"
+                      description="가능하면 오늘 완료할 거예요"
+                      sectionTasks={shouldDoTasks}
+                      draggingTask={draggingTask}
+                      startDrag={startDrag}
+                      onDeleteTask={handleDeleteTask}
+                      onEditTask={handleEditTask}
+                      onSaveResult={handleSaveResult}
+                      onToggleComplete={handleToggleComplete}
+                    />
+                    <PrioritySection
+                      priorityKey="could"
+                      title="Could do"
+                      description="여유가 있으면 진행할 거예요"
+                      sectionTasks={couldDoTasks}
+                      draggingTask={draggingTask}
+                      startDrag={startDrag}
+                      onDeleteTask={handleDeleteTask}
+                      onEditTask={handleEditTask}
+                      onSaveResult={handleSaveResult}
+                      onToggleComplete={handleToggleComplete}
+                    />
+                  </>
+                )}
+              </motion.div>
             </div>
           </section>
 

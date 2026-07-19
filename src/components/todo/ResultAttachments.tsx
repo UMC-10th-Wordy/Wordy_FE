@@ -138,7 +138,7 @@ export function ResultAttachments({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex h-8 shrink-0 items-center justify-center gap-1 rounded-md px-2 text-(--color-button-default) hover:bg-(--color-bg-brand-light)"
+              className="flex h-8 shrink-0 items-center justify-center gap-1 rounded-md px-2 text-(--color-button-default) transition-colors duration-100 ease-out hover:bg-(--color-bg-brand-light)"
             >
               <PlusIcon aria-hidden className="size-5 shrink-0" />
               <span className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) font-medium">
@@ -148,7 +148,7 @@ export function ResultAttachments({
             <button
               type="button"
               onClick={() => imageInputRef.current?.click()}
-              className="flex h-8 shrink-0 items-center justify-center gap-1 rounded-md px-2 text-(--color-button-default) hover:bg-(--color-bg-brand-light)"
+              className="flex h-8 shrink-0 items-center justify-center gap-1 rounded-md px-2 text-(--color-button-default) transition-colors duration-100 ease-out hover:bg-(--color-bg-brand-light)"
             >
               <PlusIcon aria-hidden className="size-5 shrink-0" />
               <span className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) font-medium">

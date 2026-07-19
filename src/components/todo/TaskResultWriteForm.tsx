@@ -1,8 +1,8 @@
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
 import { TextButton } from '@/components/common/Button/TextButton'
-import { Input2 } from '@/components/common/Input/Input2'
 import ProjectTag from './ProjectTag'
 import { ResultAttachments } from './ResultAttachments'
+import { MemoInput } from './MemoInput'
 import type { Task, TaskResultFile, TaskResultImage } from '@/types/todo'
 
 interface TaskResultWriteFormProps {
@@ -63,8 +63,9 @@ export function TaskResultWriteForm({
         <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
           업무 결과
         </p>
-        <Input2
+        <MemoInput
           className="w-full"
+          minHeightClassName="min-h-[120px]"
           placeholder="이 업무가 어떻게 진행되었나요? 결과를 작성해 주세요"
           value={writeResult}
           onChange={(e) => onWriteResultChange(e.target.value)}

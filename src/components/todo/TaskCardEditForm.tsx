@@ -1,9 +1,9 @@
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
 import { TextButton } from '@/components/common/Button/TextButton'
-import { Input2 } from '@/components/common/Input/Input2'
 import PrioritySelect from './PrioritySelect'
 import TagSelect from './TagSelect'
 import { ResultAttachments } from './ResultAttachments'
+import { MemoInput } from './MemoInput'
 import type { Task, TaskPriority, TaskResultFile, TaskResultImage, TaskTag } from '@/types/todo'
 
 interface TaskCardEditFormProps {
@@ -67,8 +67,8 @@ export function TaskCardEditForm({
         <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
           업무명 <span className="text-(--color-text-required)">*</span>
         </p>
-        <Input2
-          className="w-full !min-h-0 h-[53px]"
+        <MemoInput
+          className="w-full"
           value={draftTitle}
           onChange={(e) => onDraftTitleChange(e.target.value)}
         />
@@ -78,8 +78,8 @@ export function TaskCardEditForm({
         <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
           메모
         </p>
-        <Input2
-          className="w-full !min-h-0 h-[53px]"
+        <MemoInput
+          className="w-full"
           value={draftMemo}
           onChange={(e) => onDraftMemoChange(e.target.value)}
         />
@@ -91,9 +91,9 @@ export function TaskCardEditForm({
             <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
               업무 결과
             </p>
-            <Input2
+            <MemoInput
               className="w-full"
-              maxCharacter={undefined}
+              minHeightClassName="min-h-[120px]"
               value={draftResult}
               onChange={(e) => onDraftResultChange(e.target.value)}
             />

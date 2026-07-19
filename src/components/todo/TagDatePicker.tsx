@@ -130,7 +130,7 @@ export default function TagDatePicker({ anchorRef, value, onChange, onClose }: T
                 type="button"
                 onClick={() => handleSelect(date)}
                 className={[
-                  'flex size-10 items-center justify-center rounded-lg [font-size:var(--font-size-body-3)] leading-(--line-height-body)',
+                  'flex size-10 items-center justify-center rounded-lg [font-size:var(--font-size-body-3)] leading-(--line-height-body) transition-colors duration-100 ease-out',
                   isSelected
                     ? 'bg-(--color-icon-brand) text-(--color-text-inverse) font-semibold'
                     : isCurrentMonth

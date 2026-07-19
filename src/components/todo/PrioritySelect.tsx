@@ -83,7 +83,7 @@ export default function PrioritySelect({ value, onChange }: PrioritySelectProps)
             <div
               key={option.value}
               onClick={() => handleSelect(option.value)}
-              className="flex w-full cursor-pointer flex-col items-start rounded-md p-1 hover:bg-(--color-bg-tertiary)"
+              className="flex w-full cursor-pointer flex-col items-start rounded-md p-1 transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
             >
               <div className="flex w-full items-center gap-2">
                 <Radio
