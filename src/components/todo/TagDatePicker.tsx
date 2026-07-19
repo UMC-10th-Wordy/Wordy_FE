@@ -40,25 +40,41 @@ export default function TagDatePicker({ anchorRef, value, onChange, onClose }: T
   const [viewDate, setViewDate] = useState(
     () => new Date((parsed ?? today).getFullYear(), (parsed ?? today).getMonth(), 1),
   )
-  const [pos, setPos] = useState({ top: 0, left: 0 })
-
   useOutsideClick(ref, onClose, true, anchorRef)
 
   useLayoutEffect(() => {
     const calcPos = () => {
       if (!anchorRef.current || !ref.current) return
+      const el = ref.current
       const anchor = anchorRef.current.getBoundingClientRect()
-      const pickerH = ref.current.offsetHeight
-      const pickerW = ref.current.offsetWidth
-      const vw = window.innerWidth
       const vh = window.innerHeight
+
+      let scrollContainer: Element | null = anchorRef.current.parentElement
+      while (scrollContainer) {
+        const { overflowY } = getComputedStyle(scrollContainer)
+        if (overflowY === 'scroll' || overflowY === 'auto') break
+        scrollContainer = scrollContainer.parentElement
+      }
+      if (scrollContainer) {
+        const containerRect = scrollContainer.getBoundingClientRect()
+        if (anchor.bottom < containerRect.top || anchor.top > containerRect.bottom) {
+          el.style.visibility = 'hidden'
+          return
+        } else {
+          el.style.visibility = 'visible'
+        }
+      }
+
+      const pickerH = el.offsetHeight
+      const pickerW = el.offsetWidth
+      const vw = window.innerWidth
 
       const spaceBelow = vh - anchor.bottom
       const top = spaceBelow >= pickerH + GAP ? anchor.bottom + GAP : anchor.top - pickerH - GAP
-
       const left = Math.max(GAP, Math.min(anchor.left, vw - pickerW - GAP))
 
-      setPos({ top, left })
+      el.style.top = `${top}px`
+      el.style.left = `${left}px`
     }
 
     calcPos()
@@ -71,7 +87,7 @@ export default function TagDatePicker({ anchorRef, value, onChange, onClose }: T
       window.removeEventListener('scroll', calcPos, true)
       window.removeEventListener('resize', calcPos)
     }
-  }, [anchorRef])
+  }, [anchorRef, onClose])
 
   const year = viewDate.getFullYear()
   const month = viewDate.getMonth()
@@ -85,7 +101,6 @@ export default function TagDatePicker({ anchorRef, value, onChange, onClose }: T
   return createPortal(
     <div
       ref={ref}
-      style={{ top: pos.top, left: pos.left }}
       className="fixed z-70 flex flex-col gap-4 rounded-(--scale-12) bg-(--color-bg-default) p-5 shadow-[0px_1px_7.5px_0px_rgba(0,0,0,0.1)]"
     >
       <div className="flex items-center justify-between">

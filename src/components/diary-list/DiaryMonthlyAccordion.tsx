@@ -27,7 +27,7 @@ export const DiaryMonthlyAccordion = ({ record, isOpen, onToggle }: DiaryMonthly
   const rightEntries = sortedEntries.slice(middleIndex)
 
   return (
-    <article className="relative w-full rounded-(--scale-12) border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) p-(--scale-20) shadow-[0_1px_5px_rgba(0,0,0,0.1)]">
+    <article className="relative w-full rounded-(--scale-12) border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) p-(--scale-20) shadow-[0_1px_5px_rgba(0,0,0,0.1)] transition-colors duration-100 ease-out hover:bg-(--color-bg-secondary)">
       <div className="relative h-[145px] pr-11">
         <div className="flex items-baseline gap-(--scale-8)">
           <h3 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-heading) font-(--font-weight-semibold) text-(--color-text-default)">
