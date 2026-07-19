@@ -215,11 +215,7 @@ export function SidebarPage() {
           <DiaryListPage />
         </Scrollbar>
       )}
-      {currentPage === '일지 모아보기' && isDiaryDetailPage && (
-        <Scrollbar className="flex-1">
-          <DiaryDetailPage />
-        </Scrollbar>
-      )}
+      {currentPage === '일지 모아보기' && isDiaryDetailPage && <DiaryDetailPage />}
 
       {modal === 'setting' && (
         <SettingModal
