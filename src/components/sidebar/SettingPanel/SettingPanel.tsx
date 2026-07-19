@@ -81,15 +81,16 @@ export function SettingPanel({
     }
   }, [openDropdown])
 
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     const url = URL.createObjectURL(file)
     setAvatarSrc(url)
   }
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
 
   const profileChanged =
     name !== profileName || job !== profileJob || career !== profileCareer || avatarSrc !== null
