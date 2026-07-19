@@ -40,7 +40,7 @@ export const PerformanceQuestionChat = ({
   return (
     <div className="flex h-full min-h-0 w-full flex-col">
       <div className="flex min-h-0 w-full flex-1 pb-(--scale-48)">
-        <Scrollbar scrollbarClassName="pt-2 pr-1">
+        <Scrollbar scrollbarClassName="py-2 pr-1">
           <div className="flex min-h-full w-full flex-col pr-(--scale-24)">
             {messages.map((message, index) => {
               const previousMessage = messages[index - 1]

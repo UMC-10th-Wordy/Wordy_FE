@@ -56,7 +56,7 @@ export const DiaryDetailPage = ({ hideDelete }: { hideDelete?: boolean }) => {
   return (
     <div className="grid h-full min-h-0 min-w-0 flex-1 grid-cols-2 overflow-hidden bg-(--color-bg-default)">
       <main className="flex h-full min-h-0 min-w-0 w-full overflow-x-clip border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default)">
-        <Scrollbar scrollbarClassName="pt-2 pr-1">
+        <Scrollbar scrollbarClassName="py-2 pr-1">
           <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-[60px]">
             <DiaryDetailHeader
               dateLabel={formatDateLabel(diary.date)}
