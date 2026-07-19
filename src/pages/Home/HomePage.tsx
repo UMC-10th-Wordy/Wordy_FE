@@ -85,7 +85,7 @@ const MOCK_WEEKLY_DAYS = [
 
 const MOCK_RECENT_RECORDS = [
   {
-    id: '1',
+    id: '2026-08-20',
     date: '2026년 8월 20일 목요일',
     totalCount: 6,
     tasks: [
@@ -110,7 +110,7 @@ const MOCK_RECENT_RECORDS = [
     ],
   },
   {
-    id: '2',
+    id: '2026-08-19',
     date: '2026년 8월 19일 수요일',
     totalCount: 4,
     tasks: [
@@ -187,7 +187,7 @@ export function HomePage({ userName = 'Alex Kim', className, ...rest }: HomePage
 
         {/* 배너 + 오늘의 업무 */}
         <div className="grid grid-cols-3 gap-5 h-100">
-          <HomeBanner className="col-span-2" />
+          <HomeBanner className="col-span-2" onNavigate={() => navigate('/today')} />
           <TodayTaskCard
             dateLabel={todayLabel}
             tasks={MOCK_TODAY_TASKS}
@@ -227,7 +227,7 @@ export function HomePage({ userName = 'Alex Kim', className, ...rest }: HomePage
                 <RecentRecordCard
                   key={record.id}
                   {...record}
-                  onClick={() => navigate('/records')}
+                  onClick={() => navigate(`/records/${record.id}`)}
                 />
               ))}
             </div>
