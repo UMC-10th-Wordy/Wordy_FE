@@ -474,7 +474,7 @@ export default function TagSettingsModal({
                     </button>
                   )}
                 </div>
-                <Scrollbar inline scrollbarClassName="pl-3" className="min-h-0 flex-1">
+                <Scrollbar inline scrollbarClassName="pl-3">
                   <div className="flex flex-col gap-3 pb-1">
                     {isSearching ? (
                       Array.from({ length: 5 }).map((_, i) => (
@@ -892,7 +892,7 @@ export default function TagSettingsModal({
 
           {/* 새 태그 탭 */}
           {tab === 'new' && (
-            <Scrollbar inline scrollbarClassName="pl-3" className="min-h-0 flex-1">
+            <Scrollbar inline scrollbarClassName="pl-3">
               <div className="flex flex-col gap-4 pb-1">
                 {/* 태그명 + 색상 */}
                 <div className="flex items-start gap-5">

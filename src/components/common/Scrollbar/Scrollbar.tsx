@@ -13,7 +13,6 @@ export interface ScrollbarProps {
 export function Scrollbar({ children, className, scrollbarClassName, inline }: ScrollbarProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
-  const thumbRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
 
   const [thumbHeight, setThumbHeight] = useState(0)
@@ -175,7 +174,6 @@ export function Scrollbar({ children, className, scrollbarClassName, inline }: S
         {/* 트랙 */}
         <div ref={trackRef} className="flex-1 relative flex items-start justify-center w-2 my-1">
           <div
-            ref={thumbRef}
             className={[
               'absolute w-2 rounded-full cursor-pointer transition-colors duration-100 ease-out',
               thumbColor,
