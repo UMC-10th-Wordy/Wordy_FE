@@ -52,9 +52,12 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
     ro.observe(el)
     if (track) ro.observe(track)
     if (innerRef.current) ro.observe(innerRef.current)
+    const mo = new MutationObserver(updateThumb)
+    mo.observe(el, { childList: true, subtree: true, attributes: true })
     return () => {
       el.removeEventListener('scroll', updateThumb)
       ro.disconnect()
+      mo.disconnect()
     }
   }, [updateThumb])
 
