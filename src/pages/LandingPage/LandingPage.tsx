@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
+import { animate, type AnimationPlaybackControls } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { LandingHeader } from '@/components/landing/LandingHeader'
 import { LandingHeroSection } from '@/components/landing/LandingHeroSection'
@@ -18,16 +19,41 @@ export function LandingPage() {
   const heroRef = useRef<HTMLDivElement>(null)
   const [currentPage, setCurrentPage] = useState<LandingPage>('홈')
   const [activeFeature, setActiveFeature] = useState<FeatureKey>('업무 일지')
+  const scrollAnimationRef = useRef<AnimationPlaybackControls | null>(null)
 
   const scrollToSection = useCallback(
     (ref: React.RefObject<HTMLElement | HTMLDivElement | null>) => {
-      ref.current?.scrollIntoView({ behavior: 'smooth' })
+      const target = ref.current
+      if (!target) return
+
+      let container: Element | null = target.parentElement
+      while (container) {
+        const { overflowY } = getComputedStyle(container)
+        if (overflowY === 'scroll' || overflowY === 'auto') break
+        container = container.parentElement
+      }
+      if (!container) return
+
+      scrollAnimationRef.current?.stop()
+
+      const targetY =
+        container.scrollTop +
+        target.getBoundingClientRect().top -
+        container.getBoundingClientRect().top
+      scrollAnimationRef.current = animate(container.scrollTop, targetY, {
+        duration: 0.3,
+        ease: 'easeOut',
+        onUpdate: (v) => {
+          container!.scrollTop = v
+        },
+      })
     },
     [],
   )
 
   const handleNavigate = useCallback(
     (page: LandingPage) => {
+      // TODO: 로그인 상태일 경우 '홈' 클릭 시 /로 이동 (API 연동 후 처리)
       if (page === '홈') scrollToSection(heroRef)
       if (page === '기능 소개') scrollToSection(featureRef)
       if (page === '요금제 안내') scrollToSection(pricingRef)
@@ -45,22 +71,26 @@ export function LandingPage() {
 
   // 스크롤 위치 기반으로 헤더 active 자동 변경
   useEffect(() => {
-    const handler = () => {
-      const featureTop = featureRef.current?.getBoundingClientRect().top ?? Infinity
-      const pricingTop = pricingRef.current?.getBoundingClientRect().top ?? Infinity
-      const threshold = window.innerHeight * 0.5
+    const visibilityMap = new Map<Element, boolean>()
 
-      if (pricingTop <= threshold) {
-        setCurrentPage('요금제 안내')
-      } else if (featureTop <= threshold) {
-        setCurrentPage('기능 소개')
-      } else {
-        setCurrentPage('홈')
-      }
-    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          visibilityMap.set(entry.target, entry.isIntersecting)
+        })
 
-    window.addEventListener('scroll', handler, { passive: true })
-    return () => window.removeEventListener('scroll', handler)
+        if (visibilityMap.get(pricingRef.current!)) setCurrentPage('요금제 안내')
+        else if (visibilityMap.get(featureRef.current!)) setCurrentPage('기능 소개')
+        else if (visibilityMap.get(heroRef.current!)) setCurrentPage('홈')
+      },
+      { threshold: 0.3 },
+    )
+
+    if (heroRef.current) observer.observe(heroRef.current)
+    if (featureRef.current) observer.observe(featureRef.current)
+    if (pricingRef.current) observer.observe(pricingRef.current)
+
+    return () => observer.disconnect()
   }, [])
 
   return (
@@ -76,6 +106,7 @@ export function LandingPage() {
           ].join(', '),
         }}
       >
+        {/* TODO: 로그인 상태 연동 후 isLoggedIn prop 전달 및 로그인 시 로그인 버튼 숨김 처리 (API 연동 후 처리) */}
         <LandingHeader
           currentPage={currentPage}
           onNavigate={handleNavigate}

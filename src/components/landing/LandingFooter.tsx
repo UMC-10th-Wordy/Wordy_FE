@@ -38,7 +38,7 @@ export function LandingFooter({ onNavigate, onNavigateToFeature }: LandingFooter
                 key={label}
                 type="button"
                 onClick={() => onNavigateToFeature?.(label)}
-                className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-secondary) whitespace-nowrap hover:text-(--color-text-default) text-left"
+                className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-secondary) whitespace-nowrap hover:text-(--color-text-default) text-left transition-colors duration-100 ease-out"
               >
                 {label}
               </button>
@@ -50,7 +50,7 @@ export function LandingFooter({ onNavigate, onNavigateToFeature }: LandingFooter
             </p>
             <button
               type="button"
-              className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-secondary) whitespace-nowrap hover:text-(--color-text-default) text-left"
+              className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-secondary) whitespace-nowrap hover:text-(--color-text-default) text-left transition-colors duration-100 ease-out"
             >
               문의 및 피드백 하기
             </button>
@@ -62,7 +62,7 @@ export function LandingFooter({ onNavigate, onNavigateToFeature }: LandingFooter
             <button
               type="button"
               onClick={() => onNavigate?.('요금제 안내')}
-              className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-secondary) whitespace-nowrap hover:text-(--color-text-default) text-left"
+              className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-secondary) whitespace-nowrap hover:text-(--color-text-default) text-left transition-colors duration-100 ease-out"
             >
               요금제 안내
             </button>
@@ -77,13 +77,13 @@ export function LandingFooter({ onNavigate, onNavigateToFeature }: LandingFooter
         </span>
         <button
           type="button"
-          className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-tertiary) whitespace-nowrap hover:text-(--color-text-secondary)"
+          className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-tertiary) whitespace-nowrap hover:text-(--color-text-secondary) transition-colors duration-100 ease-out"
         >
           개인정보처리방침
         </button>
         <button
           type="button"
-          className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-tertiary) whitespace-nowrap hover:text-(--color-text-secondary)"
+          className="[font-size:var(--font-size-body-3)] font-medium leading-(--line-height-body) text-(--color-text-tertiary) whitespace-nowrap hover:text-(--color-text-secondary) transition-colors duration-100 ease-out"
         >
           서비스이용약관
         </button>

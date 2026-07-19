@@ -130,20 +130,18 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
 
   return (
     <div className={['relative min-h-0 flex-1 w-full', className].filter(Boolean).join(' ')}>
-      {/* 스크롤 콘텐츠 */}
       <div
         ref={contentRef}
-        className="flex flex-col h-full min-w-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden pr-2"
+        className="flex flex-col h-full overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden"
       >
         <div ref={innerRef} className="min-h-full">
           {children}
         </div>
       </div>
 
-      {/* 커스텀 스크롤바 — 항상 렌더, 스크롤 불가 시 invisible */}
       <div
         className={[
-          'absolute right-0 top-0 flex flex-col items-center h-full pt-2 pr-1',
+          'absolute top-0 right-0 h-full z-10 flex flex-col items-center pt-2 pr-1',
           isScrollable ? '' : 'invisible',
         ].join(' ')}
       >
