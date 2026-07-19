@@ -1,3 +1,5 @@
+import DiarySearchEmptyIllustration from '@/assets/icons/wordy-diary-search-empty.svg'
+
 import type { DiarySearchTab } from '@/types/diarySearch'
 
 interface DiarySearchEmptyStateProps {
@@ -11,8 +13,12 @@ export const DiarySearchEmptyState = ({ type }: DiarySearchEmptyStateProps) => {
   return (
     <section className="flex min-h-0 w-[800px] flex-1 items-center justify-center pb-[60px]">
       <div className="flex flex-col items-center gap-(--scale-12)">
-        {/* TODO(#71): 검색 결과 빈 상태 일러스트 전달 후 에셋으로 교체 */}
-        <div aria-hidden className="h-[129px] w-[253px]" />
+        <img
+          src={DiarySearchEmptyIllustration}
+          alt=""
+          aria-hidden
+          className="h-[140px] w-[175px]"
+        />
 
         <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-secondary)">
           {description}
