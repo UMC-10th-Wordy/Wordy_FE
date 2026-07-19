@@ -18,7 +18,7 @@ export function JobDropdown({ options, value, onChange, className, ...rest }: Jo
       ].join(' ')}
       {...rest}
     >
-      <Scrollbar>
+      <Scrollbar inline scrollbarClassName="pl-2">
         {options.map((option) => (
           <SidebarNavItemText
             key={option}
