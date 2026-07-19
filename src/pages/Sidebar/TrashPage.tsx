@@ -8,7 +8,7 @@ import { TrashMoreMenu } from '@/components/sidebar/TrashMoreMenu/TrashMoreMenu'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 import MeatballIcon from '@/assets/icons/meatball.svg?react'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
-import EmptyImage from '@/assets/icons/wordy-performance-empty.svg?react'
+import trashEmptyIllustration from '@/assets/images/trash-empty-illustration.svg'
 
 export interface TrashItem {
   id: string
@@ -109,7 +109,7 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
         {/* 카드 목록 또는 빈 상태 */}
         {items.length === 0 ? (
           <div className="flex flex-col gap-4 items-center justify-center w-full flex-1 min-h-[400px]">
-            <EmptyImage className="w-[253px] h-[129px]" />
+            <img src={trashEmptyIllustration} alt="" width={269} height={130} />
             <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-secondary) text-center whitespace-nowrap">
               휴지통이 비어있어요
             </p>
