@@ -44,7 +44,8 @@ export function BannerIllustration({ className }: { className?: string }) {
     <svg
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="xMaxYMax meet"
-      className={['w-full h-full', className].filter(Boolean).join(' ')}
+      className={className}
+      style={{ width: `${W}px`, height: `${H}px` }}
     >
       {/* ── Vector: 배경 짙은 언덕 (y: 0→22) ── */}
       {(() => {
