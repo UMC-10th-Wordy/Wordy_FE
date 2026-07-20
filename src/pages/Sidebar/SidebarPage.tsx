@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Sidebar,
@@ -116,7 +116,10 @@ export function SidebarPage() {
   ]
 
   return (
-    <div className="flex h-screen w-full items-stretch">
+    <div
+      className="flex h-screen w-full items-stretch"
+      style={{ '--sidebar-width': sidebarStatus === 'open' ? '260px' : '72px' } as CSSProperties}
+    >
       <Sidebar
         page={currentPage}
         status={sidebarStatus}
