@@ -206,16 +206,22 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
               <button
                 type="button"
                 aria-label="태그 추가"
-                onClick={() => setShowModal('new')}
-                className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) hover:bg-(--color-bg-tertiary)"
+                onClick={() => {
+                  setIsOpen(false)
+                  setShowModal('new')
+                }}
+                className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
               >
                 <PlusIcon aria-hidden className="size-6" />
               </button>
               <button
                 type="button"
                 aria-label="태그 설정"
-                onClick={() => setShowModal('existing')}
-                className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) hover:bg-(--color-bg-tertiary)"
+                onClick={() => {
+                  setIsOpen(false)
+                  setShowModal('existing')
+                }}
+                className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
               >
                 <SettingIcon aria-hidden className="size-6" />
               </button>
@@ -253,7 +259,7 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
                     data-flip-id={tag.label}
                     data-vdrag-row="true"
                     data-vdrag-id={tag.label}
-                    className="flex h-10.5 w-full shrink-0 items-center gap-1 rounded-md p-1 hover:bg-(--color-bg-tertiary)"
+                    className="flex h-10.5 w-full shrink-0 items-center gap-1 rounded-md p-1 transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
                   >
                     <span
                       onMouseDown={startDrag(tag.label)}

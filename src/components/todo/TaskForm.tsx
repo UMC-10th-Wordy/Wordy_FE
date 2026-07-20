@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Input2 } from '@/components/common/Input/Input2'
 import { TextButton } from '@/components/common/Button/TextButton'
+import { MemoInput } from './MemoInput'
 import PrioritySelect from './PrioritySelect'
 import TagSelect from './TagSelect'
 import type { TaskDraftValues, TaskPriority, TaskTag } from '@/types/todo'
@@ -53,9 +53,9 @@ export default function TaskForm({ onCancel, onSubmit }: TaskFormProps) {
         <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
           업무명 <span className="text-(--color-text-required)">*</span>
         </p>
-        <Input2
+        <MemoInput
           placeholder="업무명을 입력해 주세요"
-          className="w-full !min-h-0 h-[53px]"
+          className="w-full"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -66,9 +66,9 @@ export default function TaskForm({ onCancel, onSubmit }: TaskFormProps) {
         <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
           메모
         </p>
-        <Input2
+        <MemoInput
           placeholder="업무와 관련한 내용을 자유롭게 적어주세요"
-          className="w-full !min-h-0 h-[53px]"
+          className="w-full"
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
         />

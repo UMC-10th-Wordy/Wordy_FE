@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import MoveIcon from '@/assets/icons/move.svg?react'
 import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
@@ -34,6 +35,8 @@ export function TaskCardView({
   onDeleteClick,
   onStartWriteResult,
 }: TaskCardViewProps) {
+  const hasExpandableContent = Boolean(task.memo) || task.isCompleted
+
   return (
     <>
       {/* 드래그 핸들 / 체크박스 / 프로젝트 태그 / 업무명 */}
@@ -95,50 +98,59 @@ export function TaskCardView({
         </div>
       </div>
 
-      {isExpanded && (
-        <>
-          {/* 메모 */}
-          {task.memo && (
-            <div className="flex w-full flex-col items-start gap-1 pb-2">
-              <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
-                메모
-              </p>
-              <p className="w-full [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-secondary)">
-                {task.memo}
-              </p>
-            </div>
-          )}
-
-          {/* 업무 결과 - 완료된 업무에서만 노출 */}
-          {task.isCompleted &&
-            (task.result ? (
-              <div className="flex w-full flex-col items-start gap-4">
-                <div className="flex w-full flex-col items-start gap-1">
-                  <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
-                    업무 결과
-                  </p>
-                  <p className="w-full [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)">
-                    {task.result}
-                  </p>
-                </div>
-                <ResultAttachments
-                  files={task.resultFiles ?? []}
-                  images={task.resultImages ?? []}
-                />
+      <AnimatePresence initial={false}>
+        {isExpanded && hasExpandableContent && (
+          <motion.div
+            key="task-card-details"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="flex w-full flex-col items-end gap-4 overflow-hidden"
+          >
+            {/* 메모 */}
+            {task.memo && (
+              <div className="flex w-full flex-col items-start gap-1 pb-2">
+                <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
+                  메모
+                </p>
+                <p className="w-full [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-secondary)">
+                  {task.memo}
+                </p>
               </div>
-            ) : (
-              <TextButton
-                type="button"
-                variant="text_only"
-                size="medium"
-                iconLeft={<PlusIcon aria-hidden className="size-7" />}
-                onClick={onStartWriteResult}
-              >
-                업무 결과 작성하기
-              </TextButton>
-            ))}
-        </>
-      )}
+            )}
+
+            {/* 업무 결과 - 완료된 업무에서만 노출 */}
+            {task.isCompleted &&
+              (task.result ? (
+                <div className="flex w-full flex-col items-start gap-4">
+                  <div className="flex w-full flex-col items-start gap-1">
+                    <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
+                      업무 결과
+                    </p>
+                    <p className="w-full [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)">
+                      {task.result}
+                    </p>
+                  </div>
+                  <ResultAttachments
+                    files={task.resultFiles ?? []}
+                    images={task.resultImages ?? []}
+                  />
+                </div>
+              ) : (
+                <TextButton
+                  type="button"
+                  variant="text_only"
+                  size="medium"
+                  iconLeft={<PlusIcon aria-hidden className="size-7" />}
+                  onClick={onStartWriteResult}
+                >
+                  업무 결과 작성하기
+                </TextButton>
+              ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
