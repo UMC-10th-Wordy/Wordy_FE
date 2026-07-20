@@ -1,7 +1,8 @@
 import { useRef } from 'react'
-import type { HTMLAttributes } from 'react'
+import type { HTMLAttributes, RefObject } from 'react'
 import { SidebarMenu } from '../SidebarMenu/SidebarMenu'
 import type { SidebarMenuItem } from '../SidebarMenu/SidebarMenu'
+import { useOutsideClick } from '@/hooks/useOutsideClick'
 import TrashIcon from '@/assets/icons/trash.svg?react'
 import SettingIcon from '@/assets/icons/setting.svg?react'
 import CardIcon from '@/assets/icons/card.svg?react'
@@ -14,6 +15,7 @@ export interface ProfileModalProps extends HTMLAttributes<HTMLDivElement> {
   onSetting?: () => void
   onLogout?: () => void
   onClose?: () => void
+  triggerRef?: RefObject<HTMLElement | null>
 }
 
 export function ProfileModal({
@@ -22,11 +24,13 @@ export function ProfileModal({
   onPlan,
   onSetting,
   onLogout,
-  onClose: _onClose,
+  onClose,
+  triggerRef,
   className,
   ...rest
 }: ProfileModalProps) {
   const ref = useRef<HTMLDivElement>(null)
+  useOutsideClick(ref, () => onClose?.(), true, triggerRef)
 
   const items: SidebarMenuItem[] = [
     { icon: <TrashIcon width={28} height={28} />, label: '휴지통', onClick: onTrash },

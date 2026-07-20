@@ -9,19 +9,12 @@ import { EmailVerificationPage } from '@/pages/EmailVerificationPage'
 import { MailNoticePage } from '@/pages/MailNoticePage'
 import { ProfileSetupPage } from '@/pages/ProfileSetupPage'
 import { DiarySearchPage } from '@/pages/DiarySearchPage'
+import { TrashDiaryDetailPage } from '@/pages/TrashDiaryDetailPage'
 import { LandingPreview } from '@/pages/LandingPreview/LandingPreview'
 import { LandingPage } from '@/pages/LandingPage/LandingPage'
 import { SocialSignupPage } from '@/pages/SocialSignupPage'
 
 export const router = createBrowserRouter([
-  {
-    path: '/landing-preview',
-    element: <LandingPreview />,
-  },
-  {
-    path: '/landing',
-    element: <LandingPage />,
-  },
   {
     path: '/',
     element: <SidebarPage />,
@@ -35,10 +28,6 @@ export const router = createBrowserRouter([
     element: <SidebarPage />,
   },
   {
-    path: '/records/search',
-    element: <DiarySearchPage />,
-  },
-  {
     path: '/records/:diaryId',
     element: <SidebarPage />,
   },
@@ -49,38 +38,18 @@ export const router = createBrowserRouter([
   {
     element: <AppLayout />,
     children: [
-      {
-        path: '/trash',
-        element: <TrashPage />,
-      },
-      {
-        path: '/plan',
-        element: <PlanPage />,
-      },
+      { path: '/landing-preview', element: <LandingPreview /> },
+      { path: '/landing', element: <LandingPage /> },
+      { path: '/records/search', element: <DiarySearchPage /> },
+      { path: '/trash', element: <TrashPage /> },
+      { path: '/trash/:diaryId', element: <TrashDiaryDetailPage /> },
+      { path: '/plan', element: <PlanPage /> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/signup', element: <SignupPage /> },
+      { path: '/email-verification', element: <EmailVerificationPage /> },
+      { path: '/mail-notice', element: <MailNoticePage /> },
+      { path: '/profile-setup', element: <ProfileSetupPage /> },
+      { path: '/social-signup', element: <SocialSignupPage /> },
     ],
-  },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/signup',
-    element: <SignupPage />,
-  },
-  {
-    path: '/social-signup',
-    element: <SocialSignupPage />,
-  },
-  {
-    path: '/email-verification',
-    element: <EmailVerificationPage />,
-  },
-  {
-    path: '/mail-notice',
-    element: <MailNoticePage />,
-  },
-  {
-    path: '/profile-setup',
-    element: <ProfileSetupPage />,
   },
 ])

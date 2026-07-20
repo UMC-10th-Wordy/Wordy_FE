@@ -46,7 +46,7 @@ export function PlanPage() {
       </div>
 
       {/* 컨텐츠 */}
-      <div className="flex flex-col gap-10 items-start px-10 w-full max-w-230 mx-auto">
+      <div className="flex flex-col gap-10 items-start w-full max-w-7xl mx-auto">
         {/* 헤더 */}
         <div className="flex flex-col gap-1 items-start shrink-0">
           <h2 className="[font-size:var(--font-size-heading-2)] leading-(--line-height-body) font-semibold text-(--color-text-default)">
@@ -58,7 +58,7 @@ export function PlanPage() {
         </div>
 
         {/* 카드 목록 */}
-        <div className="flex gap-8 w-full">
+        <div className="flex gap-8 w-full h-145">
           {/* Free 카드 */}
           <div className="flex flex-1 flex-col justify-between bg-(--color-bg-default) border border-(--color-border-brand-subtle) rounded-(--scale-16) shadow-[0px_1px_5px_rgba(0,0,0,0.1)] p-8 overflow-hidden">
             <div className="flex flex-col gap-4 items-start w-full">
@@ -113,25 +113,9 @@ export function PlanPage() {
                 'linear-gradient(132.9deg, rgba(221,221,255,0.3) 0%, rgba(250,250,252,0.3) 100%)',
             }}
           >
-            {/* COMING SOON 배너 — 우상단 corner ribbon */}
-            <div
-              className="absolute z-10 pointer-events-none overflow-hidden"
-              style={{
-                right: 0,
-                top: 0,
-                width: '160px',
-                height: '160px',
-              }}
-            >
-              <div
-                className="absolute flex items-center justify-center bg-(--color-icon-brand) px-3 py-2"
-                style={{
-                  width: '230px',
-                  top: '32px',
-                  right: '-58px',
-                  transform: 'rotate(45deg)',
-                }}
-              >
+            {/* COMING SOON 배너 */}
+            <div className="absolute top-0 right-0 z-10 pointer-events-none overflow-hidden size-50">
+              <div className="absolute top-10 -right-20 w-70 rotate-45 flex items-center justify-center bg-(--color-icon-brand) px-3 py-2">
                 <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-semibold text-(--color-text-inverse) whitespace-nowrap">
                   COMING SOON
                 </span>

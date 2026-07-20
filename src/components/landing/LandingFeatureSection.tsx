@@ -66,7 +66,7 @@ export function LandingFeatureSection({
   }
 
   return (
-    <div className="flex w-full max-w-330 h-151.25 items-start gap-10 rounded-(--scale-20) border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) p-10 shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]">
+    <div className="flex w-full max-w-7xl h-151.25 items-start gap-10 rounded-(--scale-20) border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) p-10 shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]">
       {/* 좌측 아코디언 메뉴 — justify-center로 수직 중앙 */}
       <div className="flex h-full w-80.75 shrink-0 flex-col gap-5 justify-center">
         {FEATURES.map((f, i) => {
@@ -74,30 +74,25 @@ export function LandingFeatureSection({
           return (
             <div key={f.key} className="flex flex-col gap-5">
               {i > 0 && <div className="h-px w-full bg-(--color-border-brand-subtle)" />}
-              {isActive ? (
-                /* active — Figma: h-[182px] 고정, 아이콘 + 제목 + 설명 */
-                <div className="flex h-45.5 flex-col gap-2 items-start justify-center">
-                  {f.icon(true)}
-                  <p className="[font-size:var(--font-size-heading-4)] font-semibold leading-(--line-height-body) text-(--color-text-default)">
-                    {f.key}
-                  </p>
+              <button
+                type="button"
+                onClick={() => setActive(f.key)}
+                disabled={isActive}
+                className="flex flex-col gap-2 items-start text-left"
+              >
+                {f.icon(isActive)}
+                <p className="[font-size:var(--font-size-heading-4)] font-semibold leading-(--line-height-body) text-(--color-text-default)">
+                  {f.key}
+                </p>
+                {/* 설명 — max-h로 펼침/접힘 애니메이션 */}
+                <div
+                  className={`overflow-hidden transition-all duration-200 ease-out ${isActive ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+                >
                   <p className="[font-size:var(--font-size-body-1)] font-medium leading-(--line-height-body) text-(--color-text-tertiary)">
                     {f.description}
                   </p>
                 </div>
-              ) : (
-                /* inactive — 버튼으로 클릭 가능 */
-                <button
-                  type="button"
-                  onClick={() => setActive(f.key)}
-                  className="flex flex-col gap-2 items-start text-left"
-                >
-                  {f.icon(false)}
-                  <p className="[font-size:var(--font-size-heading-4)] font-semibold leading-(--line-height-body) text-(--color-text-default)">
-                    {f.key}
-                  </p>
-                </button>
-              )}
+              </button>
             </div>
           )
         })}
@@ -110,7 +105,7 @@ export function LandingFeatureSection({
             key={f.key}
             src={f.image}
             alt={`${f.key} 화면`}
-            className="absolute inset-0 w-full h-full object-cover rounded-xl shadow-[0px_1px_15px_0px_rgba(0,0,0,0.1)] transition-all duration-200 ease-out"
+            className={`absolute inset-0 w-full h-full object-cover rounded-xl shadow-[0px_1px_15px_0px_rgba(0,0,0,0.1)] transition-all duration-200 ease-out`}
             style={{
               opacity: f.key === active ? 1 : 0,
               transform: f.key === active ? 'translateY(0)' : 'translateY(8px)',

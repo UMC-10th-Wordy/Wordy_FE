@@ -6,12 +6,13 @@ import ScrollbarDownIcon from '@/assets/icons/scrollbar-down.svg?react'
 export interface ScrollbarProps {
   children: ReactNode
   className?: string
+  scrollbarClassName?: string
+  inline?: boolean
 }
 
-export function Scrollbar({ children, className }: ScrollbarProps) {
+export function Scrollbar({ children, className, scrollbarClassName, inline }: ScrollbarProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
-  const thumbRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
 
   const [thumbHeight, setThumbHeight] = useState(0)
@@ -52,9 +53,12 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
     ro.observe(el)
     if (track) ro.observe(track)
     if (innerRef.current) ro.observe(innerRef.current)
+    const mo = new MutationObserver(updateThumb)
+    mo.observe(el, { childList: true, subtree: true, attributes: true })
     return () => {
       el.removeEventListener('scroll', updateThumb)
       ro.disconnect()
+      mo.disconnect()
     }
   }, [updateThumb])
 
@@ -126,23 +130,33 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
       : 'bg-(--color-icon-tertiary)'
 
   return (
-    <div className={['relative min-h-0 flex-1 w-full', className].filter(Boolean).join(' ')}>
-      {/* 스크롤 콘텐츠 */}
+    <div
+      className={[inline ? 'flex min-h-0 flex-1' : 'relative min-h-0 flex-1 w-full', className]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <div
         ref={contentRef}
-        className="flex flex-col h-full min-w-0 overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden pr-2"
+        className={[
+          'overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden',
+          inline ? 'flex-1 min-w-0' : 'flex flex-col h-full',
+        ].join(' ')}
       >
         <div ref={innerRef} className="min-h-full">
           {children}
         </div>
       </div>
 
-      {/* 커스텀 스크롤바 — 항상 렌더, 스크롤 불가 시 invisible */}
       <div
         className={[
-          'absolute right-0 top-0 flex flex-col items-center h-full pt-2 pr-1',
+          inline
+            ? 'flex shrink-0 flex-col items-center'
+            : 'absolute top-0 right-0 h-full z-10 flex flex-col items-center',
+          scrollbarClassName,
           isScrollable ? '' : 'invisible',
-        ].join(' ')}
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
         {/* 위 버튼 */}
         <button
@@ -160,7 +174,6 @@ export function Scrollbar({ children, className }: ScrollbarProps) {
         {/* 트랙 */}
         <div ref={trackRef} className="flex-1 relative flex items-start justify-center w-2 my-1">
           <div
-            ref={thumbRef}
             className={[
               'absolute w-2 rounded-full cursor-pointer transition-colors duration-100 ease-out',
               thumbColor,

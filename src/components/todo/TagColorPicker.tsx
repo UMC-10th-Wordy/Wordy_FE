@@ -82,7 +82,7 @@ export default function TagColorPicker({
               onChange(opt.value)
               onClose()
             }}
-            className={`flex h-10 w-full items-center gap-2 p-1 rounded-md ${value === opt.value ? 'bg-(--color-bg-tertiary)' : 'bg-(--color-bg-default)'}`}
+            className={`flex h-10 w-full items-center gap-2 p-1 rounded-md transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary) ${value === opt.value ? 'bg-(--color-bg-tertiary)' : 'bg-(--color-bg-default)'}`}
           >
             <span className={`size-7 shrink-0 rounded-sm ${opt.bg}`} />
             <span className="[font-size:var(--font-size-body-2)] font-normal leading-(--line-height-body) text-(--color-text-secondary)">

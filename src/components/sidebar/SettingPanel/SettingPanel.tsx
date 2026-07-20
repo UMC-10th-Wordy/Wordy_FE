@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import type { HTMLAttributes } from 'react'
 import { SidebarTap } from '../SidebarTap/SidebarTap'
 import { Input1 } from '@/components/common/Input/Input1'
@@ -11,9 +12,17 @@ import { CareerDropdown } from '../CareerDropdown/CareerDropdown'
 import { SettingAccordion } from '../SettingAccordion/SettingAccordion'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 import CameraIcon from '@/assets/icons/camera.svg?react'
+import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 
 export type SettingTab = 'profile' | 'notification'
 type InnerView = 'main' | 'password'
+
+export interface NotificationSettings {
+  emailMarketing: boolean
+  inboxMarketing: boolean
+  inboxPerformanceReady: boolean
+  inboxPerformanceNudge: boolean
+}
 
 export interface SettingPanelProps extends HTMLAttributes<HTMLDivElement> {
   initialTab?: SettingTab
@@ -23,10 +32,18 @@ export interface SettingPanelProps extends HTMLAttributes<HTMLDivElement> {
   profileJob?: string
   profileCareer?: string
   onSaveProfile?: (data: { name: string; job: string; career: string }) => void
+  onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void
   // 알림
-  notificationSettings?: Record<string, boolean>
-  onChangeNotification?: (key: string, value: boolean) => void
+  notificationSettings?: NotificationSettings
+  onChangeNotification?: (key: keyof NotificationSettings, value: boolean) => void
   onClose?: () => void
+}
+
+const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
+  emailMarketing: false,
+  inboxMarketing: false,
+  inboxPerformanceReady: false,
+  inboxPerformanceNudge: false,
 }
 
 export function SettingPanel({
@@ -36,7 +53,8 @@ export function SettingPanel({
   profileJob = '',
   profileCareer = '',
   onSaveProfile,
-  notificationSettings = {},
+  onChangePassword,
+  notificationSettings = DEFAULT_NOTIFICATION_SETTINGS,
   onChangeNotification,
   onClose,
   className,
@@ -51,6 +69,39 @@ export function SettingPanel({
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false)
   const [avatarSrc, setAvatarSrc] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const jobAnchorRef = useRef<HTMLDivElement>(null)
+  const careerAnchorRef = useRef<HTMLDivElement>(null)
+  const [jobRect, setJobRect] = useState<DOMRect | null>(null)
+  const [careerRect, setCareerRect] = useState<DOMRect | null>(null)
+
+  useEffect(() => {
+    if (openDropdown === 'job' && jobAnchorRef.current) {
+      setJobRect(jobAnchorRef.current.getBoundingClientRect())
+    }
+    if (openDropdown === 'career' && careerAnchorRef.current) {
+      setCareerRect(careerAnchorRef.current.getBoundingClientRect())
+    }
+  }, [openDropdown])
+
+  useEffect(() => {
+    if (!openDropdown) return
+    const handleMouseDown = (e: MouseEvent) => {
+      const jobAnchor = jobAnchorRef.current
+      const careerAnchor = careerAnchorRef.current
+      if (
+        (jobAnchor && jobAnchor.contains(e.target as Node)) ||
+        (careerAnchor && careerAnchor.contains(e.target as Node))
+      )
+        return
+      setOpenDropdown(null)
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [openDropdown])
+
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -58,9 +109,6 @@ export function SettingPanel({
     const url = URL.createObjectURL(file)
     setAvatarSrc(url)
   }
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
 
   const profileChanged =
     name !== profileName || job !== profileJob || career !== profileCareer || avatarSrc !== null
@@ -101,14 +149,23 @@ export function SettingPanel({
         </div>
 
         {/* 우측 콘텐츠 */}
-        <div className="flex flex-1 flex-col h-full isolate items-start justify-between min-w-0 min-h-0 overflow-y-auto p-5">
+        <div className="flex flex-1 flex-col h-full isolate items-start justify-between min-w-0 min-h-0 p-5">
           {currentTab === 'profile' && innerView === 'password' ? (
             <>
               <div className="flex flex-col gap-6 items-start shrink-0 w-full">
                 <div className="flex items-center justify-between shrink-0 w-full">
-                  <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-semibold text-(--color-text-secondary) whitespace-nowrap">
-                    비밀번호 변경
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <IconButton
+                      variant="text_neutral"
+                      size="small"
+                      icon={<ArrowLeftIcon className="size-6" />}
+                      onClick={() => setInnerView('main')}
+                      aria-label="돌아가기"
+                    />
+                    <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-semibold text-(--color-text-secondary) whitespace-nowrap">
+                      비밀번호 변경
+                    </span>
+                  </div>
                   <IconButton
                     variant="text_neutral"
                     size="medium"
@@ -119,40 +176,50 @@ export function SettingPanel({
                 </div>
                 <div className="flex flex-col gap-6 w-full">
                   <Input1
-                    label="현재 비밀번호"
+                    label={
+                      <>
+                        현재 비밀번호 <span className="text-(--color-status-error)">*</span>
+                      </>
+                    }
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="현재 비밀번호 입력"
+                    placeholder="사용하고 있는 비밀번호를 입력해 주세요"
                   />
                   <Input1
-                    label="새 비밀번호"
+                    label={
+                      <>
+                        새로운 비밀번호 <span className="text-(--color-status-error)">*</span>
+                      </>
+                    }
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="새 비밀번호 입력"
+                    placeholder="변경할 비밀번호를 입력해 주세요"
+                    hint="영문, 숫자, 특수문자를 모두 포함한 8자리 이상의 조합으로 만들어주세요"
                   />
                   <Input1
-                    label="새 비밀번호 확인"
+                    label={
+                      <>
+                        새로운 비밀번호 확인 <span className="text-(--color-status-error)">*</span>
+                      </>
+                    }
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="새 비밀번호 재입력"
-                    error={passwordMismatch ? '비밀번호가 일치하지 않습니다.' : undefined}
-                    success={
-                      !passwordMismatch && confirmPassword.length > 0
-                        ? '비밀번호가 일치합니다.'
-                        : undefined
-                    }
+                    placeholder="변경할 비밀번호를 한 번 더 입력해 주세요"
+                    error={passwordMismatch ? '변경할 비밀번호가 일치하지 않아요' : undefined}
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-between shrink-0 w-full">
-                <TextButton variant="text_only" size="large" onClick={() => setInnerView('main')}>
-                  돌아가기
-                </TextButton>
-                <TextButton variant="fill" size="large" disabled={!passwordReady}>
-                  변경하기
+              <div className="flex justify-end shrink-0 w-full">
+                <TextButton
+                  variant="fill"
+                  size="large"
+                  disabled={!passwordReady}
+                  onClick={() => onChangePassword?.({ currentPassword, newPassword })}
+                >
+                  비밀번호 변경하기
                 </TextButton>
               </div>
             </>
@@ -237,68 +304,31 @@ export function SettingPanel({
                       </TextButton>
                     </div>
                     {/* 직무 */}
-                    <div className="flex items-center gap-5 z-2">
+                    <div className="flex items-center gap-5">
                       <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-tertiary) text-right w-17 shrink-0">
                         직무
                       </span>
-                      <div className="relative flex-1 min-w-0">
+                      <div ref={jobAnchorRef} className="relative flex-1 min-w-0">
                         <SettingAccordion
                           label={job || '선택'}
                           className="w-full"
                           aria-expanded={openDropdown === 'job'}
                           onClick={() => setOpenDropdown((v) => (v === 'job' ? null : 'job'))}
                         />
-                        {openDropdown === 'job' && (
-                          <div className="absolute top-full left-0 mt-2 z-10 w-full">
-                            <JobDropdown
-                              options={[
-                                '서비스·제품 기획',
-                                '프론트엔드·백엔드 개발',
-                                '디자인',
-                                '마케팅·세일즈',
-                                '데이터 분석',
-                                '고객 지원·CS',
-                                '인사·HR',
-                                '재무·회계',
-                                '교육·연구',
-                                '개인·프리랜서',
-                                '학생',
-                                '기타',
-                              ]}
-                              value={job}
-                              onChange={(value) => {
-                                setJob(value)
-                                setOpenDropdown(null)
-                              }}
-                            />
-                          </div>
-                        )}
                       </div>
                     </div>
                     {/* 재직 연차 */}
-                    <div className="flex items-center gap-5 z-1">
+                    <div className="flex items-center gap-5">
                       <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-tertiary) text-right w-17 shrink-0">
                         재직 연차
                       </span>
-                      <div className="relative flex-1 min-w-0">
+                      <div ref={careerAnchorRef} className="relative flex-1 min-w-0">
                         <SettingAccordion
                           label={career || '선택'}
                           className="w-full"
                           aria-expanded={openDropdown === 'career'}
                           onClick={() => setOpenDropdown((v) => (v === 'career' ? null : 'career'))}
                         />
-                        {openDropdown === 'career' && (
-                          <div className="absolute top-full left-0 mt-2 z-10 w-full">
-                            <CareerDropdown
-                              options={['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과']}
-                              value={career}
-                              onChange={(value) => {
-                                setCareer(value)
-                                setOpenDropdown(null)
-                              }}
-                            />
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -342,13 +372,41 @@ export function SettingPanel({
                 </div>
 
                 <div className="flex flex-col gap-4 w-full">
-                  {Object.entries(notificationSettings).map(([key, value]) => (
-                    <div key={key} className="flex items-center justify-between">
-                      <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)">
-                        {key}
-                      </span>
+                  {(
+                    [
+                      {
+                        key: 'emailMarketing',
+                        channel: '[이메일]',
+                        label: '마케팅 및 프로모션 정보 수신',
+                      },
+                      {
+                        key: 'inboxMarketing',
+                        channel: '[알림함]',
+                        label: '마케팅 및 프로모션 정보 알림',
+                      },
+                      {
+                        key: 'inboxPerformanceReady',
+                        channel: '[알림함]',
+                        label: '성과 대시보드 생성 완료 알림',
+                      },
+                      {
+                        key: 'inboxPerformanceNudge',
+                        channel: '[알림함]',
+                        label: '성과 대시보드 생성 유도 알림',
+                      },
+                    ] as const
+                  ).map(({ key, channel, label }) => (
+                    <div key={key} className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-brand) shrink-0">
+                          {channel}
+                        </span>
+                        <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)">
+                          {label}
+                        </span>
+                      </div>
                       <Toggle
-                        checked={value}
+                        checked={notificationSettings[key]}
                         onChange={(e) => onChangeNotification?.(key, e.target.checked)}
                       />
                     </div>
@@ -359,6 +417,61 @@ export function SettingPanel({
           )}
         </div>
       </div>
+
+      {openDropdown === 'job' &&
+        jobRect &&
+        createPortal(
+          <JobDropdown
+            style={{
+              position: 'fixed',
+              top: jobRect.bottom + 8,
+              left: jobRect.left,
+              width: jobRect.width,
+              zIndex: 100,
+            }}
+            options={[
+              '서비스·제품 기획',
+              '프론트엔드·백엔드 개발',
+              '디자인',
+              '마케팅·세일즈',
+              '데이터 분석',
+              '고객 지원·CS',
+              '인사·HR',
+              '재무·회계',
+              '교육·연구',
+              '개인·프리랜서',
+              '학생',
+              '기타',
+            ]}
+            value={job}
+            onChange={(value) => {
+              setJob(value)
+              setOpenDropdown(null)
+            }}
+          />,
+          document.body,
+        )}
+
+      {openDropdown === 'career' &&
+        careerRect &&
+        createPortal(
+          <CareerDropdown
+            style={{
+              position: 'fixed',
+              top: careerRect.bottom + 8,
+              left: careerRect.left,
+              width: careerRect.width,
+              zIndex: 100,
+            }}
+            options={['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과']}
+            value={career}
+            onChange={(value) => {
+              setCareer(value)
+              setOpenDropdown(null)
+            }}
+          />,
+          document.body,
+        )}
 
       {showWithdrawConfirm && (
         <ConfirmDialog

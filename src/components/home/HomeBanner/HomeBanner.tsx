@@ -1,9 +1,6 @@
 import type { HTMLAttributes } from 'react'
-import { motion } from 'framer-motion'
 import { TextButton } from '@/components/common/Button/TextButton'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
-import imgVectorLeftCorner from '@/assets/images/banner/vector_left_corner.svg'
-import { EASE_SPRING } from './constants'
 import { BannerIllustration } from './BannerIllustration'
 
 export interface HomeBannerProps extends HTMLAttributes<HTMLDivElement> {
@@ -44,19 +41,8 @@ export function HomeBanner({ onNavigate, className, ...rest }: HomeBannerProps) 
         </TextButton>
       </div>
 
-      {/* 좌측 하단 코너 — SVG xMaxYMax 정렬 밖에 있어 별도 배치, 색상 #349F8F */}
-      <motion.img
-        src={imgVectorLeftCorner}
-        alt=""
-        className="absolute left-0 bottom-0 pointer-events-none select-none"
-        style={{ width: '9.9%', height: '20.35%' }}
-        initial={{ x: 0 }}
-        animate={{ x: [0, '-1.877%', '-1.877%'] }}
-        transition={{ duration: 2, times: [0, 0.3959, 1], ease: [EASE_SPRING, 'linear'] as never }}
-      />
-
-      {/* 일러스트 */}
-      <BannerIllustration className="absolute right-0 bottom-0 h-full pointer-events-none select-none" />
+      {/* 일러스트 — 고정 크기, 우측 하단 앵커, 넘치면 카드에서 잘림 */}
+      <BannerIllustration className="absolute right-0 bottom-0 pointer-events-none select-none" />
     </div>
   )
 }

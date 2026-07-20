@@ -85,6 +85,7 @@ export const PerformancePreviewResult = ({
       <PerformanceResultProgress
         totalTaskCount={data.totalTaskCount}
         completedTaskCount={data.completedTaskCount}
+        shouldAnimate={!readOnly}
       />
 
       <div className="mt-(--scale-24)">

@@ -1,11 +1,15 @@
+import { motion } from 'framer-motion'
+
 interface PerformanceResultProgressProps {
   totalTaskCount: number
   completedTaskCount: number
+  shouldAnimate?: boolean
 }
 
 export const PerformanceResultProgress = ({
   totalTaskCount,
   completedTaskCount,
+  shouldAnimate = false,
 }: PerformanceResultProgressProps) => {
   const progressRate =
     totalTaskCount === 0 ? 0 : Math.round((completedTaskCount / totalTaskCount) * 100)
@@ -33,11 +37,18 @@ export const PerformanceResultProgress = ({
         </div>
 
         <div className="absolute bottom-0 left-0 h-[12px] w-full overflow-hidden rounded-(--scale-1000) bg-(--color-bg-tertiary)">
-          {/* TODO(#25): 성과 변환 완료 화면 진입 시 progress bar가 0%에서 달성률까지 채워지는 모션 추가 */}
-
-          <div
+          <motion.div
             className="h-full rounded-(--scale-1000) bg-[linear-gradient(90deg,var(--primitive-primary-700)_0%,var(--primitive-primary-500)_100%)]"
-            style={{ width: `${progressRate}%` }}
+            initial={{
+              width: shouldAnimate ? '0%' : `${progressRate}%`,
+            }}
+            animate={{
+              width: `${progressRate}%`,
+            }}
+            transition={{
+              duration: shouldAnimate ? 0.6 : 0,
+              ease: [0, 0, 0.2, 1],
+            }}
           />
         </div>
       </div>
