@@ -31,12 +31,18 @@ export const OnboardingCard = ({
     <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(287.56deg,#D9F8FF_0%,#D9E4FF_61.06%,#EDE4FF_100%)] px-6 py-16">
       <div className="flex min-h-[880px] w-full max-w-[800px] flex-col rounded-[32px] bg-(--color-bg-default) px-[100px] py-[80px] shadow-xl shadow-black/5">
         <div className="mx-auto flex w-full max-w-[600px] flex-col gap-3">
-          <LogoIcon className="mb-3 h-6 w-auto self-start" />
-          <h1 className="text-[32px] font-bold text-(--color-text-default)">{title}</h1>
-          <p className="text-[15px] leading-relaxed text-(--color-text-tertiary)">{description}</p>
+          <LogoIcon className="mb-3 h-8 w-auto self-start" />
+          <h1 className="[font-size:var(--font-size-heading-1)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
+            {title}
+          </h1>
+          <p className="[font-size:var(--font-size-body-1)] font-normal leading-(--line-height-body) text-(--color-text-tertiary)">
+            {description}
+          </p>
         </div>
 
-        <div className="mx-auto mt-12 w-full max-w-[600px] flex-1">{children}</div>
+        <div className="mx-auto flex w-full max-w-[600px] flex-1 items-center pb-16 pt-6">
+          <div className="w-full">{children}</div>
+        </div>
 
         <div className="mx-auto flex w-full max-w-[600px] items-center justify-between">
           <div className="w-[120px]">
@@ -44,8 +50,9 @@ export const OnboardingCard = ({
               <TextButton
                 variant="text_only"
                 size="small"
-                iconLeft={<ArrowLeftIcon width={16} height={16} />}
+                iconLeft={<ArrowLeftIcon width={24} height={24} />}
                 onClick={onPrev}
+                className="gap-2"
               >
                 이전 단계
               </TextButton>
@@ -68,9 +75,10 @@ export const OnboardingCard = ({
             <TextButton
               variant="text_only"
               size="small"
-              iconRight={<ArrowRightIcon width={16} height={16} />}
+              iconRight={<ArrowRightIcon width={24} height={24} />}
               disabled={nextDisabled}
               onClick={onNext}
+              className="gap-2"
             >
               {nextLabel}
             </TextButton>

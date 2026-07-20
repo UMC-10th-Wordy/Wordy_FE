@@ -2,7 +2,7 @@ import { TextButton } from '@/components/common/Button/TextButton'
 import GenerateIcon from '@/assets/icons/generate.svg?react'
 import WordySleepingIcon from '@/assets/icons/wordy-sleeping.svg?react'
 import WordyReadyIcon from '@/assets/icons/wordy-ready.svg?react'
-import WordyGeneratingIcon from '@/assets/icons/wordy-generating.svg?react'
+import { WordyGeneratingAnimation } from './WordyGeneratingAnimation'
 import type { WeeklyDashboardStatus } from './dashboard.types'
 
 interface WeeklyStatusCardProps {
@@ -73,11 +73,7 @@ export const WeeklyStatusCard = ({ status, convertedCount, onGenerate }: WeeklyS
 
       {status === 'generating' && (
         <div className="flex flex-col items-center gap-8">
-          <WordyGeneratingIcon
-            width={220}
-            height={220}
-            className="shrink-0 animate-bounce [animation-duration:1.2s]"
-          />
+          <WordyGeneratingAnimation size={220} />
           <div className="flex flex-col items-center gap-2 text-center">
             <h2 className="[font-size:var(--font-size-heading-4)] font-bold text-(--color-text-default)">
               워디가 열심히 만들고 있어요.

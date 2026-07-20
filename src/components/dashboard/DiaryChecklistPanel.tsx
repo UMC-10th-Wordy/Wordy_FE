@@ -1,4 +1,4 @@
-import CheckIcon from '@/assets/icons/check.svg?react'
+import CheckIcon from '@/assets/icons/check-bold.svg?react'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 import type { DiaryEntry } from './dashboard.types'
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
@@ -41,7 +41,7 @@ export const DiaryChecklistPanel = ({
           <p className="[font-size:var(--font-size-body-4)]">이번 주에 변환한 업무 일지가 없어요</p>
         </div>
       ) : (
-        <Scrollbar axis="y" className="flex-1">
+        <Scrollbar className="flex-1">
           <ul className="flex flex-col gap-1">
             {entries.map((entry) => {
               const checked = selectedIds.includes(entry.id)
@@ -67,7 +67,7 @@ export const DiaryChecklistPanel = ({
                       ].join(' ')}
                     >
                       {checked && (
-                        <CheckIcon width={24} height={24} className="text-(--color-text-inverse)" />
+                        <CheckIcon width={16} height={16} className="text-(--color-text-inverse)" />
                       )}
                     </span>
                     <span

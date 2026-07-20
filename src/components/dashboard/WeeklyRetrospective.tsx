@@ -5,7 +5,7 @@ import { useToast } from '@/components/common/Toast/useToast'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
-import CheckIcon from '@/assets/icons/check.svg?react'
+import CheckIcon from '@/assets/icons/check-bold.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 
 interface PlanRow {
@@ -55,8 +55,8 @@ const TEXTS: Record<RetrospectivePeriod, RetrospectiveTexts> = {
     ],
     planLabel: '다음 주 업무 계획',
     planPlaceholder: '다음 주 진행할 업무 내용을 작성해 주세요',
-    toastTempSaved: '주간 회고가 임시 저장되었어요.',
-    toastSaved: '주간 회고가 저장되었어요.',
+    toastTempSaved: '주간 회고가 임시 저장되었어요',
+    toastSaved: '주간 회고가 저장되었어요',
   },
   monthly: {
     title: '월간 회고',
@@ -80,8 +80,8 @@ const TEXTS: Record<RetrospectivePeriod, RetrospectiveTexts> = {
     ],
     planLabel: '다음 달 업무 계획',
     planPlaceholder: '다음 달 진행할 업무 내용을 작성해 주세요',
-    toastTempSaved: '월간 회고가 임시 저장되었어요.',
-    toastSaved: '월간 회고가 저장되었어요.',
+    toastTempSaved: '월간 회고가 임시 저장되었어요',
+    toastSaved: '월간 회고가 저장되었어요',
   },
 }
 
@@ -204,7 +204,7 @@ export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectivePr
               <span className="text-(--color-text-tertiary)">{String(i + 1).padStart(2, '0')}</span>
               <span>{row.content}</span>
               <span>{row.schedule}</span>
-              <span className="flex justify-end gap-3 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+              <span className="flex justify-end gap-3 opacity-0 transition-opacity duration-100 ease-out group-hover:opacity-100 group-focus-within:opacity-100">
                 <button type="button" aria-label="수정" onClick={() => handleEditRow(row)}>
                   <EditIcon width={18} height={18} className="text-(--color-icon-tertiary)" />
                 </button>

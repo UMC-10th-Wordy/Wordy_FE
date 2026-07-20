@@ -28,7 +28,7 @@ export const MonthlyWeekListPanel = ({
         </span>
       </div>
 
-      <Scrollbar axis="y" className="flex-1">
+      <Scrollbar className="flex-1">
         <ul className="flex flex-col">
           {weeks.map((week) => (
             <li key={week.id} className="flex h-[48px] items-center gap-2.5">
