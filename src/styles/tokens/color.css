@@ -1,0 +1,95 @@
+@layer base {
+  :root {
+    /* Text */
+    --color-text-default: var(--primitive-neutral-900);
+    --color-text-secondary: var(--primitive-neutral-700);
+    --color-text-tertiary: var(--primitive-neutral-600);
+    --color-text-inverse: var(--primitive-neutral-white);
+    --color-text-brand: var(--primitive-primary-700);
+    --color-text-brand-subtle: var(--primitive-primary-500);
+    --color-text-error: var(--primitive-red-700);
+    --color-text-success: var(--primitive-green-700);
+    --color-text-disabled: var(--primitive-neutral-500);
+    --color-text-required: var(--primitive-red-700);
+
+    /* Background */
+    --color-bg-default: var(--primitive-neutral-white);
+    --color-bg-secondary: var(--primitive-neutral-100);
+    --color-bg-tertiary: var(--primitive-neutral-200);
+    --color-bg-overlay: rgba(0, 0, 0, 0.25);
+    --color-bg-brand-subtle: var(--primitive-primary-100);
+    --color-bg-brand-light: var(--primitive-primary-200);
+    --color-bg-dark: var(--primitive-neutral-900);
+    --color-bg-disabled: var(--primitive-neutral-200);
+
+    /* Border */
+    --color-border-default: var(--primitive-neutral-600);
+    --color-border-light: var(--primitive-neutral-500);
+    --color-border-subtle: var(--primitive-neutral-400);
+    --color-border-inverse: var(--primitive-neutral-white);
+    --color-border-strong: var(--primitive-neutral-800);
+    --color-border-brand: var(--primitive-primary-700);
+    --color-border-brand-subtle: var(--primitive-primary-300);
+    --color-border-disabled: var(--primitive-neutral-500);
+    --color-border-error: var(--primitive-red-700);
+    --color-border-success: var(--primitive-green-700);
+    --color-border-opacity: rgba(17, 17, 17, 0.15);
+
+    /* Icon */
+    --color-icon-default: var(--primitive-neutral-900);
+    --color-icon-secondary: var(--primitive-neutral-700);
+    --color-icon-tertiary: var(--primitive-neutral-500);
+    --color-icon-inverse: var(--primitive-neutral-white);
+    --color-icon-brand: var(--primitive-primary-700);
+    --color-icon-brand-subtle: var(--primitive-primary-400);
+    --color-icon-error: var(--primitive-red-700);
+    --color-icon-success: var(--primitive-green-700);
+    --color-icon-disabled: var(--primitive-neutral-400);
+
+    /* Button */
+    --color-button-default: var(--primitive-primary-700);
+    --color-button-hover: var(--primitive-primary-800);
+    --color-button-pressed: var(--primitive-primary-900);
+    --color-button-focused: var(--primitive-primary-800);
+    --color-button-disabled: var(--primitive-neutral-200);
+
+    /* Chip */
+    --color-chip-default: var(--primitive-primary-200);
+    --color-chip-hover: var(--primitive-primary-300);
+    --color-chip-pressed: var(--primitive-primary-300);
+    --color-chip-focused: var(--primitive-primary-700);
+    --color-chip-disabled: var(--primitive-neutral-200);
+
+    /* Sidebar */
+    --color-sidebar-primary-hover: var(--primitive-primary-300);
+    --color-sidebar-primary-focused: var(--primitive-primary-300);
+    --color-sidebar-neutral-hover: var(--primitive-neutral-100);
+    --color-sidebar-neutral-focused: var(--primitive-neutral-200);
+
+    /* Status */
+    --color-status-success: var(--primitive-green-700);
+    --color-status-warning: var(--primitive-yellow-700);
+    --color-status-error: var(--primitive-red-700);
+    --color-status-info: var(--primitive-blue-700);
+
+    /* Tag */
+    --color-tag-black-text: var(--primitive-neutral-900);
+    --color-tag-black-bg: var(--primitive-neutral-200);
+    --color-tag-red-text: var(--primitive-red-700);
+    --color-tag-red-bg: var(--primitive-red-200);
+    --color-tag-orange-text: var(--primitive-orange-700);
+    --color-tag-orange-bg: var(--primitive-orange-200);
+    --color-tag-yellow-text: var(--primitive-yellow-800);
+    --color-tag-yellow-bg: var(--primitive-yellow-200);
+    --color-tag-green-text: var(--primitive-green-700);
+    --color-tag-green-bg: var(--primitive-green-200);
+    --color-tag-blue-text: var(--primitive-blue-700);
+    --color-tag-blue-bg: var(--primitive-secondary-200);
+    --color-tag-navy-text: var(--primitive-primary-700);
+    --color-tag-navy-bg: var(--primitive-primary-200);
+    --color-tag-pink-text: var(--primitive-pink-700);
+    --color-tag-pink-bg: var(--primitive-pink-200);
+    --color-tag-brown-text: var(--primitive-brown-700);
+    --color-tag-brown-bg: var(--primitive-brown-200);
+  }
+}

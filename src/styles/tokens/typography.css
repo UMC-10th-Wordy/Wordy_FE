@@ -1,0 +1,24 @@
+@layer base {
+  :root {
+    /* Font Size */
+    --font-size-heading-1: 48px;
+    --font-size-heading-2: 32px;
+    --font-size-heading-3: 28px;
+    --font-size-heading-4: 24px;
+    --font-size-body-1: 20px;
+    --font-size-body-2: 18px;
+    --font-size-body-3: 16px;
+    --font-size-body-4: 14px;
+    --font-size-caption-1: 12px;
+
+    /* Line Height */
+    --line-height-heading: 1.6;
+    --line-height-body: 1.6;
+
+    /* Font Weight */
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+  }
+}
