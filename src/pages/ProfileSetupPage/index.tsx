@@ -113,7 +113,7 @@ export const ProfileSetupPage = () => {
               aria-pressed={career === option}
               onClick={() => setCareer(option)}
               className={[
-                'w-full rounded-lg py-4 text-center transition-colors',
+                'w-full rounded-lg py-4 text-center transition-colors duration-100 ease-out',
                 career === option
                   ? 'bg-(--primitive-primary-300) text-(--color-text-default)'
                   : 'bg-(--color-bg-secondary) text-(--color-text-default) hover:bg-(--color-bg-tertiary)',
@@ -152,7 +152,7 @@ export const ProfileSetupPage = () => {
             aria-pressed={job === option}
             onClick={() => setJob(option)}
             className={[
-              'rounded-lg px-4 py-2.5 transition-colors',
+              'rounded-lg px-4 py-2.5 transition-colorstransition-colors duration-100 ease-out',
               job === option
                 ? 'bg-(--primitive-primary-300) text-(--color-text-default)'
                 : 'bg-(--color-bg-secondary) text-(--color-text-default) hover:bg-(--color-bg-tertiary)',

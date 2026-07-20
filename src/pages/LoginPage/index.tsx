@@ -25,7 +25,6 @@ export const LoginPage = () => {
     : password.length < 8
       ? '비밀번호는 8자 이상이어야 해요.'
       : ''
-
   const isValid = !emailError && !passwordError
 
   const handleSubmit = () => {
@@ -41,15 +40,17 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-(--color-bg-secondary) px-6 py-16">
-      <div className="w-full max-w-[800px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-[80px] shadow-xl shadow-black/5">
-        {/* TODO: 로고 svg 에셋 받으면 교체 */}
-        <LogoIcon className="mb-6 h-7 w-auto" />
-
-        <h1 className="mb-2 text-3xl font-bold text-(--color-text-default)">로그인</h1>
-        <p className="mb-10 text-(--color-text-tertiary)">
-          오늘도 워디를 만나러 오셨군요, 반가워요!
-        </p>
+    <div className="flex min-h-screen items-center justify-center bg-(--color-bg-secondary) px-6 py-8">
+      <div className="flex w-full max-w-[800px] flex-col gap-8 rounded-[32px] bg-(--color-bg-default) px-[100px] py-10 shadow-xl shadow-black/5 [@media(min-height:960px)]:gap-[52px] [@media(min-height:960px)]:py-[80px]">
+        <div className="flex flex-col">
+          <LogoIcon className="mb-4 h-8 w-auto self-start" />
+          <h1 className="[font-size:var(--font-size-heading-1)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
+            로그인
+          </h1>
+          <p className="[font-size:var(--font-size-body-1)] font-normal leading-(--line-height-body) text-(--color-text-tertiary)">
+            오늘도 워디를 만나러 오셨군요, 반가워요!
+          </p>
+        </div>
 
         <form
           onSubmit={(e) => {
@@ -67,7 +68,6 @@ export const LoginPage = () => {
             placeholder="이메일을 입력해주세요"
             error={touched.email && emailError ? emailError : undefined}
           />
-
           <Input1
             type="password"
             aria-label="비밀번호"
@@ -77,46 +77,57 @@ export const LoginPage = () => {
             placeholder="비밀번호를 입력해주세요"
             error={touched.password && passwordError ? passwordError : undefined}
           />
-
           <div className="mb-4 flex items-center justify-between">
             <Checkbox
               label="로그인 정보 기억하기"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
             />
-            {/* TODO: 비밀번호 찾기 페이지 라우팅 연결 */}
-            <TextButton variant="text_only" size="small">
+            {/* TODO: 비밀번호 찾기 페이지 연결 */}
+            <button
+              type="button"
+              className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-button-default)"
+            >
               비밀번호 찾기
-            </TextButton>
+            </button>
           </div>
-
           <TextButton type="submit" variant="fill" size="large" fullWidth disabled={!isValid}>
             로그인 하기
           </TextButton>
         </form>
 
-        <div className="my-8 flex items-center gap-4">
-          <div className="h-px flex-1 bg-(--color-border-subtle)" />
-          <span className="text-sm text-(--color-text-tertiary)">또는</span>
-          <div className="h-px flex-1 bg-(--color-border-subtle)" />
+        <div className="-mt-[21px] flex flex-col gap-[31px] [@media(max-height:959px)]:-mt-px">
+          <div className="flex items-center gap-[19px]">
+            <div className="h-px flex-1 bg-(--color-border-subtle)" />
+            <span className="[font-size:var(--font-size-body-4)] text-(--color-text-tertiary)">
+              또는
+            </span>
+            <div className="h-px flex-1 bg-(--color-border-subtle)" />
+          </div>
+
+          <TextButton
+            variant="stroke_neutral"
+            size="large"
+            fullWidth
+            iconLeft={<GoogleIcon width={20} height={20} />}
+            onClick={handleGoogleLogin}
+            className="gap-2.5 border-[#747775] hover:border-[#747775] active:border-[#747775]"
+          >
+            Google로 시작하기
+          </TextButton>
         </div>
 
-        <TextButton
-          variant="stroke_neutral"
-          size="large"
-          fullWidth
-          iconLeft={<GoogleIcon width={20} height={20} />}
-          onClick={handleGoogleLogin}
-        >
-          Google로 시작하기
-        </TextButton>
-
-        <div className="mt-8 flex items-center justify-center gap-1 text-sm text-(--color-text-tertiary)">
-          <span>아직 회원이 아니신가요?</span>
-          {/* TODO: 회원가입 페이지 라우팅 연결 */}
-          <TextButton variant="text_only" size="small" onClick={() => navigate('/signup')}>
+        <div className="flex items-center justify-center gap-3">
+          <span className="[font-size:var(--font-size-body-3)] font-normal leading-(--line-height-body) text-(--color-text-tertiary)">
+            아직 회원이 아니신가요?
+          </span>
+          <button
+            type="button"
+            onClick={() => navigate('/signup')}
+            className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-text-brand)"
+          >
             회원가입
-          </TextButton>
+          </button>
         </div>
       </div>
     </div>

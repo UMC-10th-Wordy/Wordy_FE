@@ -56,7 +56,7 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
               aria-pressed={active}
               onClick={() => setSelectedId(tag.id)}
               className={[
-                'rounded-full px-4 py-2 [font-size:var(--font-size-body-4)] transition-colors',
+                'rounded-full px-4 py-2 [font-size:var(--font-size-body-4)] transition-colors duration-100 ease-out',
                 active
                   ? 'bg-(--primitive-primary-300) font-semibold text-(--color-text-brand)'
                   : 'border border-(--color-border-subtle) bg-(--color-bg-default) text-(--color-text-secondary)',

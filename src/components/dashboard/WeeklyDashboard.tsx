@@ -203,7 +203,7 @@ export const WeeklyDashboard = () => {
             </button>
           </div>
 
-          <div className="flex gap-7 overflow-x-auto">
+          <div className="flex gap-7">
             {status === 'complete' ? (
               <div className="flex flex-1 flex-col gap-7">
                 <WeeklySummaryInsight stats={DUMMY_STATS} aiSummary={DUMMY_AI_SUMMARY} />
@@ -244,7 +244,7 @@ export const WeeklyDashboard = () => {
             </button>
           </div>
 
-          <div className="flex gap-7 overflow-x-auto">
+          <div className="flex gap-7">
             <MonthlyDashboard
               generation={monthlyGeneration}
               onGenerate={handleMonthlyGenerate}

@@ -12,6 +12,7 @@ import { DiarySearchPage } from '@/pages/DiarySearchPage'
 import { TrashDiaryDetailPage } from '@/pages/TrashDiaryDetailPage'
 import { LandingPreview } from '@/pages/LandingPreview/LandingPreview'
 import { LandingPage } from '@/pages/LandingPage/LandingPage'
+import { SocialSignupPage } from '@/pages/SocialSignupPage'
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +49,7 @@ export const router = createBrowserRouter([
       { path: '/email-verification', element: <EmailVerificationPage /> },
       { path: '/mail-notice', element: <MailNoticePage /> },
       { path: '/profile-setup', element: <ProfileSetupPage /> },
+      { path: '/social-signup', element: <SocialSignupPage /> },
     ],
   },
 ])

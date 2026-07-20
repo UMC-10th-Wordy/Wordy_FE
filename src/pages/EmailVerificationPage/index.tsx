@@ -62,11 +62,15 @@ export const EmailVerificationPage = () => {
           </TextButton>
         }
         footer={
-          <div className="flex items-center gap-1 text-sm text-(--color-text-tertiary)">
-            <span>이메일이 잘못되었나요?</span>
-            <TextButton variant="text_only" size="small" onClick={() => navigate('/signup')}>
-              이메일 주소 바꾸기
-            </TextButton>
+          <div className="flex items-center justify-center gap-3 [font-size:var(--font-size-body-3)] text-(--color-text-tertiary)">
+            <span>제대로 인증되지 않나요?</span>
+            {/* TODO(#35): 문의하기 연결 */}
+            <button
+              type="button"
+              className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-button-default)"
+            >
+              문의하기
+            </button>
           </div>
         }
       />
@@ -93,12 +97,16 @@ export const EmailVerificationPage = () => {
         </TextButton>
       }
       footer={
-        <div className="flex items-center gap-1 text-sm text-(--color-text-tertiary)">
+        <div className="flex items-center justify-center gap-3 [font-size:var(--font-size-body-3)] text-(--color-text-tertiary)">
           <span>이메일이 잘못되었나요?</span>
           {/* TODO(#35): 회원가입 페이지로 돌아가기 라우팅 연결 */}
-          <TextButton variant="text_only" size="small" onClick={() => navigate('/signup')}>
+          <button
+            type="button"
+            onClick={() => navigate('/signup')}
+            className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-button-default)"
+          >
             이메일 주소 바꾸기
-          </TextButton>
+          </button>
         </div>
       }
     />

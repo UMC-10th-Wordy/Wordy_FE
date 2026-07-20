@@ -2,7 +2,7 @@ import { TextButton } from '@/components/common/Button/TextButton'
 import GenerateIcon from '@/assets/icons/generate.svg?react'
 import WordySleepingIcon from '@/assets/icons/wordy-sleeping.svg?react'
 import WordyReadyIcon from '@/assets/icons/wordy-ready.svg?react'
-import WordyGeneratingIcon from '@/assets/icons/wordy-generating.svg?react'
+import { WordyGeneratingAnimation } from './WordyGeneratingAnimation'
 
 interface MonthlyStatusCardProps {
   status: 'insufficient' | 'ready' | 'generating'
@@ -16,7 +16,7 @@ export const MonthlyStatusCard = ({
   onGenerate,
 }: MonthlyStatusCardProps) => {
   return (
-    <section className="flex h-[748px] min-w-[1047px] max-w-[1172px] flex-1 shrink-0 flex-col items-center justify-center gap-[56px] rounded-xl border border-(--color-border-subtle) bg-(--color-bg-default) px-5 py-10">
+    <section className="flex h-[748px] min-w-0 max-w-[1172px] flex-[2] flex-col items-center justify-center gap-[56px] rounded-xl border border-(--color-border-subtle) bg-(--color-bg-default) px-5 py-10">
       {status === 'insufficient' && (
         <div className="flex flex-col items-center gap-8">
           <WordySleepingIcon width={220} height={220} className="shrink-0" />
@@ -75,7 +75,7 @@ export const MonthlyStatusCard = ({
 
       {status === 'generating' && (
         <div className="flex flex-col items-center gap-8">
-          <WordyGeneratingIcon width={220} height={220} className="shrink-0" />
+          <WordyGeneratingAnimation size={220} />
           <div className="flex flex-col items-center gap-2 text-center">
             <h2 className="[font-size:var(--font-size-heading-4)] font-bold text-(--color-text-default)">
               워디가 열심히 만들고 있어요.

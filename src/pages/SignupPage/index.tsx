@@ -54,10 +54,12 @@ export const SignupPage = () => {
 
   return (
     <div className="flex min-h-screen justify-center bg-(--color-bg-secondary) px-6 py-16">
-      <div className="flex h-fit w-full max-w-[800px] flex-col gap-[52px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-[80px] shadow-xl shadow-black/5">
+      <div className="flex h-fit w-full max-w-[800px] flex-col gap-[52px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-10 [@media(min-height:960px)]:py-[80px] shadow-xl shadow-black/5">
         <header>
           <LogoIcon className="mb-6 h-7 w-auto" />
-          <h1 className="mb-2 text-3xl font-bold text-(--color-text-default)">회원가입</h1>
+          <h1 className="[font-size:var(--font-size-heading-1)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
+            회원가입
+          </h1>
           <p className="text-(--color-text-tertiary)">환영합니다! 워디를 시작해볼까요?</p>
         </header>
 
@@ -124,12 +126,17 @@ export const SignupPage = () => {
           </TextButton>
         </form>
 
-        <div className="flex items-center justify-center gap-1 text-sm text-(--color-text-tertiary)">
-          <span>이미 회원이신가요?</span>
-          {/* TODO(#이슈번호): 로그인 페이지 라우팅 연결 */}
-          <TextButton variant="text_only" size="small" onClick={() => navigate('/login')}>
+        <div className="flex items-center justify-center gap-3">
+          <span className="[font-size:var(--font-size-body-3)] font-normal leading-(--line-height-body) text-(--color-text-tertiary)">
+            이미 회원이신가요?
+          </span>
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-text-brand)"
+          >
             로그인
-          </TextButton>
+          </button>
         </div>
       </div>
     </div>
