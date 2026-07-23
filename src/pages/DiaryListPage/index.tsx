@@ -15,7 +15,7 @@ export const DiaryListPage = () => {
   const records = IS_EMPTY_STATE ? EMPTY_DIARY_MONTHLY_RECORDS : DIARY_MONTHLY_RECORDS
 
   return (
-    <main className="h-full min-w-0 w-full flex-1 bg-(--color-bg-default)">
+    <main className="relative z-0 h-full min-w-0 w-full flex-1 bg-(--color-bg-default)">
       <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-[60px]">
         <DiaryListHeader />
 
