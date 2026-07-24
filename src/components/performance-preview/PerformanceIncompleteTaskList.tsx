@@ -50,7 +50,7 @@ export const PerformanceIncompleteTaskList = ({
                   size="small"
                   disabled={isMoved}
                   onClick={() => onMoveToTomorrow(task.id)}
-                  className="h-(--scale-32) w-(--scale-64) shrink-0 px-(--scale-8) py-[5px] [font-size:var(--font-size-body-4)] font-[var(--font-weight-medium)] text-(--color-button-default) disabled:text-(--color-text-disabled) disabled:pointer-events-none"
+                  className="h-(--scale-32) w-(--scale-64) shrink-0 px-(--scale-8) py-[5px] [font-size:var(--font-size-body-4)] font-[var(--font-weight-medium)] underline underline-offset-2 text-(--color-button-default) disabled:text-(--color-text-disabled) disabled:pointer-events-none"
                 >
                   내일하기
                 </TextButton>
