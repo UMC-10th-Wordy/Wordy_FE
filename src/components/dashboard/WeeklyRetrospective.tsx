@@ -280,7 +280,7 @@ export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectivePr
             toasts.length > 0 ? 'opacity-100' : 'opacity-0',
           ].join(' ')}
         >
-          <ToastContainer toasts={toasts} />
+          <ToastContainer toasts={toasts} align="left" />
         </div>
         <div className="flex items-center gap-4">
           {savedAt && (
