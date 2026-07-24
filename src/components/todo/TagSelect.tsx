@@ -4,42 +4,15 @@ import ChevronDownIcon from '@/assets/icons/Direction=bottom.svg?react'
 import MoveIcon from '@/assets/icons/move.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import SettingIcon from '@/assets/icons/setting.svg?react'
+import { IconButton } from '@/components/common/Button/IconButton'
+import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 import ProjectTag from './ProjectTag'
 import TagSettingsModal from './TagSettingsModal'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
 import { useVerticalDragReorder, type VerticalDragOverInfo } from '@/hooks/useVerticalDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
+import { INITIAL_TAG_OPTIONS } from '@/mocks/tagOptions'
 import type { TaskTag } from '@/types/todo'
-
-/* 더미 데이터 */
-const INITIAL_TAG_OPTIONS: TaskTag[] = [
-  {
-    label: '온보딩 리뉴얼',
-    color: 'green',
-    meta: {
-      projectName: '온보딩 리뉴얼',
-      purpose: '신규 사용자 활성화 흐름 개선',
-      expectedOutcome: '첫 주 핵심 기능 도달률 상승',
-      startDate: '2026.06.01',
-      endDate: '2026.07.31',
-      kpis: ['온보딩 완료율', '첫 주 핵심 기능 도달률'],
-    },
-  },
-  { label: '온보딩 A/B 테스트', color: 'blue' },
-  { label: '온보딩 튜토리얼 개선', color: 'navy' },
-  { label: '온보딩 이메일 캠페인', color: 'orange' },
-  { label: '온보딩 인앱 가이드', color: 'yellow' },
-  { label: '온보딩 분석 대시보드', color: 'brown' },
-  { label: '온보딩 체크리스트 UI', color: 'red' },
-  { label: '온보딩 영상 제작', color: 'pink' },
-  { label: '온보딩 설문 자동화', color: 'green' },
-  { label: '온보딩 FAQ 페이지', color: 'navy' },
-  { label: '온보딩 성과 리포트', color: 'blue' },
-  { label: '온보딩 모바일 최적화', color: 'orange' },
-  { label: '디자인 시스템 V2', color: 'pink' },
-  { label: '리서치', color: 'navy' },
-  { label: '광고', color: 'blue' },
-]
 
 const SCROLL_THRESHOLD = 10
 
@@ -203,28 +176,28 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
               태그 목록
             </span>
             <div className="flex items-center gap-2">
-              <button
+              <IconButton
                 type="button"
+                variant="text_neutral"
+                size="small"
                 aria-label="태그 추가"
                 onClick={() => {
                   setIsOpen(false)
                   setShowModal('new')
                 }}
-                className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
-              >
-                <PlusIcon aria-hidden className="size-6" />
-              </button>
-              <button
+                icon={<PlusIcon aria-hidden className="size-6" />}
+              />
+              <IconButton
                 type="button"
+                variant="text_neutral"
+                size="small"
                 aria-label="태그 설정"
                 onClick={() => {
                   setIsOpen(false)
                   setShowModal('existing')
                 }}
-                className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
-              >
-                <SettingIcon aria-hidden className="size-6" />
-              </button>
+                icon={<SettingIcon aria-hidden className="size-6" />}
+              />
             </div>
           </div>
 
@@ -233,71 +206,76 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
               프로젝트 태그를 추가해 주세요
             </p>
           ) : (
-            <div
-              ref={listRef}
-              className={`relative flex w-full flex-col gap-1 pr-1 ${
-                effectiveTags.length > SCROLL_THRESHOLD ? 'max-h-104 overflow-y-auto' : ''
-              }`}
-            >
-              {previewEntries.map((entry) => {
-                if (entry.kind === 'placeholder') {
-                  return (
+            (() => {
+              const listContent = (
+                <div ref={listRef} className="relative flex w-full flex-col gap-1 pr-1">
+                  {previewEntries.map((entry) => {
+                    if (entry.kind === 'placeholder') {
+                      return (
+                        <div
+                          key="__placeholder__"
+                          data-flip-id="__placeholder__"
+                          style={{ height: dragHeight }}
+                          className="w-full shrink-0 rounded-md bg-(--color-bg-tertiary)"
+                          aria-hidden
+                        />
+                      )
+                    }
+
+                    const { tag } = entry
+                    return (
+                      <div
+                        key={tag.label}
+                        data-flip-id={tag.label}
+                        data-vdrag-row="true"
+                        data-vdrag-id={tag.label}
+                        className="flex h-10.5 w-full shrink-0 items-center gap-1 rounded-md p-1 transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
+                      >
+                        <span
+                          onMouseDown={startDrag(tag.label)}
+                          onDragStart={(event) => event.preventDefault()}
+                          draggable={false}
+                          className="flex size-6 shrink-0 cursor-grab items-center justify-center [-webkit-user-drag:none] active:cursor-grabbing"
+                        >
+                          <MoveIcon
+                            aria-hidden
+                            className="size-6 shrink-0 text-(--color-icon-secondary) select-none"
+                          />
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleSelect(tag)}
+                          className="flex min-w-0 flex-1 items-center justify-start"
+                        >
+                          <ProjectTag label={tag.label} color={tag.color} />
+                        </button>
+                      </div>
+                    )
+                  })}
+
+                  {draggingTag && floatingTop !== null && (
                     <div
-                      key="__placeholder__"
-                      data-flip-id="__placeholder__"
-                      style={{ height: dragHeight }}
-                      className="w-full shrink-0 rounded-md bg-(--color-bg-tertiary)"
-                      aria-hidden
-                    />
-                  )
-                }
-
-                const { tag } = entry
-                return (
-                  <div
-                    key={tag.label}
-                    data-flip-id={tag.label}
-                    data-vdrag-row="true"
-                    data-vdrag-id={tag.label}
-                    className="flex h-10.5 w-full shrink-0 items-center gap-1 rounded-md p-1 transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
-                  >
-                    <span
-                      onMouseDown={startDrag(tag.label)}
-                      onDragStart={(event) => event.preventDefault()}
-                      draggable={false}
-                      className="flex size-6 shrink-0 cursor-grab items-center justify-center [-webkit-user-drag:none] active:cursor-grabbing"
+                      style={{ position: 'absolute', top: floatingTop, left: 0, right: 0 }}
+                      className="pointer-events-none z-10 flex h-10.5 w-full shrink-0 items-center gap-1 rounded-md bg-(--color-bg-default) p-1 shadow-[0px_4px_12px_0px_rgba(0,0,0,0.15)]"
                     >
-                      <MoveIcon
-                        aria-hidden
-                        className="size-6 shrink-0 text-(--color-icon-secondary) select-none"
-                      />
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleSelect(tag)}
-                      className="flex min-w-0 flex-1 items-center justify-start"
-                    >
-                      <ProjectTag label={tag.label} color={tag.color} />
-                    </button>
-                  </div>
-                )
-              })}
-
-              {draggingTag && floatingTop !== null && (
-                <div
-                  style={{ position: 'absolute', top: floatingTop, left: 0, right: 0 }}
-                  className="pointer-events-none z-10 flex h-10.5 w-full shrink-0 items-center gap-1 rounded-md bg-(--color-bg-default) p-1 shadow-[0px_4px_12px_0px_rgba(0,0,0,0.15)]"
-                >
-                  <span className="flex size-6 shrink-0 items-center justify-center">
-                    <MoveIcon
-                      aria-hidden
-                      className="size-6 shrink-0 text-(--color-icon-secondary)"
-                    />
-                  </span>
-                  <ProjectTag label={draggingTag.label} color={draggingTag.color} />
+                      <span className="flex size-6 shrink-0 items-center justify-center">
+                        <MoveIcon
+                          aria-hidden
+                          className="size-6 shrink-0 text-(--color-icon-secondary)"
+                        />
+                      </span>
+                      <ProjectTag label={draggingTag.label} color={draggingTag.color} />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              )
+
+              return effectiveTags.length > SCROLL_THRESHOLD ? (
+                <Scrollbar className="h-104 !flex-none">{listContent}</Scrollbar>
+              ) : (
+                listContent
+              )
+            })()
           )}
         </div>
       )}

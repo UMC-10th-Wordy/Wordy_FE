@@ -32,6 +32,8 @@ function createResultImages(files: File[]): TaskResultImage[] {
 
 interface TaskCardProps {
   task: Task
+  isExpanded: boolean
+  onToggleExpanded: () => void
   onDelete?: () => void
   onEdit?: (values: TaskDraftValues) => void
   onSaveResult?: (values: TaskResultValues) => void
@@ -41,13 +43,14 @@ interface TaskCardProps {
 
 export default function TaskCard({
   task,
+  isExpanded,
+  onToggleExpanded,
   onDelete,
   onEdit,
   onSaveResult,
   onHandleMouseDown,
   onToggleComplete,
 }: TaskCardProps) {
-  const [isExpanded, setIsExpanded] = useState(true)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [draftPriority, setDraftPriority] = useState<TaskPriority | null>(task.priority)
@@ -244,7 +247,7 @@ export default function TaskCard({
         <TaskCardView
           task={task}
           isExpanded={isExpanded}
-          onToggleExpanded={() => setIsExpanded((prev) => !prev)}
+          onToggleExpanded={onToggleExpanded}
           onHandleMouseDown={onHandleMouseDown}
           onToggleComplete={onToggleComplete}
           onStartEdit={handleStartEdit}

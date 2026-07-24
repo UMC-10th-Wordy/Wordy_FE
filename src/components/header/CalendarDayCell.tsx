@@ -36,7 +36,7 @@ export function CalendarDayCell({
 
   return (
     <div
-      className={`flex items-center justify-center rounded-[11px] p-[3px] transition-colors duration-100 ease-out ${borderClassName} ${
+      className={`flex size-[46px] shrink-0 items-center justify-center rounded-[11px] p-[3px] transition-colors duration-100 ease-out ${borderClassName} ${
         isCurrentMonth ? 'hover:bg-(--color-bg-brand-light)' : ''
       }`}
     >

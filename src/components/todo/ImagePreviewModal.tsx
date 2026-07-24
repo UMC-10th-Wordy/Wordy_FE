@@ -6,6 +6,7 @@ import ImageIcon from '@/assets/icons/image.svg?react'
 import { downloadFile } from '@/utils/file'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import { useModalFocus } from '@/hooks/useModalFocus'
+import { IconButton } from '@/components/common/Button/IconButton'
 
 const IMAGE_MAX_SIZE = 600
 
@@ -69,22 +70,24 @@ export function ImagePreviewModal({ name, url, onClose }: ImagePreviewModalProps
 
         {/* 다운로드/닫기 아이콘 */}
         <div className="absolute top-0 left-full ml-5 flex flex-col gap-2">
-          <button
+          <IconButton
             type="button"
+            variant="icon_inverse"
+            size="large"
+            className="!size-[52px] !rounded-md"
             aria-label="닫기"
             onClick={onClose}
-            className="flex size-[52px] shrink-0 items-center justify-center rounded-md bg-black/50 text-(--color-icon-inverse) transition-colors duration-100 ease-out hover:bg-black/60"
-          >
-            <XMarkIcon aria-hidden className="size-7" />
-          </button>
-          <button
+            icon={<XMarkIcon aria-hidden className="size-7" />}
+          />
+          <IconButton
             type="button"
+            variant="icon_inverse"
+            size="large"
+            className="!size-[52px] !rounded-md"
             aria-label="다운로드"
             onClick={() => downloadFile(url, name)}
-            className="flex size-[52px] shrink-0 items-center justify-center rounded-md bg-black/50 text-(--color-icon-inverse) transition-colors duration-100 ease-out hover:bg-black/60"
-          >
-            <DownloadIcon aria-hidden className="size-7 shrink-0" />
-          </button>
+            icon={<DownloadIcon aria-hidden className="size-7 shrink-0" />}
+          />
         </div>
 
         {/* 파일 이름 */}

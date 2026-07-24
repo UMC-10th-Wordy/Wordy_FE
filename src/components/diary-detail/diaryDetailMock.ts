@@ -1,4 +1,4 @@
-import { PERFORMANCE_PREVIEW_RESULT_MOCK } from '@/components/performance-preview/performancePreviewResultMock'
+import { PERFORMANCE_PREVIEW_RESULT_MOCK } from '@/mocks/performancePreviewResultMock'
 
 import type { DiaryDetailData } from '@/types/diaryDetail'
 
