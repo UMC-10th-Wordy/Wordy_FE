@@ -7,7 +7,7 @@ import { DeleteDiaryDialog } from '@/components/diary-detail/DeleteDiaryDialog'
 import { DiaryDetailHeader } from '@/components/diary-detail/DiaryDetailHeader'
 import { DiaryRetrospective } from '@/components/diary-detail/DiaryRetrospective'
 import { ReadOnlyTaskCard } from '@/components/diary-detail/ReadOnlyTaskCard'
-import { DIARY_DETAIL_MOCK } from '@/components/diary-detail/diaryDetailMock'
+import { DIARY_DETAIL_MOCK } from '@/mocks/diaryDetailMock'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
 import TodoTabs from '@/components/todo/TodoTabs'
 

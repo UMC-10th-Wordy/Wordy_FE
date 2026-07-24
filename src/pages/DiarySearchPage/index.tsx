@@ -8,10 +8,7 @@ import { DiarySearchHeader } from '@/components/diary-search/DiarySearchHeader'
 import { DiarySearchList } from '@/components/diary-search/DiarySearchList'
 import { DiarySearchSkeleton } from '@/components/diary-search/DiarySearchSkeleton'
 import { TagSearchList } from '@/components/diary-search/TagSearchList'
-import {
-  MOCK_DIARY_SEARCH_RESULTS,
-  MOCK_TAG_SEARCH_RESULTS,
-} from '@/components/diary-search/diarySearchMock'
+import { MOCK_DIARY_SEARCH_RESULTS, MOCK_TAG_SEARCH_RESULTS } from '@/mocks/diarySearchMock'
 import { useRecentSearchKeywords } from '@/hooks/useRecentSearchKeywords'
 
 import type { DiarySearchSort, DiarySearchTab } from '@/types/diarySearch'
