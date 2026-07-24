@@ -37,6 +37,7 @@ export default function TodoListPage() {
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
+  const [collapsedTaskIds, setCollapsedTaskIds] = useState<Set<string>>(new Set())
   const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
   const [previewStatus, setPreviewStatus] = useState<'empty' | 'converting' | 'failed'>('empty')
@@ -106,6 +107,20 @@ export default function TodoListPage() {
           : task,
       ),
     )
+  }
+
+  const isTaskExpanded = (id: string) => !collapsedTaskIds.has(id)
+
+  const toggleTaskExpanded = (id: string) => {
+    setCollapsedTaskIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
   }
 
   const handleToggleComplete = (id: string) => {
@@ -261,6 +276,8 @@ export default function TodoListPage() {
                         sectionTasks={mustDoTasks}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
+                        isTaskExpanded={isTaskExpanded}
+                        onToggleTaskExpanded={toggleTaskExpanded}
                         onDeleteTask={handleDeleteTask}
                         onEditTask={handleEditTask}
                         onSaveResult={handleSaveResult}
@@ -273,6 +290,8 @@ export default function TodoListPage() {
                         sectionTasks={shouldDoTasks}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
+                        isTaskExpanded={isTaskExpanded}
+                        onToggleTaskExpanded={toggleTaskExpanded}
                         onDeleteTask={handleDeleteTask}
                         onEditTask={handleEditTask}
                         onSaveResult={handleSaveResult}
@@ -285,6 +304,8 @@ export default function TodoListPage() {
                         sectionTasks={couldDoTasks}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
+                        isTaskExpanded={isTaskExpanded}
+                        onToggleTaskExpanded={toggleTaskExpanded}
                         onDeleteTask={handleDeleteTask}
                         onEditTask={handleEditTask}
                         onSaveResult={handleSaveResult}

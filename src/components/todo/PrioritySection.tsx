@@ -10,6 +10,8 @@ interface PrioritySectionProps {
   sectionTasks: Task[]
   draggingTask: Task | null
   startDrag: (id: string) => (event: MouseEvent<HTMLButtonElement>) => void
+  isTaskExpanded: (id: string) => boolean
+  onToggleTaskExpanded: (id: string) => void
   onDeleteTask: (id: string) => void
   onEditTask: (id: string, values: TaskDraftValues) => void
   onSaveResult: (id: string, values: TaskResultValues) => void
@@ -24,6 +26,8 @@ export function PrioritySection({
   sectionTasks,
   draggingTask,
   startDrag,
+  isTaskExpanded,
+  onToggleTaskExpanded,
   onDeleteTask,
   onEditTask,
   onSaveResult,
@@ -42,6 +46,8 @@ export function PrioritySection({
     >
       <TaskCard
         task={task}
+        isExpanded={isTaskExpanded(task.id)}
+        onToggleExpanded={() => onToggleTaskExpanded(task.id)}
         onHandleMouseDown={startDrag(task.id)}
         onDelete={() => onDeleteTask(task.id)}
         onEdit={(values) => onEditTask(task.id, values)}
