@@ -153,13 +153,20 @@ fix/#이슈번호-버그명   — 버그 수정
 
 - 작업 시작 전 이슈 먼저 생성
 - 이슈 제목 형식: `[FEAT] 기능명` / `[FIX] 버그명`
+- 이슈 템플릿(`.github/ISSUE_TEMPLATE`) 사용: 기능 요청은 `feature.md`, 버그 리포트는 `bug.md` 양식에 맞춰 작성
 
 ### PR 규칙
 
 - PR 제목은 커밋 컨벤션과 동일한 형식
 - 이슈 없이 PR 금지 (`closes #이슈번호` 필수)
+- PR 템플릿(`.github/pull_request_template.md`) 양식에 맞춰 작성
 - `feat` / `fix` 브랜치 → `develop` 으로 PR
 - `develop` → `main` 은 배포 시점에만 머지
 - PR 승인 1명 이상 필수
 - PR의 모든 리뷰 댓글 resolve 후 머지
 - 리뷰 요청 후 팀원들에게 공지
+
+### 소통 및 회의 규칙
+
+- 작업 완료 시 팀 채널에 공유
+- 작업 지연이나 이슈 발생 시 즉시 공유
