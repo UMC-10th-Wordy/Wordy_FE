@@ -146,12 +146,12 @@ export const WeeklyDashboard = () => {
         : 'insufficient'
 
   return (
-    <div className="flex flex-1 flex-col gap-6 px-10 py-8">
+    <div className="flex flex-1 flex-col gap-6 px-(--scale-40) pt-(--scale-40) pb-[60px]">
       <header className="flex flex-col gap-1">
-        <h1 className="[font-size:var(--font-size-heading-4)] font-bold text-(--color-text-default)">
+        <h1 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
           성과 대시보드
         </h1>
-        <p className="[font-size:var(--font-size-body-4)] text-(--color-text-tertiary)">
+        <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-regular)] text-(--color-text-tertiary)">
           나의 업무 성과를 분석해 볼까요?
         </p>
       </header>

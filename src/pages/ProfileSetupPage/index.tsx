@@ -60,10 +60,10 @@ export const ProfileSetupPage = () => {
               <img
                 src={photoUrl}
                 alt="프로필 미리보기"
-                className="size-[140px] rounded-full object-cover"
+                className="size-[160px] rounded-full object-cover"
               />
             ) : (
-              <ProfileDefaultIcon width={140} height={140} />
+              <ProfileDefaultIcon width={160} height={160} />
             )}
             <CameraBadgeIcon width={40} height={40} className="absolute bottom-1 right-1" />
           </button>
@@ -79,7 +79,7 @@ export const ProfileSetupPage = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="이름을 입력해 주세요"
+            placeholder="닉네임을 입력해 주세요"
             aria-label="이름"
             className="w-full rounded-lg border border-(--color-border-subtle) px-5 py-4 text-(--color-text-default) placeholder:text-(--color-text-tertiary) focus:border-(--color-border-brand) focus:outline-none"
           />
@@ -113,7 +113,7 @@ export const ProfileSetupPage = () => {
               aria-pressed={career === option}
               onClick={() => setCareer(option)}
               className={[
-                'w-full rounded-lg py-4 text-center transition-colors duration-100 ease-out',
+                'flex h-[56px] w-full items-center justify-center rounded-lg px-5 transition-colors duration-100 ease-out',
                 career === option
                   ? 'bg-(--primitive-primary-300) text-(--color-text-default)'
                   : 'bg-(--color-bg-secondary) text-(--color-text-default) hover:bg-(--color-bg-tertiary)',
@@ -134,7 +134,7 @@ export const ProfileSetupPage = () => {
         <>
           입력된 정보는 맞춤형 서비스 제공을 위해 사용되며
           <br />
-          프로필에서 변경할 수 있어요
+          나중에 변경할 수 있어요
         </>
       }
       step={2}
@@ -152,7 +152,7 @@ export const ProfileSetupPage = () => {
             aria-pressed={job === option}
             onClick={() => setJob(option)}
             className={[
-              'rounded-lg px-4 py-2.5 transition-colorstransition-colors duration-100 ease-out',
+              'flex h-[56px] items-center justify-center rounded-lg px-5 transition-colors duration-100 ease-out',
               job === option
                 ? 'bg-(--primitive-primary-300) text-(--color-text-default)'
                 : 'bg-(--color-bg-secondary) text-(--color-text-default) hover:bg-(--color-bg-tertiary)',
