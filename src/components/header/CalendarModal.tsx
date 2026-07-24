@@ -76,7 +76,7 @@ export function CalendarModal({ selectedDate, tasks, onSelectDate }: CalendarMod
           ))}
         </div>
 
-        <div className="grid w-full grid-cols-7 gap-y-[8px]">
+        <div className="grid w-full grid-cols-7 place-items-center gap-y-[8px]">
           {gridDates.map((date) => (
             <CalendarDayCell
               key={date.toISOString()}
