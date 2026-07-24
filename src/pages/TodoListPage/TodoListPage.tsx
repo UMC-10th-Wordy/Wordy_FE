@@ -26,7 +26,7 @@ import type {
   TodoFilter,
   TodoFilterCounts,
 } from '@/types/todo'
-import { INITIAL_TASKS } from './sampleData'
+import { INITIAL_TASKS } from '@/mocks/taskSampleData'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
