@@ -21,6 +21,8 @@ import TagColorPicker, { COLOR_OPTIONS } from './TagColorPicker'
 import TagDatePicker from './TagDatePicker'
 import type { ProjectTagColor } from './ProjectTag'
 import type { TaskTag } from '@/types/todo'
+import { createTag, getTagDetail } from '@/api/tagApi'
+import { mapDraftToCreatePayload, mapTagDtoToTaskTag } from '@/utils/tagMapper'
 
 type Tab = 'existing' | 'new'
 
@@ -92,6 +94,7 @@ export default function TagSettingsModal({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState<TaskTag | null>(null)
   const [expandedLabel, setExpandedLabel] = useState<string | null>(null)
+  const [detailByLabel, setDetailByLabel] = useState<Record<string, TaskTag>>({})
   const [editingLabel, setEditingLabel] = useState<string | null>(null)
   const [deletingLabel, setDeletingLabel] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<{
@@ -228,6 +231,19 @@ export default function TagSettingsModal({
 
   const getEditOriginal = () => tags.find((t) => t.label === editingLabel)
 
+  const handleToggleExpand = (tag: TaskTag) => {
+    const isExpanding = expandedLabel !== tag.label
+    setExpandedLabel(isExpanding ? tag.label : null)
+    setSelectedTag(isExpanding ? tag : null)
+    if (isExpanding && tag.id) {
+      getTagDetail(tag.id)
+        .then((dto) => {
+          if (dto) setDetailByLabel((prev) => ({ ...prev, [tag.label]: mapTagDtoToTaskTag(dto) }))
+        })
+        .catch(() => {})
+    }
+  }
+
   const hasEditChanges = () => {
     const original = getEditOriginal()
     if (!original) return false
@@ -251,6 +267,7 @@ export default function TagSettingsModal({
     if (isDuplicate) return
     const original = getEditOriginal()
     const updated: TaskTag = {
+      id: original?.id,
       label: editDraft.label,
       color: editDraft.color,
       meta: original?.meta
@@ -307,21 +324,26 @@ export default function TagSettingsModal({
     newKpis.some((k) => k.trim() !== '') &&
     !tags.some((t) => t.label === newLabel.trim())
 
-  const handleAddTag = () => {
+  const handleAddTag = async () => {
     if (!canAddNewTag) return
-    onAddTag({
-      label: newLabel.trim(),
-      color: newColor,
-      meta: {
-        projectName: newProjectName.trim(),
-        purpose: newPurpose.trim(),
-        expectedOutcome: newOutcome.trim(),
-        startDate: newStartDate || undefined,
-        endDate: newEndDate || undefined,
-        kpis: newKpis.filter((k) => k.trim() !== ''),
-      },
-    })
-    onClose()
+    try {
+      const created = await createTag(
+        mapDraftToCreatePayload({
+          label: newLabel.trim(),
+          color: newColor,
+          projectName: newProjectName.trim(),
+          purpose: newPurpose.trim(),
+          expectedOutcome: newOutcome.trim(),
+          startDate: newStartDate,
+          endDate: newEndDate,
+          kpis: newKpis.filter((k) => k.trim() !== ''),
+        }),
+      )
+      onAddTag(mapTagDtoToTaskTag(created))
+      onClose()
+    } catch {
+      return
+    }
   }
 
   const modal = createPortal(
@@ -533,9 +555,7 @@ export default function TagSettingsModal({
                                 className="flex min-w-0 flex-1 items-center"
                                 onClick={() => {
                                   if (editingLabel === tag.label) return
-                                  const isExpanding = expandedLabel !== tag.label
-                                  setExpandedLabel(isExpanding ? tag.label : null)
-                                  setSelectedTag(isExpanding ? tag : null)
+                                  handleToggleExpand(tag)
                                 }}
                               >
                                 <ProjectTag
@@ -571,9 +591,7 @@ export default function TagSettingsModal({
                                     if (editingLabel === tag.label) {
                                       handleCancelEdit()
                                     } else {
-                                      const isExpanding = expandedLabel !== tag.label
-                                      setExpandedLabel(isExpanding ? tag.label : null)
-                                      setSelectedTag(isExpanding ? tag : null)
+                                      handleToggleExpand(tag)
                                     }
                                   }}
                                   className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
@@ -825,48 +843,54 @@ export default function TagSettingsModal({
                                   </div>
                                 </>
                               ) : (
-                                <>
-                                  {[
-                                    { label: '목적', value: tag.meta.purpose },
-                                    { label: '기대 성과', value: tag.meta.expectedOutcome },
-                                    {
-                                      label: '기간',
-                                      value:
-                                        tag.meta.startDate && tag.meta.endDate
-                                          ? `${tag.meta.startDate} - ${tag.meta.endDate}`
-                                          : tag.meta.startDate || tag.meta.endDate || null,
-                                    },
-                                  ]
-                                    .filter((row) => row.value)
-                                    .map((row) => (
-                                      <div key={row.label} className="flex items-center gap-2">
-                                        <span className="w-25 shrink-0 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-tertiary)">
-                                          {row.label}
-                                        </span>
-                                        <span className="min-w-0 flex-1 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-secondary)">
-                                          {row.value}
-                                        </span>
-                                      </div>
-                                    ))}
-                                  {tag.meta.kpis.length > 0 && (
-                                    <div className="flex items-start gap-2">
-                                      <span className="w-25 shrink-0 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-tertiary)">
-                                        핵심 평가 지표
-                                      </span>
-                                      <ul className="min-w-0 flex-1 flex flex-col gap-2">
-                                        {tag.meta.kpis.map((kpi, i) => (
-                                          <li
-                                            key={i}
-                                            className="flex items-center gap-2 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-secondary)"
-                                          >
-                                            <span className="size-0.75 shrink-0 rounded-full bg-(--color-text-tertiary)" />
-                                            {kpi}
-                                          </li>
+                                (() => {
+                                  const detailMeta =
+                                    (detailByLabel[tag.label] ?? tag).meta ?? tag.meta
+                                  return (
+                                    <>
+                                      {[
+                                        { label: '목적', value: detailMeta.purpose },
+                                        { label: '기대 성과', value: detailMeta.expectedOutcome },
+                                        {
+                                          label: '기간',
+                                          value:
+                                            detailMeta.startDate && detailMeta.endDate
+                                              ? `${detailMeta.startDate} - ${detailMeta.endDate}`
+                                              : detailMeta.startDate || detailMeta.endDate || null,
+                                        },
+                                      ]
+                                        .filter((row) => row.value)
+                                        .map((row) => (
+                                          <div key={row.label} className="flex items-center gap-2">
+                                            <span className="w-25 shrink-0 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-tertiary)">
+                                              {row.label}
+                                            </span>
+                                            <span className="min-w-0 flex-1 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-secondary)">
+                                              {row.value}
+                                            </span>
+                                          </div>
                                         ))}
-                                      </ul>
-                                    </div>
-                                  )}
-                                </>
+                                      {detailMeta.kpis.length > 0 && (
+                                        <div className="flex items-start gap-2">
+                                          <span className="w-25 shrink-0 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-tertiary)">
+                                            핵심 평가 지표
+                                          </span>
+                                          <ul className="min-w-0 flex-1 flex flex-col gap-2">
+                                            {detailMeta.kpis.map((kpi, i) => (
+                                              <li
+                                                key={i}
+                                                className="flex items-center gap-2 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-secondary)"
+                                              >
+                                                <span className="size-0.75 shrink-0 rounded-full bg-(--color-text-tertiary)" />
+                                                {kpi}
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      )}
+                                    </>
+                                  )
+                                })()
                               )}
                             </div>
                           )}
