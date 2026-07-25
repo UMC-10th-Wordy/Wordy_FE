@@ -286,6 +286,7 @@ export default function TagSettingsModal({
       const updated = mapTagDtoToTaskTag(updatedDto)
       onEditTag(editingKey, updated)
       if (selectedTag && getTagKey(selectedTag) === editingKey) setSelectedTag(updated)
+      setDetailByKey((prev) => ({ ...prev, [editingKey]: updated }))
       setEditingKey(null)
       setExpandedKey(null)
     } catch {
