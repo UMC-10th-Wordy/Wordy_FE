@@ -4,11 +4,32 @@ UMC 10th Wordy 프로젝트 프론트엔드
 
 업무일지 작성, AI 성과 변환, 주간·월간 대시보드를 통해 개인 업무를 체계적으로 관리하는 웹 애플리케이션입니다.
 
+## 프로젝트 링크
+
+- [배포 서비스](https://wordy-site.vercel.app/)
+- [GitHub Repository](https://github.com/UMC-10th-Wordy/Wordy_FE)
+- [Figma](https://www.figma.com/design/iko4179xXJ89NwtiXIJtTz/Wordy-UI-Design)
+
+## 주요 기능
+
+- 오늘의 업무를 등록하고 수정·삭제하거나 완료 상태로 관리
+- 프로젝트 태그 생성·수정·삭제 및 업무별 태그 설정
+- 업무 결과와 첨부 파일을 기록하고 AI 성과 변환 흐름 체험
+- 월별 업무 일지 목록·상세·검색 및 휴지통 관리
+- 주간·월간 성과 대시보드와 회고·계획 작성
+- 이메일 및 소셜 회원가입, 프로필 설정 화면 제공
+
+> 현재 서버 API가 연결되지 않은 기능은 Mock Data를 사용해 화면과 사용자 흐름을 확인할 수 있습니다.
+
 ## 기술 스택
 
 - React 19 + TypeScript
-- Vite
+- React Router
+- Vite 8
 - Tailwind CSS v4
+- Framer Motion
+- ESLint + Prettier
+- Husky + Commitlint
 
 ## 팀원 및 역할 분담
 
@@ -86,24 +107,35 @@ Monthly 탭
 
 ## 시작하기
 
+### 요구 사항
+
+- Node.js 20 이상
+- pnpm
+
+### 설치 및 실행
+
 ```bash
-# 의존성 설치
+git clone https://github.com/UMC-10th-Wordy/Wordy_FE.git
+cd Wordy_FE
+
 pnpm install
 
-# 개발 서버 실행
-pnpm dev
+cp .env.example .env
 
-# 빌드
-pnpm build
+pnpm dev
 ```
 
 ## 환경 변수
 
-`.env.example`을 복사해서 `.env` 파일을 만들어주세요.
+로컬 실행 전 `.env.example`을 복사해 `.env` 파일을 생성합니다.
 
 ```bash
 cp .env.example .env
 ```
+
+| 변수                | 설명                 | 기본 예시               |
+| ------------------- | -------------------- | ----------------------- |
+| `VITE_API_BASE_URL` | 백엔드 API 기본 주소 | `http://localhost:8080` |
 
 ## 스크립트
 
@@ -116,6 +148,17 @@ cp .env.example .env
 | `pnpm format`     | 포맷팅                  |
 | `pnpm type-check` | 타입 체크               |
 | `pnpm preview`    | 빌드 결과 로컬 미리보기 |
+
+## 구현 화면
+
+| 구분          | 화면                                                        | 데이터 상태   |
+| ------------- | ----------------------------------------------------------- | ------------- |
+| 서비스 소개   | 랜딩 페이지                                                 | 정적 데이터   |
+| 인증          | 로그인, 회원가입, 이메일 인증, 프로필 설정                  | API 연동 예정 |
+| 홈            | 오늘의 업무, 연속 기록, 주간 기록, 최근 일지                | Mock Data     |
+| 업무 관리     | 업무 등록·수정·삭제, 결과 작성, 태그 관리                   | Mock/API 혼합 |
+| 일지 모아보기 | 월별 목록, 상세, 검색, 휴지통                               | Mock Data     |
+| 성과 대시보드 | 주간·월간 대시보드, 핵심 지표, 업무 흐름, 회고 및 다음 계획 | Mock Data     |
 
 ## 협업 규칙
 
