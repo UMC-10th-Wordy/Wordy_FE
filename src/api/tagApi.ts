@@ -33,3 +33,31 @@ export async function createTag(payload: CreateTagPayload): Promise<TagDto> {
   tagMockStore = [...tagMockStore, created]
   return created
 }
+
+export async function updateTag(tagId: string, payload: CreateTagPayload): Promise<TagDto> {
+  const now = new Date().toISOString()
+  const existing = tagMockStore.find((tag) => tag.tagId === tagId)
+  if (!existing) throw new Error('TAG_NOT_FOUND')
+  const updated: TagDto = {
+    ...existing,
+    tagName: payload.tagName,
+    color: payload.color,
+    projectName: payload.projectName,
+    projectPurpose: payload.projectPurpose,
+    expectedOutcome: payload.expectedOutcome,
+    expectedStartDate: payload.expectedStartDate
+      ? `${payload.expectedStartDate}T00:00:00.000Z`
+      : '',
+    expectedEndDate: payload.expectedEndDate ? `${payload.expectedEndDate}T00:00:00.000Z` : '',
+    kpis: payload.kpis,
+    updatedAt: now,
+  }
+  tagMockStore = tagMockStore.map((tag) => (tag.tagId === tagId ? updated : tag))
+  return updated
+}
+
+export async function deleteTag(tagId: string): Promise<void> {
+  const exists = tagMockStore.some((tag) => tag.tagId === tagId)
+  if (!exists) throw new Error('TAG_NOT_FOUND')
+  tagMockStore = tagMockStore.filter((tag) => tag.tagId !== tagId)
+}

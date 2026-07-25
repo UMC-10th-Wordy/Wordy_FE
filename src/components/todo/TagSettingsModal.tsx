@@ -21,7 +21,7 @@ import TagColorPicker, { COLOR_OPTIONS } from './TagColorPicker'
 import TagDatePicker from './TagDatePicker'
 import type { ProjectTagColor } from './ProjectTag'
 import type { TaskTag } from '@/types/todo'
-import { createTag, getTagDetail } from '@/api/tagApi'
+import { createTag, deleteTag, getTagDetail, updateTag } from '@/api/tagApi'
 import { getTagKey, mapDraftToCreatePayload, mapTagDtoToTaskTag } from '@/utils/tagMapper'
 
 type Tab = 'existing' | 'new'
@@ -261,33 +261,36 @@ export default function TagSettingsModal({
     )
   }
 
-  const handleConfirmEdit = () => {
+  const handleConfirmEdit = async () => {
     if (!editingKey || !hasEditChanges()) return
     const isDuplicate = tags.some(
       (t) => t.label === editDraft.label.trim() && getTagKey(t) !== editingKey,
     )
     if (isDuplicate) return
     const original = getEditOriginal()
-    const updated: TaskTag = {
-      id: original?.id,
-      label: editDraft.label,
-      color: editDraft.color,
-      meta: original?.meta
-        ? {
-            ...original.meta,
-            projectName: editDraft.projectName,
-            purpose: editDraft.purpose,
-            expectedOutcome: editDraft.expectedOutcome,
-            startDate: editDraft.startDate || undefined,
-            endDate: editDraft.endDate || undefined,
-            kpis: editDraft.kpis.filter((k) => k.trim() !== ''),
-          }
-        : undefined,
+    if (!original?.id) return
+    try {
+      const updatedDto = await updateTag(
+        original.id,
+        mapDraftToCreatePayload({
+          label: editDraft.label.trim(),
+          color: editDraft.color,
+          projectName: editDraft.projectName,
+          purpose: editDraft.purpose,
+          expectedOutcome: editDraft.expectedOutcome,
+          startDate: editDraft.startDate,
+          endDate: editDraft.endDate,
+          kpis: editDraft.kpis.filter((k) => k.trim() !== ''),
+        }),
+      )
+      const updated = mapTagDtoToTaskTag(updatedDto)
+      onEditTag(editingKey, updated)
+      if (selectedTag && getTagKey(selectedTag) === editingKey) setSelectedTag(updated)
+      setEditingKey(null)
+      setExpandedKey(null)
+    } catch {
+      return
     }
-    onEditTag(editingKey, updated)
-    if (selectedTag && getTagKey(selectedTag) === editingKey) setSelectedTag(updated)
-    setEditingKey(null)
-    setExpandedKey(null)
   }
 
   const handleCancelEdit = () => {
@@ -1185,11 +1188,17 @@ export default function TagSettingsModal({
             </>
           }
           onCancel={() => setDeletingKey(null)}
-          onConfirm={() => {
-            onDeleteTag(deletingKey)
-            if (selectedTag && getTagKey(selectedTag) === deletingKey) setSelectedTag(null)
-            if (expandedKey === deletingKey) setExpandedKey(null)
-            setDeletingKey(null)
+          onConfirm={async () => {
+            try {
+              const target = tags.find((t) => getTagKey(t) === deletingKey)
+              if (target?.id) await deleteTag(target.id)
+              onDeleteTag(deletingKey)
+              if (selectedTag && getTagKey(selectedTag) === deletingKey) setSelectedTag(null)
+              if (expandedKey === deletingKey) setExpandedKey(null)
+              setDeletingKey(null)
+            } catch {
+              return
+            }
           }}
         />
       )}
