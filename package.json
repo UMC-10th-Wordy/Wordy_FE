@@ -16,6 +16,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.4",
     "class-variance-authority": "^0.7.1",
     "framer-motion": "^12.42.2",
     "pdfjs-dist": "^4.7.76",
