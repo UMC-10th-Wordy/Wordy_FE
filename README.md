@@ -20,6 +20,19 @@ UMC 10th Wordy 프로젝트 프론트엔드
 
 > 현재 모든 기능은 Mock Data를 기반으로 화면과 사용자 흐름을 구현했습니다. 태그 관리 등 일부 기능은 API 명세에 맞춰 응답 타입(`ApiEnvelope` 등)까지 미리 설계해두어 실제 서버 연동만 남은 상태이며, 나머지 기능도 순차적으로 API 연동을 진행할 예정입니다.
 
+## 목차
+
+- [기술 스택](#기술-스택)
+- [팀원 및 역할 분담](#팀원-및-역할-분담)
+- [폴더 구조](#폴더-구조)
+- [화면 목록 및 플로우](#화면-목록-및-플로우)
+- [시작하기](#시작하기)
+- [환경 변수](#환경-변수)
+- [스크립트](#스크립트)
+- [구현 화면](#구현-화면)
+- [API 연동 현황](#api-연동-현황)
+- [협업 규칙](#협업-규칙)
+
 ## 기술 스택
 
 - React 19 + TypeScript
@@ -167,6 +180,34 @@ cp .env.example .env
 | 일지 모아보기 | 월별 목록, 상세, 검색, 휴지통                               |
 | 성과 대시보드 | 주간·월간 대시보드, 핵심 지표, 업무 흐름, 회고 및 다음 계획 |
 | 설정 / 알림함 | 워크스페이스 관리, 프로필/알림 설정, 알림함, 요금제         |
+
+### 랜딩 페이지
+
+<img src="docs/images/01-landing.png" width="800" />
+
+### 로그인
+
+<img src="docs/images/02-login.png" width="800" />
+
+### 회원가입
+
+<img src="docs/images/03-signup.png" width="800" />
+
+### 홈
+
+<img src="docs/images/04-home.png" width="800" />
+
+### 오늘의 업무
+
+<img src="docs/images/05-daily-task.png" width="800" />
+
+### 일지 모아보기
+
+<img src="docs/images/06-diary-list.png" width="800" />
+
+### 성과 대시보드
+
+<img src="docs/images/07-dashboard.png" width="800" />
 
 ## API 연동 현황
 
