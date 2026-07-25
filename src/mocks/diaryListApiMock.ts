@@ -10,8 +10,8 @@ export const DAILY_ENTRIES_SUMMARY_RESPONSE_MOCK = {
   message: '조회에 성공했습니다.',
   result: {
     monthlyCount: {
-      count: 4,
-      diffFromLastMonth: 2,
+      count: 3,
+      diffFromLastMonth: 1,
     },
     streak: {
       currentStreak: 12,
@@ -30,27 +30,6 @@ export const MONTHLY_DAILY_ENTRIES_RESPONSE_MOCK = {
   code: 'S200',
   message: '조회에 성공했습니다.',
   result: [
-    {
-      yearMonth: '2026-08',
-      year: 2026,
-      month: 8,
-      totalDays: 5,
-      tags: [
-        {
-          tagName: '광고',
-          color: '#2d96ff',
-        },
-        {
-          tagName: '회의',
-          color: '#14c369',
-        },
-        {
-          tagName: '디자인',
-          color: '#ff5fd7',
-        },
-      ],
-      summary: '협업 및 기획 업무 비중이 늘며, 산출물 정리가 활발했던 달이에요.',
-    },
     {
       yearMonth: '2026-07',
       year: 2026,
@@ -177,84 +156,6 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
   string,
   MonthlyDailyEntriesDetailResponse
 > = {
-  '2026-08': {
-    success: true,
-    code: 'S200',
-    message: '조회에 성공했습니다.',
-    result: [
-      {
-        dailyEntryId: 'diary-2026-08-21',
-        entryDate: '2026-08-21',
-        day: 21,
-        tags: [
-          {
-            tagName: '회의',
-            color: '#14c369',
-          },
-        ],
-        mainTaskTitle:
-          'Product Strategy Alignment 회의 준비Product Strategy Alignment 회의 준비Product Strategy Alignment 회의 준비Product Strategy Alignment 회의 준비Product Strategy Alignment 회의 준비',
-        extraTaskCount: 7,
-        summary: '회의 준비와 디자인 시스템 V2 정리를 병행하며 다음 분기 실행 기반을 다졌어요.',
-      },
-      {
-        dailyEntryId: 'diary-2026-08-20',
-        entryDate: '2026-08-20',
-        day: 20,
-        tags: [
-          {
-            tagName: '광고',
-            color: '#2d96ff',
-          },
-        ],
-        mainTaskTitle: '광고 캠페인 제안서 초안',
-        extraTaskCount: 6,
-        summary: '타깃 세그먼트 3종을 정의하고 KPI 가설을 수립했어요.',
-      },
-      {
-        dailyEntryId: 'diary-2026-08-14',
-        entryDate: '2026-08-14',
-        day: 14,
-        tags: [
-          {
-            tagName: '디자인',
-            color: '#ff5fd7',
-          },
-        ],
-        mainTaskTitle: '디자인 시스템 V2 컴포넌트 정리',
-        extraTaskCount: 7,
-        summary: 'Button, Input, Dialog Variants를 일괄 점검했어요.',
-      },
-      {
-        dailyEntryId: 'diary-2026-08-12',
-        entryDate: '2026-08-12',
-        day: 12,
-        tags: [
-          {
-            tagName: '개발',
-            color: '#ff6d38',
-          },
-        ],
-        mainTaskTitle: 'AI 일지 변환 프롬프트 A/B',
-        extraTaskCount: 7,
-        summary: '프롬프트 2종을 비교하고 요약 품질이 22% 향상된 것을 확인했어요.',
-      },
-      {
-        dailyEntryId: 'diary-2026-08-10',
-        entryDate: '2026-08-10',
-        day: 10,
-        tags: [
-          {
-            tagName: '문서화',
-            color: '#14c369',
-          },
-        ],
-        mainTaskTitle: '팀 핸드북 V1 정리',
-        extraTaskCount: 7,
-        summary: '온보딩, 협업 툴, 코드 리뷰 가이드를 통합했어요.',
-      },
-    ],
-  },
   '2026-07': {
     success: true,
     code: 'S200',
