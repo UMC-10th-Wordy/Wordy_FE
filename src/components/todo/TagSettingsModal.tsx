@@ -5,9 +5,11 @@ import { PillTabs } from '@/components/todo/PillTabs'
 import { useModalFocus } from '@/hooks/useModalFocus'
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
+import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
+import { Input1 } from '@/components/common/Input/Input1'
+import { SearchInput } from '@/components/common/SearchInput/SearchInput'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
-import MagnifierIcon from '@/assets/icons/magnifier.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import GenerateIcon from '@/assets/icons/generate.svg?react'
@@ -64,9 +66,6 @@ function FieldLabel({ children, required }: { children: React.ReactNode; require
 const COLOR_SWATCH_MAP = Object.fromEntries(
   COLOR_OPTIONS.map((opt) => [opt.value, opt.bg]),
 ) as Record<ProjectTagColor, string>
-
-const fieldInputClass =
-  'w-full h-15 rounded-lg border border-(--color-border-subtle) bg-(--color-bg-default) px-5 [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) outline-none focus:border-(--color-border-brand) transition-colors'
 
 interface TagSettingsModalProps {
   tags: TaskTag[]
@@ -145,8 +144,6 @@ export default function TagSettingsModal({
       return []
     }
   })
-  const [showSearchDropdown, setShowSearchDropdown] = useState(false)
-  const searchRef = useRef<HTMLDivElement>(null)
   const colorBtnRef = useRef<HTMLButtonElement>(null)
   const editColorBtnRef = useRef<HTMLButtonElement>(null)
   const startDateBtnRef = useRef<HTMLButtonElement>(null)
@@ -163,21 +160,7 @@ export default function TagSettingsModal({
     updateRecentSearches([trimmed, ...recentSearches.filter((q) => q !== trimmed)].slice(0, 10))
   }
 
-  useEffect(() => {
-    const handleMouseDown = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setShowSearchDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => document.removeEventListener('mousedown', handleMouseDown)
-  }, [])
-
   useEscapeKey(() => {
-    if (showSearchDropdown) {
-      setShowSearchDropdown(false)
-      return
-    }
     if (showColorPicker) {
       setShowColorPicker(false)
       return
@@ -375,14 +358,13 @@ export default function TagSettingsModal({
               태그는 성과 대시보드에서 프로젝트 흐름과 KPI를 추적하는 데에 활용돼요.
             </p>
           </div>
-          <button
-            type="button"
+          <IconButton
             aria-label="닫기"
             onClick={onClose}
-            className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
-          >
-            <XMarkIcon aria-hidden className="size-6" />
-          </button>
+            variant="icon_neutral"
+            size="small"
+            icon={<XMarkIcon aria-hidden className="size-6" />}
+          />
         </div>
 
         {/* 탭 + 컨텐츠 영역 */}
@@ -400,91 +382,21 @@ export default function TagSettingsModal({
           {tab === 'existing' && (
             <div className="flex min-h-0 flex-1 flex-col gap-5">
               {/* 검색창 */}
-              <div ref={searchRef} className="relative shrink-0 z-10">
-                <div className="flex h-12 items-center gap-2.5 rounded-(--scale-12) border border-(--color-border-light) bg-(--color-bg-default) px-5">
-                  <button
-                    type="button"
-                    aria-label="검색"
-                    onClick={() => {
-                      if (searchQuery) {
-                        addRecentSearch(searchQuery)
-                        setShowSearchDropdown(false)
-                      }
-                    }}
-                    className="flex size-8 shrink-0 items-center justify-center text-(--color-icon-secondary)"
-                  >
-                    <MagnifierIcon aria-hidden className="size-8" />
-                  </button>
-                  <input
-                    type="text"
-                    placeholder="프로젝트 태그를 검색해 보세요."
-                    value={searchQuery}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    onFocus={() => setShowSearchDropdown(true)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        addRecentSearch(searchQuery)
-                        setShowSearchDropdown(false)
-                      }
-                    }}
-                    className="min-w-0 flex-1 bg-transparent [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) outline-none"
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      aria-label="검색어 지우기"
-                      onClick={() => handleSearchChange('')}
-                      className="flex size-8 shrink-0 items-center justify-center text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:text-(--color-icon-default)"
-                    >
-                      <XMarkIcon aria-hidden className="size-6" />
-                    </button>
-                  )}
-                </div>
-                {/* 최근 검색어 드롭다운 */}
-                {showSearchDropdown && !searchQuery && recentSearches.length > 0 && (
-                  <div className="absolute left-[-1px] top-[calc(100%+4px)] w-[calc(100%+2px)] rounded-(--scale-12) bg-(--color-bg-default) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] px-4 py-5 flex flex-col gap-2.5">
-                    <div className="flex items-center justify-between pl-1">
-                      <p className="[font-size:var(--font-size-body-3)] font-semibold leading-(--line-height-body) text-(--color-text-tertiary)">
-                        최근 검색어
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => updateRecentSearches([])}
-                        className="flex h-8 items-center justify-center rounded-md px-2 [font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-text-brand)"
-                      >
-                        모두 지우기
-                      </button>
-                    </div>
-                    <div className="flex flex-col">
-                      {recentSearches.map((q) => (
-                        <div key={q} className="flex h-13 items-center justify-between p-1">
-                          <button
-                            type="button"
-                            className="min-w-0 flex-1 text-left [font-size:var(--font-size-body-2)] font-normal leading-(--line-height-body) text-(--color-text-default)"
-                            onClick={() => {
-                              addRecentSearch(q)
-                              setSearchQuery(q)
-                              setShowSearchDropdown(false)
-                            }}
-                          >
-                            {q}
-                          </button>
-                          <button
-                            type="button"
-                            aria-label="삭제"
-                            onClick={() =>
-                              updateRecentSearches(recentSearches.filter((item) => item !== q))
-                            }
-                            className="flex size-8 shrink-0 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
-                          >
-                            <XMarkIcon aria-hidden className="size-6" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <SearchInput
+                className="shrink-0 z-10"
+                placeholder="프로젝트 태그를 검색해 보세요."
+                value={searchQuery}
+                recentKeywords={recentSearches}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                onSearch={(value) => {
+                  setSearchQuery(value)
+                  addRecentSearch(value)
+                }}
+                onClearAll={() => updateRecentSearches([])}
+                onRemoveKeyword={(keyword) =>
+                  updateRecentSearches(recentSearches.filter((item) => item !== keyword))
+                }
+              />
 
               {/* 태그 목록 */}
               <div className="flex min-h-0 flex-1 flex-col gap-2">
@@ -625,13 +537,12 @@ export default function TagSettingsModal({
                                     <div className="flex items-start gap-5">
                                       <div className="flex min-w-0 flex-1 flex-col gap-1">
                                         <FieldLabel required>태그명</FieldLabel>
-                                        <input
+                                        <Input1
                                           type="text"
                                           value={editDraft.label}
                                           onChange={(e) =>
                                             setEditDraft((d) => ({ ...d, label: e.target.value }))
                                           }
-                                          className={fieldInputClass}
                                           autoFocus
                                         />
                                       </div>
@@ -661,7 +572,7 @@ export default function TagSettingsModal({
                                     {/* 프로젝트 혹은 업무명 */}
                                     <div className="flex flex-col gap-1">
                                       <FieldLabel required>프로젝트 혹은 업무명</FieldLabel>
-                                      <input
+                                      <Input1
                                         type="text"
                                         placeholder="프로젝트 혹은 업무명을 입력해 주세요"
                                         value={editDraft.projectName}
@@ -671,26 +582,24 @@ export default function TagSettingsModal({
                                             projectName: e.target.value,
                                           }))
                                         }
-                                        className={fieldInputClass}
                                       />
                                     </div>
                                     {/* 프로젝트 목적 */}
                                     <div className="flex flex-col gap-1">
                                       <FieldLabel required>프로젝트 목적</FieldLabel>
-                                      <input
+                                      <Input1
                                         type="text"
                                         placeholder="프로젝트 목적을 입력해 주세요"
                                         value={editDraft.purpose}
                                         onChange={(e) =>
                                           setEditDraft((d) => ({ ...d, purpose: e.target.value }))
                                         }
-                                        className={fieldInputClass}
                                       />
                                     </div>
                                     {/* 기대하는 성과 */}
                                     <div className="flex flex-col gap-1">
                                       <FieldLabel required>기대하는 성과</FieldLabel>
-                                      <input
+                                      <Input1
                                         type="text"
                                         placeholder="기대하는 성과를 입력해 주세요"
                                         value={editDraft.expectedOutcome}
@@ -700,7 +609,6 @@ export default function TagSettingsModal({
                                             expectedOutcome: e.target.value,
                                           }))
                                         }
-                                        className={fieldInputClass}
                                       />
                                     </div>
                                     {/* 예상 기간 */}
@@ -713,8 +621,7 @@ export default function TagSettingsModal({
                                             type="button"
                                             onClick={() => setShowEditStartDatePicker((v) => !v)}
                                             className={[
-                                              fieldInputClass,
-                                              'flex h-15 w-full items-center justify-between text-left',
+                                              'flex h-15 w-full items-center justify-between rounded-lg border border-(--color-border-subtle) bg-(--color-bg-default) px-5 text-left [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal outline-none transition-colors focus:border-(--color-border-brand)',
                                               !editDraft.startDate &&
                                                 'text-(--color-text-tertiary)',
                                             ]
@@ -747,8 +654,7 @@ export default function TagSettingsModal({
                                             type="button"
                                             onClick={() => setShowEditEndDatePicker((v) => !v)}
                                             className={[
-                                              fieldInputClass,
-                                              'flex h-15 w-full items-center justify-between text-left',
+                                              'flex h-15 w-full items-center justify-between rounded-lg border border-(--color-border-subtle) bg-(--color-bg-default) px-5 text-left [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal outline-none transition-colors focus:border-(--color-border-brand)',
                                               !editDraft.endDate && 'text-(--color-text-tertiary)',
                                             ]
                                               .filter(Boolean)
@@ -789,38 +695,35 @@ export default function TagSettingsModal({
                                         </TextButton>
                                       </div>
                                       {editDraft.kpis.map((kpi, i) => (
-                                        <div
+                                        <Input1
                                           key={i}
-                                          className="flex h-15 items-center justify-between rounded-lg border border-(--color-border-subtle) bg-(--color-bg-default) px-5 transition-colors focus-within:border-(--color-border-brand)"
-                                        >
-                                          <input
-                                            type="text"
-                                            placeholder="핵심 평가 지표를 입력해 주세요"
-                                            value={kpi}
-                                            onChange={(e) =>
-                                              setEditDraft((d) => ({
-                                                ...d,
-                                                kpis: d.kpis.map((k, ki) =>
-                                                  ki === i ? e.target.value : k,
-                                                ),
-                                              }))
-                                            }
-                                            className="min-w-0 flex-1 bg-transparent [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) outline-none"
-                                          />
-                                          <button
-                                            type="button"
-                                            aria-label="KPI 삭제"
-                                            onClick={() =>
-                                              setEditDraft((d) => ({
-                                                ...d,
-                                                kpis: d.kpis.filter((_, ki) => ki !== i),
-                                              }))
-                                            }
-                                            className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-icon-secondary)"
-                                          >
-                                            <TrashIcon aria-hidden className="size-6" />
-                                          </button>
-                                        </div>
+                                          type="text"
+                                          placeholder="핵심 평가 지표를 입력해 주세요"
+                                          value={kpi}
+                                          onChange={(e) =>
+                                            setEditDraft((d) => ({
+                                              ...d,
+                                              kpis: d.kpis.map((k, ki) =>
+                                                ki === i ? e.target.value : k,
+                                              ),
+                                            }))
+                                          }
+                                          endAdornment={
+                                            <button
+                                              type="button"
+                                              aria-label="KPI 삭제"
+                                              onClick={() =>
+                                                setEditDraft((d) => ({
+                                                  ...d,
+                                                  kpis: d.kpis.filter((_, ki) => ki !== i),
+                                                }))
+                                              }
+                                              className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-icon-secondary)"
+                                            >
+                                              <TrashIcon aria-hidden className="size-6" />
+                                            </button>
+                                          }
+                                        />
                                       ))}
                                       <TextButton
                                         variant="stroke"
@@ -941,12 +844,11 @@ export default function TagSettingsModal({
                 <div className="flex items-start gap-5">
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <FieldLabel required>태그명</FieldLabel>
-                    <input
+                    <Input1
                       type="text"
                       placeholder="태그명을 입력해 주세요"
                       value={newLabel}
                       onChange={(e) => setNewLabel(e.target.value)}
-                      className={fieldInputClass}
                     />
                   </div>
                   <div className="flex shrink-0 flex-col gap-1">
@@ -974,36 +876,33 @@ export default function TagSettingsModal({
                 {/* 프로젝트 혹은 업무명 */}
                 <div className="flex flex-col gap-1">
                   <FieldLabel required>프로젝트 혹은 업무명</FieldLabel>
-                  <input
+                  <Input1
                     type="text"
                     placeholder="예) 온보딩 리뉴얼"
                     value={newProjectName}
                     onChange={(e) => setNewProjectName(e.target.value)}
-                    className={fieldInputClass}
                   />
                 </div>
 
                 {/* 프로젝트 목적 */}
                 <div className="flex flex-col gap-1">
                   <FieldLabel required>프로젝트 목적</FieldLabel>
-                  <input
+                  <Input1
                     type="text"
                     placeholder="예) 신규 사용자 활성화 흐름 개선"
                     value={newPurpose}
                     onChange={(e) => setNewPurpose(e.target.value)}
-                    className={fieldInputClass}
                   />
                 </div>
 
                 {/* 기대하는 성과 */}
                 <div className="flex flex-col gap-1">
                   <FieldLabel required>기대하는 성과</FieldLabel>
-                  <input
+                  <Input1
                     type="text"
                     placeholder="예) 첫 주 핵심 기능 도달률 상승"
                     value={newOutcome}
                     onChange={(e) => setNewOutcome(e.target.value)}
-                    className={fieldInputClass}
                   />
                 </div>
 
@@ -1019,7 +918,7 @@ export default function TagSettingsModal({
                           setShowStartDatePicker((v) => !v)
                           setShowEndDatePicker(false)
                         }}
-                        className={`${fieldInputClass} flex items-center justify-between cursor-pointer`}
+                        className="flex h-15 w-full cursor-pointer items-center justify-between rounded-lg border border-(--color-border-subtle) bg-(--color-bg-default) px-5 text-left [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal outline-none transition-colors focus:border-(--color-border-brand)"
                       >
                         <span
                           className={
@@ -1053,7 +952,7 @@ export default function TagSettingsModal({
                           setShowEndDatePicker((v) => !v)
                           setShowStartDatePicker(false)
                         }}
-                        className={`${fieldInputClass} flex items-center justify-between cursor-pointer`}
+                        className="flex h-15 w-full cursor-pointer items-center justify-between rounded-lg border border-(--color-border-subtle) bg-(--color-bg-default) px-5 text-left [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal outline-none transition-colors focus:border-(--color-border-brand)"
                       >
                         <span
                           className={
@@ -1100,26 +999,23 @@ export default function TagSettingsModal({
                     <AiLoadingDots />
                   ) : (
                     newKpis.map((kpi, i) => (
-                      <div
+                      <Input1
                         key={i}
-                        className="flex h-15 items-center justify-between rounded-lg border border-(--color-border-subtle) bg-(--color-bg-default) px-5 transition-colors focus-within:border-(--color-border-brand)"
-                      >
-                        <input
-                          type="text"
-                          placeholder="예) 온보딩 완료율"
-                          value={kpi}
-                          onChange={(e) => handleKpiChange(i, e.target.value)}
-                          className="min-w-0 flex-1 bg-transparent [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) outline-none"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveKpi(i)}
-                          aria-label="KPI 삭제"
-                          className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-status-error)"
-                        >
-                          <TrashIcon aria-hidden className="size-6" />
-                        </button>
-                      </div>
+                        type="text"
+                        placeholder="예) 온보딩 완료율"
+                        value={kpi}
+                        onChange={(e) => handleKpiChange(i, e.target.value)}
+                        endAdornment={
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveKpi(i)}
+                            aria-label="KPI 삭제"
+                            className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-status-error)"
+                          >
+                            <TrashIcon aria-hidden className="size-6" />
+                          </button>
+                        }
+                      />
                     ))
                   )}
                   <TextButton
