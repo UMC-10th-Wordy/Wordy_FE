@@ -236,9 +236,11 @@ export default function TagSettingsModal({
     setExpandedLabel(isExpanding ? tag.label : null)
     setSelectedTag(isExpanding ? tag : null)
     if (isExpanding && tag.id) {
-      getTagDetail(tag.id).then((dto) => {
-        if (dto) setDetailByLabel((prev) => ({ ...prev, [tag.label]: mapTagDtoToTaskTag(dto) }))
-      })
+      getTagDetail(tag.id)
+        .then((dto) => {
+          if (dto) setDetailByLabel((prev) => ({ ...prev, [tag.label]: mapTagDtoToTaskTag(dto) }))
+        })
+        .catch(() => {})
     }
   }
 
@@ -265,6 +267,7 @@ export default function TagSettingsModal({
     if (isDuplicate) return
     const original = getEditOriginal()
     const updated: TaskTag = {
+      id: original?.id,
       label: editDraft.label,
       color: editDraft.color,
       meta: original?.meta
@@ -323,20 +326,24 @@ export default function TagSettingsModal({
 
   const handleAddTag = async () => {
     if (!canAddNewTag) return
-    const created = await createTag(
-      mapDraftToCreatePayload({
-        label: newLabel.trim(),
-        color: newColor,
-        projectName: newProjectName.trim(),
-        purpose: newPurpose.trim(),
-        expectedOutcome: newOutcome.trim(),
-        startDate: newStartDate,
-        endDate: newEndDate,
-        kpis: newKpis.filter((k) => k.trim() !== ''),
-      }),
-    )
-    onAddTag(mapTagDtoToTaskTag(created))
-    onClose()
+    try {
+      const created = await createTag(
+        mapDraftToCreatePayload({
+          label: newLabel.trim(),
+          color: newColor,
+          projectName: newProjectName.trim(),
+          purpose: newPurpose.trim(),
+          expectedOutcome: newOutcome.trim(),
+          startDate: newStartDate,
+          endDate: newEndDate,
+          kpis: newKpis.filter((k) => k.trim() !== ''),
+        }),
+      )
+      onAddTag(mapTagDtoToTaskTag(created))
+      onClose()
+    } catch {
+      return
+    }
   }
 
   const modal = createPortal(

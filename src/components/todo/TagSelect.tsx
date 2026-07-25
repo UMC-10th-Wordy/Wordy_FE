@@ -67,9 +67,11 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
   useEffect(() => {
     if (tags !== undefined) return
     let cancelled = false
-    getTags().then((dtos) => {
-      if (!cancelled) setTagOptions(dtos.map(mapTagDtoToTaskTag))
-    })
+    getTags()
+      .then((dtos) => {
+        if (!cancelled) setTagOptions(dtos.map(mapTagDtoToTaskTag))
+      })
+      .catch(() => {})
     return () => {
       cancelled = true
     }

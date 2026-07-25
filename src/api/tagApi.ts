@@ -22,8 +22,8 @@ export async function createTag(payload: CreateTagPayload): Promise<TagDto> {
     expectedOutcome: payload.expectedOutcome,
     expectedStartDate: payload.expectedStartDate
       ? `${payload.expectedStartDate}T00:00:00.000Z`
-      : now,
-    expectedEndDate: payload.expectedEndDate ? `${payload.expectedEndDate}T00:00:00.000Z` : now,
+      : '',
+    expectedEndDate: payload.expectedEndDate ? `${payload.expectedEndDate}T00:00:00.000Z` : '',
     kpis: payload.kpis,
     createdAt: now,
     updatedAt: now,
