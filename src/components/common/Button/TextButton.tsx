@@ -49,8 +49,8 @@ const button = cva(
         ],
       },
       size: {
-        small: 'h-8 px-2 gap-1 [font-size:var(--font-size-body-1)] rounded-md',
-        medium: 'h-11 px-3 gap-1 [font-size:var(--font-size-body-2)] rounded-lg',
+        small: 'h-8 px-2 gap-1 [font-size:var(--font-size-body-4)] rounded-md',
+        medium: 'h-11 px-3 gap-1 [font-size:var(--font-size-body-3)] rounded-lg',
         large: 'h-15 px-4 gap-2 [font-size:var(--font-size-body-1)] rounded-lg',
       },
       fullWidth: {
@@ -77,6 +77,12 @@ export interface TextButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   iconRight?: ReactNode
 }
 
+const iconSizeClass: Record<TextButtonSize, string> = {
+  small: 'size-5 [&>svg]:size-5',
+  medium: 'size-7 [&>svg]:size-7',
+  large: 'size-8 [&>svg]:size-8',
+}
+
 export function TextButton({
   variant,
   size,
@@ -87,11 +93,25 @@ export function TextButton({
   children,
   ...rest
 }: TextButtonProps) {
+  const resolvedSize = size ?? 'medium'
+
   return (
     <button type="button" className={button({ variant, size, fullWidth, className })} {...rest}>
-      {iconLeft}
+      {iconLeft && (
+        <span
+          className={`inline-flex shrink-0 items-center justify-center ${iconSizeClass[resolvedSize]}`}
+        >
+          {iconLeft}
+        </span>
+      )}
       {children}
-      {iconRight}
+      {iconRight && (
+        <span
+          className={`inline-flex shrink-0 items-center justify-center ${iconSizeClass[resolvedSize]}`}
+        >
+          {iconRight}
+        </span>
+      )}
     </button>
   )
 }

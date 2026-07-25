@@ -76,10 +76,22 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   icon: ReactNode
 }
 
+const iconSizeClass: Record<IconButtonSize, string> = {
+  small: 'size-5 [&>svg]:size-5',
+  medium: 'size-7 [&>svg]:size-7',
+  large: 'size-8 [&>svg]:size-8',
+}
+
 export function IconButton({ variant, size, icon, className, ...rest }: IconButtonProps) {
+  const resolvedSize = size ?? 'medium'
+
   return (
     <button type="button" className={iconButton({ variant, size, className })} {...rest}>
-      {icon}
+      <span
+        className={`inline-flex shrink-0 items-center justify-center ${iconSizeClass[resolvedSize]}`}
+      >
+        {icon}
+      </span>
     </button>
   )
 }
