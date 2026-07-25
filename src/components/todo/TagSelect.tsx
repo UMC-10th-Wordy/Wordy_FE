@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import ChevronUpIcon from '@/assets/icons/Direction=top.svg?react'
 import ChevronDownIcon from '@/assets/icons/Direction=bottom.svg?react'
 import MoveIcon from '@/assets/icons/move.svg?react'
@@ -11,7 +11,8 @@ import TagSettingsModal from './TagSettingsModal'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
 import { useVerticalDragReorder, type VerticalDragOverInfo } from '@/hooks/useVerticalDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
-import { INITIAL_TAG_OPTIONS } from '@/mocks/tagOptions'
+import { getTags } from '@/api/tagApi'
+import { mapTagDtoToTaskTag } from '@/utils/tagMapper'
 import type { TaskTag } from '@/types/todo'
 
 const SCROLL_THRESHOLD = 10
@@ -58,10 +59,21 @@ interface TagSelectProps {
 
 export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [tagOptions, setTagOptions] = useState<TaskTag[]>(INITIAL_TAG_OPTIONS)
+  const [tagOptions, setTagOptions] = useState<TaskTag[]>([])
   const [showModal, setShowModal] = useState<'existing' | 'new' | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (tags !== undefined) return
+    let cancelled = false
+    getTags().then((dtos) => {
+      if (!cancelled) setTagOptions(dtos.map(mapTagDtoToTaskTag))
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [tags])
 
   const effectiveTags = tags ?? tagOptions
   const updateTags = (updater: (prev: TaskTag[]) => TaskTag[]) => {

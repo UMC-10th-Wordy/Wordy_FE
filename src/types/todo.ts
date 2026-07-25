@@ -13,6 +13,7 @@ export interface ProjectTagMeta {
 
 /* 업무 카드에 표시되는 프로젝트 태그 */
 export interface TaskTag {
+  id?: string
   label: string
   color: ProjectTagColor
   meta?: ProjectTagMeta
