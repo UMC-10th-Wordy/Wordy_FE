@@ -12,7 +12,7 @@ import { useOutsideClick } from '@/hooks/useOutsideClick'
 import { useVerticalDragReorder, type VerticalDragOverInfo } from '@/hooks/useVerticalDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
 import { getTags } from '@/api/tagApi'
-import { mapTagDtoToTaskTag } from '@/utils/tagMapper'
+import { getTagKey, mapTagDtoToTaskTag } from '@/utils/tagMapper'
 import type { TaskTag } from '@/types/todo'
 
 const SCROLL_THRESHOLD = 10
@@ -21,20 +21,20 @@ type TagPreviewEntry = { kind: 'tag'; tag: TaskTag } | { kind: 'placeholder' }
 
 function buildTagPreview(
   options: TaskTag[],
-  draggingLabel: string | null,
+  draggingKey: string | null,
   overInfo: VerticalDragOverInfo,
 ): TagPreviewEntry[] {
-  if (!draggingLabel) {
+  if (!draggingKey) {
     return options.map((tag) => ({ kind: 'tag', tag }))
   }
 
   const entries: TagPreviewEntry[] = options
-    .filter((tag) => tag.label !== draggingLabel)
+    .filter((tag) => getTagKey(tag) !== draggingKey)
     .map((tag) => ({ kind: 'tag', tag }))
 
   if (overInfo.itemId) {
     const targetIndex = entries.findIndex(
-      (entry) => entry.kind === 'tag' && entry.tag.label === overInfo.itemId,
+      (entry) => entry.kind === 'tag' && getTagKey(entry.tag) === overInfo.itemId,
     )
     if (targetIndex === -1) {
       entries.push({ kind: 'placeholder' })
@@ -91,16 +91,16 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
     setIsOpen(false)
   }
 
-  const handleTagDrop = (draggedLabel: string, over: VerticalDragOverInfo) => {
+  const handleTagDrop = (draggedKey: string, over: VerticalDragOverInfo) => {
     updateTags((prev) => {
-      const draggedIndex = prev.findIndex((tag) => tag.label === draggedLabel)
+      const draggedIndex = prev.findIndex((tag) => getTagKey(tag) === draggedKey)
       if (draggedIndex === -1) return prev
 
-      const rest = prev.filter((tag) => tag.label !== draggedLabel)
+      const rest = prev.filter((tag) => getTagKey(tag) !== draggedKey)
       const draggedTag = prev[draggedIndex]
 
       if (over.itemId) {
-        const targetIndex = rest.findIndex((tag) => tag.label === over.itemId)
+        const targetIndex = rest.findIndex((tag) => getTagKey(tag) === over.itemId)
         if (targetIndex === -1) {
           rest.push(draggedTag)
         } else {
@@ -125,7 +125,7 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
 
   const previewEntries = buildTagPreview(effectiveTags, draggingId, overInfo)
   const draggingTag = draggingId
-    ? (effectiveTags.find((tag) => tag.label === draggingId) ?? null)
+    ? (effectiveTags.find((tag) => getTagKey(tag) === draggingId) ?? null)
     : null
 
   /* 태그 들고 움직이기 */
@@ -237,16 +237,17 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
                     }
 
                     const { tag } = entry
+                    const key = getTagKey(tag)
                     return (
                       <div
-                        key={tag.label}
-                        data-flip-id={tag.label}
+                        key={key}
+                        data-flip-id={key}
                         data-vdrag-row="true"
-                        data-vdrag-id={tag.label}
+                        data-vdrag-id={key}
                         className="flex h-10.5 w-full shrink-0 items-center gap-1 rounded-md p-1 transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
                       >
                         <span
-                          onMouseDown={startDrag(tag.label)}
+                          onMouseDown={startDrag(key)}
                           onDragStart={(event) => event.preventDefault()}
                           draggable={false}
                           className="flex size-6 shrink-0 cursor-grab items-center justify-center [-webkit-user-drag:none] active:cursor-grabbing"
@@ -306,11 +307,11 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
           onAddTag={(tag) => {
             updateTags((prev) => [...prev, tag])
           }}
-          onEditTag={(oldLabel, updated) => {
-            updateTags((prev) => prev.map((t) => (t.label === oldLabel ? updated : t)))
+          onEditTag={(oldKey, updated) => {
+            updateTags((prev) => prev.map((t) => (getTagKey(t) === oldKey ? updated : t)))
           }}
-          onDeleteTag={(label) => {
-            updateTags((prev) => prev.filter((t) => t.label !== label))
+          onDeleteTag={(key) => {
+            updateTags((prev) => prev.filter((t) => getTagKey(t) !== key))
           }}
         />
       )}
