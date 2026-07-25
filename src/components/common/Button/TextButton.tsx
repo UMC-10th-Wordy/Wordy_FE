@@ -1,5 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { ButtonIcon } from './ButtonIcon'
 
 const button = cva(
   [
@@ -49,8 +50,8 @@ const button = cva(
         ],
       },
       size: {
-        small: 'h-8 px-2 gap-1 [font-size:var(--font-size-body-1)] rounded-md',
-        medium: 'h-11 px-3 gap-1 [font-size:var(--font-size-body-2)] rounded-lg',
+        small: 'h-8 px-2 gap-1 [font-size:var(--font-size-body-4)] rounded-md',
+        medium: 'h-11 px-3 gap-1 [font-size:var(--font-size-body-3)] rounded-lg',
         large: 'h-15 px-4 gap-2 [font-size:var(--font-size-body-1)] rounded-lg',
       },
       fullWidth: {
@@ -87,11 +88,13 @@ export function TextButton({
   children,
   ...rest
 }: TextButtonProps) {
+  const resolvedSize = size ?? 'medium'
+
   return (
     <button type="button" className={button({ variant, size, fullWidth, className })} {...rest}>
-      {iconLeft}
+      {iconLeft && <ButtonIcon icon={iconLeft} size={resolvedSize} />}
       {children}
-      {iconRight}
+      {iconRight && <ButtonIcon icon={iconRight} size={resolvedSize} />}
     </button>
   )
 }
