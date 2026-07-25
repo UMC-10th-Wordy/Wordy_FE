@@ -10,6 +10,7 @@ export interface Input1Props extends Omit<InputHTMLAttributes<HTMLInputElement>,
   hint?: ReactNode
   error?: ReactNode
   success?: ReactNode
+  endAdornment?: ReactNode
 }
 
 export function Input1({
@@ -17,6 +18,7 @@ export function Input1({
   hint,
   error,
   success,
+  endAdornment,
   className,
   type,
   disabled,
@@ -66,6 +68,7 @@ export function Input1({
             )}
           </button>
         )}
+        {!isPassword && endAdornment}
       </div>
       {hasError && (
         <div className="flex items-center gap-1">

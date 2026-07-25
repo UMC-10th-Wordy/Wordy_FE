@@ -23,24 +23,26 @@ export function SearchInput({
   onBlur,
   onKeyDown,
   onChange,
+  value,
   ...rest
 }: SearchInputProps) {
   const [focused, setFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const showDropdown = focused && recentKeywords.length > 0
+  const hasValue = String(value ?? '').length > 0
+  const showDropdown = focused && !hasValue && recentKeywords.length > 0
 
   return (
     <div className={['relative', className].filter(Boolean).join(' ')}>
       <div
         className={[
           'flex items-center gap-2.5 px-5 py-3 rounded-(--scale-12) bg-(--color-bg-default) transition-colors duration-100 ease-out',
-          'ring-1',
-          focused ? 'ring-(--color-border-brand)' : 'ring-(--color-border-light)',
+          'border border-(--color-border-light)',
         ].join(' ')}
       >
         <input
           ref={inputRef}
           type="text"
+          value={value}
           autoComplete="off"
           className="flex-1 min-w-0 bg-transparent outline-none [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) caret-(--color-border-brand)"
           onChange={onChange}
@@ -53,6 +55,10 @@ export function SearchInput({
             onBlur?.(e)
           }}
           onKeyDown={(e) => {
+            if (e.key === 'Escape' && showDropdown) {
+              e.stopPropagation()
+              setFocused(false)
+            }
             if (e.key === 'Enter') onSearch?.(e.currentTarget.value)
             onKeyDown?.(e)
           }}
@@ -62,7 +68,7 @@ export function SearchInput({
       </div>
 
       {showDropdown && (
-        <div className="absolute left-0 top-[calc(100%+8px)] w-full bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] px-4 py-5 flex flex-col gap-2.5 z-10">
+        <div className="absolute left-0 top-[calc(100%+10px)] w-full bg-(--color-bg-default) rounded-(--scale-12) shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)] px-4 py-5 flex flex-col gap-2.5 z-10">
           <div className="flex items-center justify-between pl-1">
             <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-semibold text-(--color-text-tertiary)">
               최근 검색어
@@ -79,11 +85,11 @@ export function SearchInput({
             {recentKeywords.slice(0, 5).map((keyword) => (
               <li
                 key={keyword}
-                className="flex items-center justify-between h-13 px-1 hover:bg-(--color-sidebar-neutral-hover) rounded-md transition-colors duration-100 ease-out"
+                className="flex h-13 items-center justify-between p-1 transition-colors duration-100 ease-out hover:bg-(--color-sidebar-neutral-hover)"
               >
                 <button
                   type="button"
-                  className="flex-1 text-left [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-normal text-(--color-text-default)"
+                  className="flex-1 text-left [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)"
                   onClick={() => {
                     if (inputRef.current) {
                       const nativeInputValueSetter = Object.getOwnPropertyDescriptor(

@@ -1,5 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { ButtonIcon } from './ButtonIcon'
 
 const iconButton = cva(
   [
@@ -46,6 +47,13 @@ const iconButton = cva(
           'active:bg-[var(--color-bg-tertiary)]',
           'disabled:text-[var(--color-text-disabled)]',
         ],
+        icon_neutral: [
+          'text-[var(--color-icon-secondary)]',
+          'hover:bg-[var(--color-bg-tertiary)]',
+          'focus-visible:bg-[var(--color-bg-tertiary)]',
+          'active:bg-[var(--color-bg-tertiary)]',
+          'disabled:text-[var(--color-icon-disabled)]',
+        ],
         icon_inverse: [
           'bg-[rgba(0,0,0,0.5)] text-[var(--color-text-inverse)]',
           'hover:bg-[var(--color-bg-default)] hover:text-[var(--color-text-default)]',
@@ -77,9 +85,11 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 export function IconButton({ variant, size, icon, className, ...rest }: IconButtonProps) {
+  const resolvedSize = size ?? 'medium'
+
   return (
     <button type="button" className={iconButton({ variant, size, className })} {...rest}>
-      {icon}
+      <ButtonIcon icon={icon} size={resolvedSize} />
     </button>
   )
 }
