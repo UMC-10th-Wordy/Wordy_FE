@@ -29,6 +29,10 @@ export function fromApiDate(value: string): string {
   return value.slice(0, 10).replaceAll('-', '.')
 }
 
+export function getTagKey(tag: TaskTag): string {
+  return tag.id ?? tag.label
+}
+
 export function mapTagDtoToTaskTag(dto: TagDto): TaskTag {
   return {
     id: dto.tagId,

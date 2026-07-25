@@ -22,7 +22,7 @@ import TagDatePicker from './TagDatePicker'
 import type { ProjectTagColor } from './ProjectTag'
 import type { TaskTag } from '@/types/todo'
 import { createTag, getTagDetail } from '@/api/tagApi'
-import { mapDraftToCreatePayload, mapTagDtoToTaskTag } from '@/utils/tagMapper'
+import { getTagKey, mapDraftToCreatePayload, mapTagDtoToTaskTag } from '@/utils/tagMapper'
 
 type Tab = 'existing' | 'new'
 
@@ -74,8 +74,8 @@ interface TagSettingsModalProps {
   onClose: () => void
   onApply: (tag: TaskTag) => void
   onAddTag: (tag: TaskTag) => void
-  onEditTag: (oldLabel: string, updated: TaskTag) => void
-  onDeleteTag: (label: string) => void
+  onEditTag: (oldKey: string, updated: TaskTag) => void
+  onDeleteTag: (key: string) => void
 }
 
 export default function TagSettingsModal({
@@ -93,10 +93,10 @@ export default function TagSettingsModal({
   // 기존 태그 탭
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState<TaskTag | null>(null)
-  const [expandedLabel, setExpandedLabel] = useState<string | null>(null)
-  const [detailByLabel, setDetailByLabel] = useState<Record<string, TaskTag>>({})
-  const [editingLabel, setEditingLabel] = useState<string | null>(null)
-  const [deletingLabel, setDeletingLabel] = useState<string | null>(null)
+  const [expandedKey, setExpandedKey] = useState<string | null>(null)
+  const [detailByKey, setDetailByKey] = useState<Record<string, TaskTag>>({})
+  const [editingKey, setEditingKey] = useState<string | null>(null)
+  const [deletingKey, setDeletingKey] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<{
     label: string
     color: ProjectTagColor
@@ -214,8 +214,9 @@ export default function TagSettingsModal({
   }
 
   const handleStartEdit = (tag: TaskTag) => {
-    setEditingLabel(tag.label)
-    setExpandedLabel(tag.label)
+    const key = getTagKey(tag)
+    setEditingKey(key)
+    setExpandedKey(key)
     setEditDraft({
       label: tag.label,
       color: tag.color,
@@ -229,16 +230,17 @@ export default function TagSettingsModal({
     setShowEditColorPicker(false)
   }
 
-  const getEditOriginal = () => tags.find((t) => t.label === editingLabel)
+  const getEditOriginal = () => tags.find((t) => getTagKey(t) === editingKey)
 
   const handleToggleExpand = (tag: TaskTag) => {
-    const isExpanding = expandedLabel !== tag.label
-    setExpandedLabel(isExpanding ? tag.label : null)
+    const key = getTagKey(tag)
+    const isExpanding = expandedKey !== key
+    setExpandedKey(isExpanding ? key : null)
     setSelectedTag(isExpanding ? tag : null)
     if (isExpanding && tag.id) {
       getTagDetail(tag.id)
         .then((dto) => {
-          if (dto) setDetailByLabel((prev) => ({ ...prev, [tag.label]: mapTagDtoToTaskTag(dto) }))
+          if (dto) setDetailByKey((prev) => ({ ...prev, [key]: mapTagDtoToTaskTag(dto) }))
         })
         .catch(() => {})
     }
@@ -260,9 +262,9 @@ export default function TagSettingsModal({
   }
 
   const handleConfirmEdit = () => {
-    if (!editingLabel || !hasEditChanges()) return
+    if (!editingKey || !hasEditChanges()) return
     const isDuplicate = tags.some(
-      (t) => t.label === editDraft.label.trim() && t.label !== editingLabel,
+      (t) => t.label === editDraft.label.trim() && getTagKey(t) !== editingKey,
     )
     if (isDuplicate) return
     const original = getEditOriginal()
@@ -282,15 +284,15 @@ export default function TagSettingsModal({
           }
         : undefined,
     }
-    onEditTag(editingLabel, updated)
-    if (selectedTag?.label === editingLabel) setSelectedTag(updated)
-    setEditingLabel(null)
-    setExpandedLabel(null)
+    onEditTag(editingKey, updated)
+    if (selectedTag && getTagKey(selectedTag) === editingKey) setSelectedTag(updated)
+    setEditingKey(null)
+    setExpandedKey(null)
   }
 
   const handleCancelEdit = () => {
-    setEditingLabel(null)
-    setExpandedLabel(null)
+    setEditingKey(null)
+    setExpandedKey(null)
     setShowEditColorPicker(false)
     setShowEditStartDatePicker(false)
     setShowEditEndDatePicker(false)
@@ -539,363 +541,376 @@ export default function TagSettingsModal({
                         </div>
                       </div>
                     ) : (
-                      visibleTags.map((tag) => (
-                        <div key={tag.label} className="flex shrink-0 flex-col">
-                          <div
-                            className={[
-                              'flex items-center gap-2 border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-3 py-2 shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]',
-                              expandedLabel === tag.label && tag.meta
-                                ? 'rounded-tl-lg rounded-tr-lg'
-                                : 'rounded-lg',
-                            ].join(' ')}
-                          >
-                            <>
-                              <button
-                                type="button"
-                                className="flex min-w-0 flex-1 items-center"
-                                onClick={() => {
-                                  if (editingLabel === tag.label) return
-                                  handleToggleExpand(tag)
-                                }}
-                              >
-                                <ProjectTag
-                                  label={editingLabel === tag.label ? editDraft.label : tag.label}
-                                  color={editingLabel === tag.label ? editDraft.color : tag.color}
-                                />
-                              </button>
-                              <div className="flex shrink-0 items-center gap-2">
-                                <button
-                                  type="button"
-                                  aria-label="수정"
-                                  onClick={() => {
-                                    if (editingLabel !== tag.label) handleStartEdit(tag)
-                                  }}
-                                  className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
-                                >
-                                  <EditIcon aria-hidden className="size-6" />
-                                </button>
-                                <button
-                                  type="button"
-                                  aria-label="삭제"
-                                  onClick={() => {
-                                    if (editingLabel !== tag.label) setDeletingLabel(tag.label)
-                                  }}
-                                  className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
-                                >
-                                  <TrashIcon aria-hidden className="size-6" />
-                                </button>
-                                <button
-                                  type="button"
-                                  aria-label={expandedLabel === tag.label ? '접기' : '펼치기'}
-                                  onClick={() => {
-                                    if (editingLabel === tag.label) {
-                                      handleCancelEdit()
-                                    } else {
-                                      handleToggleExpand(tag)
-                                    }
-                                  }}
-                                  className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
-                                >
-                                  {expandedLabel === tag.label ? (
-                                    <DirectionTopIcon aria-hidden className="size-6" />
-                                  ) : (
-                                    <DirectionBottomIcon aria-hidden className="size-6" />
-                                  )}
-                                </button>
-                              </div>
-                            </>
-                          </div>
-                          {expandedLabel === tag.label && tag.meta && (
+                      visibleTags.map((tag) => {
+                        const key = getTagKey(tag)
+                        const isEditingThis = editingKey === key
+                        const isExpandedThis = expandedKey === key
+                        return (
+                          <div key={key} className="flex shrink-0 flex-col">
                             <div
-                              className={`flex flex-col rounded-bl-lg rounded-br-lg border-[0.5px] border-t-0 border-(--color-border-brand-subtle) bg-(--color-bg-brand-subtle) p-4 ${editingLabel === tag.label ? 'gap-5' : 'gap-3'}`}
+                              className={[
+                                'flex items-center gap-2 border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) px-3 py-2 shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]',
+                                isExpandedThis && tag.meta
+                                  ? 'rounded-tl-lg rounded-tr-lg'
+                                  : 'rounded-lg',
+                              ].join(' ')}
                             >
-                              {editingLabel === tag.label ? (
-                                <>
-                                  {/* 태그명 + 색상 */}
-                                  <div className="flex items-start gap-5">
-                                    <div className="flex min-w-0 flex-1 flex-col gap-1">
-                                      <FieldLabel required>태그명</FieldLabel>
+                              <>
+                                <button
+                                  type="button"
+                                  className="flex min-w-0 flex-1 items-center"
+                                  onClick={() => {
+                                    if (isEditingThis) return
+                                    handleToggleExpand(tag)
+                                  }}
+                                >
+                                  <ProjectTag
+                                    label={isEditingThis ? editDraft.label : tag.label}
+                                    color={isEditingThis ? editDraft.color : tag.color}
+                                  />
+                                </button>
+                                <div className="flex shrink-0 items-center gap-2">
+                                  <button
+                                    type="button"
+                                    aria-label="수정"
+                                    onClick={() => {
+                                      if (!isEditingThis) handleStartEdit(tag)
+                                    }}
+                                    className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
+                                  >
+                                    <EditIcon aria-hidden className="size-6" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    aria-label="삭제"
+                                    onClick={() => {
+                                      if (!isEditingThis) setDeletingKey(key)
+                                    }}
+                                    className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
+                                  >
+                                    <TrashIcon aria-hidden className="size-6" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    aria-label={isExpandedThis ? '접기' : '펼치기'}
+                                    onClick={() => {
+                                      if (isEditingThis) {
+                                        handleCancelEdit()
+                                      } else {
+                                        handleToggleExpand(tag)
+                                      }
+                                    }}
+                                    className="flex size-8 items-center justify-center rounded-md text-(--color-icon-secondary) transition-colors duration-100 ease-out hover:bg-(--color-bg-tertiary)"
+                                  >
+                                    {isExpandedThis ? (
+                                      <DirectionTopIcon aria-hidden className="size-6" />
+                                    ) : (
+                                      <DirectionBottomIcon aria-hidden className="size-6" />
+                                    )}
+                                  </button>
+                                </div>
+                              </>
+                            </div>
+                            {isExpandedThis && tag.meta && (
+                              <div
+                                className={`flex flex-col rounded-bl-lg rounded-br-lg border-[0.5px] border-t-0 border-(--color-border-brand-subtle) bg-(--color-bg-brand-subtle) p-4 ${isEditingThis ? 'gap-5' : 'gap-3'}`}
+                              >
+                                {isEditingThis ? (
+                                  <>
+                                    {/* 태그명 + 색상 */}
+                                    <div className="flex items-start gap-5">
+                                      <div className="flex min-w-0 flex-1 flex-col gap-1">
+                                        <FieldLabel required>태그명</FieldLabel>
+                                        <input
+                                          type="text"
+                                          value={editDraft.label}
+                                          onChange={(e) =>
+                                            setEditDraft((d) => ({ ...d, label: e.target.value }))
+                                          }
+                                          className={fieldInputClass}
+                                          autoFocus
+                                        />
+                                      </div>
+                                      <div className="flex shrink-0 flex-col gap-1">
+                                        <FieldLabel required>색상</FieldLabel>
+                                        <div className="relative">
+                                          <button
+                                            ref={editColorBtnRef}
+                                            type="button"
+                                            onClick={() => setShowEditColorPicker((v) => !v)}
+                                            className={`size-15 rounded-(--scale-8) ${COLOR_SWATCH_MAP[editDraft.color]}`}
+                                            aria-label="색상 선택"
+                                          />
+                                          {showEditColorPicker && (
+                                            <TagColorPicker
+                                              anchorRef={editColorBtnRef}
+                                              value={editDraft.color}
+                                              onChange={(c) =>
+                                                setEditDraft((d) => ({ ...d, color: c }))
+                                              }
+                                              onClose={() => setShowEditColorPicker(false)}
+                                            />
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {/* 프로젝트 혹은 업무명 */}
+                                    <div className="flex flex-col gap-1">
+                                      <FieldLabel required>프로젝트 혹은 업무명</FieldLabel>
                                       <input
                                         type="text"
-                                        value={editDraft.label}
+                                        placeholder="프로젝트 혹은 업무명을 입력해 주세요"
+                                        value={editDraft.projectName}
                                         onChange={(e) =>
-                                          setEditDraft((d) => ({ ...d, label: e.target.value }))
+                                          setEditDraft((d) => ({
+                                            ...d,
+                                            projectName: e.target.value,
+                                          }))
                                         }
                                         className={fieldInputClass}
-                                        autoFocus
                                       />
                                     </div>
-                                    <div className="flex shrink-0 flex-col gap-1">
-                                      <FieldLabel required>색상</FieldLabel>
-                                      <div className="relative">
-                                        <button
-                                          ref={editColorBtnRef}
-                                          type="button"
-                                          onClick={() => setShowEditColorPicker((v) => !v)}
-                                          className={`size-15 rounded-(--scale-8) ${COLOR_SWATCH_MAP[editDraft.color]}`}
-                                          aria-label="색상 선택"
-                                        />
-                                        {showEditColorPicker && (
-                                          <TagColorPicker
-                                            anchorRef={editColorBtnRef}
-                                            value={editDraft.color}
-                                            onChange={(c) =>
-                                              setEditDraft((d) => ({ ...d, color: c }))
-                                            }
-                                            onClose={() => setShowEditColorPicker(false)}
-                                          />
-                                        )}
+                                    {/* 프로젝트 목적 */}
+                                    <div className="flex flex-col gap-1">
+                                      <FieldLabel required>프로젝트 목적</FieldLabel>
+                                      <input
+                                        type="text"
+                                        placeholder="프로젝트 목적을 입력해 주세요"
+                                        value={editDraft.purpose}
+                                        onChange={(e) =>
+                                          setEditDraft((d) => ({ ...d, purpose: e.target.value }))
+                                        }
+                                        className={fieldInputClass}
+                                      />
+                                    </div>
+                                    {/* 기대하는 성과 */}
+                                    <div className="flex flex-col gap-1">
+                                      <FieldLabel required>기대하는 성과</FieldLabel>
+                                      <input
+                                        type="text"
+                                        placeholder="기대하는 성과를 입력해 주세요"
+                                        value={editDraft.expectedOutcome}
+                                        onChange={(e) =>
+                                          setEditDraft((d) => ({
+                                            ...d,
+                                            expectedOutcome: e.target.value,
+                                          }))
+                                        }
+                                        className={fieldInputClass}
+                                      />
+                                    </div>
+                                    {/* 예상 기간 */}
+                                    <div className="flex flex-col gap-1">
+                                      <FieldLabel>예상 기간</FieldLabel>
+                                      <div className="flex items-center gap-3">
+                                        <div className="relative flex-1">
+                                          <button
+                                            ref={editStartDateBtnRef}
+                                            type="button"
+                                            onClick={() => setShowEditStartDatePicker((v) => !v)}
+                                            className={[
+                                              fieldInputClass,
+                                              'flex h-15 w-full items-center justify-between text-left',
+                                              !editDraft.startDate &&
+                                                'text-(--color-text-tertiary)',
+                                            ]
+                                              .filter(Boolean)
+                                              .join(' ')}
+                                          >
+                                            <span>{editDraft.startDate || '시작일'}</span>
+                                            <CalendarIcon
+                                              aria-hidden
+                                              className="size-6 shrink-0 text-(--color-icon-tertiary)"
+                                            />
+                                          </button>
+                                          {showEditStartDatePicker && (
+                                            <TagDatePicker
+                                              anchorRef={
+                                                editStartDateBtnRef as React.RefObject<HTMLElement>
+                                              }
+                                              value={editDraft.startDate}
+                                              onChange={(v) =>
+                                                setEditDraft((d) => ({ ...d, startDate: v }))
+                                              }
+                                              onClose={() => setShowEditStartDatePicker(false)}
+                                            />
+                                          )}
+                                        </div>
+                                        <div className="h-[1.5px] w-2 shrink-0 bg-(--color-text-tertiary)" />
+                                        <div className="relative flex-1">
+                                          <button
+                                            ref={editEndDateBtnRef}
+                                            type="button"
+                                            onClick={() => setShowEditEndDatePicker((v) => !v)}
+                                            className={[
+                                              fieldInputClass,
+                                              'flex h-15 w-full items-center justify-between text-left',
+                                              !editDraft.endDate && 'text-(--color-text-tertiary)',
+                                            ]
+                                              .filter(Boolean)
+                                              .join(' ')}
+                                          >
+                                            <span>{editDraft.endDate || '종료일'}</span>
+                                            <CalendarIcon
+                                              aria-hidden
+                                              className="size-6 shrink-0 text-(--color-icon-tertiary)"
+                                            />
+                                          </button>
+                                          {showEditEndDatePicker && (
+                                            <TagDatePicker
+                                              anchorRef={
+                                                editEndDateBtnRef as React.RefObject<HTMLElement>
+                                              }
+                                              value={editDraft.endDate}
+                                              onChange={(v) =>
+                                                setEditDraft((d) => ({ ...d, endDate: v }))
+                                              }
+                                              onClose={() => setShowEditEndDatePicker(false)}
+                                            />
+                                          )}
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                  {/* 프로젝트 혹은 업무명 */}
-                                  <div className="flex flex-col gap-1">
-                                    <FieldLabel required>프로젝트 혹은 업무명</FieldLabel>
-                                    <input
-                                      type="text"
-                                      placeholder="프로젝트 혹은 업무명을 입력해 주세요"
-                                      value={editDraft.projectName}
-                                      onChange={(e) =>
-                                        setEditDraft((d) => ({ ...d, projectName: e.target.value }))
-                                      }
-                                      className={fieldInputClass}
-                                    />
-                                  </div>
-                                  {/* 프로젝트 목적 */}
-                                  <div className="flex flex-col gap-1">
-                                    <FieldLabel required>프로젝트 목적</FieldLabel>
-                                    <input
-                                      type="text"
-                                      placeholder="프로젝트 목적을 입력해 주세요"
-                                      value={editDraft.purpose}
-                                      onChange={(e) =>
-                                        setEditDraft((d) => ({ ...d, purpose: e.target.value }))
-                                      }
-                                      className={fieldInputClass}
-                                    />
-                                  </div>
-                                  {/* 기대하는 성과 */}
-                                  <div className="flex flex-col gap-1">
-                                    <FieldLabel required>기대하는 성과</FieldLabel>
-                                    <input
-                                      type="text"
-                                      placeholder="기대하는 성과를 입력해 주세요"
-                                      value={editDraft.expectedOutcome}
-                                      onChange={(e) =>
-                                        setEditDraft((d) => ({
-                                          ...d,
-                                          expectedOutcome: e.target.value,
-                                        }))
-                                      }
-                                      className={fieldInputClass}
-                                    />
-                                  </div>
-                                  {/* 예상 기간 */}
-                                  <div className="flex flex-col gap-1">
-                                    <FieldLabel>예상 기간</FieldLabel>
-                                    <div className="flex items-center gap-3">
-                                      <div className="relative flex-1">
-                                        <button
-                                          ref={editStartDateBtnRef}
-                                          type="button"
-                                          onClick={() => setShowEditStartDatePicker((v) => !v)}
-                                          className={[
-                                            fieldInputClass,
-                                            'flex h-15 w-full items-center justify-between text-left',
-                                            !editDraft.startDate && 'text-(--color-text-tertiary)',
-                                          ]
-                                            .filter(Boolean)
-                                            .join(' ')}
+                                    {/* 핵심 평가 지표 */}
+                                    <div className="flex flex-col gap-2">
+                                      <div className="flex items-start justify-between">
+                                        <FieldLabel required>핵심 평가 지표</FieldLabel>
+                                        <TextButton
+                                          variant="stroke"
+                                          size="small"
+                                          className="w-26.75 shrink-0 [font-size:var(--font-size-body-4)]"
+                                          iconLeft={<GenerateIcon aria-hidden className="size-5" />}
                                         >
-                                          <span>{editDraft.startDate || '시작일'}</span>
-                                          <CalendarIcon
-                                            aria-hidden
-                                            className="size-6 shrink-0 text-(--color-icon-tertiary)"
-                                          />
-                                        </button>
-                                        {showEditStartDatePicker && (
-                                          <TagDatePicker
-                                            anchorRef={
-                                              editStartDateBtnRef as React.RefObject<HTMLElement>
-                                            }
-                                            value={editDraft.startDate}
-                                            onChange={(v) =>
-                                              setEditDraft((d) => ({ ...d, startDate: v }))
-                                            }
-                                            onClose={() => setShowEditStartDatePicker(false)}
-                                          />
-                                        )}
+                                          AI 추천 받기
+                                        </TextButton>
                                       </div>
-                                      <div className="h-[1.5px] w-2 shrink-0 bg-(--color-text-tertiary)" />
-                                      <div className="relative flex-1">
-                                        <button
-                                          ref={editEndDateBtnRef}
-                                          type="button"
-                                          onClick={() => setShowEditEndDatePicker((v) => !v)}
-                                          className={[
-                                            fieldInputClass,
-                                            'flex h-15 w-full items-center justify-between text-left',
-                                            !editDraft.endDate && 'text-(--color-text-tertiary)',
-                                          ]
-                                            .filter(Boolean)
-                                            .join(' ')}
+                                      {editDraft.kpis.map((kpi, i) => (
+                                        <div
+                                          key={i}
+                                          className="flex h-15 items-center justify-between rounded-lg border border-(--color-border-subtle) bg-(--color-bg-default) px-5 transition-colors focus-within:border-(--color-border-brand)"
                                         >
-                                          <span>{editDraft.endDate || '종료일'}</span>
-                                          <CalendarIcon
-                                            aria-hidden
-                                            className="size-6 shrink-0 text-(--color-icon-tertiary)"
-                                          />
-                                        </button>
-                                        {showEditEndDatePicker && (
-                                          <TagDatePicker
-                                            anchorRef={
-                                              editEndDateBtnRef as React.RefObject<HTMLElement>
+                                          <input
+                                            type="text"
+                                            placeholder="핵심 평가 지표를 입력해 주세요"
+                                            value={kpi}
+                                            onChange={(e) =>
+                                              setEditDraft((d) => ({
+                                                ...d,
+                                                kpis: d.kpis.map((k, ki) =>
+                                                  ki === i ? e.target.value : k,
+                                                ),
+                                              }))
                                             }
-                                            value={editDraft.endDate}
-                                            onChange={(v) =>
-                                              setEditDraft((d) => ({ ...d, endDate: v }))
-                                            }
-                                            onClose={() => setShowEditEndDatePicker(false)}
+                                            className="min-w-0 flex-1 bg-transparent [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) outline-none"
                                           />
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  {/* 핵심 평가 지표 */}
-                                  <div className="flex flex-col gap-2">
-                                    <div className="flex items-start justify-between">
-                                      <FieldLabel required>핵심 평가 지표</FieldLabel>
+                                          <button
+                                            type="button"
+                                            aria-label="KPI 삭제"
+                                            onClick={() =>
+                                              setEditDraft((d) => ({
+                                                ...d,
+                                                kpis: d.kpis.filter((_, ki) => ki !== i),
+                                              }))
+                                            }
+                                            className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-icon-secondary)"
+                                          >
+                                            <TrashIcon aria-hidden className="size-6" />
+                                          </button>
+                                        </div>
+                                      ))}
                                       <TextButton
                                         variant="stroke"
                                         size="small"
-                                        className="w-26.75 shrink-0 [font-size:var(--font-size-body-4)]"
-                                        iconLeft={<GenerateIcon aria-hidden className="size-5" />}
+                                        fullWidth
+                                        className="[font-size:var(--font-size-body-4)]"
+                                        onClick={() =>
+                                          setEditDraft((d) => ({ ...d, kpis: [...d.kpis, ''] }))
+                                        }
+                                        iconLeft={<PlusIcon aria-hidden className="size-5" />}
                                       >
-                                        AI 추천 받기
+                                        KPI 추가하기
                                       </TextButton>
                                     </div>
-                                    {editDraft.kpis.map((kpi, i) => (
-                                      <div
-                                        key={i}
-                                        className="flex h-15 items-center justify-between rounded-lg border border-(--color-border-subtle) bg-(--color-bg-default) px-5 transition-colors focus-within:border-(--color-border-brand)"
+                                    {/* 취소 / 수정하기 버튼 */}
+                                    <div className="flex w-full items-center justify-center gap-3">
+                                      <TextButton
+                                        variant="stroke_neutral"
+                                        size="medium"
+                                        className="w-35 [font-size:var(--font-size-body-3)]"
+                                        onClick={handleCancelEdit}
                                       >
-                                        <input
-                                          type="text"
-                                          placeholder="핵심 평가 지표를 입력해 주세요"
-                                          value={kpi}
-                                          onChange={(e) =>
-                                            setEditDraft((d) => ({
-                                              ...d,
-                                              kpis: d.kpis.map((k, ki) =>
-                                                ki === i ? e.target.value : k,
-                                              ),
-                                            }))
-                                          }
-                                          className="min-w-0 flex-1 bg-transparent [font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal text-(--color-text-default) placeholder:text-(--color-text-tertiary) outline-none"
-                                        />
-                                        <button
-                                          type="button"
-                                          aria-label="KPI 삭제"
-                                          onClick={() =>
-                                            setEditDraft((d) => ({
-                                              ...d,
-                                              kpis: d.kpis.filter((_, ki) => ki !== i),
-                                            }))
-                                          }
-                                          className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-icon-secondary)"
-                                        >
-                                          <TrashIcon aria-hidden className="size-6" />
-                                        </button>
-                                      </div>
-                                    ))}
-                                    <TextButton
-                                      variant="stroke"
-                                      size="small"
-                                      fullWidth
-                                      className="[font-size:var(--font-size-body-4)]"
-                                      onClick={() =>
-                                        setEditDraft((d) => ({ ...d, kpis: [...d.kpis, ''] }))
-                                      }
-                                      iconLeft={<PlusIcon aria-hidden className="size-5" />}
-                                    >
-                                      KPI 추가하기
-                                    </TextButton>
-                                  </div>
-                                  {/* 취소 / 수정하기 버튼 */}
-                                  <div className="flex w-full items-center justify-center gap-3">
-                                    <TextButton
-                                      variant="stroke_neutral"
-                                      size="medium"
-                                      className="w-35 [font-size:var(--font-size-body-3)]"
-                                      onClick={handleCancelEdit}
-                                    >
-                                      취소하기
-                                    </TextButton>
-                                    <TextButton
-                                      variant="fill"
-                                      size="medium"
-                                      className="w-35 [font-size:var(--font-size-body-3)]"
-                                      onClick={handleConfirmEdit}
-                                      disabled={!hasEditChanges()}
-                                    >
-                                      수정하기
-                                    </TextButton>
-                                  </div>
-                                </>
-                              ) : (
-                                (() => {
-                                  const detailMeta =
-                                    (detailByLabel[tag.label] ?? tag).meta ?? tag.meta
-                                  return (
-                                    <>
-                                      {[
-                                        { label: '목적', value: detailMeta.purpose },
-                                        { label: '기대 성과', value: detailMeta.expectedOutcome },
-                                        {
-                                          label: '기간',
-                                          value:
-                                            detailMeta.startDate && detailMeta.endDate
-                                              ? `${detailMeta.startDate} - ${detailMeta.endDate}`
-                                              : detailMeta.startDate || detailMeta.endDate || null,
-                                        },
-                                      ]
-                                        .filter((row) => row.value)
-                                        .map((row) => (
-                                          <div key={row.label} className="flex items-center gap-2">
+                                        취소하기
+                                      </TextButton>
+                                      <TextButton
+                                        variant="fill"
+                                        size="medium"
+                                        className="w-35 [font-size:var(--font-size-body-3)]"
+                                        onClick={handleConfirmEdit}
+                                        disabled={!hasEditChanges()}
+                                      >
+                                        수정하기
+                                      </TextButton>
+                                    </div>
+                                  </>
+                                ) : (
+                                  (() => {
+                                    const detailMeta = (detailByKey[key] ?? tag).meta ?? tag.meta
+                                    return (
+                                      <>
+                                        {[
+                                          { label: '목적', value: detailMeta.purpose },
+                                          { label: '기대 성과', value: detailMeta.expectedOutcome },
+                                          {
+                                            label: '기간',
+                                            value:
+                                              detailMeta.startDate && detailMeta.endDate
+                                                ? `${detailMeta.startDate} - ${detailMeta.endDate}`
+                                                : detailMeta.startDate ||
+                                                  detailMeta.endDate ||
+                                                  null,
+                                          },
+                                        ]
+                                          .filter((row) => row.value)
+                                          .map((row) => (
+                                            <div
+                                              key={row.label}
+                                              className="flex items-center gap-2"
+                                            >
+                                              <span className="w-25 shrink-0 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-tertiary)">
+                                                {row.label}
+                                              </span>
+                                              <span className="min-w-0 flex-1 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-secondary)">
+                                                {row.value}
+                                              </span>
+                                            </div>
+                                          ))}
+                                        {detailMeta.kpis.length > 0 && (
+                                          <div className="flex items-start gap-2">
                                             <span className="w-25 shrink-0 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-tertiary)">
-                                              {row.label}
+                                              핵심 평가 지표
                                             </span>
-                                            <span className="min-w-0 flex-1 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-secondary)">
-                                              {row.value}
-                                            </span>
+                                            <ul className="min-w-0 flex-1 flex flex-col gap-2">
+                                              {detailMeta.kpis.map((kpi, i) => (
+                                                <li
+                                                  key={i}
+                                                  className="flex items-center gap-2 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-secondary)"
+                                                >
+                                                  <span className="size-0.75 shrink-0 rounded-full bg-(--color-text-tertiary)" />
+                                                  {kpi}
+                                                </li>
+                                              ))}
+                                            </ul>
                                           </div>
-                                        ))}
-                                      {detailMeta.kpis.length > 0 && (
-                                        <div className="flex items-start gap-2">
-                                          <span className="w-25 shrink-0 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-tertiary)">
-                                            핵심 평가 지표
-                                          </span>
-                                          <ul className="min-w-0 flex-1 flex flex-col gap-2">
-                                            {detailMeta.kpis.map((kpi, i) => (
-                                              <li
-                                                key={i}
-                                                className="flex items-center gap-2 [font-size:var(--font-size-body-3)] leading-(--line-height-body) text-(--color-text-secondary)"
-                                              >
-                                                <span className="size-0.75 shrink-0 rounded-full bg-(--color-text-tertiary)" />
-                                                {kpi}
-                                              </li>
-                                            ))}
-                                          </ul>
-                                        </div>
-                                      )}
-                                    </>
-                                  )
-                                })()
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      ))
+                                        )}
+                                      </>
+                                    )
+                                  })()
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })
                     )}
                     {filteredTags.length > visibleCount && (
                       <TextButton
@@ -1156,7 +1171,7 @@ export default function TagSettingsModal({
   return (
     <>
       {modal}
-      {deletingLabel && (
+      {deletingKey && (
         <ConfirmDialog
           message={
             <>
@@ -1169,12 +1184,12 @@ export default function TagSettingsModal({
               </span>
             </>
           }
-          onCancel={() => setDeletingLabel(null)}
+          onCancel={() => setDeletingKey(null)}
           onConfirm={() => {
-            onDeleteTag(deletingLabel)
-            if (selectedTag?.label === deletingLabel) setSelectedTag(null)
-            if (expandedLabel === deletingLabel) setExpandedLabel(null)
-            setDeletingLabel(null)
+            onDeleteTag(deletingKey)
+            if (selectedTag && getTagKey(selectedTag) === deletingKey) setSelectedTag(null)
+            if (expandedKey === deletingKey) setExpandedKey(null)
+            setDeletingKey(null)
           }}
         />
       )}
