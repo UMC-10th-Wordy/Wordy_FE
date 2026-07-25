@@ -1,11 +1,8 @@
 import { DiaryListHeader } from '@/components/diary-list/DiaryListHeader'
 import { DiaryMonthlySection } from '@/components/diary-list/DiaryMonthlySection'
-import {
-  DIARY_MONTHLY_RECORDS,
-  EMPTY_DIARY_MONTHLY_RECORDS,
-} from '@/components/diary-list/diaryMonthlyMock'
+import { DIARY_MONTHLY_RECORDS, EMPTY_DIARY_MONTHLY_RECORDS } from '@/mocks/diaryMonthlyMock'
 import { DiarySummarySection } from '@/components/diary-list/DiarySummarySection'
-import { DIARY_SUMMARY_MOCK, EMPTY_DIARY_SUMMARY_MOCK } from '@/components/diary-list/diaryListMock'
+import { DIARY_SUMMARY_MOCK, EMPTY_DIARY_SUMMARY_MOCK } from '@/mocks/diaryListMock'
 
 // 업무 일지 기록이 없는 상태를 테스트하기 위한 코드, 실제 서비스에서는 API 호출 결과에 따라 결정
 const IS_EMPTY_STATE = false
