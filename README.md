@@ -181,6 +181,34 @@ cp .env.example .env
 | 성과 대시보드 | 주간·월간 대시보드, 핵심 지표, 업무 흐름, 회고 및 다음 계획 |
 | 설정 / 알림함 | 워크스페이스 관리, 프로필/알림 설정, 알림함, 요금제         |
 
+### 랜딩 페이지
+
+<img src="docs/images/01-landing.png" width="800" />
+
+### 로그인
+
+<img src="docs/images/02-login.png" width="800" />
+
+### 회원가입
+
+<img src="docs/images/03-signup.png" width="800" />
+
+### 홈
+
+<img src="docs/images/04-home.png" width="800" />
+
+### 오늘의 업무
+
+<img src="docs/images/05-daily-task.png" width="800" />
+
+### 일지 모아보기
+
+<img src="docs/images/06-diary-list.png" width="800" />
+
+### 성과 대시보드
+
+<img src="docs/images/07-dashboard.png" width="800" />
+
 ## API 연동 현황
 
 도메인(파트)별로 FE 담당자를 나눠 API 연동을 진행하고 있습니다.
