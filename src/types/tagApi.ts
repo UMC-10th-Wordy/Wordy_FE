@@ -37,6 +37,10 @@ export interface CreateTagPayload {
   kpis: TagKpiDto[]
 }
 
+export type UpdateTagPayload = CreateTagPayload
+
 export type TagListResponse = ApiEnvelope<TagDto[]>
 export type TagDetailResponse = ApiEnvelope<TagDto>
 export type CreateTagResponse = ApiEnvelope<TagDto>
+export type UpdateTagResponse = ApiEnvelope<TagDto>
+export type DeleteTagResponse = ApiEnvelope<null>
