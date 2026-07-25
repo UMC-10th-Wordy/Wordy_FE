@@ -47,33 +47,37 @@ const renderMonthlyDescription = (
   previousMonthCount: number,
   highlightClassName: string,
 ) => {
-  if (currentMonthCount === 0 || previousMonthCount === 0) {
+  if (previousMonthCount === 0) {
     return '이번 달의 기록을 열심히 작성해 볼까요?'
   }
 
-  const differenceCount = Math.abs(currentMonthCount - previousMonthCount)
+  const differenceCount = currentMonthCount - previousMonthCount
 
-  if (currentMonthCount < previousMonthCount) {
+  if (differenceCount > 0) {
     return (
       <>
         지난 달보다{' '}
         <span className={`font-[var(--font-weight-medium)] ${highlightClassName}`}>
-          {differenceCount}개
+          {differenceCount}개 더
+        </span>{' '}
+        작성하고 있어요
+      </>
+    )
+  }
+
+  if (differenceCount < 0) {
+    return (
+      <>
+        지난 달보다{' '}
+        <span className={`font-[var(--font-weight-medium)] ${highlightClassName}`}>
+          {Math.abs(differenceCount)}개
         </span>{' '}
         적어요
       </>
     )
   }
 
-  return (
-    <>
-      지난 달보다{' '}
-      <span className={`font-[var(--font-weight-medium)] ${highlightClassName}`}>
-        {differenceCount}개 더
-      </span>{' '}
-      작성하고 있어요
-    </>
-  )
+  return '지난 달과 동일하게 작성하고 있어요'
 }
 
 export const DiarySummaryCard = ({

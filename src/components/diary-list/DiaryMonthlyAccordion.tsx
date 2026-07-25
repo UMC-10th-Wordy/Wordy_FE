@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 
+import { useGetMonthlyDailyEntriesByYearMonth } from '@/api/diary-list/diary-list.query'
 import { IconButton } from '@/components/common/Button/IconButton'
 import ProjectTag from '@/components/todo/ProjectTag'
 
@@ -18,7 +19,13 @@ interface DiaryMonthlyAccordionProps {
 }
 
 export const DiaryMonthlyAccordion = ({ record, isOpen, onToggle }: DiaryMonthlyAccordionProps) => {
-  const sortedEntries = [...record.entries].sort(
+  const {
+    data: entries = [],
+    isPending: isEntriesPending,
+    isError: isEntriesError,
+  } = useGetMonthlyDailyEntriesByYearMonth(record.id, isOpen)
+
+  const sortedEntries = [...entries].sort(
     (firstEntry, secondEntry) => secondEntry.day - firstEntry.day,
   )
 
@@ -92,28 +99,51 @@ export const DiaryMonthlyAccordion = ({ record, isOpen, onToggle }: DiaryMonthly
             className="overflow-hidden"
           >
             <div className="mt-[33px] rounded-(--scale-16) bg-(--color-bg-brand-subtle) p-(--scale-20)">
-              <div className="grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] gap-x-2.5">
-                <div className="flex min-w-0 flex-col gap-(--scale-24)">
-                  {leftEntries.map((entry) => (
-                    <DiaryMonthlyEntry key={entry.id} entry={entry} />
-                  ))}
-                </div>
-
+              {/* isEntriesPending, isEntriesError UI와 문구는 API 테스트를 위해 임의로 지정함. 이후 삭제 예정 */}
+              {isEntriesPending && (
                 <div
-                  className="my-(--scale-8) w-px self-stretch"
-                  style={{
-                    backgroundImage:
-                      'repeating-linear-gradient(to bottom, var(--color-border-subtle) 0 2px, transparent 2px 4px)',
-                  }}
-                  aria-hidden="true"
-                />
-
-                <div className="flex min-w-0 flex-col gap-(--scale-24)">
-                  {rightEntries.map((entry) => (
-                    <DiaryMonthlyEntry key={entry.id} entry={entry} />
-                  ))}
+                  className="flex min-h-[104px] items-center justify-center"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-(--font-weight-medium) text-(--color-text-tertiary)">
+                    월별 기록을 불러오는 중이에요
+                  </p>
                 </div>
-              </div>
+              )}
+
+              {!isEntriesPending && isEntriesError && (
+                <div className="flex min-h-[104px] items-center justify-center" role="alert">
+                  <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-(--font-weight-medium) text-(--color-text-tertiary)">
+                    월별 기록을 불러오지 못했어요
+                  </p>
+                </div>
+              )}
+
+              {!isEntriesPending && !isEntriesError && (
+                <div className="grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] gap-x-2.5">
+                  <div className="flex min-w-0 flex-col gap-(--scale-24)">
+                    {leftEntries.map((entry) => (
+                      <DiaryMonthlyEntry key={entry.id} entry={entry} />
+                    ))}
+                  </div>
+
+                  <div
+                    className="my-(--scale-8) w-px self-stretch"
+                    style={{
+                      backgroundImage:
+                        'repeating-linear-gradient(to bottom, var(--color-border-subtle) 0 2px, transparent 2px 4px)',
+                    }}
+                    aria-hidden="true"
+                  />
+
+                  <div className="flex min-w-0 flex-col gap-(--scale-24)">
+                    {rightEntries.map((entry) => (
+                      <DiaryMonthlyEntry key={entry.id} entry={entry} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
