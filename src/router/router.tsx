@@ -1,6 +1,12 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { AppLayout } from '@/components/common/Layout/AppLayout'
-import { SidebarPage } from '@/pages/Sidebar/SidebarPage'
+import { SidebarLayout } from '@/components/common/Layout/SidebarLayout'
+import { ScrollableOutlet } from '@/components/common/Layout/ScrollableOutlet'
+import { HomePage } from '@/pages/Home/HomePage'
+import TodoListPage from '@/pages/TodoListPage/TodoListPage'
+import { DiaryListPage } from '@/pages/DiaryListPage'
+import { DiaryDetailPage } from '@/pages/DiaryDetailPage'
+import { WeeklyDashboard } from '@/components/dashboard/WeeklyDashboard'
 import { TrashPage } from '@/pages/Sidebar/TrashPage'
 import { PlanPage } from '@/pages/Sidebar/PlanPage'
 import { LoginPage } from '@/pages/LoginPage'
@@ -16,24 +22,19 @@ import { SocialSignupPage } from '@/pages/SocialSignupPage'
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <SidebarPage />,
-  },
-  {
-    path: '/today',
-    element: <SidebarPage />,
-  },
-  {
-    path: '/records',
-    element: <SidebarPage />,
-  },
-  {
-    path: '/records/:diaryId',
-    element: <SidebarPage />,
-  },
-  {
-    path: '/dashboard',
-    element: <SidebarPage />,
+    element: <SidebarLayout />,
+    children: [
+      {
+        element: <ScrollableOutlet />,
+        children: [
+          { path: '/', element: <HomePage userName="홍길동" /> },
+          { path: '/today', element: <TodoListPage /> },
+          { path: '/records', element: <DiaryListPage /> },
+          { path: '/dashboard', element: <WeeklyDashboard /> },
+        ],
+      },
+      { path: '/records/:diaryId', element: <DiaryDetailPage /> },
+    ],
   },
   {
     element: <AppLayout />,

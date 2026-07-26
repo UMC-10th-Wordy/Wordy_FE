@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   Sidebar,
   ProfileModal,
@@ -7,19 +7,13 @@ import {
   NotificationModal,
   WorkspaceModal,
 } from '@/components/sidebar'
-import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
-import type { SidebarPage, NotificationItemProps } from '@/components/sidebar'
+import type { NotificationItemProps } from '@/components/sidebar'
 import type { NotificationSettings } from '@/components/sidebar/SettingPanel/SettingPanel'
-import TodoListPage from '@/pages/TodoListPage/TodoListPage'
-import { HomePage } from '@/pages/Home/HomePage'
-import { DiaryListPage } from '@/pages/DiaryListPage'
-import { DiaryDetailPage } from '@/pages/DiaryDetailPage'
 import HomeIcon from '@/assets/icons/home.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
 import DocumentIcon from '@/assets/icons/document.svg?react'
 import DashboardIcon from '@/assets/icons/dashboard.svg?react'
-import { WeeklyDashboard } from '@/components/dashboard/WeeklyDashboard'
 
 type ModalState = null | 'profile-menu' | 'setting' | 'notification' | 'workspace'
 
@@ -46,7 +40,7 @@ const getPageByPath = (pathname: string): SidebarPageName => {
   return PAGE_BY_PATH[pathname] ?? '홈'
 }
 
-export function SidebarPage() {
+export function SidebarLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const [modal, setModal] = useState<ModalState>(null)
@@ -63,9 +57,6 @@ export function SidebarPage() {
     inboxPerformanceReady: false,
     inboxPerformanceNudge: false,
   })
-
-  const isDiaryListPage = location.pathname === '/records'
-  const isDiaryDetailPage = location.pathname.startsWith('/records/')
 
   const notificationItems: NotificationItemProps[] = [
     {
@@ -201,27 +192,7 @@ export function SidebarPage() {
         }
       />
 
-      {currentPage === '홈' && (
-        <Scrollbar className="flex-1" scrollbarClassName="py-2 pr-1">
-          <HomePage userName="홍길동" />
-        </Scrollbar>
-      )}
-      {currentPage === '오늘의 업무' && (
-        <Scrollbar className="flex-1" scrollbarClassName="py-2 pr-1">
-          <TodoListPage />
-        </Scrollbar>
-      )}
-      {currentPage === '성과 대시보드' && (
-        <Scrollbar className="flex-1" scrollbarClassName="py-2 pr-1">
-          <WeeklyDashboard />
-        </Scrollbar>
-      )}
-      {currentPage === '일지 모아보기' && isDiaryListPage && (
-        <Scrollbar className="flex-1" scrollbarClassName="py-2 pr-1">
-          <DiaryListPage />
-        </Scrollbar>
-      )}
-      {currentPage === '일지 모아보기' && isDiaryDetailPage && <DiaryDetailPage />}
+      <Outlet />
 
       {modal === 'setting' && (
         <SettingModal
