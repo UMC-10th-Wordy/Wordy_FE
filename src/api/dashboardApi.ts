@@ -13,6 +13,19 @@ import type {
   WeeklyReflectionDto,
 } from '@/types/dashboardApi'
 
+export interface WeeklyReflectionDto {
+  reflectionId: string
+  workSummary: string
+  resourcesUsed: string
+  learning: string
+}
+
+export interface UpdateReflectionPayload {
+  workSummary?: string
+  resourcesUsed?: string
+  learning?: string
+}
+
 let dashboardListStore: DashboardListItemDto[] = [...INITIAL_DASHBOARD_LIST_MOCK]
 let dashboardDetailStore: DashboardDetailDto = { ...INITIAL_DASHBOARD_DETAIL_MOCK }
 
@@ -53,12 +66,13 @@ export async function createReflection(
   payload: CreateReflectionPayload,
 ): Promise<string> {
   void dashboardId
-  const reflection: WeeklyReflectionDto = { ...payload }
+  const reflectionId = crypto.randomUUID()
+  const reflection: WeeklyReflectionDto = { reflectionId, ...payload }
   dashboardDetailStore = {
     ...dashboardDetailStore,
     weeklyReflections: [...dashboardDetailStore.weeklyReflections, reflection],
   }
-  return crypto.randomUUID()
+  return reflectionId
 }
 
 /* PATCH /dashboards/{dashboardId}/reflection/{reflectionId} — 주간회고 수정 */
@@ -70,8 +84,8 @@ export async function updateReflection(
   void dashboardId
   dashboardDetailStore = {
     ...dashboardDetailStore,
-    weeklyReflections: dashboardDetailStore.weeklyReflections.map((r, i) =>
-      i === 0 ? { ...r, ...payload } : r,
+    weeklyReflections: dashboardDetailStore.weeklyReflections.map((r) =>
+      r.reflectionId === reflectionId ? { ...r, ...payload } : r,
     ),
   }
   return reflectionId

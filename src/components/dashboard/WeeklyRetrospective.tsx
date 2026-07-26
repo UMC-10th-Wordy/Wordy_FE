@@ -91,11 +91,17 @@ type QuestionKey = 'work' | 'resource' | 'learning'
 interface WeeklyRetrospectiveProps {
   period?: RetrospectivePeriod
   dashboardId?: string
+  initialReflection?: {
+    reflectionId: string
+    workSummary: string
+    resourcesUsed: string
+    learning: string
+  }
 }
-
 export const WeeklyRetrospective = ({
   period = 'weekly',
   dashboardId,
+  initialReflection,
 }: WeeklyRetrospectiveProps) => {
   const texts = TEXTS[period]
 
@@ -108,7 +114,9 @@ export const WeeklyRetrospective = ({
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
   )
-  const [reflectionId, setReflectionId] = useState<string | null>(null)
+  const [reflectionId, setReflectionId] = useState<string | null>(
+    initialReflection?.reflectionId ?? null,
+  )
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const { toasts, addToast } = useToast()
 
@@ -151,6 +159,7 @@ export const WeeklyRetrospective = ({
     const request = reflectionId
       ? updateReflection(dashboardId, reflectionId, {
           workSummary: answers.work,
+          resourcesUsed: answers.resource,
           learning: answers.learning,
         })
       : createReflection(dashboardId, {

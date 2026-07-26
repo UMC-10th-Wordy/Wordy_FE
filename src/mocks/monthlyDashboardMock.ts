@@ -27,8 +27,54 @@ export const DUMMY_FOCUS_AREAS = [
 ]
 
 export const DUMMY_MONTHLY_TAGS: TagWorkflow[] = [
-  // ⚠️ 여기엔 지금 MonthlyDashboard.tsx 안에 있는 DUMMY_MONTHLY_TAGS 배열 내용을
-  //    그대로 복사해서 붙여넣어 (온보딩 리뉴얼 + 디자인 시스템 V2 두 항목)
+  {
+    id: 'onboarding',
+    name: '온보딩 리뉴얼',
+    color: 'green',
+    count: 9,
+    purpose: '신규 사용자가 첫 주 안에 핵심 가치를 경험하도록 온보딩 흐름을 단순화해요.',
+    expectedResult: '이탈 구간 3곳을 제거하고, 1주차 핵심 액션 도달률을 끌어올려요.',
+    taskCount: '9건',
+    period: '26.06.02 - 26.06.27',
+    achievement: '이탈 구간 3곳 중 2곳에서 80% 개선을 완료했어요.',
+    kpis: [
+      {
+        title: '1주차 핵심 액션 도달률',
+        description: '온보딩 진입 동선을 2단계 단축해 핵심 액션 도달까지의 마찰을 줄이는 중이에요',
+        highlights: [
+          '온보딩 와이어프레임 12종 정리, PM·디자이너 합의안 도출 완료',
+          'Phase 1 프로토타입 70% 진척, 7월 사용자 테스트 일정 확정',
+        ],
+        files: ['onboarding-Lo-fiwireframes-v1.fig', 'Q2 인터뷰 정리.md', 'okr-recap.pdf'],
+      },
+      {
+        title: '이탈 지점 개선',
+        description:
+          '이탈 구간 3곳을 인터뷰·로그 데이터로 교차 검증하고 개선안을 반영하는 단계예요',
+        highlights: ['기존 온보딩 이탈 지점 3가지를 인터뷰·로그 데이터로 교차 검증 완료'],
+        files: [],
+      },
+    ],
+  },
+  {
+    id: 'design-system',
+    name: '디자인 시스템 V2',
+    color: 'pink',
+    count: 8,
+    purpose: '컴포넌트 일관성을 확보해 개발·디자인 협업 비용을 줄여요.',
+    expectedResult: '공용 컴포넌트 커버리지를 80% 이상으로 올려요.',
+    taskCount: '8건',
+    period: '26.06.02 - 26.06.27',
+    achievement: '핵심 컴포넌트 정비를 70% 완료했어요.',
+    kpis: [
+      {
+        title: '공용 컴포넌트 커버리지',
+        description: '페이지 전반의 컴포넌트 일관성을 확보하는 단계예요',
+        highlights: ['핵심 컴포넌트 12종 중 8종 정비 완료, 나머지 4종 이번 주 착수'],
+        files: ['design-system-v2-audit.md'],
+      },
+    ],
+  },
 ]
 
 export const DUMMY_MONTHLY_HIGHLIGHTS = [

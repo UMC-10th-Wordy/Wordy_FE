@@ -36,6 +36,8 @@ export const WeeklyDashboard = () => {
   const [detail, setDetail] = useState<DashboardDetailDto | null>(null)
   // TODO: API에 주차 이동 파라미터(BaseDate) 연결 예정. 현재는 라벨만 이동
   const [weekOffset, setWeekOffset] = useState(0)
+  // TODO: 월간 API 명세 확정 시 월 이동 데이터 갱신 연결. 현재는 라벨만 이동
+  const [monthOffset, setMonthOffset] = useState(0)
 
   // 월간 생성 상태 — 탭 전환 시 유실되지 않도록 부모에서 소유
   const [monthlyGeneration, setMonthlyGeneration] = useState<MonthlyGeneration>('idle')
@@ -198,7 +200,10 @@ export const WeeklyDashboard = () => {
                 <WeeklySummaryInsight stats={stats} aiSummary={aiSummary} />
                 <TagWorkflowSection tags={tags} />
                 <WeeklyHighlights items={highlights} />
-                <WeeklyRetrospective dashboardId={detail?.dashboardId} />
+                <WeeklyRetrospective
+                  dashboardId={detail?.dashboardId}
+                  initialReflection={detail?.weeklyReflections[0]}
+                />
               </div>
             ) : (
               <>
@@ -226,7 +231,7 @@ export const WeeklyDashboard = () => {
               <ArrowLeftIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
             </button>
             <span className="[font-size:var(--font-size-body-4)] text-(--color-text-default)">
-              2026년 6월
+              {`2026년 ${6 + monthOffset}월`}
             </span>
             <button type="button" aria-label="다음 달">
               <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
