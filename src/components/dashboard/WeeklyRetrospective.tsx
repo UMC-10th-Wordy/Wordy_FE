@@ -172,7 +172,9 @@ export const WeeklyRetrospective = ({
         setReflectionId((prev) => prev ?? id)
         addToast(texts.toastSaved)
       })
-      .catch(() => {})
+      .catch(() => {
+        addToast('저장에 실패했어요. 다시 시도해 주세요')
+      })
   }
   const hasContent = Object.values(answers).some((v) => v.trim()) || plans.length > 0
   const canSave = hasContent && !editing

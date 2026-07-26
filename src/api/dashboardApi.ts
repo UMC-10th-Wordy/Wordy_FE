@@ -69,6 +69,10 @@ export async function updateReflection(
   payload: UpdateReflectionPayload,
 ): Promise<string> {
   void dashboardId
+  const exists = dashboardDetailStore.weeklyReflections.some((r) => r.reflectionId === reflectionId)
+  if (!exists) {
+    throw new Error(`reflection not found: ${reflectionId}`) // 실서버 404에 대응
+  }
   dashboardDetailStore = {
     ...dashboardDetailStore,
     weeklyReflections: dashboardDetailStore.weeklyReflections.map((r) =>
