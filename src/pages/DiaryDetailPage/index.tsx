@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { useDeleteDailyEntry } from '@/api/diary-list/diary-list.mutation'
+import { useGetDailyEntryDetail } from '@/api/diary-list/diary-list.query'
+
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 
 import { DeleteDiaryDialog } from '@/components/diary-detail/DeleteDiaryDialog'
 import { DiaryDetailHeader } from '@/components/diary-detail/DiaryDetailHeader'
 import { DiaryRetrospective } from '@/components/diary-detail/DiaryRetrospective'
 import { ReadOnlyTaskCard } from '@/components/diary-detail/ReadOnlyTaskCard'
-import { DIARY_DETAIL_MOCK } from '@/mocks/diaryDetailMock'
+import { PERFORMANCE_PREVIEW_RESULT_MOCK } from '@/mocks/performancePreviewResultMock'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
 import TodoTabs from '@/components/todo/TodoTabs'
 
@@ -19,38 +22,81 @@ const formatDateLabel = (date: string) => {
   return `${year}년 ${month}월 ${day}일`
 }
 
-export const DiaryDetailPage = ({ hideDelete }: { hideDelete?: boolean }) => {
+interface DiaryDetailPageProps {
+  hideDelete?: boolean
+}
+
+export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
   const navigate = useNavigate()
-  const { diaryId } = useParams<{ diaryId: string }>()
+  const { diaryId = '' } = useParams<{ diaryId: string }>()
 
   const [activeTab, setActiveTab] = useState<TodoFilter>('completed')
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
-  // TODO(#65): diaryId를 이용한 업무 일지 상세 조회 API 연결
-  const diary = {
-    ...DIARY_DETAIL_MOCK,
-    id: diaryId ?? DIARY_DETAIL_MOCK.id,
-    date: diaryId ?? DIARY_DETAIL_MOCK.date,
-  }
+  const {
+    data: diary,
+    isLoading: isDiaryLoading,
+    isError: isDiaryError,
+  } = useGetDailyEntryDetail(diaryId)
 
-  const completedTasks = diary.tasks.filter((task) => task.isCompleted)
-  const incompleteTasks = diary.tasks.filter((task) => !task.isCompleted)
-
-  const activeTasks = activeTab === 'completed' ? completedTasks : incompleteTasks
-
-  const filterCounts: TodoFilterCounts = {
-    completed: completedTasks.length,
-    incomplete: incompleteTasks.length,
-  }
+  const { mutate: deleteDiary, isPending: isDeletePending } = useDeleteDailyEntry()
 
   const handleBack = () => {
     navigate(-1)
   }
 
   const handleDeleteDiary = () => {
-    // TODO(#65): 해당 업무 일지 삭제 API 연결 후 목록 데이터 갱신
-    setIsDeleteDialogOpen(false)
-    navigate('/records', { replace: true })
+    if (!diaryId || isDeletePending) {
+      return
+    }
+
+    deleteDiary(diaryId, {
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false)
+        navigate('/records', { replace: true })
+      },
+      onError: (error) => {
+        console.error('업무 일지 삭제에 실패했습니다.', error)
+      },
+    })
+  }
+
+  // isLoading, isError UI와 문구는 API 테스트를 위해 임의로 지정함. 이후 삭제 예정
+  if (isDiaryLoading) {
+    return (
+      <div className="flex h-full min-h-0 min-w-0 flex-1 items-center justify-center bg-(--color-bg-default)">
+        <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)">
+          업무 일지를 불러오는 중입니다.
+        </p>
+      </div>
+    )
+  }
+
+  if (isDiaryError || !diary) {
+    return (
+      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-(--scale-16) bg-(--color-bg-default)">
+        <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)">
+          업무 일지를 불러오지 못했습니다.
+        </p>
+
+        <button
+          type="button"
+          onClick={handleBack}
+          className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-semibold)] text-(--color-text-brand)"
+        >
+          이전 페이지로 돌아가기
+        </button>
+      </div>
+    )
+  }
+  const completedTasks = diary.tasks.filter((task) => task.isCompleted)
+  const incompleteTasks = diary.tasks.filter((task) => !task.isCompleted)
+
+  const activeTasks = activeTab === 'completed' ? completedTasks : incompleteTasks
+
+  const filterCounts: TodoFilterCounts = {
+    completed: diary.completedCount,
+    incomplete: diary.incompleteCount,
   }
 
   return (
@@ -93,7 +139,8 @@ export const DiaryDetailPage = ({ hideDelete }: { hideDelete?: boolean }) => {
           key={diary.id}
           status="success"
           result={{
-            data: diary.performance,
+            // TODO(#149): 성과 미리보기 조회 API 연결 후 별도 Query 결과로 교체
+            data: PERFORMANCE_PREVIEW_RESULT_MOCK,
             readOnly: true,
           }}
         />
@@ -101,7 +148,11 @@ export const DiaryDetailPage = ({ hideDelete }: { hideDelete?: boolean }) => {
 
       {isDeleteDialogOpen && (
         <DeleteDiaryDialog
-          onCancel={() => setIsDeleteDialogOpen(false)}
+          onCancel={() => {
+            if (!isDeletePending) {
+              setIsDeleteDialogOpen(false)
+            }
+          }}
           onConfirm={handleDeleteDiary}
         />
       )}
