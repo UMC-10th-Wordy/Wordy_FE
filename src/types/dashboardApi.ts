@@ -35,6 +35,7 @@ export interface TagAnalysisDto {
 }
 
 export interface WeeklyReflectionDto {
+  reflectionId: string
   workSummary: string
   resourcesUsed: string
   learning: string
@@ -81,5 +82,6 @@ export interface CreateReflectionPayload {
 
 export interface UpdateReflectionPayload {
   workSummary?: string
+  resourcesUsed?: string
   learning?: string
 }

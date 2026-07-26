@@ -13,19 +13,6 @@ import type {
   WeeklyReflectionDto,
 } from '@/types/dashboardApi'
 
-export interface WeeklyReflectionDto {
-  reflectionId: string
-  workSummary: string
-  resourcesUsed: string
-  learning: string
-}
-
-export interface UpdateReflectionPayload {
-  workSummary?: string
-  resourcesUsed?: string
-  learning?: string
-}
-
 let dashboardListStore: DashboardListItemDto[] = [...INITIAL_DASHBOARD_LIST_MOCK]
 let dashboardDetailStore: DashboardDetailDto = { ...INITIAL_DASHBOARD_DETAIL_MOCK }
 
