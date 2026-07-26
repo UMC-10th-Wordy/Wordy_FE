@@ -1,6 +1,7 @@
 import DirectionRightIcon from '@/assets/icons/Direction=right.svg?react'
 import { IconButton } from '@/components/common/Button/IconButton'
 import ProjectTag from '@/components/todo/ProjectTag'
+import { formatDiaryDate } from '@/utils/diary-list/formatDiaryDate'
 import { highlightSearchKeyword } from '@/utils/highlightSearchKeyword'
 
 import type { DiarySearchDiary } from '@/types/diarySearch'
@@ -12,10 +13,14 @@ interface DiarySearchItemProps {
 }
 
 export const DiarySearchItem = ({ diary, keyword, onDetailClick }: DiarySearchItemProps) => {
+  const dateLabel = formatDiaryDate(diary.entryDate)
   return (
     <article className="w-full py-(--scale-8)">
-      <time className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)">
-        {diary.displayDate}
+      <time
+        dateTime={diary.entryDate}
+        className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)"
+      >
+        {dateLabel}
       </time>
 
       <div className="mt-[7px] flex min-w-0 items-center">
@@ -40,7 +45,7 @@ export const DiarySearchItem = ({ diary, keyword, onDetailClick }: DiarySearchIt
               />
             }
             onClick={() => onDetailClick(diary.id)}
-            aria-label={`${diary.displayDate} 업무 일지 자세히 보기`}
+            aria-label={`${dateLabel} 업무 일지 자세히 보기`}
           />
         </div>
       </div>

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import {
   mapDailyEntriesSummary,
+  mapDailyEntrySearchResult,
   mapMonthlyDiaryEntries,
   mapMonthlyDiaryRecords,
 } from '@/utils/diary-list/diaryListMapper'
@@ -10,7 +11,10 @@ import {
   getDailyEntriesSummary,
   getMonthlyDailyEntries,
   getMonthlyDailyEntriesByYearMonth,
+  searchDailyEntries,
 } from './diary-list.api'
+
+import type { DailyEntrySearchParams } from '@/types/api/diaryList'
 
 export const diaryListQueryKeys = {
   all: ['diary-list'] as const,
@@ -18,6 +22,8 @@ export const diaryListQueryKeys = {
   monthlyRecords: () => [...diaryListQueryKeys.all, 'monthly-records'] as const,
   monthlyEntries: (yearMonth: string) =>
     [...diaryListQueryKeys.all, 'monthly-entries', yearMonth] as const,
+  searches: () => [...diaryListQueryKeys.all, 'search'] as const,
+  search: (params: DailyEntrySearchParams) => [...diaryListQueryKeys.searches(), params] as const,
 }
 
 export const useGetDailyEntriesSummary = () => {
@@ -42,5 +48,14 @@ export const useGetMonthlyDailyEntriesByYearMonth = (yearMonth: string, enabled:
     queryFn: () => getMonthlyDailyEntriesByYearMonth(yearMonth),
     select: mapMonthlyDiaryEntries,
     enabled,
+  })
+}
+
+export const useGetDailyEntrySearch = (params: DailyEntrySearchParams) => {
+  return useQuery({
+    queryKey: diaryListQueryKeys.search(params),
+    queryFn: () => searchDailyEntries(params),
+    select: mapDailyEntrySearchResult,
+    enabled: params.query.trim().length > 0,
   })
 }

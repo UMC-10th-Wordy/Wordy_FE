@@ -1,5 +1,6 @@
 import type {
   DailyEntriesSummaryResponse,
+  DailyEntrySearchItem,
   MonthlyDailyEntriesDetailResponse,
   MonthlyDailyEntriesResponse,
 } from '@/types/api/diaryList'
@@ -374,3 +375,91 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
     ],
   },
 }
+
+export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
+  {
+    dailyEntryId: 'daily-entry-2026-06-21',
+    entryDate: '2026-06-21',
+    tags: [
+      {
+        tagName: '온보딩 리뉴얼',
+        color: '#14c369',
+      },
+    ],
+    title: 'Product Strategy Alignment 회의 준비',
+  },
+  {
+    dailyEntryId: 'daily-entry-2026-06-20',
+    entryDate: '2026-06-20',
+    tags: [
+      {
+        tagName: '회의',
+        color: '#14c369',
+      },
+    ],
+    title:
+      'Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비',
+  },
+  {
+    dailyEntryId: 'daily-entry-2026-06-19',
+    entryDate: '2026-06-19',
+    tags: [],
+    title: 'Product Strategy Alignment 회의 준비',
+  },
+  {
+    dailyEntryId: 'daily-entry-2026-06-18',
+    entryDate: '2026-06-18',
+    tags: [
+      {
+        tagName: '회의록 작성',
+        color: '#14c369',
+      },
+    ],
+    title: '프로젝트 정기 회의록 작성',
+  },
+  {
+    dailyEntryId: 'daily-entry-2026-06-15',
+    entryDate: '2026-06-15',
+    tags: [
+      {
+        tagName: '고객 회의',
+        color: '#14c369',
+      },
+    ],
+    title: '고객 요청사항 확인 및 다음 작업 정리',
+  },
+  {
+    dailyEntryId: 'daily-entry-2026-06-03',
+    entryDate: '2026-06-03',
+    tags: [
+      {
+        tagName: '온보딩 리뉴얼',
+        color: '#14c369',
+      },
+    ],
+    title: 'Product Strategy Alignment 회의 준비',
+  },
+  {
+    dailyEntryId: 'daily-entry-2026-02-21',
+    entryDate: '2026-02-21',
+    tags: [
+      {
+        tagName: '온보딩 리뉴얼',
+        color: '#14c369',
+      },
+    ],
+    title: 'Product Strategy Alignment 회의 준비',
+  },
+  {
+    dailyEntryId: 'daily-entry-2026-01-21',
+    entryDate: '2026-01-21',
+    tags: [],
+    title: 'Product Strategy Alignment 회의 준비',
+  },
+  {
+    dailyEntryId: 'daily-entry-2026-01-20',
+    entryDate: '2026-01-20',
+    tags: [],
+    title: '주간 회의 내용 정리 및 다음 업무 계획 수립',
+  },
+]

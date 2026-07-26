@@ -1,26 +1,31 @@
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
+import type { DailyEntrySearchSort } from '@/types/api/diaryList'
 
 export type DiarySearchTab = 'diary' | 'projectTag'
-export type DiarySearchSort = 'latest' | 'oldest'
+export type DiarySearchSort = DailyEntrySearchSort
 
 export interface DiarySearchProjectTag {
-  id: string
   name: string
   color: ProjectTagColor
 }
 
 export interface DiarySearchDiary {
   id: string
-  createdAt: string
-  displayDate: string
+  entryDate: string
   title: string
   tag?: DiarySearchProjectTag
 }
 
 export interface DiarySearchTagResult {
-  id: string
   name: string
   color: ProjectTagColor
-  latestDiaryCreatedAt: string
   diaries: DiarySearchDiary[]
+}
+
+export interface DiarySearchResultData {
+  keyword: string
+  diaryCount: number
+  projectTagCount: number
+  diaries: DiarySearchDiary[]
+  tagResults: DiarySearchTagResult[]
 }

@@ -1,6 +1,8 @@
 import { hexToTagColor } from '@/utils/tagMapper'
 
 import type {
+  DailyEntrySearchItem,
+  DailyEntrySearchResult,
   DailyEntriesSummaryResult,
   DailyEntryTag,
   MonthlyDailyEntry,
@@ -12,6 +14,12 @@ import type {
   MonthlyDiaryEntry,
   MonthlyDiaryRecord,
 } from '@/types/diaryList'
+import type {
+  DiarySearchDiary,
+  DiarySearchProjectTag,
+  DiarySearchResultData,
+  DiarySearchTagResult,
+} from '@/types/diarySearch'
 
 const mapDiaryProjectTag = (tag: DailyEntryTag, id: string): DiaryProjectTag => {
   return {
@@ -74,4 +82,76 @@ export const mapMonthlyDiaryEntries = (entries: MonthlyDailyEntry[]): MonthlyDia
       performanceSummary: entry.summary,
     }
   })
+}
+const mapDiarySearchProjectTag = (tag: DailyEntryTag): DiarySearchProjectTag => {
+  return {
+    name: tag.tagName,
+    color: hexToTagColor(tag.color),
+  }
+}
+
+const mapDiarySearchDiary = (
+  entry: DailyEntrySearchItem,
+  displayedTag?: DailyEntryTag,
+): DiarySearchDiary => {
+  const representativeTag = displayedTag ?? entry.tags[0]
+
+  return {
+    id: entry.dailyEntryId,
+    entryDate: entry.entryDate,
+    title: entry.title,
+    tag: representativeTag ? mapDiarySearchProjectTag(representativeTag) : undefined,
+  }
+}
+
+const mapDiarySearchTagResults = (result: DailyEntrySearchResult): DiarySearchTagResult[] => {
+  const normalizedKeyword = result.keyword.trim().toLocaleLowerCase()
+  const tagResultMap = new Map<string, DiarySearchTagResult>()
+
+  result.results.forEach((entry) => {
+    entry.tags.forEach((tag) => {
+      const normalizedTagName = tag.tagName.toLocaleLowerCase()
+
+      if (!normalizedTagName.includes(normalizedKeyword)) {
+        return
+      }
+
+      const tagKey = `${normalizedTagName}-${tag.color.toLocaleLowerCase()}`
+      const existingTagResult = tagResultMap.get(tagKey)
+      const diary = mapDiarySearchDiary(entry, tag)
+
+      if (existingTagResult) {
+        existingTagResult.diaries.push(diary)
+        return
+      }
+
+      tagResultMap.set(tagKey, {
+        name: tag.tagName,
+        color: hexToTagColor(tag.color),
+        diaries: [diary],
+      })
+    })
+  })
+
+  return Array.from(tagResultMap.values())
+}
+
+export const mapDailyEntrySearchResult = (
+  result: DailyEntrySearchResult,
+): DiarySearchResultData => {
+  const normalizedKeyword = result.keyword.trim().toLocaleLowerCase()
+
+  const diaries = result.results
+    .filter((entry) => entry.title.toLocaleLowerCase().includes(normalizedKeyword))
+    .map((entry) => mapDiarySearchDiary(entry))
+
+  const tagResults = mapDiarySearchTagResults(result)
+
+  return {
+    keyword: result.keyword,
+    diaryCount: result.entryCount,
+    projectTagCount: result.tagCount,
+    diaries,
+    tagResults,
+  }
 }

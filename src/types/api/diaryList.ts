@@ -65,3 +65,29 @@ export interface MonthlyDailyEntry {
 }
 
 export type MonthlyDailyEntriesDetailResponse = DiaryListApiResponse<MonthlyDailyEntry[]>
+
+/* 일지 검색 */
+// GET /daily-entries/search
+
+export type DailyEntrySearchSort = 'latest' | 'oldest'
+
+export interface DailyEntrySearchParams {
+  query: string
+  sort: DailyEntrySearchSort
+}
+
+export interface DailyEntrySearchItem {
+  dailyEntryId: string
+  entryDate: string
+  tags: DailyEntryTag[]
+  title: string
+}
+
+export interface DailyEntrySearchResult {
+  keyword: string
+  entryCount: number
+  tagCount: number
+  results: DailyEntrySearchItem[]
+}
+
+export type DailyEntrySearchResponse = DiaryListApiResponse<DailyEntrySearchResult>
