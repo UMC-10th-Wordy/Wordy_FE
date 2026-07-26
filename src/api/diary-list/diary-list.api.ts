@@ -8,6 +8,8 @@ import {
 
 import type {
   DailyEntriesSummaryResult,
+  DailyEntryDeleteResponse,
+  DailyEntryDeleteResult,
   DailyEntryDetailResult,
   DailyEntrySearchParams,
   DailyEntrySearchResponse,
@@ -18,10 +20,16 @@ import type {
 
 const MOCK_API_DELAY = 300
 
+const DELETED_DAILY_ENTRY_IDS = new Set<string>()
+
 const wait = (milliseconds: number) => {
   return new Promise<void>((resolve) => {
     setTimeout(resolve, milliseconds)
   })
+}
+
+const isDeletedDailyEntry = (dailyEntryId: string) => {
+  return DELETED_DAILY_ENTRY_IDS.has(dailyEntryId)
 }
 
 export const getDailyEntriesSummary = async (): Promise<DailyEntriesSummaryResult> => {
@@ -41,7 +49,9 @@ export const getMonthlyDailyEntriesByYearMonth = async (
 ): Promise<MonthlyDailyEntry[]> => {
   await wait(MOCK_API_DELAY)
 
-  return MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP[yearMonth]?.result ?? []
+  const entries = MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP[yearMonth]?.result ?? []
+
+  return entries.filter((entry) => !isDeletedDailyEntry(entry.dailyEntryId))
 }
 
 export const searchDailyEntries = async ({
@@ -69,19 +79,23 @@ export const searchDailyEntries = async ({
     return emptyResponse.result
   }
 
-  const titleMatchedEntries = DAILY_ENTRY_SEARCH_ITEMS_MOCK.filter((entry) =>
+  const searchableEntries = DAILY_ENTRY_SEARCH_ITEMS_MOCK.filter(
+    (entry) => !isDeletedDailyEntry(entry.dailyEntryId),
+  )
+
+  const titleMatchedEntries = searchableEntries.filter((entry) =>
     entry.title.toLocaleLowerCase().includes(normalizedKeyword),
   )
 
   const matchedTagNames = new Set(
-    DAILY_ENTRY_SEARCH_ITEMS_MOCK.flatMap((entry) =>
+    searchableEntries.flatMap((entry) =>
       entry.tags
         .filter((tag) => tag.tagName.toLocaleLowerCase().includes(normalizedKeyword))
         .map((tag) => tag.tagName.toLocaleLowerCase()),
     ),
   )
 
-  const matchedEntries = DAILY_ENTRY_SEARCH_ITEMS_MOCK.filter((entry) => {
+  const matchedEntries = searchableEntries.filter((entry) => {
     const isTitleMatched = entry.title.toLocaleLowerCase().includes(normalizedKeyword)
 
     const isTagMatched = entry.tags.some((tag) =>
@@ -117,10 +131,37 @@ export const getDailyEntryDetail = async (
 ): Promise<DailyEntryDetailResult> => {
   await wait(MOCK_API_DELAY)
 
+  if (isDeletedDailyEntry(dailyEntryId)) {
+    throw new Error('삭제된 업무 일지입니다.')
+  }
+
   const response = DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP[dailyEntryId]
 
   if (!response) {
     throw new Error('업무 일지를 찾을 수 없습니다.')
+  }
+
+  return response.result
+}
+
+export const deleteDailyEntry = async (dailyEntryId: string): Promise<DailyEntryDeleteResult> => {
+  await wait(MOCK_API_DELAY)
+
+  const detailResponse = DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP[dailyEntryId]
+
+  if (!detailResponse || isDeletedDailyEntry(dailyEntryId)) {
+    throw new Error('삭제할 업무 일지를 찾을 수 없습니다.')
+  }
+
+  DELETED_DAILY_ENTRY_IDS.add(dailyEntryId)
+
+  const response: DailyEntryDeleteResponse = {
+    success: true,
+    code: 'S200',
+    message: '삭제에 성공했습니다.',
+    result: {
+      dailyEntryId,
+    },
   }
 
   return response.result

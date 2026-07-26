@@ -133,3 +133,11 @@ export interface DailyEntryDetailResult {
 }
 
 export type DailyEntryDetailResponse = DiaryListApiResponse<DailyEntryDetailResult>
+
+/* 일지 삭제 */
+// DELETE /daily-entries/{dailyEntryId}
+export interface DailyEntryDeleteResult {
+  dailyEntryId: string
+}
+
+export type DailyEntryDeleteResponse = DiaryListApiResponse<DailyEntryDeleteResult>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { useDeleteDailyEntry } from '@/api/diary-list/diary-list.mutation'
 import { useGetDailyEntryDetail } from '@/api/diary-list/diary-list.query'
 
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
@@ -38,14 +39,25 @@ export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
     isError: isDiaryError,
   } = useGetDailyEntryDetail(diaryId)
 
+  const { mutate: deleteDiary, isPending: isDeletePending } = useDeleteDailyEntry()
+
   const handleBack = () => {
     navigate(-1)
   }
 
   const handleDeleteDiary = () => {
-    // TODO(#149): 업무 일지 삭제 API 연결 후 관련 Query 캐시 갱신
-    setIsDeleteDialogOpen(false)
-    navigate('/records', { replace: true })
+    if (!diaryId || isDeletePending) {
+      return
+    }
+
+    deleteDiary(diaryId, {
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false)
+        navigate('/records', {
+          replace: true,
+        })
+      },
+    })
   }
 
   {
