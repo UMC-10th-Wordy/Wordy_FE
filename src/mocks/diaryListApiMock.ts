@@ -60,7 +60,7 @@ export const MONTHLY_DAILY_ENTRIES_RESPONSE_MOCK = {
       totalDays: 2,
       tags: [
         {
-          tagName: '기획',
+          tagName: '온보딩 리뉴얼',
           color: '#14c369',
         },
         {
@@ -72,7 +72,7 @@ export const MONTHLY_DAILY_ENTRIES_RESPONSE_MOCK = {
           color: '#ff5fd7',
         },
       ],
-      summary: '분기 시작 기획과 데이터 분석 업무가 집중된 달이에요.',
+      summary: '회의 준비와 업무 데이터 분석이 중심이 된 달이에요.',
     },
     {
       yearMonth: '2026-05',
@@ -218,13 +218,13 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         day: 21,
         tags: [
           {
-            tagName: '기획',
+            tagName: '온보딩 리뉴얼',
             color: '#14c369',
           },
         ],
-        mainTaskTitle: '분기 프로젝트 일정 기획',
-        extraTaskCount: 4,
-        summary: '분기 목표를 기준으로 프로젝트 일정과 주요 산출물을 정리했어요.',
+        mainTaskTitle: 'Product Strategy Alignment 회의 준비',
+        extraTaskCount: 2,
+        summary: '회의 자료와 주요 논의 내용을 정리하고 프로젝트 문서를 마무리했어요.',
       },
       {
         dailyEntryId: 'daily-entry-2026-06-17',
@@ -390,7 +390,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
     title: 'Product Strategy Alignment 회의 준비',
   },
   {
-    dailyEntryId: 'daily-entry-2026-06-20',
+    dailyEntryId: 'daily-entry-long-title-2026-06-20',
     entryDate: '2026-06-20',
     tags: [
       {
@@ -637,48 +637,6 @@ export const DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP: Record<string, DailyEntryDeta
           title: '다음 회의 일정 정리',
           memo: '참석 가능 시간을 확인한 뒤 일정을 확정한다.',
           priority: 'COULD_DO',
-          status: 'INCOMPLETE',
-          results: [],
-        },
-      ],
-    },
-  },
-
-  'daily-entry-2026-06-20': {
-    success: true,
-    code: 'S200',
-    message: '조회에 성공했습니다.',
-    result: {
-      dailyEntryId: 'daily-entry-2026-06-20',
-      entryDate: '2026-06-20',
-      reflectionContent:
-        '회의 준비에 예상보다 많은 시간이 들었다. 다음에는 자료 범위를 먼저 정해야겠다.',
-      completedCount: 1,
-      incompleteCount: 1,
-      tasks: [
-        {
-          taskId: 'task-4',
-          tag: {
-            tagName: '회의',
-            color: '#14c369',
-          },
-          title: 'Product Strategy Alignment 회의 준비',
-          memo: '',
-          priority: 'MUST_DO',
-          status: 'COMPLETED',
-          results: [
-            {
-              taskResultId: 'task-result-4',
-              content: '회의 안건과 필요한 자료를 정리했다.',
-              attachments: [],
-            },
-          ],
-        },
-        {
-          taskId: 'task-5',
-          title: '회의 후속 업무 정리',
-          memo: '',
-          priority: 'SHOULD_DO',
           status: 'INCOMPLETE',
           results: [],
         },

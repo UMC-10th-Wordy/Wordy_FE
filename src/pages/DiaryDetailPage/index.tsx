@@ -53,16 +53,15 @@ export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
     deleteDiary(diaryId, {
       onSuccess: () => {
         setIsDeleteDialogOpen(false)
-        navigate('/records', {
-          replace: true,
-        })
+        navigate('/records', { replace: true })
+      },
+      onError: (error) => {
+        console.error('업무 일지 삭제에 실패했습니다.', error)
       },
     })
   }
 
-  {
-    /* isLoading, isError UI와 문구는 API 테스트를 위해 임의로 지정함. 이후 삭제 예정 */
-  }
+  // isLoading, isError UI와 문구는 API 테스트를 위해 임의로 지정함. 이후 삭제 예정
   if (isDiaryLoading) {
     return (
       <div className="flex h-full min-h-0 min-w-0 flex-1 items-center justify-center bg-(--color-bg-default)">
@@ -149,7 +148,11 @@ export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
 
       {isDeleteDialogOpen && (
         <DeleteDiaryDialog
-          onCancel={() => setIsDeleteDialogOpen(false)}
+          onCancel={() => {
+            if (!isDeletePending) {
+              setIsDeleteDialogOpen(false)
+            }
+          }}
           onConfirm={handleDeleteDiary}
         />
       )}

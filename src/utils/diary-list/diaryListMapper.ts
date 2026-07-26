@@ -122,7 +122,7 @@ const mapDiarySearchTagResults = (result: DailyEntrySearchResult): DiarySearchTa
         return
       }
 
-      const tagKey = `${normalizedTagName}-${tag.color.toLocaleLowerCase()}`
+      const tagKey = normalizedTagName
       const existingTagResult = tagResultMap.get(tagKey)
       const diary = mapDiarySearchDiary(entry, tag)
 
@@ -225,8 +225,7 @@ const mapDailyEntryDetailTask = (task: DailyEntryDetailTask, entryDate: string):
     tag: task.tag
       ? {
           label: task.tag.tagName,
-          color:
-            task.tag.color.toLowerCase() === '#3b82f6' ? 'blue' : hexToTagColor(task.tag.color),
+          color: hexToTagColor(task.tag.color),
         }
       : undefined,
     priority: mapDailyEntryTaskPriority(task.priority),

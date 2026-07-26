@@ -37,7 +37,7 @@ export const DiarySearchPage = () => {
   const searchKeyword =
     searchInputState.baseKeyword === searchedKeyword ? searchInputState.value : searchedKeyword
 
-  const { data: searchResult, isFetching } = useGetDailyEntrySearch({
+  const { data: searchResult, isPending } = useGetDailyEntrySearch({
     query: searchedKeyword,
     sort,
   })
@@ -139,7 +139,7 @@ export const DiarySearchPage = () => {
             />
           </div>
 
-          {isFetching ? (
+          {isPending ? (
             <DiarySearchSkeleton />
           ) : (
             <>

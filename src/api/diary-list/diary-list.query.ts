@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import {
   mapDailyEntriesSummary,
@@ -60,6 +60,7 @@ export const useGetDailyEntrySearch = (params: DailyEntrySearchParams) => {
     queryKey: diaryListQueryKeys.search(params),
     queryFn: () => searchDailyEntries(params),
     select: mapDailyEntrySearchResult,
+    placeholderData: keepPreviousData,
     enabled: params.query.trim().length > 0,
   })
 }
