@@ -15,8 +15,7 @@ export const DiaryMonthlyEntry = ({ entry }: DiaryMonthlyEntryProps) => {
   const navigate = useNavigate()
 
   const handleEntryClick = () => {
-    // TODO: 업무 일지 상세 조회 API 연동 시 dailyEntryId 기반 경로로 변경
-    navigate(`/records/${entry.date}`)
+    navigate(`/records/${entry.id}`)
   }
 
   return (

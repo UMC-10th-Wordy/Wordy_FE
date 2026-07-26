@@ -1,5 +1,6 @@
 import {
   DAILY_ENTRIES_SUMMARY_RESPONSE_MOCK,
+  DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP,
   DAILY_ENTRY_SEARCH_ITEMS_MOCK,
   MONTHLY_DAILY_ENTRIES_RESPONSE_MOCK,
   MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP,
@@ -7,6 +8,7 @@ import {
 
 import type {
   DailyEntriesSummaryResult,
+  DailyEntryDetailResult,
   DailyEntrySearchParams,
   DailyEntrySearchResponse,
   DailyEntrySearchResult,
@@ -105,6 +107,20 @@ export const searchDailyEntries = async ({
       tagCount: matchedTagNames.size,
       results: sortedEntries,
     },
+  }
+
+  return response.result
+}
+
+export const getDailyEntryDetail = async (
+  dailyEntryId: string,
+): Promise<DailyEntryDetailResult> => {
+  await wait(MOCK_API_DELAY)
+
+  const response = DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP[dailyEntryId]
+
+  if (!response) {
+    throw new Error('업무 일지를 찾을 수 없습니다.')
   }
 
   return response.result

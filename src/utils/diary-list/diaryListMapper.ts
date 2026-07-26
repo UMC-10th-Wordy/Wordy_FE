@@ -1,6 +1,10 @@
 import { hexToTagColor } from '@/utils/tagMapper'
 
 import type {
+  DailyEntryAttachment,
+  DailyEntryDetailResult,
+  DailyEntryDetailTask,
+  DailyEntryTaskPriority,
   DailyEntrySearchItem,
   DailyEntrySearchResult,
   DailyEntriesSummaryResult,
@@ -20,6 +24,8 @@ import type {
   DiarySearchResultData,
   DiarySearchTagResult,
 } from '@/types/diarySearch'
+import type { DiaryDetailContentData } from '@/types/diaryDetail'
+import type { Task, TaskPriority, TaskResultFile, TaskResultImage } from '@/types/todo'
 
 const mapDiaryProjectTag = (tag: DailyEntryTag, id: string): DiaryProjectTag => {
   return {
@@ -153,5 +159,91 @@ export const mapDailyEntrySearchResult = (
     projectTagCount: result.tagCount,
     diaries,
     tagResults,
+  }
+}
+
+const mapDailyEntryTaskPriority = (priority: DailyEntryTaskPriority): TaskPriority => {
+  const priorityMap: Record<DailyEntryTaskPriority, TaskPriority> = {
+    MUST_DO: 'must',
+    SHOULD_DO: 'should',
+    COULD_DO: 'could',
+  }
+
+  return priorityMap[priority]
+}
+
+const createAttachmentId = (
+  taskResultId: string,
+  attachment: DailyEntryAttachment,
+  index: number,
+) => {
+  return `${taskResultId}-${attachment.fileType}-${index}`
+}
+
+const mapDailyEntryResultFiles = (task: DailyEntryDetailTask): TaskResultFile[] => {
+  return task.results.flatMap((result) =>
+    result.attachments
+      .filter((attachment) => attachment.fileType === 'file')
+      .map((attachment, index) => ({
+        id: createAttachmentId(result.taskResultId, attachment, index),
+        name: attachment.fileName,
+        url: attachment.fileUrl,
+      })),
+  )
+}
+
+const mapDailyEntryResultImages = (task: DailyEntryDetailTask): TaskResultImage[] => {
+  return task.results.flatMap((result) =>
+    result.attachments
+      .filter((attachment) => attachment.fileType === 'img')
+      .map((attachment, index) => ({
+        id: createAttachmentId(result.taskResultId, attachment, index),
+        name: attachment.fileName,
+        url: attachment.fileUrl,
+      })),
+  )
+}
+
+const mapDailyEntryTaskResultContent = (task: DailyEntryDetailTask) => {
+  const contents = task.results
+    .map((result) => result.content.trim())
+    .filter((content) => content.length > 0)
+
+  return contents.length > 0 ? contents.join('\n') : undefined
+}
+
+const mapDailyEntryDetailTask = (task: DailyEntryDetailTask, entryDate: string): Task => {
+  const resultFiles = mapDailyEntryResultFiles(task)
+  const resultImages = mapDailyEntryResultImages(task)
+  const result = mapDailyEntryTaskResultContent(task)
+
+  return {
+    id: task.taskId,
+    date: entryDate,
+    title: task.title,
+    memo: task.memo || undefined,
+    tag: task.tag
+      ? {
+          label: task.tag.tagName,
+          color:
+            task.tag.color.toLowerCase() === '#3b82f6' ? 'blue' : hexToTagColor(task.tag.color),
+        }
+      : undefined,
+    priority: mapDailyEntryTaskPriority(task.priority),
+    isCompleted: task.status === 'COMPLETED',
+    result,
+    resultFiles: resultFiles.length > 0 ? resultFiles : undefined,
+    resultImages: resultImages.length > 0 ? resultImages : undefined,
+  }
+}
+
+export const mapDailyEntryDetail = (result: DailyEntryDetailResult): DiaryDetailContentData => {
+  return {
+    id: result.dailyEntryId,
+    date: result.entryDate,
+    tasks: result.tasks.map((task) => mapDailyEntryDetailTask(task, result.entryDate)),
+    retrospective: result.reflectionContent,
+    completedCount: result.completedCount,
+    incompleteCount: result.incompleteCount,
   }
 }

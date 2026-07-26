@@ -1,4 +1,5 @@
 import type {
+  DailyEntryDetailResponse,
   DailyEntriesSummaryResponse,
   DailyEntrySearchItem,
   MonthlyDailyEntriesDetailResponse,
@@ -163,7 +164,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
     message: '조회에 성공했습니다.',
     result: [
       {
-        dailyEntryId: 'diary-2026-07-28',
+        dailyEntryId: 'daily-entry-2026-07-28',
         entryDate: '2026-07-28',
         day: 28,
         tags: [
@@ -177,7 +178,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         summary: '신규 사용자의 주요 이탈 구간을 기준으로 진입 흐름을 개선했어요.',
       },
       {
-        dailyEntryId: 'diary-2026-07-24',
+        dailyEntryId: 'daily-entry-2026-07-24',
         entryDate: '2026-07-24',
         day: 24,
         tags: [
@@ -191,7 +192,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         summary: '유사 서비스의 핵심 기능과 온보딩 구조를 비교했어요.',
       },
       {
-        dailyEntryId: 'diary-2026-07-18',
+        dailyEntryId: 'daily-entry-2026-07-18',
         entryDate: '2026-07-18',
         day: 18,
         tags: [
@@ -212,7 +213,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
     message: '조회에 성공했습니다.',
     result: [
       {
-        dailyEntryId: 'diary-2026-06-21',
+        dailyEntryId: 'daily-entry-2026-06-21',
         entryDate: '2026-06-21',
         day: 21,
         tags: [
@@ -226,7 +227,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         summary: '분기 목표를 기준으로 프로젝트 일정과 주요 산출물을 정리했어요.',
       },
       {
-        dailyEntryId: 'diary-2026-06-17',
+        dailyEntryId: 'daily-entry-2026-06-17',
         entryDate: '2026-06-17',
         day: 17,
         tags: [
@@ -247,7 +248,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
     message: '조회에 성공했습니다.',
     result: [
       {
-        dailyEntryId: 'diary-2026-05-23',
+        dailyEntryId: 'daily-entry-2026-05-23',
         entryDate: '2026-05-23',
         day: 23,
         tags: [
@@ -261,7 +262,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         summary: '팀에서 반복적으로 사용하는 업무 절차를 문서로 정리했어요.',
       },
       {
-        dailyEntryId: 'diary-2026-05-12',
+        dailyEntryId: 'daily-entry-2026-05-12',
         entryDate: '2026-05-12',
         day: 12,
         tags: [
@@ -282,7 +283,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
     message: '조회에 성공했습니다.',
     result: [
       {
-        dailyEntryId: 'diary-2026-04-26',
+        dailyEntryId: 'daily-entry-2026-04-26',
         entryDate: '2026-04-26',
         day: 26,
         tags: [
@@ -296,7 +297,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         summary: '사용자 문제를 기준으로 신규 프로젝트의 핵심 기능을 정의했어요.',
       },
       {
-        dailyEntryId: 'diary-2026-04-15',
+        dailyEntryId: 'daily-entry-2026-04-15',
         entryDate: '2026-04-15',
         day: 15,
         tags: [
@@ -317,7 +318,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
     message: '조회에 성공했습니다.',
     result: [
       {
-        dailyEntryId: 'diary-2026-03-19',
+        dailyEntryId: 'daily-entry-2026-03-19',
         entryDate: '2026-03-19',
         day: 19,
         tags: [
@@ -338,7 +339,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
     message: '조회에 성공했습니다.',
     result: [
       {
-        dailyEntryId: 'diary-2026-02-21',
+        dailyEntryId: 'daily-entry-2026-02-21',
         entryDate: '2026-02-21',
         day: 21,
         tags: [
@@ -359,7 +360,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
     message: '조회에 성공했습니다.',
     result: [
       {
-        dailyEntryId: 'diary-2026-01-15',
+        dailyEntryId: 'daily-entry-2026-01-15',
         entryDate: '2026-01-15',
         day: 15,
         tags: [
@@ -444,11 +445,11 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
     entryDate: '2026-02-21',
     tags: [
       {
-        tagName: '온보딩 리뉴얼',
+        tagName: '회의',
         color: '#14c369',
       },
     ],
-    title: 'Product Strategy Alignment 회의 준비',
+    title: '프로젝트 킥오프 회의',
   },
   {
     dailyEntryId: 'daily-entry-2026-01-21',
@@ -463,3 +464,225 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
     title: '주간 회의 내용 정리 및 다음 업무 계획 수립',
   },
 ]
+
+interface CreateDailyEntryDetailResponseMockParams {
+  dailyEntryId: string
+  entryDate: string
+  title: string
+  summary: string
+  tagName?: string
+  tagColor?: string
+}
+
+const createDailyEntryDetailResponseMock = ({
+  dailyEntryId,
+  entryDate,
+  title,
+  summary,
+  tagName,
+  tagColor,
+}: CreateDailyEntryDetailResponseMockParams): DailyEntryDetailResponse => {
+  const tag =
+    tagName && tagColor
+      ? {
+          tagName,
+          color: tagColor,
+        }
+      : undefined
+
+  return {
+    success: true,
+    code: 'S200',
+    message: '조회에 성공했습니다.',
+    result: {
+      dailyEntryId,
+      entryDate,
+      reflectionContent: summary,
+      completedCount: 1,
+      incompleteCount: 1,
+      tasks: [
+        {
+          taskId: `${dailyEntryId}-completed-task`,
+          tag,
+          title,
+          memo: '업무 진행에 필요한 내용을 확인하고 계획에 따라 작업했어요.',
+          priority: 'MUST_DO',
+          status: 'COMPLETED',
+          results: [
+            {
+              taskResultId: `${dailyEntryId}-task-result`,
+              content: '계획한 업무를 완료하고 주요 결과를 정리했어요.',
+              attachments: [],
+            },
+          ],
+        },
+        {
+          taskId: `${dailyEntryId}-incomplete-task`,
+          tag,
+          title: `${title} 후속 업무`,
+          memo: '남은 내용을 확인한 뒤 다음 업무에서 이어서 진행할 예정이에요.',
+          priority: 'SHOULD_DO',
+          status: 'INCOMPLETE',
+          results: [],
+        },
+      ],
+    },
+  }
+}
+
+const MONTHLY_DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP = Object.fromEntries(
+  Object.values(MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP)
+    .flatMap((response) => response.result)
+    .map((entry) => {
+      const firstTag = entry.tags[0]
+
+      return [
+        entry.dailyEntryId,
+        createDailyEntryDetailResponseMock({
+          dailyEntryId: entry.dailyEntryId,
+          entryDate: entry.entryDate,
+          title: entry.mainTaskTitle,
+          summary: entry.summary,
+          tagName: firstTag?.tagName,
+          tagColor: firstTag?.color,
+        }),
+      ]
+    }),
+) as Record<string, DailyEntryDetailResponse>
+
+const SEARCH_DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP = Object.fromEntries(
+  DAILY_ENTRY_SEARCH_ITEMS_MOCK.map((entry) => {
+    const firstTag = entry.tags[0]
+
+    return [
+      entry.dailyEntryId,
+      createDailyEntryDetailResponseMock({
+        dailyEntryId: entry.dailyEntryId,
+        entryDate: entry.entryDate,
+        title: entry.title,
+        summary: `${entry.title} 업무를 중심으로 오늘의 진행 내용과 결과를 정리했어요.`,
+        tagName: firstTag?.tagName,
+        tagColor: firstTag?.color,
+      }),
+    ]
+  }),
+) as Record<string, DailyEntryDetailResponse>
+
+export const DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP: Record<string, DailyEntryDetailResponse> = {
+  ...MONTHLY_DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP,
+  ...SEARCH_DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP,
+
+  'daily-entry-2026-06-21': {
+    success: true,
+    code: 'S200',
+    message: '조회에 성공했습니다.',
+    result: {
+      dailyEntryId: 'daily-entry-2026-06-21',
+      entryDate: '2026-06-21',
+      reflectionContent:
+        '오늘은 회의 준비와 프로젝트 문서 정리를 마무리했다. 다음에는 업무 우선순위를 조금 더 명확하게 정리해야겠다.',
+      completedCount: 2,
+      incompleteCount: 1,
+      tasks: [
+        {
+          taskId: 'task-1',
+          tag: {
+            tagName: '온보딩 리뉴얼',
+            color: '#14c369',
+          },
+          title: 'Product Strategy Alignment 회의 준비',
+          memo: '회의 자료와 주요 논의 내용을 미리 정리한다.',
+          priority: 'MUST_DO',
+          status: 'COMPLETED',
+          results: [
+            {
+              taskResultId: 'task-result-1',
+              content: '회의 자료 초안을 작성하고 팀원들에게 공유했다.',
+              attachments: [
+                {
+                  fileType: 'img',
+                  fileUrl: 'https://picsum.photos/seed/wordy-diary/800/600',
+                  fileName: '회의자료_미리보기.png',
+                },
+                {
+                  fileType: 'file',
+                  fileUrl:
+                    'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+                  fileName: 'Product_Strategy_Alignment_회의자료.pdf',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          taskId: 'task-2',
+          tag: {
+            tagName: '온보딩 리뉴얼',
+            color: '#14c369',
+          },
+          title: '온보딩 개선안 문서 정리',
+          memo: '기존 사용자 피드백을 반영해 개선안을 작성한다.',
+          priority: 'SHOULD_DO',
+          status: 'COMPLETED',
+          results: [
+            {
+              taskResultId: 'task-result-2',
+              content: '개선안 문서를 정리하고 주요 수정사항을 표시했다.',
+              attachments: [],
+            },
+          ],
+        },
+        {
+          taskId: 'task-3',
+          title: '다음 회의 일정 정리',
+          memo: '참석 가능 시간을 확인한 뒤 일정을 확정한다.',
+          priority: 'COULD_DO',
+          status: 'INCOMPLETE',
+          results: [],
+        },
+      ],
+    },
+  },
+
+  'daily-entry-2026-06-20': {
+    success: true,
+    code: 'S200',
+    message: '조회에 성공했습니다.',
+    result: {
+      dailyEntryId: 'daily-entry-2026-06-20',
+      entryDate: '2026-06-20',
+      reflectionContent:
+        '회의 준비에 예상보다 많은 시간이 들었다. 다음에는 자료 범위를 먼저 정해야겠다.',
+      completedCount: 1,
+      incompleteCount: 1,
+      tasks: [
+        {
+          taskId: 'task-4',
+          tag: {
+            tagName: '회의',
+            color: '#14c369',
+          },
+          title: 'Product Strategy Alignment 회의 준비',
+          memo: '',
+          priority: 'MUST_DO',
+          status: 'COMPLETED',
+          results: [
+            {
+              taskResultId: 'task-result-4',
+              content: '회의 안건과 필요한 자료를 정리했다.',
+              attachments: [],
+            },
+          ],
+        },
+        {
+          taskId: 'task-5',
+          title: '회의 후속 업무 정리',
+          memo: '',
+          priority: 'SHOULD_DO',
+          status: 'INCOMPLETE',
+          results: [],
+        },
+      ],
+    },
+  },
+}
