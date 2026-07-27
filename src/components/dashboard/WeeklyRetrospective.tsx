@@ -96,19 +96,21 @@ interface WeeklyRetrospectiveProps {
     workSummary: string
     resourcesUsed: string
     learning: string
+    onSaved?: () => void
   }
 }
 export const WeeklyRetrospective = ({
   period = 'weekly',
   dashboardId,
   initialReflection,
+  onSaved,
 }: WeeklyRetrospectiveProps) => {
   const texts = TEXTS[period]
 
   const [answers, setAnswers] = useState<Record<QuestionKey, string>>({
-    work: '',
-    resource: '',
-    learning: '',
+    work: initialReflection?.workSummary ?? '',
+    resource: initialReflection?.resourcesUsed ?? '',
+    learning: initialReflection?.learning ?? '',
   })
   const [plans, setPlans] = useState<PlanRow[]>([])
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
@@ -171,8 +173,10 @@ export const WeeklyRetrospective = ({
       .then((id) => {
         setReflectionId((prev) => prev ?? id)
         addToast(texts.toastSaved)
+        onSaved?.()
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('회고 저장 실패:', error)
         addToast('저장에 실패했어요. 다시 시도해 주세요')
       })
   }

@@ -117,6 +117,14 @@ export const WeeklyDashboard = () => {
       .catch(() => setGeneration('idle'))
   }
 
+  // 회고 저장 후 상세 재조회 — 탭 전환 복귀 시 최신 회고 복원용
+  const refreshDetail = () => {
+    if (!detail) return
+    getDashboardDetail(detail.dashboardId).then((res) => {
+      if (res) setDetail(res)
+    })
+  }
+
   const handleMonthlyGenerate = () => {
     setMonthlyGeneration('generating')
     // TODO: 월간 API 명세 확정 후 교체. 데모: 2초 후 완료
@@ -203,6 +211,7 @@ export const WeeklyDashboard = () => {
                 <WeeklyRetrospective
                   dashboardId={detail?.dashboardId}
                   initialReflection={detail?.weeklyReflections[0]}
+                  onSaved={refreshDetail}
                 />
               </div>
             ) : (
