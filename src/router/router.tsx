@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { AppLayout } from '@/components/common/Layout/AppLayout'
 import { SidebarLayout } from '@/components/common/Layout/SidebarLayout'
 import { ScrollableOutlet } from '@/components/common/Layout/ScrollableOutlet'
+import { AsyncBoundary } from '@/components/common/AsyncState/AsyncBoundary'
 import { HomePage } from '@/pages/Home/HomePage'
 import TodoListPage from '@/pages/TodoListPage/TodoListPage'
 import { DiaryListPage } from '@/pages/DiaryListPage'
@@ -33,7 +34,14 @@ export const router = createBrowserRouter([
           { path: '/dashboard', element: <WeeklyDashboard /> },
         ],
       },
-      { path: '/records/:diaryId', element: <DiaryDetailPage /> },
+      {
+        path: '/records/:diaryId',
+        element: (
+          <AsyncBoundary>
+            <DiaryDetailPage />
+          </AsyncBoundary>
+        ),
+      },
     ],
   },
   {

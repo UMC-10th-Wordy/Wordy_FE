@@ -34,6 +34,7 @@ export function HomeBanner({ onNavigate, className, ...rest }: HomeBannerProps) 
         <TextButton
           variant="fill"
           size="large"
+          className="w-70"
           iconRight={<ArrowRightIcon className="size-8" />}
           onClick={onNavigate}
         >
