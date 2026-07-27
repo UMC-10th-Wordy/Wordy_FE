@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 
+import { AsyncBoundary } from '@/components/common/AsyncState/AsyncBoundary'
 import { IconButton } from '@/components/common/Button/IconButton'
 import ProjectTag from '@/components/todo/ProjectTag'
 
@@ -84,7 +85,12 @@ export const DiaryMonthlyAccordion = ({ record, isOpen, onToggle }: DiaryMonthly
             className="overflow-hidden"
           >
             <div className="mt-[33px] rounded-(--scale-16) bg-(--color-bg-brand-subtle) p-(--scale-20)">
-              <DiaryMonthlyEntriesContent yearMonth={record.id} />
+              <AsyncBoundary
+                loadingMessage="월별 기록을 불러오는 중입니다"
+                errorMessage="월별 기록을 불러오지 못했어요"
+              >
+                <DiaryMonthlyEntriesContent yearMonth={record.id} />
+              </AsyncBoundary>
             </div>
           </motion.div>
         )}
