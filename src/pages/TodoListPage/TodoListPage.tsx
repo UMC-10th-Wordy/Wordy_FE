@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import TaskForm from '@/components/todo/TaskForm'
 import TodoTabs from '@/components/todo/TodoTabs'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
@@ -26,7 +26,8 @@ import type {
   TodoFilter,
   TodoFilterCounts,
 } from '@/types/todo'
-import { createTask, getTaskDetail, getTasks } from '@/api/taskApi'
+import { createTask, getTaskDetail } from '@/api/taskApi'
+import { useGetTasksByDate } from '@/api/task.query'
 import { mapDraftToCreateTaskPayload, mapTaskDtoToTask } from '@/utils/taskMapper'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
@@ -38,6 +39,7 @@ export default function TodoListPage() {
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
   const [tasks, setTasks] = useState<Task[]>([])
+  const [loadedDateKey, setLoadedDateKey] = useState<string | null>(null)
   const [collapsedTaskIds, setCollapsedTaskIds] = useState<Set<string>>(new Set())
   const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
@@ -47,19 +49,12 @@ export default function TodoListPage() {
 
   const currentDateKey = toDateKey(currentDate)
 
-  useEffect(() => {
-    let cancelled = false
-    getTasks(currentDateKey)
-      .then((dtos) => {
-        if (cancelled) return
-        const fetched = dtos.map(mapTaskDtoToTask)
-        setTasks((prev) => [...prev.filter((task) => task.date !== currentDateKey), ...fetched])
-      })
-      .catch(() => {})
-    return () => {
-      cancelled = true
-    }
-  }, [currentDateKey])
+  const { data: fetchedTasks } = useGetTasksByDate(currentDateKey)
+
+  if (loadedDateKey !== currentDateKey) {
+    setLoadedDateKey(currentDateKey)
+    setTasks((prev) => [...prev.filter((task) => task.date !== currentDateKey), ...fetchedTasks])
+  }
 
   const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
   const retrospective = retrospectiveByDate[currentDateKey] ?? ''
