@@ -7,6 +7,7 @@ import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
 import CheckIcon from '@/assets/icons/check-bold.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
+import { createReflection, updateReflection } from '@/api/dashboardApi'
 
 interface PlanRow {
   id: string
@@ -89,9 +90,19 @@ type QuestionKey = 'work' | 'resource' | 'learning'
 
 interface WeeklyRetrospectiveProps {
   period?: RetrospectivePeriod
+  dashboardId?: string
+  initialReflection?: {
+    reflectionId: string
+    workSummary: string
+    resourcesUsed: string
+    learning: string
+  }
 }
-
-export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectiveProps) => {
+export const WeeklyRetrospective = ({
+  period = 'weekly',
+  dashboardId,
+  initialReflection,
+}: WeeklyRetrospectiveProps) => {
   const texts = TEXTS[period]
 
   const [answers, setAnswers] = useState<Record<QuestionKey, string>>({
@@ -102,6 +113,9 @@ export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectivePr
   const [plans, setPlans] = useState<PlanRow[]>([])
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
+  )
+  const [reflectionId, setReflectionId] = useState<string | null>(
+    initialReflection?.reflectionId ?? null,
   )
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const { toasts, addToast } = useToast()
@@ -138,10 +152,30 @@ export const WeeklyRetrospective = ({ period = 'weekly' }: WeeklyRetrospectivePr
   }
 
   const handleSave = () => {
-    // TODO(#번호): API 연동 시 회고 저장 요청으로 교체
-    addToast(texts.toastSaved)
+    if (!dashboardId) {
+      addToast(texts.toastSaved) // 월간 등 미연동 구간은 기존 동작 유지
+      return
+    }
+    const request = reflectionId
+      ? updateReflection(dashboardId, reflectionId, {
+          workSummary: answers.work,
+          resourcesUsed: answers.resource,
+          learning: answers.learning,
+        })
+      : createReflection(dashboardId, {
+          workSummary: answers.work,
+          resourcesUsed: answers.resource,
+          learning: answers.learning,
+        })
+    request
+      .then((id) => {
+        setReflectionId((prev) => prev ?? id)
+        addToast(texts.toastSaved)
+      })
+      .catch(() => {
+        addToast('저장에 실패했어요. 다시 시도해 주세요')
+      })
   }
-
   const hasContent = Object.values(answers).some((v) => v.trim()) || plans.length > 0
   const canSave = hasContent && !editing
 
