@@ -1,23 +1,54 @@
+import {
+  useGetDailyEntriesSummary,
+  useGetMonthlyDailyEntries,
+} from '@/api/diary-list/diary-list.query'
 import { DiaryListHeader } from '@/components/diary-list/DiaryListHeader'
 import { DiaryMonthlySection } from '@/components/diary-list/DiaryMonthlySection'
-import { DIARY_MONTHLY_RECORDS, EMPTY_DIARY_MONTHLY_RECORDS } from '@/mocks/diaryMonthlyMock'
 import { DiarySummarySection } from '@/components/diary-list/DiarySummarySection'
-import { DIARY_SUMMARY_MOCK, EMPTY_DIARY_SUMMARY_MOCK } from '@/mocks/diaryListMock'
-
-// 업무 일지 기록이 없는 상태를 테스트하기 위한 코드, 실제 서비스에서는 API 호출 결과에 따라 결정
-const IS_EMPTY_STATE = false
 
 export const DiaryListPage = () => {
-  const summary = IS_EMPTY_STATE ? EMPTY_DIARY_SUMMARY_MOCK : DIARY_SUMMARY_MOCK
-  const records = IS_EMPTY_STATE ? EMPTY_DIARY_MONTHLY_RECORDS : DIARY_MONTHLY_RECORDS
+  const {
+    data: summary,
+    isPending: isSummaryPending,
+    isError: isSummaryError,
+  } = useGetDailyEntriesSummary()
+
+  const {
+    data: records,
+    isPending: isRecordsPending,
+    isError: isRecordsError,
+  } = useGetMonthlyDailyEntries()
+
+  const isPending = isSummaryPending || isRecordsPending
+  const isError = isSummaryError || isRecordsError
 
   return (
     <main className="relative z-0 h-full min-w-0 w-full flex-1 bg-(--color-bg-default)">
       <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-[60px]">
         <DiaryListHeader />
 
-        <DiarySummarySection summary={summary} />
-        <DiaryMonthlySection records={records} />
+        {/* isPending, isError UI와 문구는 API 테스트를 위해 임의로 지정함. 이후 삭제 예정 */}
+        {isPending && (
+          <div className="flex flex-1 items-center justify-center" role="status" aria-live="polite">
+            <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-(--font-weight-medium) text-(--color-text-secondary)">
+              업무 일지를 불러오는 중이에요
+            </p>
+          </div>
+        )}
+        {!isPending && isError && (
+          <div className="flex flex-1 items-center justify-center" role="alert">
+            <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-(--font-weight-medium) text-(--color-text-secondary)">
+              업무 일지를 불러오지 못했어요
+            </p>
+          </div>
+        )}
+
+        {!isPending && !isError && summary && records && (
+          <>
+            <DiarySummarySection summary={summary} />
+            <DiaryMonthlySection records={records} />
+          </>
+        )}
       </div>
     </main>
   )

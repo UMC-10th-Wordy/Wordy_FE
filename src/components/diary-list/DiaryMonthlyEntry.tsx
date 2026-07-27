@@ -13,10 +13,9 @@ interface DiaryMonthlyEntryProps {
 
 export const DiaryMonthlyEntry = ({ entry }: DiaryMonthlyEntryProps) => {
   const navigate = useNavigate()
-  const remainingTaskCount = Math.max(entry.totalTaskCount - 1, 0)
 
   const handleEntryClick = () => {
-    // TODO(#65): 업무 일지 조회 API 연결 시 date 대신 diaryId 사용
+    // TODO: 업무 일지 상세 조회 API 연동 시 dailyEntryId 기반 경로로 변경
     navigate(`/records/${entry.date}`)
   }
 
@@ -44,9 +43,9 @@ export const DiaryMonthlyEntry = ({ entry }: DiaryMonthlyEntryProps) => {
               {entry.representativeTask.title}
             </p>
 
-            {remainingTaskCount > 0 && (
+            {entry.extraTaskCount > 0 && (
               <span className="shrink-0 [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-(--font-weight-semibold) text-(--color-text-default)">
-                외 {remainingTaskCount}건
+                외 {entry.extraTaskCount}건
               </span>
             )}
           </div>

@@ -25,7 +25,7 @@ export interface MonthlyDiaryEntry {
   id: string
   date: string
   day: number
-  totalTaskCount: number
+  extraTaskCount: number
   representativeTask: DiaryRepresentativeTask
   performanceSummary: string
 }
@@ -37,5 +37,4 @@ export interface MonthlyDiaryRecord {
   diaryDayCount: number
   topProjectTags: DiaryProjectTag[]
   monthlySummary: string
-  entries: MonthlyDiaryEntry[]
 }
