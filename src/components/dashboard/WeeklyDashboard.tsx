@@ -4,6 +4,8 @@ import type { DashboardDetailDto } from '@/types/dashboardApi'
 import { DUMMY_WEEKS } from '@/mocks/monthlyDashboardMock'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
+import { useToast } from '@/components/common/Toast/useToast'
+import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import { WeeklyStatusCard } from './WeeklyStatusCard'
 import { DiaryChecklistPanel } from './DiaryChecklistPanel'
 import { WeeklySummaryInsight } from './WeeklySummaryInsight'
@@ -27,6 +29,7 @@ const formatEntryLabel = (dateStr: string) => {
 const TAG_FALLBACK_COLORS: ProjectTagColor[] = ['green', 'pink', 'blue', 'orange']
 
 export const WeeklyDashboard = () => {
+  const { toasts, addToast } = useToast()
   const [activeTab, setActiveTab] = useState<'weekly' | 'monthly'>('weekly')
   const [entries, setEntries] = useState<DiaryEntry[]>([])
   const [requiredCount, setRequiredCount] = useState(3)
@@ -106,6 +109,11 @@ export const WeeklyDashboard = () => {
   }
 
   const handleGenerate = () => {
+    if (generation === 'generating') return
+    if (!weekRange.start || !weekRange.end) {
+      addToast('생성 조건을 불러오지 못했어요. 잠시 후 다시 시도해 주세요')
+      return
+    }
     setGeneration('generating')
     createDashboard({ startDate: weekRange.start, endDate: weekRange.end })
       .then((dashboardId) => getDashboardDetail(dashboardId))
@@ -114,7 +122,11 @@ export const WeeklyDashboard = () => {
         setDetail(res)
         setGeneration('complete')
       })
-      .catch(() => setGeneration('idle'))
+      .catch((error) => {
+        console.error('대시보드 생성 실패:', error)
+        addToast('대시보드 생성에 실패했어요. 다시 시도해 주세요')
+        setGeneration('idle')
+      })
   }
 
   // 회고 저장 후 상세 재조회 — 탭 전환 복귀 시 최신 회고 복원용
@@ -256,6 +268,7 @@ export const WeeklyDashboard = () => {
           </div>
         </>
       )}
+      <ToastContainer toasts={toasts} align="left" />
     </div>
   )
 }
