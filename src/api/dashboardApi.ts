@@ -43,7 +43,13 @@ export async function createDashboard(payload: CreateDashboardPayload): Promise<
     createdAt: new Date().toISOString(),
   }
   dashboardListStore = [...dashboardListStore, created]
-  dashboardDetailStore = { ...dashboardDetailStore, dashboardId: created.dashboardId }
+  dashboardDetailStore = {
+    ...dashboardDetailStore,
+    dashboardId: created.dashboardId,
+    startDate: created.startDate,
+    endDate: created.endDate,
+    weeklyReflections: [],
+  }
   return created.dashboardId
 }
 
@@ -52,7 +58,9 @@ export async function createReflection(
   dashboardId: string,
   payload: CreateReflectionPayload,
 ): Promise<string> {
-  void dashboardId
+  if (dashboardDetailStore.dashboardId !== dashboardId) {
+    throw new Error(`dashboard not found: ${dashboardId}`)
+  }
   const reflectionId = crypto.randomUUID()
   const reflection: WeeklyReflectionDto = { reflectionId, ...payload }
   dashboardDetailStore = {
@@ -68,7 +76,9 @@ export async function updateReflection(
   reflectionId: string,
   payload: UpdateReflectionPayload,
 ): Promise<string> {
-  void dashboardId
+  if (dashboardDetailStore.dashboardId !== dashboardId) {
+    throw new Error(`dashboard not found: ${dashboardId}`)
+  }
   const exists = dashboardDetailStore.weeklyReflections.some((r) => r.reflectionId === reflectionId)
   if (!exists) {
     throw new Error(`reflection not found: ${reflectionId}`) // 실서버 404에 대응
