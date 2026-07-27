@@ -4,6 +4,7 @@ interface ErrorBoundaryProps {
   children: ReactNode
   fallback: (error: Error, reset: () => void) => ReactNode
   onReset?: () => void
+  resetKey?: unknown
 }
 
 interface ErrorBoundaryState {
@@ -15,6 +16,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   static getDerivedStateFromError(error: Error) {
     return { error }
+  }
+
+  componentDidUpdate(prevProps: ErrorBoundaryProps) {
+    if (this.state.error && prevProps.resetKey !== this.props.resetKey) {
+      this.reset()
+    }
   }
 
   reset = () => {
