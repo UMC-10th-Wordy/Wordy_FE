@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { useDeleteDailyEntry } from '@/api/diary-list/diary-list.mutation'
-import { useGetDailyEntryDetail } from '@/api/diary-list/diary-list.query'
+import { useDeleteDailyEntry } from '@/api/diary-list/diaryList.mutation'
+import { useGetDailyEntryDetail } from '@/api/diary-list/diaryList.query'
 
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 
@@ -26,18 +26,18 @@ interface DiaryDetailPageProps {
   hideDelete?: boolean
 }
 
-export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
+interface DiaryDetailContentProps {
+  diaryId: string
+  hideDelete?: boolean
+}
+
+const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) => {
   const navigate = useNavigate()
-  const { diaryId = '' } = useParams<{ diaryId: string }>()
 
   const [activeTab, setActiveTab] = useState<TodoFilter>('completed')
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
-  const {
-    data: diary,
-    isLoading: isDiaryLoading,
-    isError: isDiaryError,
-  } = useGetDailyEntryDetail(diaryId)
+  const { data: diary } = useGetDailyEntryDetail(diaryId)
 
   const { mutate: deleteDiary, isPending: isDeletePending } = useDeleteDailyEntry()
 
@@ -46,7 +46,7 @@ export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
   }
 
   const handleDeleteDiary = () => {
-    if (!diaryId || isDeletePending) {
+    if (isDeletePending) {
       return
     }
 
@@ -61,34 +61,6 @@ export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
     })
   }
 
-  // isLoading, isError UI와 문구는 API 테스트를 위해 임의로 지정함. 이후 삭제 예정
-  if (isDiaryLoading) {
-    return (
-      <div className="flex h-full min-h-0 min-w-0 flex-1 items-center justify-center bg-(--color-bg-default)">
-        <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)">
-          업무 일지를 불러오는 중입니다.
-        </p>
-      </div>
-    )
-  }
-
-  if (isDiaryError || !diary) {
-    return (
-      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col items-center justify-center gap-(--scale-16) bg-(--color-bg-default)">
-        <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)">
-          업무 일지를 불러오지 못했습니다.
-        </p>
-
-        <button
-          type="button"
-          onClick={handleBack}
-          className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-semibold)] text-(--color-text-brand)"
-        >
-          이전 페이지로 돌아가기
-        </button>
-      </div>
-    )
-  }
   const completedTasks = diary.tasks.filter((task) => task.isCompleted)
   const incompleteTasks = diary.tasks.filter((task) => !task.isCompleted)
 
@@ -158,4 +130,14 @@ export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
       )}
     </div>
   )
+}
+
+export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
+  const { diaryId } = useParams<{ diaryId: string }>()
+
+  if (!diaryId) {
+    throw new Error('업무 일지 ID가 없습니다.')
+  }
+
+  return <DiaryDetailContent diaryId={diaryId} hideDelete={hideDelete} />
 }

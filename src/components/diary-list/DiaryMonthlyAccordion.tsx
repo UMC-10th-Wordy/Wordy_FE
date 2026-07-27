@@ -1,10 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion'
 
-import { useGetMonthlyDailyEntriesByYearMonth } from '@/api/diary-list/diary-list.query'
+import { AsyncBoundary } from '@/components/common/AsyncState/AsyncBoundary'
 import { IconButton } from '@/components/common/Button/IconButton'
 import ProjectTag from '@/components/todo/ProjectTag'
 
-import { DiaryMonthlyEntry } from './DiaryMonthlyEntry'
+import { DiaryMonthlyEntriesContent } from './DiaryMonthlyEntriesContent'
 
 import type { MonthlyDiaryRecord } from '@/types/diaryList'
 
@@ -19,20 +19,6 @@ interface DiaryMonthlyAccordionProps {
 }
 
 export const DiaryMonthlyAccordion = ({ record, isOpen, onToggle }: DiaryMonthlyAccordionProps) => {
-  const {
-    data: entries = [],
-    isPending: isEntriesPending,
-    isError: isEntriesError,
-  } = useGetMonthlyDailyEntriesByYearMonth(record.id, isOpen)
-
-  const sortedEntries = [...entries].sort(
-    (firstEntry, secondEntry) => secondEntry.day - firstEntry.day,
-  )
-
-  const middleIndex = Math.ceil(sortedEntries.length / 2)
-  const leftEntries = sortedEntries.slice(0, middleIndex)
-  const rightEntries = sortedEntries.slice(middleIndex)
-
   return (
     <article className="relative w-full rounded-(--scale-12) border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) p-(--scale-20) shadow-[0_1px_5px_rgba(0,0,0,0.1)] transition-colors duration-100 ease-out hover:bg-(--color-bg-secondary)">
       <div className="relative h-[145px] pr-11">
@@ -99,51 +85,12 @@ export const DiaryMonthlyAccordion = ({ record, isOpen, onToggle }: DiaryMonthly
             className="overflow-hidden"
           >
             <div className="mt-[33px] rounded-(--scale-16) bg-(--color-bg-brand-subtle) p-(--scale-20)">
-              {/* isEntriesPending, isEntriesError UI와 문구는 API 테스트를 위해 임의로 지정함. 이후 삭제 예정 */}
-              {isEntriesPending && (
-                <div
-                  className="flex min-h-[104px] items-center justify-center"
-                  role="status"
-                  aria-live="polite"
-                >
-                  <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-(--font-weight-medium) text-(--color-text-tertiary)">
-                    월별 기록을 불러오는 중이에요
-                  </p>
-                </div>
-              )}
-
-              {!isEntriesPending && isEntriesError && (
-                <div className="flex min-h-[104px] items-center justify-center" role="alert">
-                  <p className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-(--font-weight-medium) text-(--color-text-tertiary)">
-                    월별 기록을 불러오지 못했어요
-                  </p>
-                </div>
-              )}
-
-              {!isEntriesPending && !isEntriesError && (
-                <div className="grid grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] gap-x-2.5">
-                  <div className="flex min-w-0 flex-col gap-(--scale-24)">
-                    {leftEntries.map((entry) => (
-                      <DiaryMonthlyEntry key={entry.id} entry={entry} />
-                    ))}
-                  </div>
-
-                  <div
-                    className="my-(--scale-8) w-px self-stretch"
-                    style={{
-                      backgroundImage:
-                        'repeating-linear-gradient(to bottom, var(--color-border-subtle) 0 2px, transparent 2px 4px)',
-                    }}
-                    aria-hidden="true"
-                  />
-
-                  <div className="flex min-w-0 flex-col gap-(--scale-24)">
-                    {rightEntries.map((entry) => (
-                      <DiaryMonthlyEntry key={entry.id} entry={entry} />
-                    ))}
-                  </div>
-                </div>
-              )}
+              <AsyncBoundary
+                loadingMessage="월별 기록을 불러오는 중입니다"
+                errorMessage="월별 기록을 불러오지 못했어요"
+              >
+                <DiaryMonthlyEntriesContent yearMonth={record.id} />
+              </AsyncBoundary>
             </div>
           </motion.div>
         )}

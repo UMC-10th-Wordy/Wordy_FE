@@ -2,7 +2,7 @@ export interface DiaryListApiResponse<T> {
   success: boolean
   code: string
   message: string
-  result: T
+  result: T | null
 }
 
 /* 일지 모아보기 요약 조회: 이번 달 작성 수, 연속 작성, 최다 기록 카테고리 */
@@ -19,8 +19,8 @@ export interface DailyEntriesStreak {
 }
 
 export interface DailyEntriesTopCategory {
-  tagName: string
-  color: string
+  tagName: string | null
+  color: string | null
   percentage: number
 }
 
@@ -115,12 +115,12 @@ export interface DailyEntryTaskResult {
 
 export interface DailyEntryDetailTask {
   taskId: string
-  tag?: DailyEntryTag
+  tag: DailyEntryTag | null
   title: string
   memo: string
   priority: DailyEntryTaskPriority
   status: DailyEntryTaskStatus
-  results: DailyEntryTaskResult[]
+  result: DailyEntryTaskResult | null
 }
 
 export interface DailyEntryDetailResult {

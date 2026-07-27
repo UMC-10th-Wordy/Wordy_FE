@@ -1,17 +1,18 @@
 import { hexToTagColor } from '@/utils/tagMapper'
 
 import type {
+  DailyEntriesSummaryResult,
   DailyEntryAttachment,
   DailyEntryDetailResult,
   DailyEntryDetailTask,
-  DailyEntryTaskPriority,
   DailyEntrySearchItem,
   DailyEntrySearchResult,
-  DailyEntriesSummaryResult,
   DailyEntryTag,
+  DailyEntryTaskPriority,
   MonthlyDailyEntry,
   MonthlyDailyEntryRecord,
 } from '@/types/api/diaryList'
+import type { DiaryDetailContentData } from '@/types/diaryDetail'
 import type {
   DiaryProjectTag,
   DiarySummaryData,
@@ -24,7 +25,6 @@ import type {
   DiarySearchResultData,
   DiarySearchTagResult,
 } from '@/types/diarySearch'
-import type { DiaryDetailContentData } from '@/types/diaryDetail'
 import type { Task, TaskPriority, TaskResultFile, TaskResultImage } from '@/types/todo'
 
 const mapDiaryProjectTag = (tag: DailyEntryTag, id: string): DiaryProjectTag => {
@@ -46,7 +46,7 @@ export const mapDailyEntriesSummary = (result: DailyEntriesSummaryResult): Diary
     previousMonthCount,
     currentStreakDays: result.streak.currentStreak,
     bestStreakDays: result.streak.maxStreak,
-    mostUsedTagName: result.topCategory.tagName,
+    mostUsedTagName: result.topCategory.tagName ?? '',
     mostUsedTagRatio: result.topCategory.percentage,
   }
 }
@@ -89,6 +89,7 @@ export const mapMonthlyDiaryEntries = (entries: MonthlyDailyEntry[]): MonthlyDia
     }
   })
 }
+
 const mapDiarySearchProjectTag = (tag: DailyEntryTag): DiarySearchProjectTag => {
   return {
     name: tag.tagName,
@@ -122,8 +123,7 @@ const mapDiarySearchTagResults = (result: DailyEntrySearchResult): DiarySearchTa
         return
       }
 
-      const tagKey = normalizedTagName
-      const existingTagResult = tagResultMap.get(tagKey)
+      const existingTagResult = tagResultMap.get(normalizedTagName)
       const diary = mapDiarySearchDiary(entry, tag)
 
       if (existingTagResult) {
@@ -131,7 +131,7 @@ const mapDiarySearchTagResults = (result: DailyEntrySearchResult): DiarySearchTa
         return
       }
 
-      tagResultMap.set(tagKey, {
+      tagResultMap.set(normalizedTagName, {
         name: tag.tagName,
         color: hexToTagColor(tag.color),
         diaries: [diary],
@@ -181,35 +181,39 @@ const createAttachmentId = (
 }
 
 const mapDailyEntryResultFiles = (task: DailyEntryDetailTask): TaskResultFile[] => {
-  return task.results.flatMap((result) =>
-    result.attachments
-      .filter((attachment) => attachment.fileType === 'file')
-      .map((attachment, index) => ({
-        id: createAttachmentId(result.taskResultId, attachment, index),
-        name: attachment.fileName,
-        url: attachment.fileUrl,
-      })),
-  )
+  const result = task.result
+
+  if (!result) {
+    return []
+  }
+
+  return result.attachments
+    .filter((attachment) => attachment.fileType === 'file')
+    .map((attachment, index) => ({
+      id: createAttachmentId(result.taskResultId, attachment, index),
+      name: attachment.fileName,
+      url: attachment.fileUrl,
+    }))
 }
 
 const mapDailyEntryResultImages = (task: DailyEntryDetailTask): TaskResultImage[] => {
-  return task.results.flatMap((result) =>
-    result.attachments
-      .filter((attachment) => attachment.fileType === 'img')
-      .map((attachment, index) => ({
-        id: createAttachmentId(result.taskResultId, attachment, index),
-        name: attachment.fileName,
-        url: attachment.fileUrl,
-      })),
-  )
+  const result = task.result
+
+  if (!result) {
+    return []
+  }
+
+  return result.attachments
+    .filter((attachment) => attachment.fileType === 'img')
+    .map((attachment, index) => ({
+      id: createAttachmentId(result.taskResultId, attachment, index),
+      name: attachment.fileName,
+      url: attachment.fileUrl,
+    }))
 }
 
-const mapDailyEntryTaskResultContent = (task: DailyEntryDetailTask) => {
-  const contents = task.results
-    .map((result) => result.content.trim())
-    .filter((content) => content.length > 0)
-
-  return contents.length > 0 ? contents.join('\n') : undefined
+const mapDailyEntryTaskResultContent = (task: DailyEntryDetailTask): string | undefined => {
+  return task.result?.content.trim() || undefined
 }
 
 const mapDailyEntryDetailTask = (task: DailyEntryDetailTask, entryDate: string): Task => {

@@ -1,17 +1,11 @@
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
-import { useGetDailyEntrySearch } from '@/api/diary-list/diary-list.query'
 import { SearchInput } from '@/components/common/SearchInput/SearchInput'
 import { DiarySearchBackButton } from '@/components/diary-search/DiarySearchBackButton'
-import { DiarySearchEmptyState } from '@/components/diary-search/DiarySearchEmptyState'
-import { DiarySearchHeader } from '@/components/diary-search/DiarySearchHeader'
-import { DiarySearchList } from '@/components/diary-search/DiarySearchList'
 import { DiarySearchSkeleton } from '@/components/diary-search/DiarySearchSkeleton'
-import { TagSearchList } from '@/components/diary-search/TagSearchList'
+import { DiarySearchResults } from '@/components/diary-search/DiarySearchResults'
 import { useRecentSearchKeywords } from '@/hooks/useRecentSearchKeywords'
-
-import type { DiarySearchSort, DiarySearchTab } from '@/types/diarySearch'
 
 interface SearchInputState {
   baseKeyword: string
@@ -29,27 +23,14 @@ export const DiarySearchPage = () => {
     value: searchedKeyword,
   })
 
-  const [activeTab, setActiveTab] = useState<DiarySearchTab>('diary')
-  const [sort, setSort] = useState<DiarySearchSort>('latest')
   const [showRecentDropdown, setShowRecentDropdown] = useState(false)
   const [isSearchFocused, setIsSearchFocused] = useState(false)
 
   const searchKeyword =
     searchInputState.baseKeyword === searchedKeyword ? searchInputState.value : searchedKeyword
 
-  const { data: searchResult, isPending } = useGetDailyEntrySearch({
-    query: searchedKeyword,
-    sort,
-  })
-
   const { recentKeywords, addRecentKeyword, removeRecentKeyword, clearRecentKeywords } =
     useRecentSearchKeywords()
-
-  const searchedDiaries = searchResult?.diaries ?? []
-  const searchedTagResults = searchResult?.tagResults ?? []
-
-  const activeResultCount =
-    activeTab === 'diary' ? searchedDiaries.length : searchedTagResults.length
 
   const handleSearch = (keyword: string) => {
     const trimmedKeyword = keyword.trim()
@@ -139,37 +120,14 @@ export const DiarySearchPage = () => {
             />
           </div>
 
-          {isPending ? (
-            <DiarySearchSkeleton />
-          ) : (
-            <>
-              <div className="mt-(--scale-48)">
-                <DiarySearchHeader
-                  activeTab={activeTab}
-                  diaryCount={searchResult?.diaryCount ?? 0}
-                  projectTagCount={searchResult?.projectTagCount ?? 0}
-                  onTabChange={setActiveTab}
-                />
-              </div>
-
-              {activeResultCount === 0 ? (
-                <DiarySearchEmptyState type={activeTab} />
-              ) : activeTab === 'diary' ? (
-                <DiarySearchList
-                  diaries={searchedDiaries}
-                  keyword={searchedKeyword}
-                  sort={sort}
-                  onSortChange={setSort}
-                  onDetailClick={handleDetailClick}
-                />
-              ) : (
-                <TagSearchList
-                  results={searchedTagResults}
-                  keyword={searchedKeyword}
-                  onDetailClick={handleDetailClick}
-                />
-              )}
-            </>
+          {searchedKeyword.trim().length > 0 && (
+            <Suspense fallback={<DiarySearchSkeleton />}>
+              <DiarySearchResults
+                key={searchedKeyword}
+                keyword={searchedKeyword}
+                onDetailClick={handleDetailClick}
+              />
+            </Suspense>
           )}
         </div>
       </div>
