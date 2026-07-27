@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { deleteDailyEntry } from './diary-list.api'
-import { diaryListQueryKeys } from './diary-list.query'
+import { deleteDailyEntry } from './diaryList.api'
+import { diaryListQueryKeys } from './diaryList.query'
 
 export const useDeleteDailyEntry = () => {
   const queryClient = useQueryClient()

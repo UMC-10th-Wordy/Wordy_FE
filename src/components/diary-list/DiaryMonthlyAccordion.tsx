@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 
-import { useGetMonthlyDailyEntriesByYearMonth } from '@/api/diary-list/diary-list.query'
+import { useGetMonthlyDailyEntriesByYearMonth } from '@/api/diary-list/diaryList.query'
 import { IconButton } from '@/components/common/Button/IconButton'
 import ProjectTag from '@/components/todo/ProjectTag'
 

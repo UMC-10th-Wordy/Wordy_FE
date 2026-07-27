@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { useDeleteDailyEntry } from '@/api/diary-list/diary-list.mutation'
-import { useGetDailyEntryDetail } from '@/api/diary-list/diary-list.query'
+import { useDeleteDailyEntry } from '@/api/diary-list/diaryList.mutation'
+import { useGetDailyEntryDetail } from '@/api/diary-list/diaryList.query'
 
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 

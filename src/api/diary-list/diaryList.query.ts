@@ -14,7 +14,7 @@ import {
   getMonthlyDailyEntries,
   getMonthlyDailyEntriesByYearMonth,
   searchDailyEntries,
-} from './diary-list.api'
+} from './diaryList.api'
 
 import type { DailyEntrySearchParams } from '@/types/api/diaryList'
 

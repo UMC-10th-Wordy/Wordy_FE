@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
-import { useGetDailyEntrySearch } from '@/api/diary-list/diary-list.query'
+import { useGetDailyEntrySearch } from '@/api/diary-list/diaryList.query'
 import { SearchInput } from '@/components/common/SearchInput/SearchInput'
 import { DiarySearchBackButton } from '@/components/diary-search/DiarySearchBackButton'
 import { DiarySearchEmptyState } from '@/components/diary-search/DiarySearchEmptyState'
