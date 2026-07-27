@@ -1,168 +1,72 @@
-import {
-  DAILY_ENTRIES_SUMMARY_RESPONSE_MOCK,
-  DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP,
-  DAILY_ENTRY_SEARCH_ITEMS_MOCK,
-  MONTHLY_DAILY_ENTRIES_RESPONSE_MOCK,
-  MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP,
-} from '@/mocks/diaryListApiMock'
-
 import type {
   DailyEntriesSummaryResult,
-  DailyEntryDeleteResponse,
   DailyEntryDeleteResult,
   DailyEntryDetailResult,
   DailyEntrySearchParams,
-  DailyEntrySearchResponse,
   DailyEntrySearchResult,
+  DiaryListApiResponse,
   MonthlyDailyEntry,
   MonthlyDailyEntryRecord,
 } from '@/types/api/diaryList'
 
-const MOCK_API_DELAY = 300
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-const DELETED_DAILY_ENTRY_IDS = new Set<string>()
-
-const wait = (milliseconds: number) => {
-  return new Promise<void>((resolve) => {
-    setTimeout(resolve, milliseconds)
+const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
+  const response = await fetch(`${BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
   })
-}
 
-const isDeletedDailyEntry = (dailyEntryId: string) => {
-  return DELETED_DAILY_ENTRY_IDS.has(dailyEntryId)
+  const data: DiaryListApiResponse<T> = await response.json()
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || `요청에 실패했습니다. (${response.status})`)
+  }
+
+  if (data.result === null) {
+    throw new Error(data.message || '응답 데이터가 없습니다.')
+  }
+
+  return data.result
 }
 
 export const getDailyEntriesSummary = async (): Promise<DailyEntriesSummaryResult> => {
-  await wait(MOCK_API_DELAY)
-
-  return DAILY_ENTRIES_SUMMARY_RESPONSE_MOCK.result
+  return request<DailyEntriesSummaryResult>('/daily-entries/summary')
 }
 
 export const getMonthlyDailyEntries = async (): Promise<MonthlyDailyEntryRecord[]> => {
-  await wait(MOCK_API_DELAY)
-
-  return MONTHLY_DAILY_ENTRIES_RESPONSE_MOCK.result
+  return request<MonthlyDailyEntryRecord[]>('/daily-entries/monthly')
 }
 
 export const getMonthlyDailyEntriesByYearMonth = async (
   yearMonth: string,
 ): Promise<MonthlyDailyEntry[]> => {
-  await wait(MOCK_API_DELAY)
-
-  const entries = MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP[yearMonth]?.result ?? []
-
-  return entries.filter((entry) => !isDeletedDailyEntry(entry.dailyEntryId))
+  return request<MonthlyDailyEntry[]>(`/daily-entries/monthly/${encodeURIComponent(yearMonth)}`)
 }
 
 export const searchDailyEntries = async ({
   query,
   sort,
 }: DailyEntrySearchParams): Promise<DailyEntrySearchResult> => {
-  await wait(MOCK_API_DELAY)
-
-  const keyword = query.trim()
-  const normalizedKeyword = keyword.toLocaleLowerCase()
-
-  if (!normalizedKeyword) {
-    const emptyResponse: DailyEntrySearchResponse = {
-      success: true,
-      code: 'S200',
-      message: '조회에 성공했습니다.',
-      result: {
-        keyword: '',
-        entryCount: 0,
-        tagCount: 0,
-        results: [],
-      },
-    }
-
-    return emptyResponse.result
-  }
-
-  const searchableEntries = DAILY_ENTRY_SEARCH_ITEMS_MOCK.filter(
-    (entry) => !isDeletedDailyEntry(entry.dailyEntryId),
-  )
-
-  const titleMatchedEntries = searchableEntries.filter((entry) =>
-    entry.title.toLocaleLowerCase().includes(normalizedKeyword),
-  )
-
-  const matchedTagNames = new Set(
-    searchableEntries.flatMap((entry) =>
-      entry.tags
-        .filter((tag) => tag.tagName.toLocaleLowerCase().includes(normalizedKeyword))
-        .map((tag) => tag.tagName.toLocaleLowerCase()),
-    ),
-  )
-
-  const matchedEntries = searchableEntries.filter((entry) => {
-    const isTitleMatched = entry.title.toLocaleLowerCase().includes(normalizedKeyword)
-
-    const isTagMatched = entry.tags.some((tag) =>
-      tag.tagName.toLocaleLowerCase().includes(normalizedKeyword),
-    )
-
-    return isTitleMatched || isTagMatched
-  })
-  const sortedEntries = [...matchedEntries].sort((firstEntry, secondEntry) => {
-    const firstEntryTime = new Date(firstEntry.entryDate).getTime()
-    const secondEntryTime = new Date(secondEntry.entryDate).getTime()
-
-    return sort === 'latest' ? secondEntryTime - firstEntryTime : firstEntryTime - secondEntryTime
+  const searchParams = new URLSearchParams({
+    query: query.trim(),
+    sort,
   })
 
-  const response: DailyEntrySearchResponse = {
-    success: true,
-    code: 'S200',
-    message: '조회에 성공했습니다.',
-    result: {
-      keyword,
-      entryCount: titleMatchedEntries.length,
-      tagCount: matchedTagNames.size,
-      results: sortedEntries,
-    },
-  }
-
-  return response.result
+  return request<DailyEntrySearchResult>(`/daily-entries/search?${searchParams.toString()}`)
 }
 
 export const getDailyEntryDetail = async (
   dailyEntryId: string,
 ): Promise<DailyEntryDetailResult> => {
-  await wait(MOCK_API_DELAY)
-
-  if (isDeletedDailyEntry(dailyEntryId)) {
-    throw new Error('삭제된 업무 일지입니다.')
-  }
-
-  const response = DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP[dailyEntryId]
-
-  if (!response) {
-    throw new Error('업무 일지를 찾을 수 없습니다.')
-  }
-
-  return response.result
+  return request<DailyEntryDetailResult>(`/daily-entries/${encodeURIComponent(dailyEntryId)}`)
 }
 
 export const deleteDailyEntry = async (dailyEntryId: string): Promise<DailyEntryDeleteResult> => {
-  await wait(MOCK_API_DELAY)
-
-  const detailResponse = DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP[dailyEntryId]
-
-  if (!detailResponse || isDeletedDailyEntry(dailyEntryId)) {
-    throw new Error('삭제할 업무 일지를 찾을 수 없습니다.')
-  }
-
-  DELETED_DAILY_ENTRY_IDS.add(dailyEntryId)
-
-  const response: DailyEntryDeleteResponse = {
-    success: true,
-    code: 'S200',
-    message: '삭제에 성공했습니다.',
-    result: {
-      dailyEntryId,
-    },
-  }
-
-  return response.result
+  return request<DailyEntryDeleteResult>(`/daily-entries/${encodeURIComponent(dailyEntryId)}`, {
+    method: 'DELETE',
+  })
 }
