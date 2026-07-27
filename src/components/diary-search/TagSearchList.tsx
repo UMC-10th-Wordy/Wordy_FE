@@ -14,7 +14,7 @@ export const TagSearchList = ({ results, keyword, onDetailClick }: TagSearchList
       <div className="flex flex-col gap-(--scale-20)">
         {results.map((result) => (
           <TagSearchAccordion
-            key={result.id}
+            key={`${result.name}-${result.color}`}
             result={result}
             keyword={keyword}
             onDetailClick={onDetailClick}
