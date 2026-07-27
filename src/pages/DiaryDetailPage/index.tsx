@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { useDeleteDailyEntry } from '@/api/diary-list/diaryList.mutation'
+import { useGetDailyEntryDetail } from '@/api/diary-list/diaryList.query'
+
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 
 import { DeleteDiaryDialog } from '@/components/diary-detail/DeleteDiaryDialog'
 import { DiaryDetailHeader } from '@/components/diary-detail/DiaryDetailHeader'
 import { DiaryRetrospective } from '@/components/diary-detail/DiaryRetrospective'
 import { ReadOnlyTaskCard } from '@/components/diary-detail/ReadOnlyTaskCard'
-import { DIARY_DETAIL_MOCK } from '@/mocks/diaryDetailMock'
+import { PERFORMANCE_PREVIEW_RESULT_MOCK } from '@/mocks/performancePreviewResultMock'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
 import TodoTabs from '@/components/todo/TodoTabs'
 
@@ -19,18 +22,43 @@ const formatDateLabel = (date: string) => {
   return `${year}년 ${month}월 ${day}일`
 }
 
-export const DiaryDetailPage = ({ hideDelete }: { hideDelete?: boolean }) => {
+interface DiaryDetailPageProps {
+  hideDelete?: boolean
+}
+
+interface DiaryDetailContentProps {
+  diaryId: string
+  hideDelete?: boolean
+}
+
+const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) => {
   const navigate = useNavigate()
-  const { diaryId } = useParams<{ diaryId: string }>()
 
   const [activeTab, setActiveTab] = useState<TodoFilter>('completed')
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
-  // TODO(#65): diaryId를 이용한 업무 일지 상세 조회 API 연결
-  const diary = {
-    ...DIARY_DETAIL_MOCK,
-    id: diaryId ?? DIARY_DETAIL_MOCK.id,
-    date: diaryId ?? DIARY_DETAIL_MOCK.date,
+  const { data: diary } = useGetDailyEntryDetail(diaryId)
+
+  const { mutate: deleteDiary, isPending: isDeletePending } = useDeleteDailyEntry()
+
+  const handleBack = () => {
+    navigate(-1)
+  }
+
+  const handleDeleteDiary = () => {
+    if (isDeletePending) {
+      return
+    }
+
+    deleteDiary(diaryId, {
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false)
+        navigate('/records', { replace: true })
+      },
+      onError: (error) => {
+        console.error('업무 일지 삭제에 실패했습니다.', error)
+      },
+    })
   }
 
   const completedTasks = diary.tasks.filter((task) => task.isCompleted)
@@ -39,18 +67,8 @@ export const DiaryDetailPage = ({ hideDelete }: { hideDelete?: boolean }) => {
   const activeTasks = activeTab === 'completed' ? completedTasks : incompleteTasks
 
   const filterCounts: TodoFilterCounts = {
-    completed: completedTasks.length,
-    incomplete: incompleteTasks.length,
-  }
-
-  const handleBack = () => {
-    navigate(-1)
-  }
-
-  const handleDeleteDiary = () => {
-    // TODO(#65): 해당 업무 일지 삭제 API 연결 후 목록 데이터 갱신
-    setIsDeleteDialogOpen(false)
-    navigate('/records', { replace: true })
+    completed: diary.completedCount,
+    incomplete: diary.incompleteCount,
   }
 
   return (
@@ -93,7 +111,8 @@ export const DiaryDetailPage = ({ hideDelete }: { hideDelete?: boolean }) => {
           key={diary.id}
           status="success"
           result={{
-            data: diary.performance,
+            // TODO(#149): 성과 미리보기 조회 API 연결 후 별도 Query 결과로 교체
+            data: PERFORMANCE_PREVIEW_RESULT_MOCK,
             readOnly: true,
           }}
         />
@@ -101,10 +120,24 @@ export const DiaryDetailPage = ({ hideDelete }: { hideDelete?: boolean }) => {
 
       {isDeleteDialogOpen && (
         <DeleteDiaryDialog
-          onCancel={() => setIsDeleteDialogOpen(false)}
+          onCancel={() => {
+            if (!isDeletePending) {
+              setIsDeleteDialogOpen(false)
+            }
+          }}
           onConfirm={handleDeleteDiary}
         />
       )}
     </div>
   )
+}
+
+export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
+  const { diaryId } = useParams<{ diaryId: string }>()
+
+  if (!diaryId) {
+    throw new Error('업무 일지 ID가 없습니다.')
+  }
+
+  return <DiaryDetailContent diaryId={diaryId} hideDelete={hideDelete} />
 }

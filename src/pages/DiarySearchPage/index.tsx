@@ -1,17 +1,11 @@
-import { useMemo, useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { SearchInput } from '@/components/common/SearchInput/SearchInput'
 import { DiarySearchBackButton } from '@/components/diary-search/DiarySearchBackButton'
-import { DiarySearchEmptyState } from '@/components/diary-search/DiarySearchEmptyState'
-import { DiarySearchHeader } from '@/components/diary-search/DiarySearchHeader'
-import { DiarySearchList } from '@/components/diary-search/DiarySearchList'
 import { DiarySearchSkeleton } from '@/components/diary-search/DiarySearchSkeleton'
-import { TagSearchList } from '@/components/diary-search/TagSearchList'
-import { MOCK_DIARY_SEARCH_RESULTS, MOCK_TAG_SEARCH_RESULTS } from '@/mocks/diarySearchMock'
+import { DiarySearchResults } from '@/components/diary-search/DiarySearchResults'
 import { useRecentSearchKeywords } from '@/hooks/useRecentSearchKeywords'
-
-import type { DiarySearchSort, DiarySearchTab } from '@/types/diarySearch'
 
 interface SearchInputState {
   baseKeyword: string
@@ -29,54 +23,14 @@ export const DiarySearchPage = () => {
     value: searchedKeyword,
   })
 
-  const searchKeyword =
-    searchInputState.baseKeyword === searchedKeyword ? searchInputState.value : searchedKeyword
-
-  const [activeTab, setActiveTab] = useState<DiarySearchTab>('diary')
-  const [sort, setSort] = useState<DiarySearchSort>('latest')
   const [showRecentDropdown, setShowRecentDropdown] = useState(false)
   const [isSearchFocused, setIsSearchFocused] = useState(false)
 
-  // TODO(#71): 검색 API 연결 후 실제 요청 상태로 교체 (스켈레톤)
-  const isLoading = false
+  const searchKeyword =
+    searchInputState.baseKeyword === searchedKeyword ? searchInputState.value : searchedKeyword
 
   const { recentKeywords, addRecentKeyword, removeRecentKeyword, clearRecentKeywords } =
     useRecentSearchKeywords()
-
-  const searchedDiaries = useMemo(() => {
-    const normalizedKeyword = searchedKeyword.trim().toLocaleLowerCase()
-
-    if (!normalizedKeyword) {
-      return []
-    }
-
-    const filteredDiaries = MOCK_DIARY_SEARCH_RESULTS.filter((diary) =>
-      diary.title.toLocaleLowerCase().includes(normalizedKeyword),
-    )
-
-    return [...filteredDiaries].sort((firstDiary, secondDiary) => {
-      const firstTime = new Date(firstDiary.createdAt).getTime()
-      const secondTime = new Date(secondDiary.createdAt).getTime()
-
-      return sort === 'latest' ? secondTime - firstTime : firstTime - secondTime
-    })
-  }, [searchedKeyword, sort])
-
-  const searchedTagResults = useMemo(() => {
-    const normalizedKeyword = searchedKeyword.trim().toLocaleLowerCase()
-
-    if (!normalizedKeyword) {
-      return []
-    }
-
-    return MOCK_TAG_SEARCH_RESULTS.filter((result) =>
-      result.name.toLocaleLowerCase().includes(normalizedKeyword),
-    ).sort(
-      (firstResult, secondResult) =>
-        new Date(secondResult.latestDiaryCreatedAt).getTime() -
-        new Date(firstResult.latestDiaryCreatedAt).getTime(),
-    )
-  }, [searchedKeyword])
 
   const handleSearch = (keyword: string) => {
     const trimmedKeyword = keyword.trim()
@@ -110,9 +64,6 @@ export const DiarySearchPage = () => {
   const handleDetailClick = (diaryId: string) => {
     navigate(`/records/${diaryId}`)
   }
-
-  const activeResultCount =
-    activeTab === 'diary' ? searchedDiaries.length : searchedTagResults.length
 
   return (
     <main className="flex h-full min-h-0 min-w-[900px] flex-col bg-(--color-bg-default)">
@@ -169,37 +120,14 @@ export const DiarySearchPage = () => {
             />
           </div>
 
-          {isLoading ? (
-            <DiarySearchSkeleton />
-          ) : (
-            <>
-              <div className="mt-(--scale-48)">
-                <DiarySearchHeader
-                  activeTab={activeTab}
-                  diaryCount={searchedDiaries.length}
-                  projectTagCount={searchedTagResults.length}
-                  onTabChange={setActiveTab}
-                />
-              </div>
-
-              {activeResultCount === 0 ? (
-                <DiarySearchEmptyState type={activeTab} />
-              ) : activeTab === 'diary' ? (
-                <DiarySearchList
-                  diaries={searchedDiaries}
-                  keyword={searchedKeyword}
-                  sort={sort}
-                  onSortChange={setSort}
-                  onDetailClick={handleDetailClick}
-                />
-              ) : (
-                <TagSearchList
-                  results={searchedTagResults}
-                  keyword={searchedKeyword}
-                  onDetailClick={handleDetailClick}
-                />
-              )}
-            </>
+          {searchedKeyword.trim().length > 0 && (
+            <Suspense fallback={<DiarySearchSkeleton />}>
+              <DiarySearchResults
+                key={searchedKeyword}
+                keyword={searchedKeyword}
+                onDetailClick={handleDetailClick}
+              />
+            </Suspense>
           )}
         </div>
       </div>

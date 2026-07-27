@@ -97,18 +97,20 @@ interface WeeklyRetrospectiveProps {
     resourcesUsed: string
     learning: string
   }
+  onSaved?: () => void
 }
 export const WeeklyRetrospective = ({
   period = 'weekly',
   dashboardId,
   initialReflection,
+  onSaved,
 }: WeeklyRetrospectiveProps) => {
   const texts = TEXTS[period]
 
   const [answers, setAnswers] = useState<Record<QuestionKey, string>>({
-    work: '',
-    resource: '',
-    learning: '',
+    work: initialReflection?.workSummary ?? '',
+    resource: initialReflection?.resourcesUsed ?? '',
+    learning: initialReflection?.learning ?? '',
   })
   const [plans, setPlans] = useState<PlanRow[]>([])
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
@@ -117,6 +119,7 @@ export const WeeklyRetrospective = ({
   const [reflectionId, setReflectionId] = useState<string | null>(
     initialReflection?.reflectionId ?? null,
   )
+  const [isSaving, setIsSaving] = useState(false)
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const { toasts, addToast } = useToast()
 
@@ -152,10 +155,12 @@ export const WeeklyRetrospective = ({
   }
 
   const handleSave = () => {
+    if (isSaving) return
     if (!dashboardId) {
       addToast(texts.toastSaved) // 월간 등 미연동 구간은 기존 동작 유지
       return
     }
+    setIsSaving(true)
     const request = reflectionId
       ? updateReflection(dashboardId, reflectionId, {
           workSummary: answers.work,
@@ -171,10 +176,13 @@ export const WeeklyRetrospective = ({
       .then((id) => {
         setReflectionId((prev) => prev ?? id)
         addToast(texts.toastSaved)
+        onSaved?.()
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('회고 저장 실패:', error)
         addToast('저장에 실패했어요. 다시 시도해 주세요')
       })
+      .finally(() => setIsSaving(false))
   }
   const hasContent = Object.values(answers).some((v) => v.trim()) || plans.length > 0
   const canSave = hasContent && !editing
@@ -322,10 +330,20 @@ export const WeeklyRetrospective = ({
               임시 저장됨: {savedAt}
             </span>
           )}
-          <TextButton variant="stroke" size="medium" disabled={!canSave} onClick={handleTempSave}>
+          <TextButton
+            variant="stroke"
+            size="medium"
+            disabled={!canSave || isSaving}
+            onClick={handleTempSave}
+          >
             임시 저장하기
           </TextButton>
-          <TextButton variant="fill" size="medium" disabled={!canSave} onClick={handleSave}>
+          <TextButton
+            variant="fill"
+            size="medium"
+            disabled={!canSave || isSaving}
+            onClick={handleSave}
+          >
             회고 저장하기
           </TextButton>
         </div>
