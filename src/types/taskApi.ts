@@ -34,6 +34,17 @@ export interface CreateTaskPayload {
   memo?: string
 }
 
+export interface UpdateTaskPayload {
+  title: string
+  priority: ApiTaskPriority
+  status: ApiTaskStatus
+  taskDate: string
+  tagId: string
+  memo?: string
+}
+
 export type TaskListResponse = ApiEnvelope<TaskDto[]>
 export type TaskDetailResponse = ApiEnvelope<TaskDto>
 export type CreateTaskResponse = ApiEnvelope<TaskDto>
+export type UpdateTaskResponse = ApiEnvelope<TaskDto>
+export type DeleteTaskResponse = ApiEnvelope<null>

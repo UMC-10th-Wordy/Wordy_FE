@@ -1,5 +1,10 @@
 import type { Task, TaskPriority } from '@/types/todo'
-import type { ApiTaskPriority, CreateTaskPayload, TaskDto } from '@/types/taskApi'
+import type {
+  ApiTaskPriority,
+  CreateTaskPayload,
+  TaskDto,
+  UpdateTaskPayload,
+} from '@/types/taskApi'
 import { hexToTagColor } from './tagMapper'
 
 const PRIORITY_TO_API: Record<TaskPriority, ApiTaskPriority> = {
@@ -42,6 +47,26 @@ export function mapDraftToCreateTaskPayload(draft: NewTaskDraft): CreateTaskPayl
   return {
     title: draft.title,
     priority: PRIORITY_TO_API[draft.priority],
+    taskDate: draft.date,
+    tagId: draft.tagId,
+    memo: draft.memo,
+  }
+}
+
+export interface UpdateTaskDraft {
+  title: string
+  priority: TaskPriority
+  date: string
+  tagId: string
+  memo?: string
+  isCompleted: boolean
+}
+
+export function mapDraftToUpdateTaskPayload(draft: UpdateTaskDraft): UpdateTaskPayload {
+  return {
+    title: draft.title,
+    priority: PRIORITY_TO_API[draft.priority],
+    status: draft.isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
     taskDate: draft.date,
     tagId: draft.tagId,
     memo: draft.memo,

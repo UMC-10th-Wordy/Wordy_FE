@@ -1,5 +1,5 @@
 import { INITIAL_TASK_MOCKS } from '@/mocks/taskApiMock'
-import type { CreateTaskPayload, TaskDto } from '@/types/taskApi'
+import type { CreateTaskPayload, TaskDto, UpdateTaskPayload } from '@/types/taskApi'
 import { getTagDetail } from './tagApi'
 
 let taskMockStore: TaskDto[] = [...INITIAL_TASK_MOCKS]
@@ -38,4 +38,37 @@ export async function createTask(payload: CreateTaskPayload): Promise<TaskDto> {
   }
   taskMockStore = [...taskMockStore, created]
   return created
+}
+
+export async function updateTask(taskId: string, payload: UpdateTaskPayload): Promise<TaskDto> {
+  const existing = taskMockStore.find((task) => task.taskId === taskId)
+  if (!existing) throw new Error('TASK_NOT_FOUND')
+  const tagDto = await getTagDetail(payload.tagId)
+  if (!tagDto) throw new Error('TAG_NOT_FOUND')
+  const now = new Date().toISOString()
+  const updated: TaskDto = {
+    ...existing,
+    title: payload.title,
+    priority: payload.priority,
+    memo: payload.memo ?? '',
+    status: payload.status,
+    taskDate: `${payload.taskDate}T00:00:00.000Z`,
+    completedAt: payload.status === 'COMPLETED' ? now : null,
+    updatedAt: now,
+    tagId: payload.tagId,
+    tag: {
+      tagId: tagDto.tagId,
+      tagName: tagDto.tagName,
+      color: tagDto.color,
+      projectName: tagDto.projectName,
+    },
+  }
+  taskMockStore = taskMockStore.map((task) => (task.taskId === taskId ? updated : task))
+  return updated
+}
+
+export async function deleteTask(taskId: string): Promise<void> {
+  const exists = taskMockStore.some((task) => task.taskId === taskId)
+  if (!exists) throw new Error('TASK_NOT_FOUND')
+  taskMockStore = taskMockStore.filter((task) => task.taskId !== taskId)
 }
