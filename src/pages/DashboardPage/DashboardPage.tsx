@@ -3,8 +3,7 @@ import {
   createDashboard,
   getDashboardDetail,
   getDashboardEligibility,
-} from '@/api/dashboard/dashboard.api'
-import type { DashboardDetailDto } from '@/types/dashboardApi'
+} from '@/api/dashboard/dashboard'
 import { DUMMY_WEEKS } from '@/mocks/dashboard/monthlyDashboardMock'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
@@ -19,7 +18,7 @@ import { WeeklyRetrospective } from '@/components/dashboard/WeeklyRetrospective'
 import { MonthlyDashboard } from '@/components/dashboard/MonthlyDashboard'
 import type { MonthlyGeneration } from '@/components/dashboard/MonthlyDashboard'
 import type { TagWorkflow } from '@/components/dashboard/TagWorkflowSection'
-import type { DiaryEntry, WeeklyDashboardStatus } from '@/types/dashboard'
+import type { DashboardDetailDto, DiaryEntry, WeeklyDashboardStatus } from '@/types/dashboard'
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
 
 // 서버 entryDate(YYYY-MM-DD) → 화면 라벨(YYYY년 M월 D일 X요일)

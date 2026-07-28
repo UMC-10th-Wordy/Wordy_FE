@@ -1,4 +1,4 @@
-import type { DashboardDetailDto, DashboardListItemDto, EligibilityDto } from '@/types/dashboardApi'
+import type { DashboardDetailDto, DashboardListItemDto, EligibilityDto } from '@/types/dashboard'
 
 export const INITIAL_ELIGIBILITY_MOCK: EligibilityDto = {
   eligible: true,
