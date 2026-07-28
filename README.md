@@ -65,6 +65,7 @@ src/
 ├── components/
 │   ├── common/      # 앱 전체 공용 컴포넌트 (조이 담당, 개별 생성 금지)
 │   └── [page]/      # 페이지 전용 컴포넌트
+├── constants/       # 여러 도메인에서 공유하는 상수
 ├── hooks/           # 커스텀 훅
 ├── lib/             # 외부 라이브러리 설정 (TanStack Query 등)
 ├── mocks/           # Mock 데이터
@@ -79,14 +80,14 @@ src/
 
 일반적으로 React + TypeScript 프로젝트에서 널리 쓰이는 방식을 따릅니다.
 
-| 대상                                | 규칙                                     | 예시                                                       |
-| ----------------------------------- | ---------------------------------------- | ---------------------------------------------------------- |
-| 폴더 (2단어 이상, 도메인/기능 단위) | kebab-case                               | `diary-list/`, `diary-search/`                             |
-| 폴더 (컴포넌트 1개를 감싸는 경우)   | PascalCase (컴포넌트명과 동일)           | `Button/Button.tsx`, `TodoListPage/TodoListPage.tsx`       |
-| 컴포넌트 파일                       | PascalCase (컴포넌트명과 동일)           | `SidebarLayout.tsx`, `ProjectTag.tsx`                      |
-| API/훅 파일 (비-컴포넌트)           | camelCase + 역할은 `.` 접미사로 구분     | `user.api.ts`, `user.query.ts`, `diaryList.mutation.ts`    |
-| 타입 파일                           | camelCase + 목적 접미사, `types/`에 위치 | `userApi.ts`(요청/응답 DTO), `diaryDetail.ts`(도메인 모델) |
-| Mock 파일                           | 대상 도메인/API명 + `Mock` 접미사        | `userApiMock.ts`, `homeMock.ts`                            |
+| 대상                                     | 규칙                                     | 예시                                                       |
+| ---------------------------------------- | ---------------------------------------- | ---------------------------------------------------------- |
+| 폴더 (여러 파일을 묶는 도메인/기능 단위) | kebab-case                               | `diary-list/`, `diary-search/`, `sidebar/`                 |
+| 폴더 (컴포넌트 1개를 감싸는 경우)        | PascalCase (컴포넌트명과 동일)           | `Button/Button.tsx`, `TodoListPage/TodoListPage.tsx`       |
+| 컴포넌트 파일                            | PascalCase (컴포넌트명과 동일)           | `SidebarLayout.tsx`, `ProjectTag.tsx`                      |
+| API/훅 파일 (비-컴포넌트)                | camelCase + 역할은 `.` 접미사로 구분     | `user.api.ts`, `user.query.ts`, `diaryList.mutation.ts`    |
+| 타입 파일                                | camelCase + 목적 접미사, `types/`에 위치 | `userApi.ts`(요청/응답 DTO), `diaryDetail.ts`(도메인 모델) |
+| Mock 파일                                | 대상 도메인/API명 + `Mock` 접미사        | `userApiMock.ts`, `homeMock.ts`                            |
 
 ## 화면 목록 및 플로우
 
