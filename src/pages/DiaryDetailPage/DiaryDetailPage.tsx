@@ -10,7 +10,7 @@ import { DeleteDiaryDialog } from '@/components/diary-detail/DeleteDiaryDialog'
 import { DiaryDetailHeader } from '@/components/diary-detail/DiaryDetailHeader'
 import { DiaryRetrospective } from '@/components/diary-detail/DiaryRetrospective'
 import { ReadOnlyTaskCard } from '@/components/diary-detail/ReadOnlyTaskCard'
-import { PERFORMANCE_PREVIEW_RESULT_MOCK } from '@/mocks/dashboard/performancePreviewResultMock'
+import { PERFORMANCE_PREVIEW_RESULT_MOCK } from '@/mocks/performance-preview/performancePreviewResultMock'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
 import TodoTabs from '@/components/todo/TodoTabs'
 
