@@ -31,7 +31,13 @@ export interface SettingPanelProps extends HTMLAttributes<HTMLDivElement> {
   profileEmail?: string
   profileJob?: string
   profileCareer?: string
-  onSaveProfile?: (data: { name: string; job: string; career: string }) => void
+  profileAvatarSrc?: string
+  onSaveProfile?: (data: {
+    name: string
+    job: string
+    career: string
+    avatarFile: File | null
+  }) => void
   onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void
   // 알림
   notificationSettings?: NotificationSettings
@@ -52,6 +58,7 @@ export function SettingPanel({
   profileEmail = '',
   profileJob = '',
   profileCareer = '',
+  profileAvatarSrc,
   onSaveProfile,
   onChangePassword,
   notificationSettings = DEFAULT_NOTIFICATION_SETTINGS,
@@ -67,10 +74,13 @@ export function SettingPanel({
   const [career, setCareer] = useState(profileCareer)
   const [openDropdown, setOpenDropdown] = useState<'job' | 'career' | null>(null)
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false)
-  const [avatarSrc, setAvatarSrc] = useState<string | null>(null)
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(profileAvatarSrc ?? null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const jobAnchorRef = useRef<HTMLDivElement>(null)
   const careerAnchorRef = useRef<HTMLDivElement>(null)
+  const jobDropdownRef = useRef<HTMLDivElement>(null)
+  const careerDropdownRef = useRef<HTMLDivElement>(null)
   const [jobRect, setJobRect] = useState<DOMRect | null>(null)
   const [careerRect, setCareerRect] = useState<DOMRect | null>(null)
 
@@ -88,9 +98,13 @@ export function SettingPanel({
     const handleMouseDown = (e: MouseEvent) => {
       const jobAnchor = jobAnchorRef.current
       const careerAnchor = careerAnchorRef.current
+      const jobDropdown = jobDropdownRef.current
+      const careerDropdown = careerDropdownRef.current
       if (
         (jobAnchor && jobAnchor.contains(e.target as Node)) ||
-        (careerAnchor && careerAnchor.contains(e.target as Node))
+        (careerAnchor && careerAnchor.contains(e.target as Node)) ||
+        (jobDropdown && jobDropdown.contains(e.target as Node)) ||
+        (careerDropdown && careerDropdown.contains(e.target as Node))
       )
         return
       setOpenDropdown(null)
@@ -108,10 +122,11 @@ export function SettingPanel({
     if (!file) return
     const url = URL.createObjectURL(file)
     setAvatarSrc(url)
+    setAvatarFile(file)
   }
 
   const profileChanged =
-    name !== profileName || job !== profileJob || career !== profileCareer || avatarSrc !== null
+    name !== profileName || job !== profileJob || career !== profileCareer || avatarFile !== null
 
   const passwordMismatch = confirmPassword.length > 0 && newPassword !== confirmPassword
   const passwordReady =
@@ -121,7 +136,7 @@ export function SettingPanel({
     !passwordMismatch
 
   const handleSave = () => {
-    onSaveProfile?.({ name, job, career })
+    onSaveProfile?.({ name, job, career, avatarFile })
   }
 
   return (
@@ -277,6 +292,7 @@ export function SettingPanel({
                         <input
                           value={name}
                           onChange={(e) => setName(e.target.value)}
+                          maxLength={5}
                           className="w-full bg-transparent outline-none [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)"
                         />
                       </div>
@@ -421,55 +437,59 @@ export function SettingPanel({
       {openDropdown === 'job' &&
         jobRect &&
         createPortal(
-          <JobDropdown
-            style={{
-              position: 'fixed',
-              top: jobRect.bottom + 8,
-              left: jobRect.left,
-              width: jobRect.width,
-              zIndex: 100,
-            }}
-            options={[
-              '서비스·제품 기획',
-              '프론트엔드·백엔드 개발',
-              '디자인',
-              '마케팅·세일즈',
-              '데이터 분석',
-              '고객 지원·CS',
-              '인사·HR',
-              '재무·회계',
-              '교육·연구',
-              '개인·프리랜서',
-              '학생',
-              '기타',
-            ]}
-            value={job}
-            onChange={(value) => {
-              setJob(value)
-              setOpenDropdown(null)
-            }}
-          />,
+          <div ref={jobDropdownRef}>
+            <JobDropdown
+              style={{
+                position: 'fixed',
+                top: jobRect.bottom + 8,
+                left: jobRect.left,
+                width: jobRect.width,
+                zIndex: 100,
+              }}
+              options={[
+                '서비스·제품 기획',
+                '프론트엔드·백엔드 개발',
+                '디자인',
+                '마케팅·세일즈',
+                '데이터 분석',
+                '고객 지원·CS',
+                '인사·HR',
+                '재무·회계',
+                '교육·연구',
+                '개인·프리랜서',
+                '학생',
+                '기타',
+              ]}
+              value={job}
+              onChange={(value) => {
+                setJob(value)
+                setOpenDropdown(null)
+              }}
+            />
+          </div>,
           document.body,
         )}
 
       {openDropdown === 'career' &&
         careerRect &&
         createPortal(
-          <CareerDropdown
-            style={{
-              position: 'fixed',
-              top: careerRect.bottom + 8,
-              left: careerRect.left,
-              width: careerRect.width,
-              zIndex: 100,
-            }}
-            options={['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과']}
-            value={career}
-            onChange={(value) => {
-              setCareer(value)
-              setOpenDropdown(null)
-            }}
-          />,
+          <div ref={careerDropdownRef}>
+            <CareerDropdown
+              style={{
+                position: 'fixed',
+                top: careerRect.bottom + 8,
+                left: careerRect.left,
+                width: careerRect.width,
+                zIndex: 100,
+              }}
+              options={['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과']}
+              value={career}
+              onChange={(value) => {
+                setCareer(value)
+                setOpenDropdown(null)
+              }}
+            />
+          </div>,
           document.body,
         )}
 
