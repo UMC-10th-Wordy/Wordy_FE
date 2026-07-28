@@ -1,5 +1,19 @@
-import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQueries,
+  useSuspenseQuery,
+} from '@tanstack/react-query'
 
+import {
+  deleteDailyEntry,
+  diaryListQueryKeys,
+  getDailyEntriesSummary,
+  getDailyEntryDetail,
+  getMonthlyDailyEntries,
+  getMonthlyDailyEntriesByYearMonth,
+  searchDailyEntries,
+} from '@/api/diary-list/diaryList'
 import {
   mapDailyEntriesSummary,
   mapDailyEntryDetail,
@@ -7,33 +21,7 @@ import {
   mapMonthlyDiaryEntries,
   mapMonthlyDiaryRecords,
 } from '@/utils/diary-list/diaryListMapper'
-
-import {
-  getDailyEntriesSummary,
-  getDailyEntryDetail,
-  getMonthlyDailyEntries,
-  getMonthlyDailyEntriesByYearMonth,
-  searchDailyEntries,
-} from './diaryList.api'
-
-import type { DailyEntrySearchParams } from '@/types/diaryListApi'
-
-export const diaryListQueryKeys = {
-  all: ['diary-list'] as const,
-
-  summary: () => [...diaryListQueryKeys.all, 'summary'] as const,
-
-  monthlyRecords: () => [...diaryListQueryKeys.all, 'monthly-records'] as const,
-
-  monthlyEntries: () => [...diaryListQueryKeys.all, 'monthly-entries'] as const,
-  monthlyEntry: (yearMonth: string) => [...diaryListQueryKeys.monthlyEntries(), yearMonth] as const,
-
-  searches: () => [...diaryListQueryKeys.all, 'search'] as const,
-  search: (params: DailyEntrySearchParams) => [...diaryListQueryKeys.searches(), params] as const,
-
-  details: () => [...diaryListQueryKeys.all, 'detail'] as const,
-  detail: (dailyEntryId: string) => [...diaryListQueryKeys.details(), dailyEntryId] as const,
-}
+import type { DailyEntrySearchParams } from '@/types/diarySearch'
 
 export const useGetDiaryListPageData = () => {
   const [summaryQuery, monthlyRecordsQuery] = useSuspenseQueries({
@@ -78,5 +66,23 @@ export const useGetDailyEntryDetail = (dailyEntryId: string) => {
     queryKey: diaryListQueryKeys.detail(dailyEntryId),
     queryFn: () => getDailyEntryDetail(dailyEntryId),
     select: mapDailyEntryDetail,
+  })
+}
+
+export const useDeleteDailyEntry = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: deleteDailyEntry,
+
+    onSuccess: ({ dailyEntryId }) => {
+      queryClient.removeQueries({
+        queryKey: diaryListQueryKeys.detail(dailyEntryId),
+      })
+
+      void queryClient.invalidateQueries({
+        queryKey: diaryListQueryKeys.all,
+      })
+    },
   })
 }

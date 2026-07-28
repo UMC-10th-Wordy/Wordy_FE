@@ -1,4 +1,4 @@
-import type { TaskDto, TaskTagSummaryDto } from '@/types/taskApi'
+import type { TaskDto, TaskTagSummaryDto } from '@/types/task'
 import { INITIAL_TAG_MOCKS } from '@/mocks/tag/tagApiMock'
 import { toDateKey } from '@/utils/calendar'
 

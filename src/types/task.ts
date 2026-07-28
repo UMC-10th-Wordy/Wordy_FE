@@ -1,4 +1,4 @@
-import type { ApiEnvelope } from './tagApi'
+import type { ApiEnvelope } from './tag'
 
 export type ApiTaskPriority = 'MUST_DO' | 'SHOULD_DO' | 'COULD_DO'
 export type ApiTaskStatus = 'IN_PROGRESS' | 'COMPLETED'

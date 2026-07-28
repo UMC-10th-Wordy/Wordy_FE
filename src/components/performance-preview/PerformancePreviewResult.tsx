@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { TextButton } from '@/components/common/Button/TextButton'
-import { useToast } from '@/components/common/Toast/useToast'
+import { useToast } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 
 import { PerformanceEditableSection } from './PerformanceEditableSection'

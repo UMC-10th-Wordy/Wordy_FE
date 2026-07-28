@@ -1,4 +1,4 @@
-import { DiaryDetailPage } from '@/pages/DiaryDetailPage'
+import { DiaryDetailPage } from '@/pages/diary/DiaryDetailPage'
 
 export function TrashDiaryDetailPage() {
   return <DiaryDetailPage hideDelete />

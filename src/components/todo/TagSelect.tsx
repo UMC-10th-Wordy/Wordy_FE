@@ -11,7 +11,7 @@ import TagSettingsModal from './TagSettingsModal'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
 import { useVerticalDragReorder, type VerticalDragOverInfo } from '@/hooks/useVerticalDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
-import { getTags } from '@/api/tag/tag.api'
+import { getTags } from '@/api/tag/tag'
 import { getTagKey, mapTagDtoToTaskTag } from '@/utils/tagMapper'
 import type { TaskTag } from '@/types/todo'
 

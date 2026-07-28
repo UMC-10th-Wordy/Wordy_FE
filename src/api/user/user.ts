@@ -6,7 +6,12 @@ import type {
   ProfileRegisterResult,
   ProfileUpdateRequest,
   ProfileUpdateResult,
-} from '@/types/userApi'
+} from '@/types/user'
+
+export const userQueryKeys = {
+  all: ['user'] as const,
+  profile: () => [...userQueryKeys.all, 'profile'] as const,
+}
 
 export const postProfileImage = async (file: File): Promise<ProfileImageUploadResult> => {
   const formData = new FormData()

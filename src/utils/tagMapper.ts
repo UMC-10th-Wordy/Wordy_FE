@@ -1,6 +1,6 @@
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
 import type { TaskTag } from '@/types/todo'
-import type { CreateTagPayload, TagDto } from '@/types/tagApi'
+import type { CreateTagPayload, TagDto } from '@/types/tag'
 
 export const TAG_COLOR_HEX: Record<ProjectTagColor, string> = {
   black: '#4d4d4d',

@@ -1,4 +1,4 @@
-import { useGetDiaryListPageData } from '@/api/diary-list/diaryList.query'
+import { useGetDiaryListPageData } from '@/hooks/useDiaryListQueries'
 import { DiaryListHeader } from '@/components/diary-list/DiaryListHeader'
 import { DiaryMonthlySection } from '@/components/diary-list/DiaryMonthlySection'
 import { DiarySummarySection } from '@/components/diary-list/DiarySummarySection'

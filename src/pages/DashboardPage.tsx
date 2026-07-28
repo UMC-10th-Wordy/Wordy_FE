@@ -3,23 +3,22 @@ import {
   createDashboard,
   getDashboardDetail,
   getDashboardEligibility,
-} from '@/api/dashboard/dashboard.api'
-import type { DashboardDetailDto } from '@/types/dashboardApi'
+} from '@/api/dashboard/dashboard'
 import { DUMMY_WEEKS } from '@/mocks/dashboard/monthlyDashboardMock'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
-import { useToast } from '@/components/common/Toast/useToast'
+import { useToast } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
-import { WeeklyStatusCard } from './WeeklyStatusCard'
-import { DiaryChecklistPanel } from './DiaryChecklistPanel'
-import { WeeklySummaryInsight } from './WeeklySummaryInsight'
-import { TagWorkflowSection } from './TagWorkflowSection'
-import { WeeklyHighlights } from './WeeklyHighlights'
-import { WeeklyRetrospective } from './WeeklyRetrospective'
-import { MonthlyDashboard } from './MonthlyDashboard'
-import type { MonthlyGeneration } from './MonthlyDashboard'
-import type { TagWorkflow } from './TagWorkflowSection'
-import type { DiaryEntry, WeeklyDashboardStatus } from './dashboard.types'
+import { WeeklyStatusCard } from '@/components/dashboard/WeeklyStatusCard'
+import { DiaryChecklistPanel } from '@/components/dashboard/DiaryChecklistPanel'
+import { WeeklySummaryInsight } from '@/components/dashboard/WeeklySummaryInsight'
+import { TagWorkflowSection } from '@/components/dashboard/TagWorkflowSection'
+import { WeeklyHighlights } from '@/components/dashboard/WeeklyHighlights'
+import { WeeklyRetrospective } from '@/components/dashboard/WeeklyRetrospective'
+import { MonthlyDashboard } from '@/components/dashboard/MonthlyDashboard'
+import type { MonthlyGeneration } from '@/components/dashboard/MonthlyDashboard'
+import type { TagWorkflow } from '@/components/dashboard/TagWorkflowSection'
+import type { DashboardDetailDto, DiaryEntry, WeeklyDashboardStatus } from '@/types/dashboard'
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
 
 // 서버 entryDate(YYYY-MM-DD) → 화면 라벨(YYYY년 M월 D일 X요일)
@@ -32,7 +31,7 @@ const formatEntryLabel = (dateStr: string) => {
 // TODO: 스키마에 태그명/색상 없음 (백엔드 확인 중) — 임시 순환 배정
 const TAG_FALLBACK_COLORS: ProjectTagColor[] = ['green', 'pink', 'blue', 'orange']
 
-export const WeeklyDashboard = () => {
+export const DashboardPage = () => {
   const { toasts, addToast } = useToast()
   const [activeTab, setActiveTab] = useState<'weekly' | 'monthly'>('weekly')
   const [entries, setEntries] = useState<DiaryEntry[]>([])

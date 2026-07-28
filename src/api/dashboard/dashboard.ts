@@ -11,7 +11,7 @@ import type {
   EligibilityDto,
   UpdateReflectionPayload,
   WeeklyReflectionDto,
-} from '@/types/dashboardApi'
+} from '@/types/dashboard'
 
 let dashboardListStore: DashboardListItemDto[] = [...INITIAL_DASHBOARD_LIST_MOCK]
 let dashboardDetailStore: DashboardDetailDto = { ...INITIAL_DASHBOARD_DETAIL_MOCK }

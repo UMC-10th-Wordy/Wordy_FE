@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Input2 } from '@/components/common/Input/Input2'
 import { TextButton } from '@/components/common/Button/TextButton'
-import { useToast } from '@/components/common/Toast/useToast'
+import { useToast } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
 import CheckIcon from '@/assets/icons/check-bold.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
-import { createReflection, updateReflection } from '@/api/dashboard/dashboard.api'
+import { createReflection, updateReflection } from '@/api/dashboard/dashboard'
 
 interface PlanRow {
   id: string

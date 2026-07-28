@@ -5,12 +5,12 @@ import {
   CAREER_TO_YEARS_OF_SERVICE,
   JOB_OPTIONS,
   JOB_TO_JOB_ROLE,
-} from '@/components/auth/onboarding'
-import type { CareerOption, JobOption } from '@/components/auth/onboarding'
+} from '@/constants/onboarding'
+import type { CareerOption, JobOption } from '@/constants/onboarding'
 import ProfileDefaultIcon from '@/assets/icons/profile-default.svg?react'
 import CameraBadgeIcon from '@/assets/icons/camera-badge.svg?react'
 import { useNavigate } from 'react-router-dom'
-import { postProfile, postProfileImage } from '@/api/user/user.api'
+import { postProfile, postProfileImage } from '@/api/user/user'
 
 export const ProfileSetupPage = () => {
   const navigate = useNavigate()

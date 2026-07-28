@@ -1,12 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { getTasks } from './task.api'
+import { getTasks, taskQueryKeys } from '@/api/task/task'
 import { mapTaskDtoToTask } from '@/utils/taskMapper'
-
-export const taskQueryKeys = {
-  all: ['tasks'] as const,
-  lists: () => [...taskQueryKeys.all, 'list'] as const,
-  list: (date: string) => [...taskQueryKeys.lists(), date] as const,
-}
 
 export const useGetTasksByDate = (date: string) => {
   return useSuspenseQuery({

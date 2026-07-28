@@ -1,6 +1,6 @@
 import { useState, useTransition } from 'react'
 
-import { useGetDailyEntrySearch } from '@/api/diary-list/diaryList.query'
+import { useGetDailyEntrySearch } from '@/hooks/useDiaryListQueries'
 import { DiarySearchEmptyState } from '@/components/diary-search/DiarySearchEmptyState'
 import { DiarySearchHeader } from '@/components/diary-search/DiarySearchHeader'
 import { DiarySearchList } from '@/components/diary-search/DiarySearchList'
