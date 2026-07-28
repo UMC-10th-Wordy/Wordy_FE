@@ -18,7 +18,7 @@ export const NOTIFICATION_ITEMS_MOCK: NotificationItemProps[] = [
     body: '회원님의 주간 성과 리포트가 발행되었어요.\n[성과 대시보드]에서 확인해 주세요!',
   },
   {
-    title: '6월 3주차의 성과 리포트 발행 완료! 🎉',
+    title: '6월 2주차의 성과 리포트 발행 완료! 🎉',
     body: '회원님의 주간 성과 리포트가 발행되었어요.\n[성과 대시보드]에서 확인해 주세요!',
   },
 ]

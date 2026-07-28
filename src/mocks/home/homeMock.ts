@@ -74,8 +74,8 @@ export const MOCK_WEEKLY_DAYS = [
 
 export const MOCK_RECENT_RECORDS = [
   {
-    id: '2026-08-20',
-    date: '2026년 8월 20일 목요일',
+    id: '2026-07-21',
+    date: '2026년 7월 21일 화요일',
     totalCount: 6,
     tasks: [
       {
@@ -99,8 +99,8 @@ export const MOCK_RECENT_RECORDS = [
     ],
   },
   {
-    id: '2026-08-19',
-    date: '2026년 8월 19일 수요일',
+    id: '2026-07-20',
+    date: '2026년 7월 20일 월요일',
     totalCount: 4,
     tasks: [
       {
