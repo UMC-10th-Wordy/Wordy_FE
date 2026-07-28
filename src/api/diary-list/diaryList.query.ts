@@ -16,7 +16,7 @@ import {
   searchDailyEntries,
 } from './diaryList.api'
 
-import type { DailyEntrySearchParams } from '@/types/diaryListApi'
+import type { DailyEntrySearchParams } from '@/types/api/diaryList'
 
 export const diaryListQueryKeys = {
   all: ['diary-list'] as const,

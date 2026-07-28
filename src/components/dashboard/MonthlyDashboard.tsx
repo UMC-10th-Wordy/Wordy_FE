@@ -12,7 +12,7 @@ import {
   DUMMY_FOCUS_AREAS,
   DUMMY_MONTHLY_TAGS,
   DUMMY_MONTHLY_HIGHLIGHTS,
-} from '@/mocks/dashboard/monthlyDashboardMock'
+} from '@/mocks/monthlyDashboardMock'
 
 // TODO(#66): API 연동 시 실제 주간 대시보드 현황으로 교체
 const REQUIRED_WEEKLY_COUNT = 3

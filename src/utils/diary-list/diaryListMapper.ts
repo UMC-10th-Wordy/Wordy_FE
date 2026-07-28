@@ -11,7 +11,7 @@ import type {
   DailyEntryTaskPriority,
   MonthlyDailyEntry,
   MonthlyDailyEntryRecord,
-} from '@/types/diaryListApi'
+} from '@/types/api/diaryList'
 import type { DiaryDetailContentData } from '@/types/diaryDetail'
 import type {
   DiaryProjectTag,

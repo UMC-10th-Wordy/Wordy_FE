@@ -7,7 +7,7 @@ import type {
   DiaryListApiResponse,
   MonthlyDailyEntry,
   MonthlyDailyEntryRecord,
-} from '@/types/diaryListApi'
+} from '@/types/api/diaryList'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 

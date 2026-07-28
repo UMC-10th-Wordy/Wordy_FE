@@ -1,6 +1,6 @@
-import { INITIAL_TASK_MOCKS } from '@/mocks/task/taskApiMock'
+import { INITIAL_TASK_MOCKS } from '@/mocks/taskApiMock'
 import type { CreateTaskPayload, TaskDto } from '@/types/taskApi'
-import { getTagDetail } from '@/api/tag/tag.api'
+import { getTagDetail } from './tagApi'
 
 let taskMockStore: TaskDto[] = [...INITIAL_TASK_MOCKS]
 

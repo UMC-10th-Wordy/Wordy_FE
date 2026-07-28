@@ -1,28 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { OnboardingCard } from '@/components/auth/OnboardingCard'
-import {
-  CAREER_OPTIONS,
-  CAREER_TO_YEARS_OF_SERVICE,
-  JOB_OPTIONS,
-  JOB_TO_JOB_ROLE,
-} from '@/components/auth/onboarding'
+import { CAREER_OPTIONS, JOB_OPTIONS } from '@/components/auth/onboarding'
 import type { CareerOption, JobOption } from '@/components/auth/onboarding'
 import ProfileDefaultIcon from '@/assets/icons/profile-default.svg?react'
 import CameraBadgeIcon from '@/assets/icons/camera-badge.svg?react'
 import { useNavigate } from 'react-router-dom'
-import { postProfile, postProfileImage } from '@/api/user/user.api'
 
 export const ProfileSetupPage = () => {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
-  const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const [career, setCareer] = useState<CareerOption | null>(null)
   const [job, setJob] = useState<JobOption | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const uploadedImageRef = useRef<{ file: File; url: string } | null>(null)
 
   // photoUrl 변경/언마운트 시 이전 blob URL 해제 (메모리 누수 방지)
   useEffect(() => {
@@ -33,39 +24,13 @@ export const ProfileSetupPage = () => {
 
   const handlePhotoChange = (file: File | undefined) => {
     if (!file) return
-    setPhotoFile(file)
+    // TODO(#40): API 연동 시 업로드 요청으로 교체. 현재는 로컬 미리보기만
     setPhotoUrl(URL.createObjectURL(file))
   }
 
-  const handleComplete = async () => {
-    if (!career || !job) return
-
-    setIsSubmitting(true)
-    try {
-      let profileImgUrl: string | undefined
-      if (photoFile) {
-        if (uploadedImageRef.current?.file === photoFile) {
-          profileImgUrl = uploadedImageRef.current.url
-        } else {
-          const uploadResult = await postProfileImage(photoFile)
-          profileImgUrl = uploadResult.profileImgUrl
-          uploadedImageRef.current = { file: photoFile, url: profileImgUrl }
-        }
-      }
-
-      await postProfile({
-        userName: name,
-        profileImgUrl,
-        yearsOfService: CAREER_TO_YEARS_OF_SERVICE[career],
-        jobRole: JOB_TO_JOB_ROLE[job],
-      })
-
-      navigate('/')
-    } catch {
-      alert('프로필 등록에 실패했어요. 다시 시도해 주세요.')
-    } finally {
-      setIsSubmitting(false)
-    }
+  const handleComplete = () => {
+    // TODO(#40): API 연동 시 프로필 저장 요청 후 홈으로 이동
+    navigate('/')
   }
 
   if (step === 0) {
@@ -116,7 +81,6 @@ export const ProfileSetupPage = () => {
             onChange={(e) => setName(e.target.value)}
             placeholder="닉네임을 입력해 주세요"
             aria-label="이름"
-            maxLength={5}
             className="w-full rounded-lg border border-(--color-border-subtle) px-5 py-4 text-(--color-text-default) placeholder:text-(--color-text-tertiary) focus:border-(--color-border-brand) focus:outline-none"
           />
         </div>
@@ -176,7 +140,7 @@ export const ProfileSetupPage = () => {
       step={2}
       totalSteps={3}
       nextLabel="시작하기"
-      nextDisabled={!job || isSubmitting}
+      nextDisabled={!job}
       onPrev={() => setStep(1)}
       onNext={handleComplete}
     >

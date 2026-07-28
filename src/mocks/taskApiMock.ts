@@ -1,5 +1,5 @@
 import type { TaskDto, TaskTagSummaryDto } from '@/types/taskApi'
-import { INITIAL_TAG_MOCKS } from '@/mocks/tag/tagApiMock'
+import { INITIAL_TAG_MOCKS } from './tagApiMock'
 import { toDateKey } from '@/utils/calendar'
 
 const TODAY = toDateKey(new Date())

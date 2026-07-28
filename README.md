@@ -25,7 +25,6 @@ UMC 10th Wordy 프로젝트 프론트엔드
 - [기술 스택](#기술-스택)
 - [팀원 및 역할 분담](#팀원-및-역할-분담)
 - [폴더 구조](#폴더-구조)
-  - [폴더/파일 네이밍 규칙](#폴더파일-네이밍-규칙)
 - [화면 목록 및 플로우](#화면-목록-및-플로우)
 - [시작하기](#시작하기)
 - [환경 변수](#환경-변수)
@@ -74,18 +73,6 @@ src/
 ├── types/           # TypeScript 타입 정의
 └── utils/           # 유틸 함수
 ```
-
-### 폴더/파일 네이밍 규칙
-
-일반적으로 React + TypeScript 프로젝트에서 널리 쓰이는 방식을 따릅니다.
-
-| 대상                      | 규칙                                 | 예시                                                       |
-| ------------------------- | ------------------------------------ | ---------------------------------------------------------- |
-| 폴더 (2단어 이상)         | kebab-case                           | `diary-list/`, `diary-search/`                             |
-| 컴포넌트 파일             | PascalCase (컴포넌트명과 동일)       | `SidebarLayout.tsx`, `ProjectTag.tsx`                      |
-| API/훅 파일 (비-컴포넌트) | camelCase + 역할은 `.` 접미사로 구분 | `user.api.ts`, `user.query.ts`, `diaryList.mutation.ts`    |
-| 타입 파일                 | camelCase + 목적 접미사              | `userApi.ts`(요청/응답 DTO), `diaryDetail.ts`(도메인 모델) |
-| Mock 파일                 | 대상 도메인/API명 + `Mock` 접미사    | `userApiMock.ts`, `homeMock.ts`                            |
 
 ## 화면 목록 및 플로우
 

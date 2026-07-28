@@ -2,7 +2,7 @@ import {
   INITIAL_DASHBOARD_DETAIL_MOCK,
   INITIAL_DASHBOARD_LIST_MOCK,
   INITIAL_ELIGIBILITY_MOCK,
-} from '@/mocks/dashboard/dashboardApiMock'
+} from '@/mocks/dashboardApiMock'
 import type {
   CreateDashboardPayload,
   CreateReflectionPayload,
