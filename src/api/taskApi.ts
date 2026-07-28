@@ -1,4 +1,4 @@
-import { INITIAL_TASK_MOCKS } from '@/mocks/taskApiMock'
+import { INITIAL_TASK_MOCKS } from '@/mocks/task/taskApiMock'
 import type { CreateTaskPayload, TaskDto } from '@/types/taskApi'
 import { getTagDetail } from './tagApi'
 

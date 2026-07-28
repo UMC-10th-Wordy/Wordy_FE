@@ -9,8 +9,8 @@ import {
   WorkspaceModal,
 } from '@/components/sidebar'
 import type { NotificationSettings } from '@/components/sidebar/SettingPanel/SettingPanel'
-import { INITIAL_WORKSPACES_MOCK } from '@/mocks/workspaceMock'
-import { NOTIFICATION_ITEMS_MOCK } from '@/mocks/notificationMock'
+import { INITIAL_WORKSPACES_MOCK } from '@/mocks/workspace/workspaceMock'
+import { NOTIFICATION_ITEMS_MOCK } from '@/mocks/notification/notificationMock'
 import {
   CAREER_TO_YEARS_OF_SERVICE,
   JOB_TO_JOB_ROLE,

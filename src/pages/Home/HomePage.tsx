@@ -13,7 +13,7 @@ import {
   MOCK_WEEK_RECORD,
   MOCK_WEEKLY_DAYS,
   MOCK_RECENT_RECORDS,
-} from '@/mocks/homeMock'
+} from '@/mocks/home/homeMock'
 import ArrowRightIcon from '@/assets/icons/Property 1=top_right.svg?react'
 
 export type HomePageProps = HTMLAttributes<HTMLDivElement>
