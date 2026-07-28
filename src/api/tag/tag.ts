@@ -1,4 +1,4 @@
-import type { CreateTagPayload, TagDto } from '@/types/tagApi'
+import type { CreateTagPayload, TagDto } from '@/types/tag'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 const TEMP_ACCESS_TOKEN = import.meta.env.DEV ? import.meta.env.VITE_TEMP_ACCESS_TOKEN : undefined

@@ -23,7 +23,7 @@ import TagColorPicker, { COLOR_OPTIONS } from './TagColorPicker'
 import TagDatePicker from './TagDatePicker'
 import type { ProjectTagColor } from './ProjectTag'
 import type { TaskTag } from '@/types/todo'
-import { createTag, deleteTag, getTagDetail, updateTag } from '@/api/tag/tag.api'
+import { createTag, deleteTag, getTagDetail, updateTag } from '@/api/tag/tag'
 import { getTagKey, mapDraftToCreatePayload, mapTagDtoToTaskTag } from '@/utils/tagMapper'
 
 type Tab = 'existing' | 'new'

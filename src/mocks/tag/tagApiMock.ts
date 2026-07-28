@@ -1,5 +1,5 @@
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
-import type { TagDto } from '@/types/tagApi'
+import type { TagDto } from '@/types/tag'
 import { TAG_COLOR_HEX } from '@/utils/tagMapper'
 
 const TAG_SEEDS: { label: string; color: ProjectTagColor }[] = [
