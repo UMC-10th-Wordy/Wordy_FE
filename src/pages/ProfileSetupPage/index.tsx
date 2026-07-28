@@ -22,6 +22,7 @@ export const ProfileSetupPage = () => {
   const [job, setJob] = useState<JobOption | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const uploadedImageRef = useRef<{ file: File; url: string } | null>(null)
 
   // photoUrl 변경/언마운트 시 이전 blob URL 해제 (메모리 누수 방지)
   useEffect(() => {
@@ -43,8 +44,13 @@ export const ProfileSetupPage = () => {
     try {
       let profileImgUrl: string | undefined
       if (photoFile) {
-        const uploadResult = await postProfileImage(photoFile)
-        profileImgUrl = uploadResult.profileImgUrl
+        if (uploadedImageRef.current?.file === photoFile) {
+          profileImgUrl = uploadedImageRef.current.url
+        } else {
+          const uploadResult = await postProfileImage(photoFile)
+          profileImgUrl = uploadResult.profileImgUrl
+          uploadedImageRef.current = { file: photoFile, url: profileImgUrl }
+        }
       }
 
       await postProfile({

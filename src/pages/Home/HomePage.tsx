@@ -58,7 +58,7 @@ export function HomePage({ className, ...rest }: HomePageProps) {
         {/* 인사 영역 */}
         <div className="flex flex-col gap-1">
           <span className="[font-size:var(--font-size-heading-4)] leading-(--line-height-heading) font-bold text-(--color-text-default)">
-            반가워요, {userName} 님
+            {userName ? `반가워요, ${userName} 님` : '반가워요!'}
           </span>
           <span className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
             오늘도 워디와 함께해 볼까요?
