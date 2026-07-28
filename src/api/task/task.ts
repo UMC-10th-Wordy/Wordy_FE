@@ -59,7 +59,12 @@ export async function updateTask(taskId: string, payload: UpdateTaskPayload): Pr
     memo: payload.memo ?? '',
     status: payload.status,
     taskDate: `${payload.taskDate}T00:00:00.000Z`,
-    completedAt: payload.status === 'COMPLETED' ? now : null,
+    completedAt:
+      payload.status === 'COMPLETED'
+        ? existing.status === 'COMPLETED'
+          ? existing.completedAt
+          : now
+        : null,
     updatedAt: now,
     tagId: payload.tagId,
     tag: {
