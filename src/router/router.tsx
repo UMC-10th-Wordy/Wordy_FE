@@ -7,7 +7,7 @@ import { HomePage } from '@/pages/Home/Home'
 import TodoListPage from '@/pages/TodoListPage/TodoListPage'
 import { DiaryListPage } from '@/pages/DiaryListPage/DiaryListPage'
 import { DiaryDetailPage } from '@/pages/DiaryDetailPage/DiaryDetailPage'
-import { WeeklyDashboard } from '@/components/dashboard/WeeklyDashboard'
+import { DashboardPage } from '@/pages/DashboardPage/DashboardPage'
 import { TrashPage } from '@/pages/sidebar/TrashPage'
 import { PlanPage } from '@/pages/sidebar/PlanPage'
 import { LoginPage } from '@/pages/LoginPage/LoginPage'
@@ -31,7 +31,7 @@ export const router = createBrowserRouter([
           { path: '/', element: <HomePage /> },
           { path: '/today', element: <TodoListPage /> },
           { path: '/records', element: <DiaryListPage /> },
-          { path: '/dashboard', element: <WeeklyDashboard /> },
+          { path: '/dashboard', element: <DashboardPage /> },
         ],
       },
       {
