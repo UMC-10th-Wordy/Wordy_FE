@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Input2 } from '@/components/common/Input/Input2'
 import { TextButton } from '@/components/common/Button/TextButton'
-import { useToast } from '@/components/common/Toast/useToast'
+import { useToast } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'

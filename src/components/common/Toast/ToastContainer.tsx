@@ -1,5 +1,5 @@
 import { Toast } from './Toast'
-import type { ToastItem } from './useToast'
+import type { ToastItem } from '@/hooks/useToast'
 
 interface ToastContainerProps {
   toasts: ToastItem[]
