@@ -14,7 +14,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     },
   })
 
-  const data = await response.json()
+  const text = await response.text()
+  const data = text ? JSON.parse(text) : { success: response.ok, result: null }
 
   if (!response.ok || !data.success) {
     throw new ApiError(data.message || `요청에 실패했습니다. (${response.status})`, response.status)
