@@ -14,7 +14,7 @@ const FREE_FEATURES: PlanFeature[] = [
   { text: 'AI 기반 성과 변환 기능 ', subText: '(일일 사용 횟수 제한)' },
   { text: '주간 성과 대시보드 생성' },
   { text: '프로젝트 및 업무 기록 기능' },
-  { text: '제한된 워크 스페이스 갯수' },
+  { text: '제한된 워크 스페이스 개수' },
 ]
 
 const PRO_FEATURES: PlanFeature[] = [
