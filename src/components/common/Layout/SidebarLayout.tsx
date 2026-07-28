@@ -16,8 +16,8 @@ import {
   JOB_TO_JOB_ROLE,
   JOB_ROLE_TO_JOB,
   YEARS_OF_SERVICE_TO_CAREER,
-} from '@/components/auth/onboarding'
-import type { CareerOption, JobOption } from '@/components/auth/onboarding'
+} from '@/constants/onboarding'
+import type { CareerOption, JobOption } from '@/constants/onboarding'
 import { updateProfile, postProfileImage } from '@/api/user/user.api'
 import { useGetProfile, userQueryKeys } from '@/api/user/user.query'
 import HomeIcon from '@/assets/icons/home.svg?react'
