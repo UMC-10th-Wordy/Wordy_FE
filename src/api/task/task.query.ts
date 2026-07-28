@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { getTasks } from './taskApi'
+import { getTasks } from './task.api'
 import { mapTaskDtoToTask } from '@/utils/taskMapper'
 
 export const taskQueryKeys = {

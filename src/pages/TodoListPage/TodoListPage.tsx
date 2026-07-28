@@ -27,8 +27,8 @@ import type {
   TodoFilter,
   TodoFilterCounts,
 } from '@/types/todo'
-import { createTask, getTaskDetail } from '@/api/taskApi'
-import { taskQueryKeys, useGetTasksByDate } from '@/api/task.query'
+import { createTask, getTaskDetail } from '@/api/task/task.api'
+import { taskQueryKeys, useGetTasksByDate } from '@/api/task/task.query'
 import { mapDraftToCreateTaskPayload, mapTaskDtoToTask } from '@/utils/taskMapper'
 import type { TaskDto } from '@/types/taskApi'
 import FailIcon from '@/assets/icons/fail.svg?react'

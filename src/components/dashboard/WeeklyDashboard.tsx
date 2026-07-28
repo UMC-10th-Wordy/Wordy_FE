@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
-import { createDashboard, getDashboardDetail, getDashboardEligibility } from '@/api/dashboardApi'
+import {
+  createDashboard,
+  getDashboardDetail,
+  getDashboardEligibility,
+} from '@/api/dashboard/dashboard.api'
 import type { DashboardDetailDto } from '@/types/dashboardApi'
 import { DUMMY_WEEKS } from '@/mocks/dashboard/monthlyDashboardMock'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
