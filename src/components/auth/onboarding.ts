@@ -1,4 +1,4 @@
-import type { JobRole, YearsOfService } from '@/types/api/user'
+import type { JobRole, YearsOfService } from '@/types/userApi'
 
 export const CAREER_OPTIONS = ['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과'] as const
 export type CareerOption = (typeof CAREER_OPTIONS)[number]
