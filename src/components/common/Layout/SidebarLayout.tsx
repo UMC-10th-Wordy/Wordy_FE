@@ -17,6 +17,7 @@ import {
   JOB_ROLE_TO_JOB,
   YEARS_OF_SERVICE_TO_CAREER,
 } from '@/components/auth/onboarding'
+import type { CareerOption, JobOption } from '@/components/auth/onboarding'
 import { updateProfile, postProfileImage } from '@/api/user/user.api'
 import { useGetProfile, userQueryKeys } from '@/api/user/user.query'
 import HomeIcon from '@/assets/icons/home.svg?react'
@@ -65,16 +66,18 @@ export function SidebarLayout() {
   const [workspaces, setWorkspaces] = useState(INITIAL_WORKSPACES_MOCK)
   const { data: profileData } = useGetProfile()
 
-  const profile = profileData
-    ? {
-        name: profileData.userName,
-        email: profileData.email,
-        plan: FALLBACK_PLAN,
-        job: JOB_ROLE_TO_JOB[profileData.jobRole],
-        career: YEARS_OF_SERVICE_TO_CAREER[profileData.yearsOfService],
-        profileImgUrl: profileData.profileImgUrl,
-      }
-    : { name: '', email: '', plan: FALLBACK_PLAN, job: '', career: '', profileImgUrl: '' }
+  const job: JobOption | '' = profileData ? JOB_ROLE_TO_JOB[profileData.jobRole] : ''
+  const career: CareerOption | '' = profileData
+    ? YEARS_OF_SERVICE_TO_CAREER[profileData.yearsOfService]
+    : ''
+  const profile = {
+    name: profileData?.userName ?? '',
+    email: profileData?.email ?? '',
+    plan: FALLBACK_PLAN,
+    job,
+    career,
+    profileImgUrl: profileData?.profileImgUrl ?? '',
+  }
   const resolvedWorkspaces = workspaces.map((w) =>
     w.id === '1' && !w.name && profileData
       ? { ...w, name: `${profileData.userName}의 워크스페이스` }
