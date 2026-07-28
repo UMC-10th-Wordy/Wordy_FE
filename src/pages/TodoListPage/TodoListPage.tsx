@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import TaskForm from '@/components/todo/TaskForm'
 import TodoTabs from '@/components/todo/TodoTabs'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
@@ -27,8 +28,9 @@ import type {
   TodoFilterCounts,
 } from '@/types/todo'
 import { createTask, getTaskDetail } from '@/api/taskApi'
-import { useGetTasksByDate } from '@/api/task.query'
+import { taskQueryKeys, useGetTasksByDate } from '@/api/task.query'
 import { mapDraftToCreateTaskPayload, mapTaskDtoToTask } from '@/utils/taskMapper'
+import type { TaskDto } from '@/types/taskApi'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
@@ -46,6 +48,7 @@ export default function TodoListPage() {
   const [previewStatus, setPreviewStatus] = useState<'empty' | 'converting' | 'failed'>('empty')
   const taskListRef = useRef<HTMLDivElement>(null)
   const { toasts, addToast } = useToast()
+  const queryClient = useQueryClient()
 
   const currentDateKey = toDateKey(currentDate)
 
@@ -97,9 +100,12 @@ export default function TodoListPage() {
         }),
       )
       setTasks((prev) => [...prev, mapTaskDtoToTask(created)])
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(currentDateKey), (prev) =>
+        prev ? [...prev, created] : [created],
+      )
       setIsTaskFormOpen(false)
     } catch {
-      return
+      addToast('업무 생성에 실패했어요. 다시 시도해 주세요')
     }
   }
 
