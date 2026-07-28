@@ -1,8 +1,14 @@
 import { INITIAL_TASK_MOCKS } from '@/mocks/task/taskApiMock'
-import type { CreateTaskPayload, TaskDto } from '@/types/taskApi'
+import type { CreateTaskPayload, TaskDto } from '@/types/task'
 import { getTagDetail } from '@/api/tag/tag'
 
 let taskMockStore: TaskDto[] = [...INITIAL_TASK_MOCKS]
+
+export const taskQueryKeys = {
+  all: ['tasks'] as const,
+  lists: () => [...taskQueryKeys.all, 'list'] as const,
+  list: (date: string) => [...taskQueryKeys.lists(), date] as const,
+}
 
 export async function getTasks(date: string): Promise<TaskDto[]> {
   return taskMockStore.filter((task) => task.taskDate.slice(0, 10) === date)

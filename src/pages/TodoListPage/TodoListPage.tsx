@@ -27,10 +27,11 @@ import type {
   TodoFilter,
   TodoFilterCounts,
 } from '@/types/todo'
-import { createTask, getTaskDetail } from '@/api/task/task.api'
-import { taskQueryKeys, useGetTasksByDate } from '@/api/task/task.query'
+import { createTask, getTaskDetail } from '@/api/task/task'
+import { taskQueryKeys } from '@/api/task/task'
+import { useGetTasksByDate } from '@/hooks/useTaskQueries'
 import { mapDraftToCreateTaskPayload, mapTaskDtoToTask } from '@/utils/taskMapper'
-import type { TaskDto } from '@/types/taskApi'
+import type { TaskDto } from '@/types/task'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
