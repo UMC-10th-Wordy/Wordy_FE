@@ -18,8 +18,8 @@ import {
   YEARS_OF_SERVICE_TO_CAREER,
 } from '@/constants/onboarding'
 import type { CareerOption, JobOption } from '@/constants/onboarding'
-import { updateProfile, postProfileImage } from '@/api/user/user.api'
-import { useGetProfile, userQueryKeys } from '@/api/user/user.query'
+import { updateProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
+import { useGetProfile } from '@/hooks/useUserQueries'
 import HomeIcon from '@/assets/icons/home.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'

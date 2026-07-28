@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useGetProfile } from '@/api/user/user.query'
+import { useGetProfile } from '@/hooks/useUserQueries'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { HomeBanner } from '@/components/home/HomeBanner/HomeBanner'
 import { TodayTaskCard } from '@/components/home/TodayTaskCard/TodayTaskCard'
