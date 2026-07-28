@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import TaskForm from '@/components/todo/TaskForm'
 import TodoTabs from '@/components/todo/TodoTabs'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
@@ -26,7 +27,10 @@ import type {
   TodoFilter,
   TodoFilterCounts,
 } from '@/types/todo'
-import { INITIAL_TASKS } from '@/mocks/taskSampleData'
+import { createTask, getTaskDetail } from '@/api/taskApi'
+import { taskQueryKeys, useGetTasksByDate } from '@/api/task.query'
+import { mapDraftToCreateTaskPayload, mapTaskDtoToTask } from '@/utils/taskMapper'
+import type { TaskDto } from '@/types/taskApi'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
@@ -36,15 +40,25 @@ export default function TodoListPage() {
   const [activeTab, setActiveTab] = useState<TodoFilter>('incomplete')
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
-  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [loadedDateKey, setLoadedDateKey] = useState<string | null>(null)
   const [collapsedTaskIds, setCollapsedTaskIds] = useState<Set<string>>(new Set())
   const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
   const [previewStatus, setPreviewStatus] = useState<'empty' | 'converting' | 'failed'>('empty')
   const taskListRef = useRef<HTMLDivElement>(null)
   const { toasts, addToast } = useToast()
+  const queryClient = useQueryClient()
 
   const currentDateKey = toDateKey(currentDate)
+
+  const { data: fetchedTasks } = useGetTasksByDate(currentDateKey)
+
+  if (loadedDateKey !== currentDateKey) {
+    setLoadedDateKey(currentDateKey)
+    setTasks((prev) => [...prev.filter((task) => task.date !== currentDateKey), ...fetchedTasks])
+  }
+
   const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
   const retrospective = retrospectiveByDate[currentDateKey] ?? ''
 
@@ -60,18 +74,39 @@ export default function TodoListPage() {
     incomplete: incompleteTasks.length,
   }
 
-  const handleAddTask = (values: TaskDraftValues) => {
-    const newTask: Task = {
-      id: crypto.randomUUID(),
-      date: currentDateKey,
-      title: values.title,
-      memo: values.memo,
-      tag: values.tag,
-      priority: values.priority,
-      isCompleted: activeTab === 'completed',
+  const handleAddTask = async (values: TaskDraftValues) => {
+    if (!values.tag?.id) {
+      const newTask: Task = {
+        id: crypto.randomUUID(),
+        date: currentDateKey,
+        title: values.title,
+        memo: values.memo,
+        tag: values.tag,
+        priority: values.priority,
+        isCompleted: activeTab === 'completed',
+      }
+      setTasks((prev) => [...prev, newTask])
+      setIsTaskFormOpen(false)
+      return
     }
-    setTasks((prev) => [...prev, newTask])
-    setIsTaskFormOpen(false)
+    try {
+      const created = await createTask(
+        mapDraftToCreateTaskPayload({
+          title: values.title,
+          priority: values.priority,
+          date: currentDateKey,
+          tagId: values.tag.id,
+          memo: values.memo,
+        }),
+      )
+      setTasks((prev) => [...prev, mapTaskDtoToTask(created)])
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(currentDateKey), (prev) =>
+        prev ? [...prev, created] : [created],
+      )
+      setIsTaskFormOpen(false)
+    } catch {
+      addToast('업무 생성에 실패했어요. 다시 시도해 주세요')
+    }
   }
 
   const handleDeleteTask = (id: string) => {
@@ -112,6 +147,7 @@ export default function TodoListPage() {
   const isTaskExpanded = (id: string) => !collapsedTaskIds.has(id)
 
   const toggleTaskExpanded = (id: string) => {
+    const isExpanding = collapsedTaskIds.has(id)
     setCollapsedTaskIds((prev) => {
       const next = new Set(prev)
       if (next.has(id)) {
@@ -121,6 +157,31 @@ export default function TodoListPage() {
       }
       return next
     })
+    if (isExpanding) {
+      getTaskDetail(id)
+        .then((dto) => {
+          if (!dto) return
+          const mapped = mapTaskDtoToTask(dto)
+          setTasks((prev) => {
+            const current = prev.find((task) => task.id === id)
+            if (
+              current &&
+              current.date === mapped.date &&
+              current.title === mapped.title &&
+              current.memo === mapped.memo &&
+              current.priority === mapped.priority &&
+              current.isCompleted === mapped.isCompleted &&
+              current.tag?.id === mapped.tag?.id &&
+              current.tag?.label === mapped.tag?.label &&
+              current.tag?.color === mapped.tag?.color
+            ) {
+              return prev
+            }
+            return prev.map((task) => (task.id === id ? { ...task, ...mapped } : task))
+          })
+        })
+        .catch(() => {})
+    }
   }
 
   const handleToggleComplete = (id: string) => {
