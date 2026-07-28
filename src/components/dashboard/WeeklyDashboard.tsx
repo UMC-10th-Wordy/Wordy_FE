@@ -19,7 +19,7 @@ import { WeeklyRetrospective } from './WeeklyRetrospective'
 import { MonthlyDashboard } from './MonthlyDashboard'
 import type { MonthlyGeneration } from './MonthlyDashboard'
 import type { TagWorkflow } from './TagWorkflowSection'
-import type { DiaryEntry, WeeklyDashboardStatus } from './dashboard.types'
+import type { DiaryEntry, WeeklyDashboardStatus } from '@/types/dashboard'
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
 
 // 서버 entryDate(YYYY-MM-DD) → 화면 라벨(YYYY년 M월 D일 X요일)

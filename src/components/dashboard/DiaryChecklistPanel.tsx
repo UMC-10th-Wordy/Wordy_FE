@@ -1,6 +1,6 @@
 import CheckIcon from '@/assets/icons/check-bold.svg?react'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
-import type { DiaryEntry } from './dashboard.types'
+import type { DiaryEntry } from '@/types/dashboard'
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 
 interface DiaryChecklistPanelProps {
