@@ -1,8 +1,28 @@
-import { INITIAL_TASK_MOCKS } from '@/mocks/task/taskApiMock'
-import type { CreateTaskPayload, TaskDto } from '@/types/task'
-import { getTagDetail } from '@/api/tag/tag'
+import type { CreateTaskPayload, TaskDto, UpdateTaskPayload } from '@/types/task'
+import { ApiError } from '@/api/tag/tag'
 
-let taskMockStore: TaskDto[] = [...INITIAL_TASK_MOCKS]
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+const TEMP_ACCESS_TOKEN = import.meta.env.DEV ? import.meta.env.VITE_TEMP_ACCESS_TOKEN : undefined
+
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`${BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(TEMP_ACCESS_TOKEN ? { Authorization: `Bearer ${TEMP_ACCESS_TOKEN}` } : {}),
+      ...options?.headers,
+    },
+  })
+
+  const text = await response.text()
+  const data = text ? JSON.parse(text) : { success: response.ok, result: null }
+
+  if (!response.ok || !data.success) {
+    throw new ApiError(data.message || `요청에 실패했습니다. (${response.status})`, response.status)
+  }
+
+  return data.result as T
+}
 
 export const taskQueryKeys = {
   all: ['tasks'] as const,
@@ -11,37 +31,34 @@ export const taskQueryKeys = {
 }
 
 export async function getTasks(date: string): Promise<TaskDto[]> {
-  return taskMockStore.filter((task) => task.taskDate.slice(0, 10) === date)
+  return request<TaskDto[]>(`/tasks?date=${encodeURIComponent(date)}`)
 }
 
 export async function getTaskDetail(taskId: string): Promise<TaskDto | null> {
-  return taskMockStore.find((task) => task.taskId === taskId) ?? null
+  try {
+    return await request<TaskDto>(`/tasks/${encodeURIComponent(taskId)}`)
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null
+    throw error
+  }
 }
 
 export async function createTask(payload: CreateTaskPayload): Promise<TaskDto> {
-  const tagDto = await getTagDetail(payload.tagId)
-  if (!tagDto) throw new Error('TAG_NOT_FOUND')
-  const now = new Date().toISOString()
-  const created: TaskDto = {
-    taskId: crypto.randomUUID(),
-    title: payload.title,
-    priority: payload.priority,
-    memo: payload.memo ?? '',
-    status: 'IN_PROGRESS',
-    taskDate: `${payload.taskDate}T00:00:00.000Z`,
-    completedAt: null,
-    createdAt: now,
-    updatedAt: now,
-    deletedAt: null,
-    userId: 'mock-user',
-    tagId: payload.tagId,
-    tag: {
-      tagId: tagDto.tagId,
-      tagName: tagDto.tagName,
-      color: tagDto.color,
-      projectName: tagDto.projectName,
-    },
-  }
-  taskMockStore = [...taskMockStore, created]
-  return created
+  return request<TaskDto>('/tasks', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function updateTask(taskId: string, payload: UpdateTaskPayload): Promise<TaskDto> {
+  return request<TaskDto>(`/tasks/${encodeURIComponent(taskId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function deleteTask(taskId: string): Promise<void> {
+  await request<null>(`/tasks/${encodeURIComponent(taskId)}`, {
+    method: 'DELETE',
+  })
 }

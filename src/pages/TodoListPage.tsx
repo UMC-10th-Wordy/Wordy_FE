@@ -27,10 +27,13 @@ import type {
   TodoFilter,
   TodoFilterCounts,
 } from '@/types/todo'
-import { createTask, getTaskDetail } from '@/api/task/task'
-import { taskQueryKeys } from '@/api/task/task'
+import { createTask, deleteTask, getTaskDetail, taskQueryKeys, updateTask } from '@/api/task/task'
 import { useGetTasksByDate } from '@/hooks/useTaskQueries'
-import { mapDraftToCreateTaskPayload, mapTaskDtoToTask } from '@/utils/taskMapper'
+import {
+  mapDraftToCreateTaskPayload,
+  mapDraftToUpdateTaskPayload,
+  mapTaskDtoToTask,
+} from '@/utils/taskMapper'
 import type { TaskDto } from '@/types/task'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
@@ -110,24 +113,63 @@ export default function TodoListPage() {
     }
   }
 
-  const handleDeleteTask = (id: string) => {
-    setTasks((prev) => prev.filter((task) => task.id !== id))
+  const handleDeleteTask = async (id: string) => {
+    const target = tasks.find((task) => task.id === id)
+    if (!target?.tag?.id) {
+      setTasks((prev) => prev.filter((task) => task.id !== id))
+      return
+    }
+    try {
+      await deleteTask(id)
+      setTasks((prev) => prev.filter((task) => task.id !== id))
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
+        prev ? prev.filter((task) => task.taskId !== id) : prev,
+      )
+    } catch {
+      addToast('업무 삭제에 실패했어요. 다시 시도해 주세요')
+    }
   }
 
-  const handleEditTask = (id: string, values: TaskDraftValues) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              title: values.title,
-              memo: values.memo,
-              tag: values.tag,
-              priority: values.priority,
-            }
-          : task,
-      ),
-    )
+  const handleEditTask = async (id: string, values: TaskDraftValues) => {
+    const target = tasks.find((task) => task.id === id)
+    if (!target?.tag?.id || !values.tag?.id) {
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                title: values.title,
+                memo: values.memo,
+                tag: values.tag,
+                priority: values.priority,
+              }
+            : task,
+        ),
+      )
+      return
+    }
+    try {
+      const updated = await updateTask(
+        id,
+        mapDraftToUpdateTaskPayload({
+          title: values.title,
+          priority: values.priority,
+          date: target.date,
+          tagId: values.tag.id,
+          memo: values.memo,
+          isCompleted: target.isCompleted,
+        }),
+      )
+      const mappedUpdated = mapTaskDtoToTask(updated)
+      setTasks((prev) =>
+        prev.map((task) => (task.id === id ? { ...task, ...mappedUpdated } : task)),
+      )
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
+        prev ? prev.map((task) => (task.taskId === id ? updated : task)) : prev,
+      )
+    } catch {
+      addToast('업무 수정에 실패했어요. 다시 시도해 주세요')
+    }
   }
 
   const handleSaveResult = (id: string, values: TaskResultValues) => {
