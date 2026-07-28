@@ -1,9 +1,4 @@
-export interface UserApiResponse<T> {
-  success: boolean
-  code: string
-  message: string
-  result: T
-}
+import type { ApiEnvelope } from '@/types/api'
 
 /* 프로필 이미지 업로드 */
 // POST /users/profile/image
@@ -12,7 +7,7 @@ export interface ProfileImageUploadResult {
   profileImgUrl: string
 }
 
-export type ProfileImageUploadResponse = UserApiResponse<ProfileImageUploadResult>
+export type ProfileImageUploadResponse = ApiEnvelope<ProfileImageUploadResult>
 
 /* 프로필 등록 */
 // POST /users/profile
@@ -45,7 +40,7 @@ export interface ProfileRegisterResult {
   email: string
 }
 
-export type ProfileRegisterResponse = UserApiResponse<ProfileRegisterResult>
+export type ProfileRegisterResponse = ApiEnvelope<ProfileRegisterResult>
 
 /* 프로필 수정 */
 // PUT /users/profile
@@ -62,7 +57,7 @@ export interface ProfileUpdateResult {
   email: string
 }
 
-export type ProfileUpdateResponse = UserApiResponse<ProfileUpdateResult>
+export type ProfileUpdateResponse = ApiEnvelope<ProfileUpdateResult>
 
 /* 내 프로필 조회 */
 // GET /users/profile
@@ -77,4 +72,4 @@ export interface ProfileGetResult {
   createdAt: string
 }
 
-export type ProfileGetResponse = UserApiResponse<ProfileGetResult>
+export type ProfileGetResponse = ApiEnvelope<ProfileGetResult>
