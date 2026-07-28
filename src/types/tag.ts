@@ -1,3 +1,5 @@
+import type { ApiEnvelope } from '@/types/api'
+
 export interface TagKpiDto {
   name: string
   target: string
@@ -17,13 +19,6 @@ export interface TagDto {
   updatedAt: string
   deletedAt: string | null
   userId: string
-}
-
-export interface ApiEnvelope<T> {
-  success: boolean
-  code: string
-  message: string
-  result: T
 }
 
 export interface CreateTagPayload {
