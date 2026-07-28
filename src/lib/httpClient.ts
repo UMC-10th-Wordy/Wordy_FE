@@ -20,12 +20,15 @@ export class ApiError extends Error {
 // TODO(#Auth): Auth API 연동 후 실제 토큰 발급/저장 로직으로 채워짐
 const getAccessToken = () => localStorage.getItem('accessToken')
 
+const REQUEST_TIMEOUT_MS = 10000
+
 export const request = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
   const accessToken = getAccessToken()
   const isFormData = options.body instanceof FormData
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
+    signal: options.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: {
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -33,11 +36,23 @@ export const request = async <T>(path: string, options: RequestInit = {}): Promi
     },
   })
 
-  const data = await response.json()
-
-  if (!response.ok) {
-    throw new ApiError(response.status, data)
+  const text = await response.text()
+  let data: { result?: T } & Partial<ApiErrorBody> = {}
+  if (text) {
+    try {
+      data = JSON.parse(text)
+    } catch {
+      data = {}
+    }
   }
 
-  return data.result
+  if (!response.ok) {
+    throw new ApiError(response.status, {
+      success: false,
+      code: data.code ?? 'UNKNOWN_ERROR',
+      message: data.message ?? '알 수 없는 오류가 발생했어요.',
+    })
+  }
+
+  return data.result as T
 }
