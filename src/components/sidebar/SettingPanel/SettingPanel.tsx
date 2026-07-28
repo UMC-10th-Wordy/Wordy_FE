@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import type { HTMLAttributes } from 'react'
+import type { CareerOption, JobOption } from '@/components/auth/onboarding'
 import { SidebarTap } from '../SidebarTap/SidebarTap'
 import { Input1 } from '@/components/common/Input/Input1'
 import { Toggle } from '@/components/common/Toggle/Toggle'
@@ -29,15 +30,15 @@ export interface SettingPanelProps extends HTMLAttributes<HTMLDivElement> {
   // 프로필
   profileName?: string
   profileEmail?: string
-  profileJob?: string
-  profileCareer?: string
+  profileJob?: JobOption | ''
+  profileCareer?: CareerOption | ''
   profileAvatarSrc?: string
   onSaveProfile?: (data: {
     name: string
-    job: string
-    career: string
+    job: JobOption | ''
+    career: CareerOption | ''
     avatarFile: File | null
-  }) => void
+  }) => void | Promise<void>
   onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void
   // 알림
   notificationSettings?: NotificationSettings
@@ -76,6 +77,7 @@ export function SettingPanel({
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false)
   const [avatarSrc, setAvatarSrc] = useState<string | null>(profileAvatarSrc ?? null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const jobAnchorRef = useRef<HTMLDivElement>(null)
   const careerAnchorRef = useRef<HTMLDivElement>(null)
@@ -135,8 +137,14 @@ export function SettingPanel({
     confirmPassword.length > 0 &&
     !passwordMismatch
 
-  const handleSave = () => {
-    onSaveProfile?.({ name, job, career, avatarFile })
+  const handleSave = async () => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
+    try {
+      await onSaveProfile?.({ name, job, career, avatarFile })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -364,7 +372,7 @@ export function SettingPanel({
                   variant="fill"
                   size="large"
                   onClick={handleSave}
-                  disabled={!profileChanged}
+                  disabled={!profileChanged || isSubmitting}
                 >
                   프로필 저장하기
                 </TextButton>
@@ -462,7 +470,7 @@ export function SettingPanel({
               ]}
               value={job}
               onChange={(value) => {
-                setJob(value)
+                setJob(value as JobOption)
                 setOpenDropdown(null)
               }}
             />
@@ -485,7 +493,7 @@ export function SettingPanel({
               options={['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과']}
               value={career}
               onChange={(value) => {
-                setCareer(value)
+                setCareer(value as CareerOption)
                 setOpenDropdown(null)
               }}
             />

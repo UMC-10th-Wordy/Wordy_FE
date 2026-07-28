@@ -17,7 +17,6 @@ import {
   JOB_ROLE_TO_JOB,
   YEARS_OF_SERVICE_TO_CAREER,
 } from '@/components/auth/onboarding'
-import type { CareerOption, JobOption } from '@/components/auth/onboarding'
 import { updateProfile, postProfileImage } from '@/api/user/user.api'
 import { useGetProfile, userQueryKeys } from '@/api/user/user.query'
 import HomeIcon from '@/assets/icons/home.svg?react'
@@ -218,22 +217,33 @@ export function SidebarLayout() {
             setNotifications((prev) => ({ ...prev, [key]: value }))
           }
           onSaveProfile={async ({ name, job, career, avatarFile }) => {
+            if (!job || !career) {
+              alert('직무와 연차를 선택해 주세요.')
+              return
+            }
+
+            let imageUploaded = false
             try {
               // 프로필이 이미 등록된 상태라 이미지 업로드만으로 즉시 반영됨 (별도 profileImgUrl 전송 불필요)
               if (avatarFile) {
                 await postProfileImage(avatarFile)
+                imageUploaded = true
               }
 
               await updateProfile({
                 userName: name,
-                yearsOfService: CAREER_TO_YEARS_OF_SERVICE[career as CareerOption],
-                jobRole: JOB_TO_JOB_ROLE[job as JobOption],
+                yearsOfService: CAREER_TO_YEARS_OF_SERVICE[career],
+                jobRole: JOB_TO_JOB_ROLE[job],
               })
 
               await queryClient.invalidateQueries({ queryKey: userQueryKeys.profile() })
               setModal(null)
             } catch {
-              alert('프로필 수정에 실패했어요. 다시 시도해 주세요.')
+              alert(
+                imageUploaded
+                  ? '프로필 사진은 저장됐지만 나머지 정보 저장에 실패했어요. 다시 시도해 주세요.'
+                  : '프로필 수정에 실패했어요. 다시 시도해 주세요.',
+              )
             }
           }}
           onClose={() => setModal(null)}
