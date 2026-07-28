@@ -1,10 +1,5 @@
 import type { Task, TaskPriority } from '@/types/todo'
-import type {
-  ApiTaskPriority,
-  CreateTaskPayload,
-  TaskDto,
-  UpdateTaskPayload,
-} from '@/types/taskApi'
+import type { ApiTaskPriority, CreateTaskPayload, TaskDto, UpdateTaskPayload } from '@/types/task'
 import { hexToTagColor } from './tagMapper'
 
 const PRIORITY_TO_API: Record<TaskPriority, ApiTaskPriority> = {

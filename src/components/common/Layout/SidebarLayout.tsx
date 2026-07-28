@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   Sidebar,
   ProfileModal,
@@ -7,8 +8,18 @@ import {
   NotificationModal,
   WorkspaceModal,
 } from '@/components/sidebar'
-import type { NotificationItemProps } from '@/components/sidebar'
 import type { NotificationSettings } from '@/components/sidebar/SettingPanel/SettingPanel'
+import { INITIAL_WORKSPACES_MOCK } from '@/mocks/workspace/workspaceMock'
+import { NOTIFICATION_ITEMS_MOCK } from '@/mocks/notification/notificationMock'
+import {
+  CAREER_TO_YEARS_OF_SERVICE,
+  JOB_TO_JOB_ROLE,
+  JOB_ROLE_TO_JOB,
+  YEARS_OF_SERVICE_TO_CAREER,
+} from '@/constants/onboarding'
+import type { CareerOption, JobOption } from '@/constants/onboarding'
+import { updateProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
+import { useGetProfile } from '@/hooks/useUserQueries'
 import HomeIcon from '@/assets/icons/home.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
@@ -32,6 +43,8 @@ const PAGE_BY_PATH: Record<string, SidebarPageName> = {
   '/dashboard': '성과 대시보드',
 }
 
+const FALLBACK_PLAN = '무료 요금제'
+
 const getPageByPath = (pathname: string): SidebarPageName => {
   if (pathname.startsWith('/records/')) {
     return '일지 모아보기'
@@ -49,7 +62,28 @@ export function SidebarLayout() {
     return stored === 'open' || stored === 'closed' ? stored : 'open'
   })
   const currentPage = getPageByPath(location.pathname)
-  const [workspaces, setWorkspaces] = useState([{ id: '1', name: 'Alex Kim의 워크스페이스' }])
+  const queryClient = useQueryClient()
+  const [workspaces, setWorkspaces] = useState(INITIAL_WORKSPACES_MOCK)
+  const { data: profileData } = useGetProfile()
+
+  const job: JobOption | '' = profileData ? JOB_ROLE_TO_JOB[profileData.jobRole] : ''
+  const career: CareerOption | '' = profileData
+    ? YEARS_OF_SERVICE_TO_CAREER[profileData.yearsOfService]
+    : ''
+  const profile = {
+    name: profileData?.userName ?? '',
+    email: profileData?.email ?? '',
+    plan: FALLBACK_PLAN,
+    job,
+    career,
+    profileImgUrl: profileData?.profileImgUrl ?? '',
+  }
+  const resolvedWorkspaces = workspaces.map((w) =>
+    w.id === '1' && !w.name && profileData
+      ? { ...w, name: `${profileData.userName}의 워크스페이스` }
+      : w,
+  )
+
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
   const [notifications, setNotifications] = useState<NotificationSettings>({
     emailMarketing: false,
@@ -58,28 +92,7 @@ export function SidebarLayout() {
     inboxPerformanceNudge: false,
   })
 
-  const notificationItems: NotificationItemProps[] = [
-    {
-      title: '7월의 성과 리포트를 발행해 주세요 👀',
-      body: '일주일동안 업무 일지를 성실히 작성하셨네요!\n[성과 대시보드]에서 월간 리포트를 발행할 수 있어요.',
-    },
-    {
-      title: '7월 2주차의 성과 리포트를 발행해 주세요 👀',
-      body: '일주일 동안 업무 일지를 성실히 작성하셨네요!\n[성과 대시보드]에서 주간 리포트를 발행할 수 있어요.',
-    },
-    {
-      title: '6월의 성과 리포트 발행 완료! 🎉',
-      body: '회원님의 월간 성과 리포트가 발행되었어요.\n[성과 대시보드]에서 확인해 주세요!',
-    },
-    {
-      title: '6월 3주차의 성과 리포트 발행 완료! 🎉',
-      body: '회원님의 주간 성과 리포트가 발행되었어요.\n[성과 대시보드]에서 확인해 주세요!',
-    },
-    {
-      title: '6월 3주차의 성과 리포트 발행 완료! 🎉',
-      body: '회원님의 주간 성과 리포트가 발행되었어요.\n[성과 대시보드]에서 확인해 주세요!',
-    },
-  ]
+  const notificationItems = NOTIFICATION_ITEMS_MOCK
 
   const pages = [
     { page: '홈' as const, icon: <HomeIcon className="size-6" />, category: 'general' as const },
@@ -124,9 +137,10 @@ export function SidebarLayout() {
           if (route) navigate(route)
         }}
         pages={pages}
-        workspaceName={workspaces.find((w) => w.id === selectedWorkspaceId)?.name ?? ''}
-        userName="홍길동"
-        userPlan="무료 요금제"
+        workspaceName={resolvedWorkspaces.find((w) => w.id === selectedWorkspaceId)?.name ?? ''}
+        userName={profile.name}
+        userPlan={profile.plan}
+        avatarSrc={profile.profileImgUrl}
         onLogoClick={() => navigate('/')}
         onWorkspaceClick={() => setModal((prev) => (prev === 'workspace' ? null : 'workspace'))}
         onNotificationClick={() =>
@@ -136,7 +150,7 @@ export function SidebarLayout() {
         workspaceMenu={
           modal === 'workspace' ? (
             <WorkspaceModal
-              workspaces={workspaces}
+              workspaces={resolvedWorkspaces}
               selectedId={selectedWorkspaceId}
               onAdd={(name) => setWorkspaces((prev) => [...prev, { id: String(Date.now()), name }])}
               onEdit={(id, name) =>
@@ -176,7 +190,7 @@ export function SidebarLayout() {
         profileMenu={
           modal === 'profile-menu' ? (
             <ProfileModal
-              email="example@email.com"
+              email={profile.email}
               onTrash={() => {
                 setModal(null)
                 navigate('/trash')
@@ -196,14 +210,45 @@ export function SidebarLayout() {
 
       {modal === 'setting' && (
         <SettingModal
-          profileName="홍길동"
-          profileEmail="example@email.com"
-          profileJob=""
-          profileCareer=""
+          profileName={profile.name}
+          profileEmail={profile.email}
+          profileJob={profile.job}
+          profileCareer={profile.career}
+          profileAvatarSrc={profile.profileImgUrl}
           notificationSettings={notifications}
           onChangeNotification={(key, value) =>
             setNotifications((prev) => ({ ...prev, [key]: value }))
           }
+          onSaveProfile={async ({ name, job, career, avatarFile }) => {
+            if (!job || !career) {
+              alert('직무와 연차를 선택해 주세요.')
+              return
+            }
+
+            let imageUploaded = false
+            try {
+              // 프로필이 이미 등록된 상태라 이미지 업로드만으로 즉시 반영됨 (별도 profileImgUrl 전송 불필요)
+              if (avatarFile) {
+                await postProfileImage(avatarFile)
+                imageUploaded = true
+              }
+
+              await updateProfile({
+                userName: name,
+                yearsOfService: CAREER_TO_YEARS_OF_SERVICE[career],
+                jobRole: JOB_TO_JOB_ROLE[job],
+              })
+
+              await queryClient.invalidateQueries({ queryKey: userQueryKeys.profile() })
+              setModal(null)
+            } catch {
+              alert(
+                imageUploaded
+                  ? '프로필 사진은 저장됐지만 나머지 정보 저장에 실패했어요. 다시 시도해 주세요.'
+                  : '프로필 수정에 실패했어요. 다시 시도해 주세요.',
+              )
+            }
+          }}
           onClose={() => setModal(null)}
         />
       )}
