@@ -1,13 +1,12 @@
 import type {
   DailyEntriesSummaryResult,
   DailyEntryDeleteResult,
-  DailyEntryDetailResult,
-  DailyEntrySearchParams,
-  DailyEntrySearchResult,
   DiaryListApiResponse,
   MonthlyDailyEntry,
   MonthlyDailyEntryRecord,
-} from '@/types/diaryListApi'
+} from '@/types/diaryList'
+import type { DailyEntrySearchParams, DailyEntrySearchResult } from '@/types/diarySearch'
+import type { DailyEntryDetailResult } from '@/types/diaryDetail'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
@@ -69,4 +68,21 @@ export const deleteDailyEntry = async (dailyEntryId: string): Promise<DailyEntry
   return request<DailyEntryDeleteResult>(`/daily-entries/${encodeURIComponent(dailyEntryId)}`, {
     method: 'DELETE',
   })
+}
+
+export const diaryListQueryKeys = {
+  all: ['diary-list'] as const,
+
+  summary: () => [...diaryListQueryKeys.all, 'summary'] as const,
+
+  monthlyRecords: () => [...diaryListQueryKeys.all, 'monthly-records'] as const,
+
+  monthlyEntries: () => [...diaryListQueryKeys.all, 'monthly-entries'] as const,
+  monthlyEntry: (yearMonth: string) => [...diaryListQueryKeys.monthlyEntries(), yearMonth] as const,
+
+  searches: () => [...diaryListQueryKeys.all, 'search'] as const,
+  search: (params: DailyEntrySearchParams) => [...diaryListQueryKeys.searches(), params] as const,
+
+  details: () => [...diaryListQueryKeys.all, 'detail'] as const,
+  detail: (dailyEntryId: string) => [...diaryListQueryKeys.details(), dailyEntryId] as const,
 }
