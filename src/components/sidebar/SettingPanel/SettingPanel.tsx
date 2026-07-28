@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import type { HTMLAttributes } from 'react'
+import { CAREER_OPTIONS, JOB_OPTIONS } from '@/components/auth/onboarding'
 import type { CareerOption, JobOption } from '@/components/auth/onboarding'
 import { SidebarTap } from '../SidebarTap/SidebarTap'
 import { Input1 } from '@/components/common/Input/Input1'
@@ -454,20 +455,7 @@ export function SettingPanel({
                 width: jobRect.width,
                 zIndex: 100,
               }}
-              options={[
-                '서비스·제품 기획',
-                '프론트엔드·백엔드 개발',
-                '디자인',
-                '마케팅·세일즈',
-                '데이터 분석',
-                '고객 지원·CS',
-                '인사·HR',
-                '재무·회계',
-                '교육·연구',
-                '개인·프리랜서',
-                '학생',
-                '기타',
-              ]}
+              options={[...JOB_OPTIONS]}
               value={job}
               onChange={(value) => {
                 setJob(value as JobOption)
@@ -490,7 +478,7 @@ export function SettingPanel({
                 width: careerRect.width,
                 zIndex: 100,
               }}
-              options={['1년 미만', '1-3년', '3-5년', '5-10년', '10년 초과']}
+              options={[...CAREER_OPTIONS]}
               value={career}
               onChange={(value) => {
                 setCareer(value as CareerOption)
