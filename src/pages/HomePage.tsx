@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useGetProfile } from '@/hooks/useUserQueries'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { useGetHome } from '@/hooks/useHomeQueries'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { HomeBanner } from '@/components/home/HomeBanner/HomeBanner'
 import { TodayTaskCard } from '@/components/home/TodayTaskCard/TodayTaskCard'
@@ -9,19 +9,25 @@ import { WEEK_DAYS } from '@/components/home/constants'
 import { WeeklyTaskRecord } from '@/components/home/WeeklyTaskRecord/WeeklyTaskRecord'
 import { RecentRecordCard } from '@/components/home/RecentRecordCard/RecentRecordCard'
 import {
-  MOCK_TODAY_TASKS,
-  MOCK_WEEK_RECORD,
-  MOCK_WEEKLY_DAYS,
-  MOCK_RECENT_RECORDS,
-} from '@/mocks/home/homeMock'
+  mapHomeTaskToTodayTask,
+  mapHomeTaskToRecentRecordTask,
+  mapWeekTasksToWeeklyDays,
+  mapWeekRecordsToDayRecords,
+  formatRecordDate,
+} from '@/utils/homeMapper'
 import ArrowRightIcon from '@/assets/icons/Property 1=top_right.svg?react'
 
 export type HomePageProps = HTMLAttributes<HTMLDivElement>
 
 export function HomePage({ className, ...rest }: HomePageProps) {
   const navigate = useNavigate()
-  const { data: profileData } = useGetProfile()
-  const userName = profileData?.userName ?? ''
+  const { data } = useGetHome()
+
+  if (data.screenType === 'landing') {
+    return <Navigate to="/landing" replace />
+  }
+
+  const { userName, todayTasks, streakDays, weekRecords, weekTasks, recentRecord } = data
   const today = new Date()
   const todayLabel = `${today.getMonth() + 1}월 ${today.getDate()}일 ${WEEK_DAYS[today.getDay()]}요일`
 
@@ -70,15 +76,15 @@ export function HomePage({ className, ...rest }: HomePageProps) {
           <HomeBanner className="col-span-2" onNavigate={() => navigate('/today')} />
           <TodayTaskCard
             dateLabel={todayLabel}
-            tasks={MOCK_TODAY_TASKS}
+            tasks={todayTasks.map(mapHomeTaskToTodayTask)}
             onNavigate={() => navigate('/today')}
           />
         </div>
 
         {/* 나의 기록 현황 + 이번 주 업무 기록 */}
         <div className="grid grid-cols-3 gap-5 h-90.25">
-          <StreakCard streak={4} weekRecord={MOCK_WEEK_RECORD} />
-          <WeeklyTaskRecord className="col-span-2" days={MOCK_WEEKLY_DAYS} />
+          <StreakCard streak={streakDays} weekRecord={mapWeekRecordsToDayRecords(weekRecords)} />
+          <WeeklyTaskRecord className="col-span-2" days={mapWeekTasksToWeeklyDays(weekTasks)} />
         </div>
 
         {/* 최근 기록 */}
@@ -95,21 +101,18 @@ export function HomePage({ className, ...rest }: HomePageProps) {
               onClick={() => navigate('/records')}
             />
           </div>
-          {MOCK_RECENT_RECORDS.length === 0 ? (
+          {recentRecord ? (
+            <RecentRecordCard
+              date={formatRecordDate(recentRecord.date)}
+              totalCount={recentRecord.tasks.length}
+              tasks={recentRecord.tasks.map(mapHomeTaskToRecentRecordTask)}
+              onClick={() => navigate(`/records/${recentRecord.date}`)}
+            />
+          ) : (
             <div className="flex items-center justify-center py-16">
               <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
                 첫 기록을 시작해 주세요!
               </span>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-5">
-              {MOCK_RECENT_RECORDS.map((record) => (
-                <RecentRecordCard
-                  key={record.id}
-                  {...record}
-                  onClick={() => navigate(`/records/${record.id}`)}
-                />
-              ))}
             </div>
           )}
         </div>
