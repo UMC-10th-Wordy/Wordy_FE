@@ -1,5 +1,5 @@
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
-import type { DailyEntrySearchSort } from '@/types/api/diaryList'
+import type { DailyEntrySearchSort } from '@/types/diaryListApi'
 
 export type DiarySearchTab = 'diary' | 'projectTag'
 export type DiarySearchSort = DailyEntrySearchSort

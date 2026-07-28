@@ -28,7 +28,7 @@ export const router = createBrowserRouter([
       {
         element: <ScrollableOutlet />,
         children: [
-          { path: '/', element: <HomePage userName="홍길동" /> },
+          { path: '/', element: <HomePage /> },
           { path: '/today', element: <TodoListPage /> },
           { path: '/records', element: <DiaryListPage /> },
           { path: '/dashboard', element: <WeeklyDashboard /> },
