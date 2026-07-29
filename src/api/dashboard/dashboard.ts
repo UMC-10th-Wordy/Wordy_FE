@@ -6,6 +6,8 @@ import type {
   DashboardListItemDto,
   EligibilityDto,
   UpdateReflectionPayload,
+  MonthlyEligibilityDto,
+  MonthlyReflectionResultDto,
 } from '@/types/dashboard'
 
 /* GET /dashboards/eligibility — 주간 대시보드 생성 조건 조회 */
@@ -47,6 +49,43 @@ export async function updateReflection(
 ): Promise<string> {
   return request<string>(`/dashboards/${dashboardId}/reflection/${reflectionId}`, {
     method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
+
+/* GET /dashboards/monthly/eligibility — 월간 대시보드 생성 조건 조회 */
+export async function getMonthlyEligibility(baseDate?: string): Promise<MonthlyEligibilityDto> {
+  const query = baseDate ? `?BaseDate=${baseDate}` : ''
+  return request<MonthlyEligibilityDto>(`/dashboards/monthly/eligibility${query}`)
+}
+
+/* GET /dashboards/monthly — 월간 대시보드 목록 조회 (경로 스웨거 표기 백엔드 확인 중) */
+export async function getMonthlyDashboards(): Promise<DashboardListItemDto[]> {
+  return request<DashboardListItemDto[]>('/dashboards/monthly')
+}
+
+/* GET /dashboards/monthly/{dashboardId} — 월간 대시보드 상세 조회 */
+export async function getMonthlyDashboardDetail(dashboardId: string): Promise<DashboardDetailDto> {
+  return request<DashboardDetailDto>(`/dashboards/monthly/${dashboardId}`)
+}
+
+/* POST /dashboards/monthly — 월간 대시보드 생성(AI). 응답은 상세 객체 */
+export async function createMonthlyDashboard(
+  payload: CreateDashboardPayload,
+): Promise<DashboardDetailDto> {
+  return request<DashboardDetailDto>('/dashboards/monthly', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+/* POST /dashboards/monthly/{dashboardId}/reflection — 월간 회고 작성 (수정 API 명세 부재) */
+export async function createMonthlyReflection(
+  dashboardId: string,
+  payload: CreateReflectionPayload,
+): Promise<MonthlyReflectionResultDto> {
+  return request<MonthlyReflectionResultDto>(`/dashboards/monthly/${dashboardId}/reflection`, {
+    method: 'POST',
     body: JSON.stringify(payload),
   })
 }
