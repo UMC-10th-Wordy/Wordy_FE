@@ -41,7 +41,7 @@ export interface CreatePerformancePreviewPayload {
   dailyEntryId: string
   tasks: PerformancePreviewTaskPayload[]
   reflectionContent: string
-  projectTag: PerformancePreviewProjectTagPayload
+  projectTag?: PerformancePreviewProjectTagPayload
   userJob: JobRole
   yearsOfService: YearsOfService
 }

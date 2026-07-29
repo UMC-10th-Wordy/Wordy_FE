@@ -50,6 +50,7 @@ export const PerformancePreviewResult = ({
   const [insight, setInsight] = useState(() => formatInsightWithBullet(data.insight))
   const [isSaved, setIsSaved] = useState(false)
   const [movedTaskIds, setMovedTaskIds] = useState<string[]>([])
+  const [pendingMoveTaskIds, setPendingMoveTaskIds] = useState<string[]>([])
   const { toasts, addToast } = useToast()
 
   const handleChangeSummary = (value: string) => {
@@ -63,9 +64,15 @@ export const PerformancePreviewResult = ({
   }
 
   const handleMoveTaskToTomorrow = async (taskId: string) => {
-    if (movedTaskIds.includes(taskId) || !onMoveTaskToTomorrow) {
+    if (
+      movedTaskIds.includes(taskId) ||
+      pendingMoveTaskIds.includes(taskId) ||
+      !onMoveTaskToTomorrow
+    ) {
       return
     }
+
+    setPendingMoveTaskIds((prev) => [...prev, taskId])
 
     try {
       await onMoveTaskToTomorrow(taskId)
@@ -73,7 +80,9 @@ export const PerformancePreviewResult = ({
       setMovedTaskIds((prev) => [...prev, taskId])
       addToast('내일 업무로 변경했어요')
     } catch {
-      // 실패 시 성공 토스트를 띄우지 않음
+      // 실패 시 성공 상태와 성공 토스트를 반영하지 않음
+    } finally {
+      setPendingMoveTaskIds((prev) => prev.filter((id) => id !== taskId))
     }
   }
 
@@ -82,11 +91,17 @@ export const PerformancePreviewResult = ({
       return
     }
 
-    await onSave({ summary, insight })
+    try {
+      await onSave({ summary, insight })
 
-    setIsSaved(true)
-    addToast('업무 일지가 저장되었어요')
+      setIsSaved(true)
+      addToast('업무 일지가 저장되었어요')
+    } catch {
+      // 실패 시 저장 완료 상태와 성공 토스트를 반영하지 않음
+    }
   }
+
+  const disabledMoveTaskIds = [...new Set([...movedTaskIds, ...pendingMoveTaskIds])]
 
   return (
     <div
@@ -103,7 +118,7 @@ export const PerformancePreviewResult = ({
       <div className="mt-(--scale-24)">
         <PerformanceIncompleteTaskList
           tasks={data.incompleteTasks}
-          movedTaskIds={movedTaskIds}
+          movedTaskIds={disabledMoveTaskIds}
           onMoveToTomorrow={(taskId) => {
             void handleMoveTaskToTomorrow(taskId)
           }}

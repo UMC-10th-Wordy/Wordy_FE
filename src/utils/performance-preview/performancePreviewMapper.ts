@@ -84,7 +84,7 @@ export const mapSavePerformancePayload = ({
 
 interface MapPerformancePreviewRequestParams {
   tasks: Task[]
-  projectTag: PerformancePreviewProjectTagPayload
+  projectTag?: PerformancePreviewProjectTagPayload
 }
 
 type PerformancePreviewRequest = Omit<
@@ -117,7 +117,7 @@ export const mapPerformancePreviewRequest = ({
             }
           : null,
     })),
-    projectTag,
+    ...(projectTag ? { projectTag } : {}),
   }
 }
 

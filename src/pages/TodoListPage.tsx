@@ -68,7 +68,7 @@ export default function TodoListPage() {
   const taskListRef = useRef<HTMLDivElement>(null)
   const { toasts, addToast } = useToast()
   const queryClient = useQueryClient()
-  const { data: profile } = useGetProfile()
+  const { data: profile, isPending: isProfilePending } = useGetProfile()
   const performancePreview = usePerformancePreview()
   const moveTaskToTomorrowMutation = useMoveTaskToTomorrow()
 
@@ -340,7 +340,7 @@ export default function TodoListPage() {
   }
 
   const goToToday = () => setCurrentDate(new Date())
-  const handleMoveTaskToTomorrow = async (taskId: string) => {
+  const handleMoveTaskToTomorrow = async (taskId: string): Promise<void> => {
     const nextDate = new Date(currentDate)
     nextDate.setDate(nextDate.getDate() + 1)
 
@@ -365,6 +365,10 @@ export default function TodoListPage() {
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
   const handleConvert = async () => {
+    if (isProfilePending) {
+      return
+    }
+
     questionChat.resetQuestionChat()
     performancePreview.preparePreview()
     setIsPreviewOpen(true)
@@ -376,22 +380,19 @@ export default function TodoListPage() {
 
     const projectTagId = tasksForDate.find((task) => task.tag?.id)?.tag?.id
 
-    if (!projectTagId) {
-      performancePreview.failPreview()
-      return
-    }
-
     try {
-      const projectTagDetail = await getTagDetail(projectTagId)
+      const projectTagDetail = projectTagId ? await getTagDetail(projectTagId) : undefined
 
-      if (!projectTagDetail) {
+      if (projectTagId && !projectTagDetail) {
         performancePreview.failPreview()
         return
       }
 
       const performanceRequest = mapPerformancePreviewRequest({
         tasks: tasksForDate,
-        projectTag: mapTagDtoToPerformanceProjectTag(projectTagDetail),
+        projectTag: projectTagDetail
+          ? mapTagDtoToPerformanceProjectTag(projectTagDetail)
+          : undefined,
       })
 
       await performancePreview.startPreview({
