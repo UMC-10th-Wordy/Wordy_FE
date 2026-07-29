@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { AsyncBoundary } from '@/components/common/AsyncState/AsyncBoundary'
 import { useDeleteDailyEntry, useGetDailyEntryDetail } from '@/hooks/useDailyEntryQueries'
+import { useGetPerformanceDetail } from '@/hooks/usePerformanceQueries'
 
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 
@@ -9,11 +11,12 @@ import { DeleteDiaryDialog } from '@/components/diary-detail/DeleteDiaryDialog'
 import { DiaryDetailHeader } from '@/components/diary-detail/DiaryDetailHeader'
 import { DiaryRetrospective } from '@/components/diary-detail/DiaryRetrospective'
 import { ReadOnlyTaskCard } from '@/components/diary-detail/ReadOnlyTaskCard'
-import { PERFORMANCE_PREVIEW_RESULT_MOCK } from '@/mocks/performance-preview/performancePreviewResultMock'
 import { PerformancePreviewPanel } from '@/components/performance-preview/PerformancePreviewPanel'
 import TodoTabs from '@/components/todo/TodoTabs'
 
-import type { TodoFilter, TodoFilterCounts } from '@/types/todo'
+import { mapPerformanceDetailResult } from '@/utils/performance-preview/performancePreviewMapper'
+
+import type { Task, TodoFilter, TodoFilterCounts } from '@/types/todo'
 
 const formatDateLabel = (date: string) => {
   const [year, month, day] = date.split('-').map(Number)
@@ -28,6 +31,33 @@ interface DiaryDetailPageProps {
 interface DiaryDetailContentProps {
   diaryId: string
   hideDelete?: boolean
+}
+
+interface DiaryPerformancePanelProps {
+  dailyPerformanceId: string
+  diaryId: string
+  tasks: Task[]
+}
+
+const DiaryPerformancePanel = ({
+  dailyPerformanceId,
+  diaryId,
+  tasks,
+}: DiaryPerformancePanelProps) => {
+  const { data: performanceDetail } = useGetPerformanceDetail(dailyPerformanceId)
+
+  const performanceResult = mapPerformanceDetailResult(performanceDetail, tasks)
+
+  return (
+    <PerformancePreviewPanel
+      key={diaryId}
+      status="success"
+      result={{
+        data: performanceResult,
+        readOnly: true,
+      }}
+    />
+  )
 }
 
 const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) => {
@@ -106,15 +136,20 @@ const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) =>
       </main>
 
       <div className="h-full min-w-0 overflow-hidden">
-        <PerformancePreviewPanel
-          key={diary.id}
-          status="success"
-          result={{
-            // TODO(#149): 성과 미리보기 조회 API 연결 후 별도 Query 결과로 교체
-            data: PERFORMANCE_PREVIEW_RESULT_MOCK,
-            readOnly: true,
-          }}
-        />
+        {diary.dailyPerformanceId ? (
+          <AsyncBoundary
+            loadingMessage="성과를 불러오는 중입니다"
+            errorMessage="성과를 불러오지 못했어요"
+          >
+            <DiaryPerformancePanel
+              dailyPerformanceId={diary.dailyPerformanceId}
+              diaryId={diary.id}
+              tasks={diary.tasks}
+            />
+          </AsyncBoundary>
+        ) : (
+          <PerformancePreviewPanel status="empty" />
+        )}
       </div>
 
       {isDeleteDialogOpen && (
