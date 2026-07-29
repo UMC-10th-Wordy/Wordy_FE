@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query'
 
 import {
+  createDailyEntry,
   deleteDailyEntry,
   dailyEntryQueryKeys,
   getDailyEntriesSummary,
@@ -66,6 +67,20 @@ export const useGetDailyEntryDetail = (dailyEntryId: string) => {
     queryKey: dailyEntryQueryKeys.detail(dailyEntryId),
     queryFn: () => getDailyEntryDetail(dailyEntryId),
     select: mapDailyEntryDetail,
+  })
+}
+
+export const useCreateDailyEntry = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createDailyEntry,
+
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: dailyEntryQueryKeys.all,
+      })
+    },
   })
 }
 

@@ -1,49 +1,43 @@
+import { request } from '@/lib/httpClient'
+
 import type {
+  CreateDailyEntryPayload,
+  CreateDailyEntryResult,
   DailyEntriesSummaryResult,
   DailyEntryDeleteResult,
-  DiaryListApiResponse,
   MonthlyDailyEntry,
   MonthlyDailyEntryRecord,
 } from '@/types/diaryList'
 import type { DailyEntrySearchParams, DailyEntrySearchResult } from '@/types/diarySearch'
 import type { DailyEntryDetailResult } from '@/types/diaryDetail'
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
-
-const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
-  const response = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
+export const createDailyEntry = async (
+  payload: CreateDailyEntryPayload,
+): Promise<CreateDailyEntryResult> => {
+  return request<CreateDailyEntryResult>('/daily-entries', {
+    method: 'POST',
+    body: JSON.stringify(payload),
   })
-
-  const data: DiaryListApiResponse<T> = await response.json()
-
-  if (!response.ok || !data.success) {
-    throw new Error(data.message || `요청에 실패했습니다. (${response.status})`)
-  }
-
-  if (data.result === null) {
-    throw new Error(data.message || '응답 데이터가 없습니다.')
-  }
-
-  return data.result
 }
 
 export const getDailyEntriesSummary = async (): Promise<DailyEntriesSummaryResult> => {
-  return request<DailyEntriesSummaryResult>('/daily-entries/summary')
+  return request<DailyEntriesSummaryResult>('/daily-entries/summary', {
+    method: 'GET',
+  })
 }
 
 export const getMonthlyDailyEntries = async (): Promise<MonthlyDailyEntryRecord[]> => {
-  return request<MonthlyDailyEntryRecord[]>('/daily-entries/monthly')
+  return request<MonthlyDailyEntryRecord[]>('/daily-entries/monthly', {
+    method: 'GET',
+  })
 }
 
 export const getMonthlyDailyEntriesByYearMonth = async (
   yearMonth: string,
 ): Promise<MonthlyDailyEntry[]> => {
-  return request<MonthlyDailyEntry[]>(`/daily-entries/monthly/${encodeURIComponent(yearMonth)}`)
+  return request<MonthlyDailyEntry[]>(`/daily-entries/monthly/${encodeURIComponent(yearMonth)}`, {
+    method: 'GET',
+  })
 }
 
 export const searchDailyEntries = async ({
@@ -55,13 +49,17 @@ export const searchDailyEntries = async ({
     sort,
   })
 
-  return request<DailyEntrySearchResult>(`/daily-entries/search?${searchParams.toString()}`)
+  return request<DailyEntrySearchResult>(`/daily-entries/search?${searchParams.toString()}`, {
+    method: 'GET',
+  })
 }
 
 export const getDailyEntryDetail = async (
   dailyEntryId: string,
 ): Promise<DailyEntryDetailResult> => {
-  return request<DailyEntryDetailResult>(`/daily-entries/${encodeURIComponent(dailyEntryId)}`)
+  return request<DailyEntryDetailResult>(`/daily-entries/${encodeURIComponent(dailyEntryId)}`, {
+    method: 'GET',
+  })
 }
 
 export const deleteDailyEntry = async (dailyEntryId: string): Promise<DailyEntryDeleteResult> => {

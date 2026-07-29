@@ -4,6 +4,7 @@ import type {
   ReorderTasksResult,
   TaskDto,
   UpdateTaskPayload,
+  MoveTaskToTomorrowPayload,
 } from '@/types/task'
 import { ApiError } from '@/api/tag/tag'
 
@@ -34,6 +35,16 @@ export const taskQueryKeys = {
   all: ['tasks'] as const,
   lists: () => [...taskQueryKeys.all, 'list'] as const,
   list: (date: string) => [...taskQueryKeys.lists(), date] as const,
+}
+
+export const moveTaskToTomorrow = async (
+  taskId: string,
+  payload: MoveTaskToTomorrowPayload,
+): Promise<TaskDto> => {
+  return request<TaskDto>(`/tasks/${encodeURIComponent(taskId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
 }
 
 export async function getTasks(date: string): Promise<TaskDto[]> {
