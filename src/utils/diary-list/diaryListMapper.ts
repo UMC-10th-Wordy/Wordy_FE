@@ -243,6 +243,7 @@ const mapDailyEntryDetailTask = (task: DailyEntryDetailTask, entryDate: string):
 export const mapDailyEntryDetail = (result: DailyEntryDetailResult): DiaryDetailContentData => {
   return {
     id: result.dailyEntryId,
+    dailyPerformanceId: result.dailyPerformanceId,
     date: result.entryDate,
     tasks: result.tasks.map((task) => mapDailyEntryDetailTask(task, result.entryDate)),
     retrospective: result.reflectionContent,

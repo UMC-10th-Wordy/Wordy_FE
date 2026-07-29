@@ -1,6 +1,7 @@
 import type {
   CompletePerformancePreviewResult,
   CreatePerformancePreviewPayload,
+  PerformanceDetailResult,
   PerformancePreviewCompletedResult,
   PerformancePreviewProjectTagPayload,
   SavePerformancePayload,
@@ -9,6 +10,7 @@ import type {
   PerformancePreviewResultData,
   PerformanceTaskResult,
 } from '@/types/performancePreviewResult'
+import { hexToTagColor } from '@/utils/tagMapper'
 import type { Task } from '@/types/todo'
 import type { TagDto } from '@/types/tag'
 
@@ -132,5 +134,46 @@ export const mapTagDtoToPerformanceProjectTag = (
     projectPurpose: tag.projectPurpose,
     expectedOutcome: tag.expectedOutcome,
     period: `${tag.expectedStartDate} ~ ${tag.expectedEndDate}`,
+  }
+}
+
+export const mapPerformanceDetailResult = (
+  result: PerformanceDetailResult,
+  tasks: Task[],
+): PerformancePreviewResultData => {
+  const incompleteTasks = tasks.filter((task) => !task.isCompleted)
+
+  return {
+    totalTaskCount: result.totalTaskCount,
+    completedTaskCount: result.completedTaskCount,
+
+    incompleteTasks: incompleteTasks.map((task) => ({
+      id: task.id,
+      title: task.title,
+      priority: task.priority,
+      tag: task.tag,
+    })),
+
+    summary: result.summary,
+    insight: result.growthInsights.join('\n'),
+    nextTasks: result.nextActions,
+
+    taskResults: result.taskPerformances.map((taskPerformance) => {
+      const diaryTask = tasks.find((task) => task.id === taskPerformance.taskId)
+
+      return {
+        id: taskPerformance.taskId,
+        taskId: taskPerformance.taskId,
+        title: taskPerformance.title || diaryTask?.title || '',
+        tag: taskPerformance.tag
+          ? {
+              label: taskPerformance.tag.tagName,
+              color: hexToTagColor(taskPerformance.tag.color),
+            }
+          : diaryTask?.tag,
+        output: taskPerformance.output,
+        impact: taskPerformance.impact,
+      }
+    }),
   }
 }
