@@ -3,7 +3,7 @@ import GenerateIcon from '@/assets/icons/generate.svg?react'
 import WordySleepingIcon from '@/assets/icons/wordy-sleeping.svg?react'
 import WordyReadyIcon from '@/assets/icons/wordy-ready.svg?react'
 import { WordyGeneratingAnimation } from './WordyGeneratingAnimation'
-import type { WeeklyDashboardStatus } from './dashboard.types'
+import type { WeeklyDashboardStatus } from '@/types/dashboard'
 
 interface WeeklyStatusCardProps {
   status: Exclude<WeeklyDashboardStatus, 'complete'>

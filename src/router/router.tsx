@@ -1,25 +1,59 @@
+import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { AppLayout } from '@/components/common/Layout/AppLayout'
 import { SidebarLayout } from '@/components/common/Layout/SidebarLayout'
 import { ScrollableOutlet } from '@/components/common/Layout/ScrollableOutlet'
 import { AsyncBoundary } from '@/components/common/AsyncState/AsyncBoundary'
-import { HomePage } from '@/pages/Home/HomePage'
-import TodoListPage from '@/pages/TodoListPage/TodoListPage'
-import { DiaryListPage } from '@/pages/DiaryListPage'
-import { DiaryDetailPage } from '@/pages/DiaryDetailPage'
-import { WeeklyDashboard } from '@/components/dashboard/WeeklyDashboard'
-import { TrashPage } from '@/pages/Sidebar/TrashPage'
-import { PlanPage } from '@/pages/Sidebar/PlanPage'
-import { LoginPage } from '@/pages/LoginPage'
-import { SignupPage } from '@/pages/SignupPage'
-import { EmailVerificationPage } from '@/pages/EmailVerificationPage'
-import { MailNoticePage } from '@/pages/MailNoticePage'
-import { ProfileSetupPage } from '@/pages/ProfileSetupPage'
-import { DiarySearchPage } from '@/pages/DiarySearchPage'
-import { TrashDiaryDetailPage } from '@/pages/TrashDiaryDetailPage'
-import { LandingPreview } from '@/pages/LandingPreview/LandingPreview'
-import { LandingPage } from '@/pages/LandingPage/LandingPage'
-import { SocialSignupPage } from '@/pages/SocialSignupPage'
+
+const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })))
+const TodoListPage = lazy(() => import('@/pages/TodoListPage'))
+const DiaryListPage = lazy(() =>
+  import('@/pages/diary/DiaryListPage').then((m) => ({ default: m.DiaryListPage })),
+)
+const DiaryDetailPage = lazy(() =>
+  import('@/pages/diary/DiaryDetailPage').then((m) => ({ default: m.DiaryDetailPage })),
+)
+const DashboardPage = lazy(() =>
+  import('@/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
+)
+const TrashPage = lazy(() =>
+  import('@/pages/trash/TrashPage').then((m) => ({ default: m.TrashPage })),
+)
+const PlanPage = lazy(() => import('@/pages/PlanPage').then((m) => ({ default: m.PlanPage })))
+const LoginPage = lazy(() =>
+  import('@/pages/auth/LoginPage').then((m) => ({ default: m.LoginPage })),
+)
+const SignupPage = lazy(() =>
+  import('@/pages/auth/SignupPage').then((m) => ({ default: m.SignupPage })),
+)
+const EmailVerificationPage = lazy(() =>
+  import('@/pages/auth/EmailVerificationPage').then((m) => ({
+    default: m.EmailVerificationPage,
+  })),
+)
+const MailNoticePage = lazy(() =>
+  import('@/pages/auth/MailNoticePage').then((m) => ({ default: m.MailNoticePage })),
+)
+const ProfileSetupPage = lazy(() =>
+  import('@/pages/auth/ProfileSetupPage').then((m) => ({ default: m.ProfileSetupPage })),
+)
+const DiarySearchPage = lazy(() =>
+  import('@/pages/diary/DiarySearchPage').then((m) => ({ default: m.DiarySearchPage })),
+)
+const TrashDiaryDetailPage = lazy(() =>
+  import('@/pages/trash/TrashDiaryDetailPage').then((m) => ({
+    default: m.TrashDiaryDetailPage,
+  })),
+)
+const LandingPreview = lazy(() =>
+  import('@/pages/landing/LandingPreview').then((m) => ({ default: m.LandingPreview })),
+)
+const LandingPage = lazy(() =>
+  import('@/pages/landing/LandingPage').then((m) => ({ default: m.LandingPage })),
+)
+const SocialSignupPage = lazy(() =>
+  import('@/pages/auth/SocialSignupPage').then((m) => ({ default: m.SocialSignupPage })),
+)
 
 export const router = createBrowserRouter([
   {
@@ -28,10 +62,10 @@ export const router = createBrowserRouter([
       {
         element: <ScrollableOutlet />,
         children: [
-          { path: '/', element: <HomePage userName="홍길동" /> },
+          { path: '/', element: <HomePage /> },
           { path: '/today', element: <TodoListPage /> },
           { path: '/records', element: <DiaryListPage /> },
-          { path: '/dashboard', element: <WeeklyDashboard /> },
+          { path: '/dashboard', element: <DashboardPage /> },
         ],
       },
       {

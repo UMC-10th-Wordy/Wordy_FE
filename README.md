@@ -25,6 +25,7 @@ UMC 10th Wordy 프로젝트 프론트엔드
 - [기술 스택](#기술-스택)
 - [팀원 및 역할 분담](#팀원-및-역할-분담)
 - [폴더 구조](#폴더-구조)
+  - [폴더/파일 네이밍 규칙](#폴더파일-네이밍-규칙)
 - [화면 목록 및 플로우](#화면-목록-및-플로우)
 - [시작하기](#시작하기)
 - [환경 변수](#환경-변수)
@@ -64,6 +65,7 @@ src/
 ├── components/
 │   ├── common/      # 앱 전체 공용 컴포넌트 (조이 담당, 개별 생성 금지)
 │   └── [page]/      # 페이지 전용 컴포넌트
+├── constants/       # 여러 도메인에서 공유하는 상수
 ├── hooks/           # 커스텀 훅
 ├── lib/             # 외부 라이브러리 설정 (TanStack Query 등)
 ├── mocks/           # Mock 데이터
@@ -73,6 +75,21 @@ src/
 ├── types/           # TypeScript 타입 정의
 └── utils/           # 유틸 함수
 ```
+
+### 폴더/파일 네이밍 규칙
+
+일반적으로 React + TypeScript 프로젝트에서 널리 쓰이는 방식을 따릅니다.
+
+| 대상                                     | 규칙                                                                          | 예시                                                                 |
+| ---------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| 폴더 (여러 파일을 묶는 도메인/기능 단위) | kebab-case                                                                    | `diary-list/`, `diary-search/`, `sidebar/`                           |
+| 폴더 (컴포넌트 1개를 감싸는 경우)        | PascalCase (컴포넌트명과 동일)                                                | `ConfirmDialog/ConfirmDialog.tsx`, `Scrollbar/Scrollbar.tsx`         |
+| 컴포넌트 파일                            | PascalCase (컴포넌트명과 동일)                                                | `SidebarLayout.tsx`, `ProjectTag.tsx`                                |
+| 페이지 파일 (`pages/`)                   | 라우트 1개당 파일 1개, 같은 도메인 페이지가 여러 개면 폴더로 묶고 아니면 flat | `DashboardPage.tsx`, `auth/LoginPage.tsx`, `diary/DiaryListPage.tsx` |
+| API 파일 (fetch 함수 + queryKeys)        | camelCase 도메인명, `api/<domain>/`에 위치, 역할 접미사 없음                  | `api/user/user.ts`, `api/task/task.ts`                               |
+| TanStack Query 훅 파일                   | `use<Domain>Queries` 형태, `hooks/`에 flat 배치                               | `useUserQueries.ts`, `useDiaryListQueries.ts`                        |
+| 타입 파일                                | camelCase 도메인명, 도메인 모델과 DTO를 한 파일에 병합                        | `user.ts`, `diaryDetail.ts`                                          |
+| Mock 파일                                | 대상 도메인/API명 + `Mock` 접미사                                             | `dashboardApiMock.ts`, `homeMock.ts`                                 |
 
 ## 화면 목록 및 플로우
 
