@@ -1,8 +1,4 @@
-import {
-  INITIAL_DASHBOARD_DETAIL_MOCK,
-  INITIAL_DASHBOARD_LIST_MOCK,
-  INITIAL_ELIGIBILITY_MOCK,
-} from '@/mocks/dashboard/dashboardApiMock'
+import { request } from '@/lib/httpClient'
 import type {
   CreateDashboardPayload,
   CreateReflectionPayload,
@@ -10,47 +6,26 @@ import type {
   DashboardListItemDto,
   EligibilityDto,
   UpdateReflectionPayload,
-  WeeklyReflectionDto,
 } from '@/types/dashboard'
-
-let dashboardListStore: DashboardListItemDto[] = [...INITIAL_DASHBOARD_LIST_MOCK]
-let dashboardDetailStore: DashboardDetailDto = { ...INITIAL_DASHBOARD_DETAIL_MOCK }
 
 /* GET /dashboards/eligibility — 주간 대시보드 생성 조건 조회 */
 export async function getDashboardEligibility(baseDate?: string): Promise<EligibilityDto> {
-  void baseDate // TODO: 실제 API 연동 시 query param으로 전달
-  return INITIAL_ELIGIBILITY_MOCK
+  const query = baseDate ? `?BaseDate=${baseDate}` : ''
+  return request<EligibilityDto>(`/dashboards/eligibility${query}`)
 }
 
 /* GET /dashboards — 주간 대시보드 목록 조회 */
 export async function getDashboards(): Promise<DashboardListItemDto[]> {
-  return dashboardListStore
+  return request<DashboardListItemDto[]>('/dashboards')
 }
 
-/* GET /dashboards/{dashboardId} — 주간 대시보드 상세 조회 */
-export async function getDashboardDetail(dashboardId: string): Promise<DashboardDetailDto | null> {
-  return dashboardDetailStore.dashboardId === dashboardId ? dashboardDetailStore : null
+/* GET /dashboards/{dashboardId} — 주간 대시보드 상세 조회 (미존재 시 ApiError throw) */
+export async function getDashboardDetail(dashboardId: string): Promise<DashboardDetailDto> {
+  return request<DashboardDetailDto>(`/dashboards/${dashboardId}`)
 }
-
 /* POST /dashboards — 주간 대시보드 생성(AI) */
 export async function createDashboard(payload: CreateDashboardPayload): Promise<string> {
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-  const created: DashboardListItemDto = {
-    dashboardId: crypto.randomUUID(),
-    startDate: payload.startDate,
-    endDate: payload.endDate,
-    summary: dashboardDetailStore.summary,
-    createdAt: new Date().toISOString(),
-  }
-  dashboardListStore = [...dashboardListStore, created]
-  dashboardDetailStore = {
-    ...dashboardDetailStore,
-    dashboardId: created.dashboardId,
-    startDate: created.startDate,
-    endDate: created.endDate,
-    weeklyReflections: [],
-  }
-  return created.dashboardId
+  return request<string>('/dashboards', { method: 'POST', body: JSON.stringify(payload) })
 }
 
 /* POST /dashboards/{dashboardId}/reflection — 주간회고 작성 */
@@ -58,16 +33,10 @@ export async function createReflection(
   dashboardId: string,
   payload: CreateReflectionPayload,
 ): Promise<string> {
-  if (dashboardDetailStore.dashboardId !== dashboardId) {
-    throw new Error(`dashboard not found: ${dashboardId}`)
-  }
-  const reflectionId = crypto.randomUUID()
-  const reflection: WeeklyReflectionDto = { reflectionId, ...payload }
-  dashboardDetailStore = {
-    ...dashboardDetailStore,
-    weeklyReflections: [...dashboardDetailStore.weeklyReflections, reflection],
-  }
-  return reflectionId
+  return request<string>(`/dashboards/${dashboardId}/reflection`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
 }
 
 /* PATCH /dashboards/{dashboardId}/reflection/{reflectionId} — 주간회고 수정 */
@@ -76,18 +45,8 @@ export async function updateReflection(
   reflectionId: string,
   payload: UpdateReflectionPayload,
 ): Promise<string> {
-  if (dashboardDetailStore.dashboardId !== dashboardId) {
-    throw new Error(`dashboard not found: ${dashboardId}`)
-  }
-  const exists = dashboardDetailStore.weeklyReflections.some((r) => r.reflectionId === reflectionId)
-  if (!exists) {
-    throw new Error(`reflection not found: ${reflectionId}`) // 실서버 404에 대응
-  }
-  dashboardDetailStore = {
-    ...dashboardDetailStore,
-    weeklyReflections: dashboardDetailStore.weeklyReflections.map((r) =>
-      r.reflectionId === reflectionId ? { ...r, ...payload } : r,
-    ),
-  }
-  return reflectionId
+  return request<string>(`/dashboards/${dashboardId}/reflection/${reflectionId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
 }
