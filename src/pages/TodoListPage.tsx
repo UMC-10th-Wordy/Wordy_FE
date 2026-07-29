@@ -278,9 +278,30 @@ export default function TodoListPage() {
     setTasks(next)
 
     const tasksForDay = next.filter((task) => task.date === currentDateKey)
-    reorderTasks(mapTasksToReorderPayload(tasksForDay)).catch(() => {
-      addToast('업무 순서 변경에 실패했어요. 다시 시도해 주세요')
-    })
+    const reorderPayload = mapTasksToReorderPayload(tasksForDay)
+    reorderTasks(reorderPayload)
+      .then(() => {
+        queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(currentDateKey), (prev) => {
+          if (!prev) return prev
+          const orderIndex = new Map(
+            reorderPayload.tasks.map((item, index) => [item.taskId, index]),
+          )
+          const priorityById = new Map(
+            reorderPayload.tasks.map((item) => [item.taskId, item.priority]),
+          )
+          return prev
+            .map((dto) =>
+              priorityById.has(dto.taskId)
+                ? { ...dto, priority: priorityById.get(dto.taskId)! }
+                : dto,
+            )
+            .slice()
+            .sort((a, b) => (orderIndex.get(a.taskId) ?? 0) - (orderIndex.get(b.taskId) ?? 0))
+        })
+      })
+      .catch(() => {
+        addToast('업무 순서 변경에 실패했어요. 다시 시도해 주세요')
+      })
   }
 
   const { draggingId, overInfo, pointer, startDrag } = useDragReorder({
