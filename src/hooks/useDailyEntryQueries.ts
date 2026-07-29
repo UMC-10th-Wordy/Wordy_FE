@@ -7,13 +7,13 @@ import {
 
 import {
   deleteDailyEntry,
-  diaryListQueryKeys,
+  dailyEntryQueryKeys,
   getDailyEntriesSummary,
   getDailyEntryDetail,
   getMonthlyDailyEntries,
   getMonthlyDailyEntriesByYearMonth,
   searchDailyEntries,
-} from '@/api/diary-list/diaryList'
+} from '@/api/daily-entry/dailyEntry'
 import {
   mapDailyEntriesSummary,
   mapDailyEntryDetail,
@@ -27,12 +27,12 @@ export const useGetDiaryListPageData = () => {
   const [summaryQuery, monthlyRecordsQuery] = useSuspenseQueries({
     queries: [
       {
-        queryKey: diaryListQueryKeys.summary(),
+        queryKey: dailyEntryQueryKeys.summary(),
         queryFn: getDailyEntriesSummary,
         select: mapDailyEntriesSummary,
       },
       {
-        queryKey: diaryListQueryKeys.monthlyRecords(),
+        queryKey: dailyEntryQueryKeys.monthlyRecords(),
         queryFn: getMonthlyDailyEntries,
         select: mapMonthlyDiaryRecords,
       },
@@ -47,7 +47,7 @@ export const useGetDiaryListPageData = () => {
 
 export const useGetMonthlyDailyEntriesByYearMonth = (yearMonth: string) => {
   return useSuspenseQuery({
-    queryKey: diaryListQueryKeys.monthlyEntry(yearMonth),
+    queryKey: dailyEntryQueryKeys.monthlyEntry(yearMonth),
     queryFn: () => getMonthlyDailyEntriesByYearMonth(yearMonth),
     select: mapMonthlyDiaryEntries,
   })
@@ -55,7 +55,7 @@ export const useGetMonthlyDailyEntriesByYearMonth = (yearMonth: string) => {
 
 export const useGetDailyEntrySearch = (params: DailyEntrySearchParams) => {
   return useSuspenseQuery({
-    queryKey: diaryListQueryKeys.search(params),
+    queryKey: dailyEntryQueryKeys.search(params),
     queryFn: () => searchDailyEntries(params),
     select: mapDailyEntrySearchResult,
   })
@@ -63,7 +63,7 @@ export const useGetDailyEntrySearch = (params: DailyEntrySearchParams) => {
 
 export const useGetDailyEntryDetail = (dailyEntryId: string) => {
   return useSuspenseQuery({
-    queryKey: diaryListQueryKeys.detail(dailyEntryId),
+    queryKey: dailyEntryQueryKeys.detail(dailyEntryId),
     queryFn: () => getDailyEntryDetail(dailyEntryId),
     select: mapDailyEntryDetail,
   })
@@ -77,11 +77,11 @@ export const useDeleteDailyEntry = () => {
 
     onSuccess: ({ dailyEntryId }) => {
       queryClient.removeQueries({
-        queryKey: diaryListQueryKeys.detail(dailyEntryId),
+        queryKey: dailyEntryQueryKeys.detail(dailyEntryId),
       })
 
       void queryClient.invalidateQueries({
-        queryKey: diaryListQueryKeys.all,
+        queryKey: dailyEntryQueryKeys.all,
       })
     },
   })

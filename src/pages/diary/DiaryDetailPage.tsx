@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { useDeleteDailyEntry, useGetDailyEntryDetail } from '@/hooks/useDiaryListQueries'
+import { useDeleteDailyEntry, useGetDailyEntryDetail } from '@/hooks/useDailyEntryQueries'
 
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 

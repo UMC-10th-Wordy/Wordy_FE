@@ -70,19 +70,20 @@ export const deleteDailyEntry = async (dailyEntryId: string): Promise<DailyEntry
   })
 }
 
-export const diaryListQueryKeys = {
-  all: ['diary-list'] as const,
+export const dailyEntryQueryKeys = {
+  all: ['daily-entry'] as const,
 
-  summary: () => [...diaryListQueryKeys.all, 'summary'] as const,
+  summary: () => [...dailyEntryQueryKeys.all, 'summary'] as const,
 
-  monthlyRecords: () => [...diaryListQueryKeys.all, 'monthly-records'] as const,
+  monthlyRecords: () => [...dailyEntryQueryKeys.all, 'monthly-records'] as const,
 
-  monthlyEntries: () => [...diaryListQueryKeys.all, 'monthly-entries'] as const,
-  monthlyEntry: (yearMonth: string) => [...diaryListQueryKeys.monthlyEntries(), yearMonth] as const,
+  monthlyEntries: () => [...dailyEntryQueryKeys.all, 'monthly-entries'] as const,
+  monthlyEntry: (yearMonth: string) =>
+    [...dailyEntryQueryKeys.monthlyEntries(), yearMonth] as const,
 
-  searches: () => [...diaryListQueryKeys.all, 'search'] as const,
-  search: (params: DailyEntrySearchParams) => [...diaryListQueryKeys.searches(), params] as const,
+  searches: () => [...dailyEntryQueryKeys.all, 'search'] as const,
+  search: (params: DailyEntrySearchParams) => [...dailyEntryQueryKeys.searches(), params] as const,
 
-  details: () => [...diaryListQueryKeys.all, 'detail'] as const,
-  detail: (dailyEntryId: string) => [...diaryListQueryKeys.details(), dailyEntryId] as const,
+  details: () => [...dailyEntryQueryKeys.all, 'detail'] as const,
+  detail: (dailyEntryId: string) => [...dailyEntryQueryKeys.details(), dailyEntryId] as const,
 }
