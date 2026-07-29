@@ -43,8 +43,23 @@ export interface UpdateTaskPayload {
   memo?: string
 }
 
+export interface ReorderTaskItem {
+  taskId: string
+  priority: ApiTaskPriority
+  sortOrder: number
+}
+
+export interface ReorderTasksPayload {
+  tasks: ReorderTaskItem[]
+}
+
+export interface ReorderTasksResult {
+  updatedCount: number
+}
+
 export type TaskListResponse = ApiEnvelope<TaskDto[]>
 export type TaskDetailResponse = ApiEnvelope<TaskDto>
 export type CreateTaskResponse = ApiEnvelope<TaskDto>
 export type UpdateTaskResponse = ApiEnvelope<TaskDto>
 export type DeleteTaskResponse = ApiEnvelope<null>
+export type ReorderTasksResponse = ApiEnvelope<ReorderTasksResult>
