@@ -71,7 +71,9 @@ export const MonthlyDashboard = ({
   const status =
     generation !== 'idle' ? generation : eligibility?.eligible ? 'ready' : 'insufficient'
 
-  if (status === 'complete' && detail) {
+  if (status === 'complete') {
+    if (!detail) return null // 생성 완료 직후 상세 수신 전 과도기 — 렌더 없음
+
     const stats = [
       { label: '일지 기록', value: String(detail.journalDays), unit: '일' },
       { label: '성과 업무', value: String(detail.performanceCount), unit: '개' },
