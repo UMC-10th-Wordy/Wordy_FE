@@ -235,15 +235,42 @@ export default function TodoListPage() {
     }
   }
 
-  const handleToggleComplete = (id: string) => {
+  const handleToggleComplete = async (id: string) => {
     const target = tasks.find((task) => task.id === id)
     if (!target) return
     const nextCompleted = !target.isCompleted
 
-    setTasks((prev) =>
-      prev.map((task) => (task.id === id ? { ...task, isCompleted: !task.isCompleted } : task)),
-    )
-    addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
+    if (!target.tag?.id) {
+      setTasks((prev) =>
+        prev.map((task) => (task.id === id ? { ...task, isCompleted: nextCompleted } : task)),
+      )
+      addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
+      return
+    }
+
+    try {
+      const updated = await updateTask(
+        id,
+        mapDraftToUpdateTaskPayload({
+          title: target.title,
+          priority: target.priority,
+          date: target.date,
+          tagId: target.tag.id,
+          memo: target.memo,
+          isCompleted: nextCompleted,
+        }),
+      )
+      const mappedUpdated = mapTaskDtoToTask(updated)
+      setTasks((prev) =>
+        prev.map((task) => (task.id === id ? { ...task, ...mappedUpdated } : task)),
+      )
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
+        prev ? prev.map((task) => (task.taskId === id ? updated : task)) : prev,
+      )
+      addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
+    } catch {
+      addToast('업무 상태 변경에 실패했어요. 다시 시도해 주세요')
+    }
   }
 
   const handleTaskDrop = (draggedId: string, over: DragOverInfo) => {
