@@ -14,7 +14,7 @@ const PRIORITY_TO_API: Record<TaskPriority, ApiTaskPriority> = {
   could: 'COULD_DO',
 }
 
-const PRIORITY_FROM_API: Record<ApiTaskPriority, TaskPriority> = {
+export const PRIORITY_FROM_API: Record<ApiTaskPriority, TaskPriority> = {
   MUST_DO: 'must',
   SHOULD_DO: 'should',
   COULD_DO: 'could',
