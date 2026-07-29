@@ -2,15 +2,6 @@ import type { PerformancePreviewResultData } from '@/types/performancePreviewRes
 import type { Task } from '@/types/todo'
 import type { DailyEntryTag, DiaryListApiResponse } from '@/types/diaryList'
 
-export interface DiaryDetailContentData {
-  id: string
-  date: string
-  tasks: Task[]
-  retrospective: string
-  completedCount: number
-  incompleteCount: number
-}
-
 export interface DiaryDetailData extends DiaryDetailContentData {
   performance: PerformancePreviewResultData
 }
@@ -55,6 +46,16 @@ export interface DailyEntryDetailResult {
   completedCount: number
   incompleteCount: number
   tasks: DailyEntryDetailTask[]
+}
+
+export interface DiaryDetailContentData {
+  id: string
+  dailyPerformanceId: string | null
+  date: string
+  tasks: Task[]
+  retrospective: string
+  completedCount: number
+  incompleteCount: number
 }
 
 export type DailyEntryDetailResponse = DiaryListApiResponse<DailyEntryDetailResult>

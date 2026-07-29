@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 
 import {
   completePerformancePreview,
@@ -26,10 +26,9 @@ export const useSavePerformance = () => {
   })
 }
 
-export const useGetPerformanceDetail = (dailyPerformanceId: string | null) => {
-  return useQuery({
-    queryKey: performanceQueryKeys.detail(dailyPerformanceId ?? ''),
-    queryFn: () => getPerformanceDetail(dailyPerformanceId as string),
-    enabled: Boolean(dailyPerformanceId),
+export const useGetPerformanceDetail = (dailyPerformanceId: string) => {
+  return useSuspenseQuery({
+    queryKey: performanceQueryKeys.detail(dailyPerformanceId),
+    queryFn: () => getPerformanceDetail(dailyPerformanceId),
   })
 }
