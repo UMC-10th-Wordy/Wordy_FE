@@ -15,8 +15,9 @@ import type { PerformancePreviewResultData } from '@/types/performancePreviewRes
 interface PerformancePreviewResultProps {
   data: PerformancePreviewResultData
   readOnly?: boolean
-  onSave?: (values: { summary: string; insight: string }) => void
-  onMoveTaskToTomorrow?: (taskId: string) => void
+  isSaving?: boolean
+  onSave?: (values: { summary: string; insight: string }) => Promise<void> | void
+  onMoveTaskToTomorrow?: (taskId: string) => Promise<void> | void
 }
 
 const formatInsightWithBullet = (insight: string) => {
@@ -41,6 +42,7 @@ const formatInsightWithBullet = (insight: string) => {
 export const PerformancePreviewResult = ({
   data,
   readOnly = false,
+  isSaving = false,
   onSave,
   onMoveTaskToTomorrow,
 }: PerformancePreviewResultProps) => {
@@ -60,18 +62,28 @@ export const PerformancePreviewResult = ({
     setIsSaved(false)
   }
 
-  const handleMoveTaskToTomorrow = (taskId: string) => {
-    if (movedTaskIds.includes(taskId)) {
+  const handleMoveTaskToTomorrow = async (taskId: string) => {
+    if (movedTaskIds.includes(taskId) || !onMoveTaskToTomorrow) {
       return
     }
 
-    setMovedTaskIds((prev) => [...prev, taskId])
-    onMoveTaskToTomorrow?.(taskId)
-    addToast('내일 업무로 변경했어요')
+    try {
+      await onMoveTaskToTomorrow(taskId)
+
+      setMovedTaskIds((prev) => [...prev, taskId])
+      addToast('내일 업무로 변경했어요')
+    } catch {
+      // 실패 시 성공 토스트를 띄우지 않음
+    }
   }
 
-  const handleSaveDiary = () => {
-    onSave?.({ summary, insight })
+  const handleSaveDiary = async () => {
+    if (!onSave || isSaving || isSaved) {
+      return
+    }
+
+    await onSave({ summary, insight })
+
     setIsSaved(true)
     addToast('업무 일지가 저장되었어요')
   }
@@ -92,7 +104,9 @@ export const PerformancePreviewResult = ({
         <PerformanceIncompleteTaskList
           tasks={data.incompleteTasks}
           movedTaskIds={movedTaskIds}
-          onMoveToTomorrow={handleMoveTaskToTomorrow}
+          onMoveToTomorrow={(taskId) => {
+            void handleMoveTaskToTomorrow(taskId)
+          }}
           readOnly={readOnly}
         />
       </div>
@@ -164,8 +178,10 @@ export const PerformancePreviewResult = ({
             variant="fill"
             size="large"
             fullWidth
-            disabled={isSaved}
-            onClick={handleSaveDiary}
+            disabled={isSaved || isSaving}
+            onClick={() => {
+              void handleSaveDiary()
+            }}
             className="[font-size:var(--font-size-body-1)] font-[var(--font-weight-medium)]"
           >
             업무 성과 저장하기

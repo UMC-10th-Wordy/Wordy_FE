@@ -1,4 +1,6 @@
 import type {
+  CreateDailyEntryPayload,
+  CreateDailyEntryResult,
   DailyEntriesSummaryResult,
   DailyEntryDeleteResult,
   DiaryListApiResponse,
@@ -36,6 +38,15 @@ const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
   }
 
   return data.result
+}
+
+export const createDailyEntry = async (
+  payload: CreateDailyEntryPayload,
+): Promise<CreateDailyEntryResult> => {
+  return request<CreateDailyEntryResult>('/daily-entries', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
 }
 
 export const getDailyEntriesSummary = async (): Promise<DailyEntriesSummaryResult> => {

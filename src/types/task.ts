@@ -57,6 +57,10 @@ export interface ReorderTasksResult {
   updatedCount: number
 }
 
+export interface MoveTaskToTomorrowPayload {
+  taskDate: string
+}
+
 export type TaskListResponse = ApiEnvelope<TaskDto[]>
 export type TaskDetailResponse = ApiEnvelope<TaskDto>
 export type CreateTaskResponse = ApiEnvelope<TaskDto>
