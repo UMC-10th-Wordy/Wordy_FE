@@ -66,6 +66,7 @@ export default function TodoListPage() {
   const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
   const taskListRef = useRef<HTMLDivElement>(null)
+  const pendingToggleIds = useRef<Set<string>>(new Set())
   const { toasts, addToast } = useToast()
   const queryClient = useQueryClient()
   const { data: profile, isPending: isProfilePending } = useGetProfile()
@@ -256,6 +257,7 @@ export default function TodoListPage() {
   }
 
   const handleToggleComplete = async (id: string) => {
+    if (pendingToggleIds.current.has(id)) return
     const target = tasks.find((task) => task.id === id)
     if (!target) return
     const nextCompleted = !target.isCompleted
@@ -268,7 +270,9 @@ export default function TodoListPage() {
       return
     }
 
+    pendingToggleIds.current.add(id)
     try {
+      await queryClient.cancelQueries({ queryKey: taskQueryKeys.list(target.date) })
       const updated = await updateTask(
         id,
         mapDraftToUpdateTaskPayload({
@@ -290,6 +294,8 @@ export default function TodoListPage() {
       addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
     } catch {
       addToast('업무 상태 변경에 실패했어요. 다시 시도해 주세요')
+    } finally {
+      pendingToggleIds.current.delete(id)
     }
   }
 
