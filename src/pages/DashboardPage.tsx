@@ -52,6 +52,15 @@ export const DashboardPage = () => {
   // TODO: 월간 API 명세 확정 시 월 이동 데이터 갱신 연결. 현재는 라벨만 이동
   const [monthOffset, setMonthOffset] = useState(0)
 
+  const [monthAnchor] = useState(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), 1)
+  })
+  const selectedMonth = new Date(monthAnchor)
+  selectedMonth.setMonth(selectedMonth.getMonth() + monthOffset)
+  const monthBaseDate = `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, '0')}-01`
+  const monthLabel = `${selectedMonth.getFullYear()}년 ${selectedMonth.getMonth() + 1}월`
+
   // 월간 생성 상태 — 탭 전환 시 유실되지 않도록 부모에서 소유
   const [monthlyGeneration, setMonthlyGeneration] = useState<MonthlyGeneration>('idle')
   const [monthlyEligibility, setMonthlyEligibility] = useState<MonthlyEligibilityDto | null>(null)
@@ -80,9 +89,7 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     let cancelled = false
-    const month = 6 + monthOffset
-    const baseDate = `2026-${String(month).padStart(2, '0')}-01`
-    getMonthlyEligibility(baseDate)
+    getMonthlyEligibility(monthBaseDate)
       .then((res) => {
         if (!cancelled) setMonthlyEligibility(res)
       })
@@ -91,7 +98,6 @@ export const DashboardPage = () => {
       cancelled = true
     }
   }, [monthOffset])
-
   const weekLabel = `2026년 6월 ${3 + weekOffset}주차`
   const totalDays = entries.length
 
@@ -99,7 +105,7 @@ export const DashboardPage = () => {
   const stats = detail
     ? [
         { label: '일지 기록', value: String(detail.journalDays), unit: '일' },
-        { label: '업무 완료율', value: String(detail.performanceCount), unit: '%' },
+        { label: '성과 업무', value: String(detail.performanceCount), unit: '개' },
         { label: '사용된 프로젝트 태그', value: String(detail.tagCount), unit: '개' },
       ]
     : []
@@ -154,16 +160,10 @@ export const DashboardPage = () => {
       })
   }
 
-  // 회고 저장 후 상세 재조회 — 탭 전환 복귀 시 최신 회고 복원용
-  const refreshDetail = () => {
-    if (!detail) return
-    getDashboardDetail(detail.dashboardId).then((res) => setDetail(res))
-  }
-
   const handleMonthlyGenerate = () => {
     if (monthlyGeneration === 'generating') return
-    if (!monthlyEligibility) {
-      addToast('생성 조건을 불러오지 못했어요. 잠시 후 다시 시도해 주세요')
+    if (!monthlyEligibility?.eligible) {
+      addToast('아직 생성 조건을 충족하지 못했어요')
       return
     }
     setMonthlyGeneration('generating')
@@ -183,11 +183,28 @@ export const DashboardPage = () => {
       })
   }
 
-  // 월간 회고 저장 후 상세 재조회
+  // 월 이동 — 이전 월의 상세/생성 상태 무효화 (리뷰 반영)
+  const handleMonthMove = (delta: number) => {
+    if (monthlyGeneration === 'generating') return
+    setMonthlyDetail(null)
+    setMonthlyGeneration('idle')
+    setMonthOffset((v) => v + delta)
+  }
+
+  const refreshDetail = () => {
+    if (!detail) return
+    void getDashboardDetail(detail.dashboardId)
+      .then((res) => setDetail(res))
+      .catch((error) => console.error('상세 재조회 실패:', error))
+  }
+
   const refreshMonthlyDetail = () => {
     if (!monthlyDetail) return
-    getMonthlyDashboardDetail(monthlyDetail.dashboardId).then((res) => setMonthlyDetail(res))
+    void getMonthlyDashboardDetail(monthlyDetail.dashboardId)
+      .then((res) => setMonthlyDetail(res))
+      .catch((error) => console.error('월간 상세 재조회 실패:', error))
   }
+
   // TODO: 주간 주차 이동(BaseDate) 연동 시 해당 주차로 정확히 이동하도록 개선
   const handleGoWeekly = (_weekId: string) => {
     setActiveTab('weekly')
@@ -292,13 +309,23 @@ export const DashboardPage = () => {
         <>
           {/* TODO: 월간 API 명세 확정 후 월 이동 데이터 갱신 연결 */}
           <div className="flex items-center gap-2 self-start rounded-full border border-(--color-border-subtle) px-4 py-2">
-            <button type="button" aria-label="이전 달" onClick={() => setMonthOffset((v) => v - 1)}>
+            <button
+              type="button"
+              aria-label="이전 달"
+              disabled={monthlyGeneration === 'generating'}
+              onClick={() => handleMonthMove(-1)}
+            >
               <ArrowLeftIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
             </button>
             <span className="[font-size:var(--font-size-body-4)] text-(--color-text-default)">
-              {`2026년 ${6 + monthOffset}월`}
+              {monthLabel}
             </span>
-            <button type="button" aria-label="다음 달">
+            <button
+              type="button"
+              aria-label="다음 달"
+              disabled={monthlyGeneration === 'generating'}
+              onClick={() => handleMonthMove(1)}
+            >
               <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
             </button>
           </div>
