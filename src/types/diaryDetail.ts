@@ -48,8 +48,10 @@ export interface DailyEntryDetailTask {
 
 export interface DailyEntryDetailResult {
   dailyEntryId: string
+  dailyPerformanceId: string | null
   entryDate: string
   reflectionContent: string
+  converted: boolean
   completedCount: number
   incompleteCount: number
   tasks: DailyEntryDetailTask[]

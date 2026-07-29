@@ -35,13 +35,21 @@ import {
   taskQueryKeys,
   updateTask,
 } from '@/api/task/task'
-import { useGetTasksByDate } from '@/hooks/useTaskQueries'
+import { useGetTasksByDate, useMoveTaskToTomorrow } from '@/hooks/useTaskQueries'
 import {
   mapDraftToCreateTaskPayload,
   mapDraftToUpdateTaskPayload,
   mapTaskDtoToTask,
   mapTasksToReorderPayload,
 } from '@/utils/taskMapper'
+import { getTagDetail } from '@/api/tag/tag'
+import { useGetProfile } from '@/hooks/useUserQueries'
+import { usePerformancePreview } from '@/hooks/usePerformancePreview'
+import { usePerformanceQuestionChat } from '@/hooks/usePerformanceQuestionChat'
+import {
+  mapPerformancePreviewRequest,
+  mapTagDtoToPerformanceProjectTag,
+} from '@/utils/performance-preview/performancePreviewMapper'
 import type { TaskDto } from '@/types/task'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
@@ -57,10 +65,22 @@ export default function TodoListPage() {
   const [collapsedTaskIds, setCollapsedTaskIds] = useState<Set<string>>(new Set())
   const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
-  const [previewStatus, setPreviewStatus] = useState<'empty' | 'converting' | 'failed'>('empty')
   const taskListRef = useRef<HTMLDivElement>(null)
   const { toasts, addToast } = useToast()
   const queryClient = useQueryClient()
+  const { data: profile, isPending: isProfilePending } = useGetProfile()
+  const performancePreview = usePerformancePreview()
+  const moveTaskToTomorrowMutation = useMoveTaskToTomorrow()
+
+  const questionChat = usePerformanceQuestionChat({
+    isActive: performancePreview.status === 'questioning',
+    questions: performancePreview.questions,
+    onFinish: (answers) => {
+      void performancePreview.completeQuestioning(answers).catch(() => {
+        // usePerformancePreview 내부에서 failed 상태로 전환
+      })
+    },
+  })
 
   const currentDateKey = toDateKey(currentDate)
 
@@ -320,11 +340,71 @@ export default function TodoListPage() {
   }
 
   const goToToday = () => setCurrentDate(new Date())
+  const handleMoveTaskToTomorrow = async (taskId: string): Promise<void> => {
+    const nextDate = new Date(currentDate)
+    nextDate.setDate(nextDate.getDate() + 1)
+
+    const nextDateKey = toDateKey(nextDate)
+
+    await moveTaskToTomorrowMutation.mutateAsync({
+      taskId,
+      taskDate: nextDateKey,
+    })
+
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === taskId
+          ? {
+              ...task,
+              date: nextDateKey,
+            }
+          : task,
+      ),
+    )
+  }
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
-  const handleConvert = () => {
-    setPreviewStatus('converting')
+  const handleConvert = async () => {
+    if (isProfilePending) {
+      return
+    }
+
+    questionChat.resetQuestionChat()
+    performancePreview.preparePreview()
     setIsPreviewOpen(true)
+
+    if (!profile) {
+      performancePreview.failPreview()
+      return
+    }
+
+    const projectTagId = tasksForDate.find((task) => task.tag?.id)?.tag?.id
+
+    try {
+      const projectTagDetail = projectTagId ? await getTagDetail(projectTagId) : undefined
+
+      if (projectTagId && !projectTagDetail) {
+        performancePreview.failPreview()
+        return
+      }
+
+      const performanceRequest = mapPerformancePreviewRequest({
+        tasks: tasksForDate,
+        projectTag: projectTagDetail
+          ? mapTagDtoToPerformanceProjectTag(projectTagDetail)
+          : undefined,
+      })
+
+      await performancePreview.startPreview({
+        entryDate: currentDateKey,
+        reflectionContent: retrospective,
+        tasks: tasksForDate,
+        profile,
+        performanceRequest,
+      })
+    } catch {
+      performancePreview.failPreview()
+    }
   }
 
   const hasAnyTaskEverToday = tasksForDate.length > 0
@@ -504,7 +584,37 @@ export default function TodoListPage() {
             }}
             className="absolute top-0 right-0 h-full w-1/2 overflow-hidden"
           >
-            <PerformancePreviewPanel status={previewStatus} />
+            {performancePreview.status === 'questioning' ? (
+              <PerformancePreviewPanel
+                status="questioning"
+                questionChat={{
+                  messages: questionChat.messages,
+                  answer: questionChat.answer,
+                  isWordyTyping: questionChat.isWordyTyping,
+                  isFinished: questionChat.isFinished,
+                  latestQuestionMessageId: questionChat.latestQuestionMessageId,
+                  onChangeAnswer: questionChat.onChangeAnswer,
+                  onSubmitAnswer: questionChat.onSubmitAnswer,
+                  onSkipQuestion: questionChat.onSkipQuestion,
+                }}
+              />
+            ) : performancePreview.status === 'success' && performancePreview.result ? (
+              <PerformancePreviewPanel
+                status="success"
+                result={{
+                  data: performancePreview.result,
+                  isSaving: performancePreview.isSaving,
+                  onSave: performancePreview.saveResult,
+                  onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
+                }}
+              />
+            ) : performancePreview.status === 'converting' ? (
+              <PerformancePreviewPanel status="converting" />
+            ) : performancePreview.status === 'failed' ? (
+              <PerformancePreviewPanel status="failed" />
+            ) : (
+              <PerformancePreviewPanel status="empty" />
+            )}
           </motion.div>
         )}
       </AnimatePresence>
