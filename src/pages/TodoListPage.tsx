@@ -27,12 +27,20 @@ import type {
   TodoFilter,
   TodoFilterCounts,
 } from '@/types/todo'
-import { createTask, deleteTask, getTaskDetail, taskQueryKeys, updateTask } from '@/api/task/task'
+import {
+  createTask,
+  deleteTask,
+  getTaskDetail,
+  reorderTasks,
+  taskQueryKeys,
+  updateTask,
+} from '@/api/task/task'
 import { useGetTasksByDate } from '@/hooks/useTaskQueries'
 import {
   mapDraftToCreateTaskPayload,
   mapDraftToUpdateTaskPayload,
   mapTaskDtoToTask,
+  mapTasksToReorderPayload,
 } from '@/utils/taskMapper'
 import type { TaskDto } from '@/types/task'
 import FailIcon from '@/assets/icons/fail.svg?react'
@@ -242,32 +250,36 @@ export default function TodoListPage() {
     if (!over.sectionKey) return
     const targetPriority = over.sectionKey as TaskPriority
 
-    setTasks((prev) => {
-      const draggedTask = prev.find((task) => task.id === draggedId)
-      if (!draggedTask) return prev
+    const draggedTask = tasks.find((task) => task.id === draggedId)
+    if (!draggedTask) return
 
-      const rest = prev.filter((task) => task.id !== draggedId)
-      const movedTask: Task = { ...draggedTask, priority: targetPriority }
+    const rest = tasks.filter((task) => task.id !== draggedId)
+    const movedTask: Task = { ...draggedTask, priority: targetPriority }
+    const next = [...rest]
 
-      if (over.itemId) {
-        const targetIndex = rest.findIndex((task) => task.id === over.itemId)
-        if (targetIndex === -1) {
-          rest.push(movedTask)
-        } else {
-          rest.splice(over.insertAfter ? targetIndex + 1 : targetIndex, 0, movedTask)
-        }
-        return rest
+    if (over.itemId) {
+      const targetIndex = next.findIndex((task) => task.id === over.itemId)
+      if (targetIndex === -1) {
+        next.push(movedTask)
+      } else {
+        next.splice(over.insertAfter ? targetIndex + 1 : targetIndex, 0, movedTask)
       }
-
-      let insertAt = rest.length
-      for (let i = rest.length - 1; i >= 0; i -= 1) {
-        if (rest[i].priority === targetPriority) {
+    } else {
+      let insertAt = next.length
+      for (let i = next.length - 1; i >= 0; i -= 1) {
+        if (next[i].priority === targetPriority) {
           insertAt = i + 1
           break
         }
       }
-      rest.splice(insertAt, 0, movedTask)
-      return rest
+      next.splice(insertAt, 0, movedTask)
+    }
+
+    setTasks(next)
+
+    const tasksForDay = next.filter((task) => task.date === currentDateKey)
+    reorderTasks(mapTasksToReorderPayload(tasksForDay)).catch(() => {
+      addToast('업무 순서 변경에 실패했어요. 다시 시도해 주세요')
     })
   }
 

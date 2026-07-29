@@ -1,4 +1,10 @@
-import type { CreateTaskPayload, TaskDto, UpdateTaskPayload } from '@/types/task'
+import type {
+  CreateTaskPayload,
+  ReorderTasksPayload,
+  ReorderTasksResult,
+  TaskDto,
+  UpdateTaskPayload,
+} from '@/types/task'
 import { ApiError } from '@/api/tag/tag'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -60,5 +66,12 @@ export async function updateTask(taskId: string, payload: UpdateTaskPayload): Pr
 export async function deleteTask(taskId: string): Promise<void> {
   await request<null>(`/tasks/${encodeURIComponent(taskId)}`, {
     method: 'DELETE',
+  })
+}
+
+export async function reorderTasks(payload: ReorderTasksPayload): Promise<ReorderTasksResult> {
+  return request<ReorderTasksResult>('/tasks/reorder', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
   })
 }
