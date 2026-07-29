@@ -1,3 +1,5 @@
+import { request } from '@/lib/httpClient'
+
 import type {
   CompletePerformancePreviewPayload,
   CompletePerformancePreviewResponse,
@@ -7,45 +9,6 @@ import type {
   SavePerformancePayload,
   SavePerformanceResponse,
 } from '@/types/performance'
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
-const TEMP_ACCESS_TOKEN = import.meta.env.DEV ? import.meta.env.VITE_TEMP_ACCESS_TOKEN : undefined
-
-interface ErrorResponse {
-  message?: string
-}
-
-const isErrorResponse = (value: unknown): value is ErrorResponse => {
-  return typeof value === 'object' && value !== null && 'message' in value
-}
-
-const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
-  const response = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(TEMP_ACCESS_TOKEN
-        ? {
-            Authorization: `Bearer ${TEMP_ACCESS_TOKEN}`,
-          }
-        : {}),
-      ...options?.headers,
-    },
-  })
-
-  const data: unknown = await response.json()
-
-  if (!response.ok) {
-    const message =
-      isErrorResponse(data) && typeof data.message === 'string'
-        ? data.message
-        : `요청에 실패했습니다. (${response.status})`
-
-    throw new Error(message)
-  }
-
-  return data as T
-}
 
 /* AI 성과 미리보기 생성 */
 // POST /ai/performance-preview
@@ -91,6 +54,9 @@ export const getPerformanceDetail = async (
 ): Promise<PerformanceDetailResponse> => {
   return request<PerformanceDetailResponse>(
     `/performances/${encodeURIComponent(dailyPerformanceId)}`,
+    {
+      method: 'GET',
+    },
   )
 }
 
