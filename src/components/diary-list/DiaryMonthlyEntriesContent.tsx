@@ -1,4 +1,4 @@
-import { useGetMonthlyDailyEntriesByYearMonth } from '@/hooks/useDiaryListQueries'
+import { useGetMonthlyDailyEntriesByYearMonth } from '@/hooks/useDailyEntryQueries'
 
 import { DiaryMonthlyEntry } from './DiaryMonthlyEntry'
 
