@@ -121,7 +121,6 @@ export const DashboardPage = () => {
     createDashboard({ startDate: weekRange.start, endDate: weekRange.end })
       .then((dashboardId) => getDashboardDetail(dashboardId))
       .then((res) => {
-        if (!res) throw new Error('dashboard not found')
         setDetail(res)
         setGeneration('complete')
       })
@@ -135,9 +134,7 @@ export const DashboardPage = () => {
   // 회고 저장 후 상세 재조회 — 탭 전환 복귀 시 최신 회고 복원용
   const refreshDetail = () => {
     if (!detail) return
-    getDashboardDetail(detail.dashboardId).then((res) => {
-      if (res) setDetail(res)
-    })
+    getDashboardDetail(detail.dashboardId).then((res) => setDetail(res))
   }
 
   const handleMonthlyGenerate = () => {

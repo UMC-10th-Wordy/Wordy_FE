@@ -19,11 +19,10 @@ export async function getDashboards(): Promise<DashboardListItemDto[]> {
   return request<DashboardListItemDto[]>('/dashboards')
 }
 
-/* GET /dashboards/{dashboardId} — 주간 대시보드 상세 조회 */
-export async function getDashboardDetail(dashboardId: string): Promise<DashboardDetailDto | null> {
+/* GET /dashboards/{dashboardId} — 주간 대시보드 상세 조회 (미존재 시 ApiError throw) */
+export async function getDashboardDetail(dashboardId: string): Promise<DashboardDetailDto> {
   return request<DashboardDetailDto>(`/dashboards/${dashboardId}`)
 }
-
 /* POST /dashboards — 주간 대시보드 생성(AI) */
 export async function createDashboard(payload: CreateDashboardPayload): Promise<string> {
   return request<string>('/dashboards', { method: 'POST', body: JSON.stringify(payload) })
