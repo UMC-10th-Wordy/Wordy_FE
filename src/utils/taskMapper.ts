@@ -1,9 +1,10 @@
-import type { Task, TaskPriority } from '@/types/todo'
+import type { Task, TaskPriority, TaskResultFile, TaskResultImage } from '@/types/todo'
 import type {
   ApiTaskPriority,
   CreateTaskPayload,
   ReorderTasksPayload,
   TaskDto,
+  TaskResultDto,
   UpdateTaskPayload,
 } from '@/types/task'
 import { hexToTagColor } from './tagMapper'
@@ -21,6 +22,8 @@ export const PRIORITY_FROM_API: Record<ApiTaskPriority, TaskPriority> = {
 }
 
 export function mapTaskDtoToTask(dto: TaskDto): Task {
+  const resultValues = dto.taskResult ? mapTaskResultDtoToValues(dto.taskResult) : null
+
   return {
     id: dto.taskId,
     date: dto.taskDate.slice(0, 10),
@@ -33,6 +36,10 @@ export function mapTaskDtoToTask(dto: TaskDto): Task {
     },
     priority: PRIORITY_FROM_API[dto.priority],
     isCompleted: dto.status === 'COMPLETED',
+    taskResultId: resultValues?.taskResultId,
+    result: resultValues?.result,
+    resultFiles: resultValues?.resultFiles,
+    resultImages: resultValues?.resultImages,
   }
 }
 
@@ -71,6 +78,39 @@ export function mapDraftToUpdateTaskPayload(draft: UpdateTaskDraft): UpdateTaskP
     taskDate: draft.date,
     tagId: draft.tagId,
     memo: draft.memo,
+  }
+}
+
+export interface TaskResultDtoMapped {
+  taskResultId: string
+  result: string
+  resultFiles: TaskResultFile[]
+  resultImages: TaskResultImage[]
+}
+
+export function mapTaskResultDtoToValues(dto: TaskResultDto): TaskResultDtoMapped {
+  const resultFiles: TaskResultFile[] = []
+  const resultImages: TaskResultImage[] = []
+
+  dto.attachments.forEach((attachment) => {
+    const item = {
+      id: attachment.attachmentId,
+      name: attachment.fileName,
+      url: attachment.fileUrl,
+      attachmentId: attachment.attachmentId,
+    }
+    if (attachment.fileType === 'img') {
+      resultImages.push(item)
+    } else {
+      resultFiles.push(item)
+    }
+  })
+
+  return {
+    taskResultId: dto.taskResultId,
+    result: dto.content,
+    resultFiles,
+    resultImages,
   }
 }
 

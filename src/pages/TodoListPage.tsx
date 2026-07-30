@@ -32,6 +32,7 @@ import {
   deleteTask,
   getTaskDetail,
   reorderTasks,
+  saveTaskResult,
   taskQueryKeys,
   updateTask,
 } from '@/api/task/task'
@@ -40,6 +41,7 @@ import {
   mapDraftToCreateTaskPayload,
   mapDraftToUpdateTaskPayload,
   mapTaskDtoToTask,
+  mapTaskResultDtoToValues,
   mapTasksToReorderPayload,
 } from '@/utils/taskMapper'
 import { getTagDetail } from '@/api/tag/tag'
@@ -191,7 +193,18 @@ export default function TodoListPage() {
       )
       const mappedUpdated = mapTaskDtoToTask(updated)
       setTasks((prev) =>
-        prev.map((task) => (task.id === id ? { ...task, ...mappedUpdated } : task)),
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                ...mappedUpdated,
+                taskResultId: task.taskResultId,
+                result: task.result,
+                resultFiles: task.resultFiles,
+                resultImages: task.resultImages,
+              }
+            : task,
+        ),
       )
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
         prev ? prev.map((task) => (task.taskId === id ? updated : task)) : prev,
@@ -201,19 +214,64 @@ export default function TodoListPage() {
     }
   }
 
-  const handleSaveResult = (id: string, values: TaskResultValues) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              result: values.result,
-              resultFiles: values.resultFiles,
-              resultImages: values.resultImages,
-            }
-          : task,
-      ),
+  const handleSaveResult = async (id: string, values: TaskResultValues) => {
+    const target = tasks.find((task) => task.id === id)
+    if (!target?.tag?.id) {
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                result: values.result,
+                resultFiles: values.resultFiles,
+                resultImages: values.resultImages,
+              }
+            : task,
+        ),
+      )
+      return
+    }
+
+    const existingAttachmentIds = new Set(
+      [...(target.resultFiles ?? []), ...(target.resultImages ?? [])]
+        .map((item) => item.attachmentId)
+        .filter((attachmentId): attachmentId is string => Boolean(attachmentId)),
     )
+    const keptAttachmentIds = new Set(
+      [...values.resultFiles, ...values.resultImages]
+        .map((item) => item.attachmentId)
+        .filter((attachmentId): attachmentId is string => Boolean(attachmentId)),
+    )
+    const removedAttachmentIds = [...existingAttachmentIds].filter(
+      (attachmentId) => !keptAttachmentIds.has(attachmentId),
+    )
+    const files = [...values.resultFiles, ...values.resultImages]
+      .map((item) => item.file)
+      .filter((file): file is File => Boolean(file))
+
+    try {
+      const saved = await saveTaskResult(id, {
+        content: values.result,
+        removedAttachmentIds,
+        files,
+      })
+      const mapped = mapTaskResultDtoToValues(saved)
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                taskResultId: mapped.taskResultId,
+                result: mapped.result,
+                resultFiles: mapped.resultFiles,
+                resultImages: mapped.resultImages,
+              }
+            : task,
+        ),
+      )
+    } catch {
+      addToast('업무 결과 저장에 실패했어요. 다시 시도해 주세요')
+    }
   }
 
   const isTaskExpanded = (id: string) => !collapsedTaskIds.has(id)
@@ -286,7 +344,18 @@ export default function TodoListPage() {
       )
       const mappedUpdated = mapTaskDtoToTask(updated)
       setTasks((prev) =>
-        prev.map((task) => (task.id === id ? { ...task, ...mappedUpdated } : task)),
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                ...mappedUpdated,
+                taskResultId: task.taskResultId,
+                result: task.result,
+                resultFiles: task.resultFiles,
+                resultImages: task.resultImages,
+              }
+            : task,
+        ),
       )
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
         prev ? prev.map((task) => (task.taskId === id ? updated : task)) : prev,
