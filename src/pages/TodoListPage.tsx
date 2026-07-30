@@ -224,7 +224,11 @@ export default function TodoListPage() {
         ),
       )
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
-        prev ? prev.map((task) => (task.taskId === id ? updated : task)) : prev,
+        prev
+          ? prev.map((task) =>
+              task.taskId === id ? { ...updated, taskResult: task.taskResult } : task,
+            )
+          : prev,
       )
     } catch {
       addToast('업무 수정에 실패했어요. 다시 시도해 주세요')
@@ -375,7 +379,11 @@ export default function TodoListPage() {
         ),
       )
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
-        prev ? prev.map((task) => (task.taskId === id ? updated : task)) : prev,
+        prev
+          ? prev.map((task) =>
+              task.taskId === id ? { ...updated, taskResult: task.taskResult } : task,
+            )
+          : prev,
       )
       addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
     } catch {
