@@ -108,7 +108,6 @@ export const mapPerformancePreviewRequest = ({
             ? 'SHOULD_DO'
             : 'COULD_DO',
       status: task.isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
-      completedAt: null,
       title: task.title,
       memo: task.memo ?? '',
       taskResult:

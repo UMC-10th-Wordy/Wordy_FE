@@ -12,7 +12,7 @@ export interface PerformancePreviewTaskPayload {
   taskId: string
   priority: ApiTaskPriority
   status: ApiTaskStatus
-  completedAt: string | null
+  completedAt?: string
   title: string
   memo: string
   taskResult: PerformancePreviewTaskResultPayload | null
