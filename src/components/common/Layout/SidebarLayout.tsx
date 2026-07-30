@@ -68,8 +68,8 @@ export function SidebarLayout() {
   const [workspaces, setWorkspaces] = useState(INITIAL_WORKSPACES_MOCK)
   const { data: profileData } = useGetProfile()
   const { mutate: logout } = useLogout()
-  const { mutate: changePassword } = useChangePassword()
-  const { mutate: withdraw } = useWithdraw()
+  const { mutate: changePassword, isPending: isChangingPassword } = useChangePassword()
+  const { mutate: withdraw, isPending: isWithdrawing } = useWithdraw()
 
   const handleLogout = () => {
     setModal(null)
@@ -83,6 +83,7 @@ export function SidebarLayout() {
   }
 
   const handleChangePassword = (data: { currentPassword: string; newPassword: string }) => {
+    if (isChangingPassword) return
     changePassword(data, {
       onSuccess: () => {
         alert('비밀번호가 변경되었어요. 다시 로그인해 주세요.')
@@ -101,6 +102,7 @@ export function SidebarLayout() {
   }
 
   const handleWithdraw = () => {
+    if (isWithdrawing) return
     setModal(null)
     withdraw(undefined, {
       onSuccess: () => {
@@ -265,7 +267,9 @@ export function SidebarLayout() {
           profileCareer={profile.career}
           profileAvatarSrc={profile.profileImgUrl}
           onChangePassword={handleChangePassword}
+          isChangingPassword={isChangingPassword}
           onWithdraw={handleWithdraw}
+          isWithdrawing={isWithdrawing}
           notificationSettings={notifications}
           onChangeNotification={(key, value) =>
             setNotifications((prev) => ({ ...prev, [key]: value }))

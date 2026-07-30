@@ -8,7 +8,7 @@ import GoogleIcon from '@/assets/icons/google.svg?react'
 import { useNavigate } from 'react-router-dom'
 import { useLogin } from '@/hooks/useAuthQueries'
 import { useToast } from '@/hooks/useToast'
-import { setAuthTokens } from '@/lib/httpClient'
+import { ApiError, setAuthTokens } from '@/lib/httpClient'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -42,8 +42,10 @@ export const LoginPage = () => {
           setAuthTokens(data.accessToken, data.refreshToken)
           navigate('/')
         },
-        onError: () => {
-          addToast('이메일 또는 비밀번호가 일치하지 않아요.')
+        onError: (error) => {
+          addToast(
+            error instanceof ApiError ? error.message : '이메일 또는 비밀번호가 일치하지 않아요.',
+          )
         },
       },
     )

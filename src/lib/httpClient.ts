@@ -106,6 +106,11 @@ export const request = async <T>(
 
   if (!response.ok) {
     if (response.status === 401 && accessToken && !isRetry && path !== REFRESH_PATH) {
+      // 다른 요청이 이미 재발급을 마쳤다면 재발급 없이 최신 토큰으로 바로 재시도
+      if (getAccessToken() !== accessToken) {
+        return request<T>(path, options, true)
+      }
+
       const refreshed = await refreshAccessToken()
       if (refreshed) {
         return request<T>(path, options, true)

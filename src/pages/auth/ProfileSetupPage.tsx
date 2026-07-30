@@ -17,7 +17,7 @@ import { useGetProfile } from '@/hooks/useUserQueries'
 export const ProfileSetupPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { data: profileData, isLoading: isProfileLoading } = useGetProfile()
+  const { data: profileData, isLoading: isProfileLoading } = useGetProfile({ retry: false })
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [photoFile, setPhotoFile] = useState<File | null>(null)

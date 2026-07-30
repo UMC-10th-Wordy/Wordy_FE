@@ -44,7 +44,9 @@ export interface SettingPanelProps extends HTMLAttributes<HTMLDivElement> {
     avatarFile: File | null
   }) => void | Promise<void>
   onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void
+  isChangingPassword?: boolean
   onWithdraw?: () => void
+  isWithdrawing?: boolean
   // 알림
   notificationSettings?: NotificationSettings
   onChangeNotification?: (key: keyof NotificationSettings, value: boolean) => void
@@ -67,7 +69,9 @@ export function SettingPanel({
   profileAvatarSrc,
   onSaveProfile,
   onChangePassword,
+  isChangingPassword = false,
   onWithdraw,
+  isWithdrawing = false,
   notificationSettings = DEFAULT_NOTIFICATION_SETTINGS,
   onChangeNotification,
   onClose,
@@ -252,7 +256,7 @@ export function SettingPanel({
                 <TextButton
                   variant="fill"
                   size="large"
-                  disabled={!passwordReady}
+                  disabled={!passwordReady || isChangingPassword}
                   onClick={() => onChangePassword?.({ currentPassword, newPassword })}
                 >
                   비밀번호 변경하기
@@ -377,6 +381,7 @@ export function SettingPanel({
                 <TextButton
                   variant="text_only"
                   size="large"
+                  disabled={isWithdrawing}
                   onClick={() => setShowWithdrawConfirm(true)}
                 >
                   워디 탈퇴하기
