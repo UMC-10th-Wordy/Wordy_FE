@@ -143,7 +143,7 @@ export const usePerformancePreview = () => {
       throw new Error('성과 저장에 필요한 reflectionSnapshotId가 없습니다.')
     }
 
-    return savePerformanceMutation.mutateAsync(
+    await savePerformanceMutation.mutateAsync(
       mapSavePerformancePayload({
         reflectionSnapshotId,
         summary: values.summary,
