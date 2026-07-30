@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import { Input1 } from '@/components/common/Input/Input1'
 import { TextButton } from '@/components/common/Button/TextButton'
-import { TermsSection, isRequiredTermsChecked } from '@/components/auth/TermsSection'
+import {
+  TermsSection,
+  isRequiredTermsChecked,
+  termsToAgreements,
+} from '@/components/auth/TermsSection'
 import type { TermsState } from '@/components/auth/TermsSection'
+import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import LogoIcon from '@/assets/icons/logo.svg?react'
 import { useNavigate } from 'react-router-dom'
+import { useSignup } from '@/hooks/useAuthQueries'
+import { useToast } from '@/hooks/useToast'
+import { ApiError } from '@/lib/httpClient'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 // 영문, 숫자, 특수문자 모두 포함 8자 이상 (피그마 힌트 문구 기준)
@@ -12,6 +20,8 @@ const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/
 
 export const SignupPage = () => {
   const navigate = useNavigate()
+  const { toasts, addToast } = useToast()
+  const { mutate: signup, isPending } = useSignup()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
@@ -48,8 +58,20 @@ export const SignupPage = () => {
 
   const handleSubmit = () => {
     if (!isValid) return
-    // TODO(#18): API 연동 시 회원가입 요청 성공 응답 후 이동으로 교체
-    navigate('/email-verification', { state: { email } })
+    signup(
+      { email, password, agreements: termsToAgreements(terms) },
+      {
+        onSuccess: () => {
+          navigate('/verify-email', { state: { email } })
+        },
+        onError: (error) => {
+          console.error('회원가입 실패:', error)
+          addToast(
+            error instanceof ApiError ? error.message : '회원가입에 실패했어요. 다시 시도해 주세요',
+          )
+        },
+      },
+    )
   }
 
   return (
@@ -121,7 +143,13 @@ export const SignupPage = () => {
 
           <TermsSection terms={terms} onChange={setTerms} />
 
-          <TextButton type="submit" variant="fill" size="large" fullWidth disabled={!isValid}>
+          <TextButton
+            type="submit"
+            variant="fill"
+            size="large"
+            fullWidth
+            disabled={!isValid || isPending}
+          >
             계정 생성하기
           </TextButton>
         </form>
@@ -139,6 +167,8 @@ export const SignupPage = () => {
           </button>
         </div>
       </div>
+
+      <ToastContainer toasts={toasts} />
     </div>
   )
 }

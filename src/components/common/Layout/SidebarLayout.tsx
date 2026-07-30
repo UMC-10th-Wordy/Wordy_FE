@@ -20,6 +20,8 @@ import {
 import type { CareerOption, JobOption } from '@/constants/onboarding'
 import { updateProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
 import { useGetProfile } from '@/hooks/useUserQueries'
+import { useChangePassword, useLogout, useWithdraw } from '@/hooks/useAuthQueries'
+import { ApiError, clearAuthTokens } from '@/lib/httpClient'
 import HomeIcon from '@/assets/icons/home.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
@@ -65,6 +67,54 @@ export function SidebarLayout() {
   const queryClient = useQueryClient()
   const [workspaces, setWorkspaces] = useState(INITIAL_WORKSPACES_MOCK)
   const { data: profileData } = useGetProfile()
+  const { mutate: logout } = useLogout()
+  const { mutate: changePassword, isPending: isChangingPassword } = useChangePassword()
+  const { mutate: withdraw, isPending: isWithdrawing } = useWithdraw()
+
+  const handleLogout = () => {
+    setModal(null)
+    logout(undefined, {
+      onSettled: () => {
+        clearAuthTokens()
+        queryClient.clear()
+        navigate('/login')
+      },
+    })
+  }
+
+  const handleChangePassword = (data: { currentPassword: string; newPassword: string }) => {
+    if (isChangingPassword) return
+    changePassword(data, {
+      onSuccess: () => {
+        alert('비밀번호가 변경되었어요. 다시 로그인해 주세요.')
+        clearAuthTokens()
+        queryClient.clear()
+        navigate('/login')
+      },
+      onError: (error) => {
+        alert(
+          error instanceof ApiError
+            ? error.message
+            : '비밀번호 변경에 실패했어요. 다시 시도해 주세요.',
+        )
+      },
+    })
+  }
+
+  const handleWithdraw = () => {
+    if (isWithdrawing) return
+    setModal(null)
+    withdraw(undefined, {
+      onSuccess: () => {
+        clearAuthTokens()
+        queryClient.clear()
+        navigate('/landing')
+      },
+      onError: (error) => {
+        alert(error instanceof ApiError ? error.message : '탈퇴에 실패했어요. 다시 시도해 주세요.')
+      },
+    })
+  }
 
   const job: JobOption | '' = profileData ? JOB_ROLE_TO_JOB[profileData.jobRole] : ''
   const career: CareerOption | '' = profileData
@@ -200,6 +250,7 @@ export function SidebarLayout() {
                 navigate('/plan')
               }}
               onSetting={() => setModal('setting')}
+              onLogout={handleLogout}
               onClose={() => setModal(null)}
             />
           ) : undefined
@@ -215,6 +266,10 @@ export function SidebarLayout() {
           profileJob={profile.job}
           profileCareer={profile.career}
           profileAvatarSrc={profile.profileImgUrl}
+          onChangePassword={handleChangePassword}
+          isChangingPassword={isChangingPassword}
+          onWithdraw={handleWithdraw}
+          isWithdrawing={isWithdrawing}
           notificationSettings={notifications}
           onChangeNotification={(key, value) =>
             setNotifications((prev) => ({ ...prev, [key]: value }))

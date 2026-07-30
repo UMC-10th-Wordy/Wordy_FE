@@ -19,6 +19,9 @@ import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 export type SettingTab = 'profile' | 'notification'
 type InnerView = 'main' | 'password'
 
+// 영문, 숫자, 특수문자 모두 포함 8자 이상 (회원가입 규칙과 동일)
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/
+
 export interface NotificationSettings {
   emailMarketing: boolean
   inboxMarketing: boolean
@@ -41,6 +44,9 @@ export interface SettingPanelProps extends HTMLAttributes<HTMLDivElement> {
     avatarFile: File | null
   }) => void | Promise<void>
   onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void
+  isChangingPassword?: boolean
+  onWithdraw?: () => void
+  isWithdrawing?: boolean
   // 알림
   notificationSettings?: NotificationSettings
   onChangeNotification?: (key: keyof NotificationSettings, value: boolean) => void
@@ -63,6 +69,9 @@ export function SettingPanel({
   profileAvatarSrc,
   onSaveProfile,
   onChangePassword,
+  isChangingPassword = false,
+  onWithdraw,
+  isWithdrawing = false,
   notificationSettings = DEFAULT_NOTIFICATION_SETTINGS,
   onChangeNotification,
   onClose,
@@ -131,11 +140,13 @@ export function SettingPanel({
   const profileChanged =
     name !== profileName || job !== profileJob || career !== profileCareer || avatarFile !== null
 
+  const passwordFormatInvalid = newPassword.length > 0 && !PASSWORD_REGEX.test(newPassword)
   const passwordMismatch = confirmPassword.length > 0 && newPassword !== confirmPassword
   const passwordReady =
     currentPassword.length > 0 &&
     newPassword.length > 0 &&
     confirmPassword.length > 0 &&
+    !passwordFormatInvalid &&
     !passwordMismatch
 
   const handleSave = async () => {
@@ -221,6 +232,11 @@ export function SettingPanel({
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="변경할 비밀번호를 입력해 주세요"
                     hint="영문, 숫자, 특수문자를 모두 포함한 8자리 이상의 조합으로 만들어주세요"
+                    error={
+                      passwordFormatInvalid
+                        ? '영문, 숫자, 특수문자를 모두 포함한 8자리 이상으로 만들어주세요.'
+                        : undefined
+                    }
                   />
                   <Input1
                     label={
@@ -240,7 +256,7 @@ export function SettingPanel({
                 <TextButton
                   variant="fill"
                   size="large"
-                  disabled={!passwordReady}
+                  disabled={!passwordReady || isChangingPassword}
                   onClick={() => onChangePassword?.({ currentPassword, newPassword })}
                 >
                   비밀번호 변경하기
@@ -365,6 +381,7 @@ export function SettingPanel({
                 <TextButton
                   variant="text_only"
                   size="large"
+                  disabled={isWithdrawing}
                   onClick={() => setShowWithdrawConfirm(true)}
                 >
                   워디 탈퇴하기
@@ -499,7 +516,10 @@ export function SettingPanel({
           }
           confirmLabel="네, 탈퇴할게요"
           cancelLabel="계속 사용할게요"
-          onConfirm={() => setShowWithdrawConfirm(false)}
+          onConfirm={() => {
+            setShowWithdrawConfirm(false)
+            onWithdraw?.()
+          }}
           onCancel={() => setShowWithdrawConfirm(false)}
         />
       )}

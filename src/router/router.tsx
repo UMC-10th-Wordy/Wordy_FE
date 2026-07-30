@@ -4,6 +4,8 @@ import { AppLayout } from '@/components/common/Layout/AppLayout'
 import { SidebarLayout } from '@/components/common/Layout/SidebarLayout'
 import { ScrollableOutlet } from '@/components/common/Layout/ScrollableOutlet'
 import { AsyncBoundary } from '@/components/common/AsyncState/AsyncBoundary'
+import { ProtectedRoute } from '@/components/common/Layout/ProtectedRoute'
+import { GuestRoute } from '@/components/common/Layout/GuestRoute'
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })))
 const TodoListPage = lazy(() => import('@/pages/TodoListPage'))
@@ -57,39 +59,49 @@ const SocialSignupPage = lazy(() =>
 
 export const router = createBrowserRouter([
   {
-    element: <SidebarLayout />,
+    element: <ProtectedRoute />,
     children: [
       {
-        element: <ScrollableOutlet />,
+        element: <SidebarLayout />,
         children: [
-          { path: '/', element: <HomePage /> },
-          { path: '/today', element: <TodoListPage /> },
-          { path: '/records', element: <DiaryListPage /> },
-          { path: '/dashboard', element: <DashboardPage /> },
+          {
+            element: <ScrollableOutlet />,
+            children: [
+              { path: '/', element: <HomePage /> },
+              { path: '/today', element: <TodoListPage /> },
+              { path: '/records', element: <DiaryListPage /> },
+              { path: '/dashboard', element: <DashboardPage /> },
+            ],
+          },
+          {
+            path: '/records/:diaryId',
+            element: (
+              <AsyncBoundary>
+                <DiaryDetailPage />
+              </AsyncBoundary>
+            ),
+          },
         ],
-      },
-      {
-        path: '/records/:diaryId',
-        element: (
-          <AsyncBoundary>
-            <DiaryDetailPage />
-          </AsyncBoundary>
-        ),
       },
     ],
   },
   {
     element: <AppLayout />,
     children: [
+      {
+        element: <GuestRoute />,
+        children: [
+          { path: '/landing', element: <LandingPage /> },
+          { path: '/login', element: <LoginPage /> },
+          { path: '/signup', element: <SignupPage /> },
+        ],
+      },
       { path: '/landing-preview', element: <LandingPreview /> },
-      { path: '/landing', element: <LandingPage /> },
       { path: '/records/search', element: <DiarySearchPage /> },
       { path: '/trash', element: <TrashPage /> },
       { path: '/trash/:diaryId', element: <TrashDiaryDetailPage /> },
       { path: '/plan', element: <PlanPage /> },
-      { path: '/login', element: <LoginPage /> },
-      { path: '/signup', element: <SignupPage /> },
-      { path: '/email-verification', element: <EmailVerificationPage /> },
+      { path: '/verify-email', element: <EmailVerificationPage /> },
       { path: '/mail-notice', element: <MailNoticePage /> },
       { path: '/profile-setup', element: <ProfileSetupPage /> },
       { path: '/social-signup', element: <SocialSignupPage /> },
