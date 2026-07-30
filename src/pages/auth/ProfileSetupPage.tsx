@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { OnboardingCard } from '@/components/auth/OnboardingCard'
 import {
   CAREER_OPTIONS,
@@ -10,10 +11,13 @@ import type { CareerOption, JobOption } from '@/constants/onboarding'
 import ProfileDefaultIcon from '@/assets/icons/profile-default.svg?react'
 import CameraBadgeIcon from '@/assets/icons/camera-badge.svg?react'
 import { useNavigate } from 'react-router-dom'
-import { postProfile, postProfileImage } from '@/api/user/user'
+import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
+import { useGetProfile } from '@/hooks/useUserQueries'
 
 export const ProfileSetupPage = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const { data: profileData, isLoading: isProfileLoading } = useGetProfile()
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [photoFile, setPhotoFile] = useState<File | null>(null)
@@ -30,6 +34,13 @@ export const ProfileSetupPage = () => {
       if (photoUrl) URL.revokeObjectURL(photoUrl)
     }
   }, [photoUrl])
+
+  // 이미 프로필을 등록한 사용자는 다시 접근할 수 없도록 홈으로 리다이렉트
+  useEffect(() => {
+    if (profileData?.userName) {
+      navigate('/', { replace: true })
+    }
+  }, [profileData, navigate])
 
   const handlePhotoChange = (file: File | undefined) => {
     if (!file) return
@@ -60,12 +71,17 @@ export const ProfileSetupPage = () => {
         jobRole: JOB_TO_JOB_ROLE[job],
       })
 
+      await queryClient.invalidateQueries({ queryKey: userQueryKeys.profile() })
       navigate('/')
     } catch {
       alert('프로필 등록에 실패했어요. 다시 시도해 주세요.')
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (isProfileLoading || profileData?.userName) {
+    return null
   }
 
   if (step === 0) {
