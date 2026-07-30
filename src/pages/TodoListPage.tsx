@@ -32,6 +32,7 @@ import {
   deleteTask,
   getTaskDetail,
   reorderTasks,
+  saveTaskResult,
   taskQueryKeys,
   updateTask,
 } from '@/api/task/task'
@@ -41,6 +42,7 @@ import {
   mapDraftToCreateTaskPayload,
   mapDraftToUpdateTaskPayload,
   mapTaskDtoToTask,
+  mapTaskResultDtoToValues,
   mapTasksToReorderPayload,
 } from '@/utils/taskMapper'
 import { getTagDetail } from '@/api/tag/tag'
@@ -75,6 +77,7 @@ export default function TodoListPage() {
   const currentDateKey = toDateKey(currentDate)
 
   const taskListRef = useRef<HTMLDivElement>(null)
+  const pendingToggleIds = useRef<Set<string>>(new Set())
   const { toasts, addToast } = useToast()
   const queryClient = useQueryClient()
   const { data: profile, isPending: isProfilePending } = useGetProfile()
@@ -207,29 +210,89 @@ export default function TodoListPage() {
       )
       const mappedUpdated = mapTaskDtoToTask(updated)
       setTasks((prev) =>
-        prev.map((task) => (task.id === id ? { ...task, ...mappedUpdated } : task)),
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                ...mappedUpdated,
+                taskResultId: task.taskResultId,
+                result: task.result,
+                resultFiles: task.resultFiles,
+                resultImages: task.resultImages,
+              }
+            : task,
+        ),
       )
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
-        prev ? prev.map((task) => (task.taskId === id ? updated : task)) : prev,
+        prev
+          ? prev.map((task) =>
+              task.taskId === id ? { ...updated, taskResult: task.taskResult } : task,
+            )
+          : prev,
       )
     } catch {
       addToast('업무 수정에 실패했어요. 다시 시도해 주세요')
     }
   }
 
-  const handleSaveResult = (id: string, values: TaskResultValues) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              result: values.result,
-              resultFiles: values.resultFiles,
-              resultImages: values.resultImages,
-            }
-          : task,
-      ),
+  const handleSaveResult = async (id: string, values: TaskResultValues) => {
+    const target = tasks.find((task) => task.id === id)
+    if (!target?.tag?.id) {
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                result: values.result,
+                resultFiles: values.resultFiles,
+                resultImages: values.resultImages,
+              }
+            : task,
+        ),
+      )
+      return
+    }
+
+    const existingAttachmentIds = new Set(
+      [...(target.resultFiles ?? []), ...(target.resultImages ?? [])]
+        .map((item) => item.attachmentId)
+        .filter((attachmentId): attachmentId is string => Boolean(attachmentId)),
     )
+    const keptAttachmentIds = new Set(
+      [...values.resultFiles, ...values.resultImages]
+        .map((item) => item.attachmentId)
+        .filter((attachmentId): attachmentId is string => Boolean(attachmentId)),
+    )
+    const removedAttachmentIds = [...existingAttachmentIds].filter(
+      (attachmentId) => !keptAttachmentIds.has(attachmentId),
+    )
+    const files = [...values.resultFiles, ...values.resultImages]
+      .map((item) => item.file)
+      .filter((file): file is File => Boolean(file))
+
+    try {
+      const saved = await saveTaskResult(id, {
+        content: values.result,
+        removedAttachmentIds,
+        files,
+      })
+      const mapped = mapTaskResultDtoToValues(saved)
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                taskResultId: mapped.taskResultId,
+                result: mapped.result,
+                resultFiles: mapped.resultFiles,
+                resultImages: mapped.resultImages,
+              }
+            : task,
+        ),
+      )
+    } catch {
+      addToast('업무 결과 저장에 실패했어요. 다시 시도해 주세요')
+    }
   }
 
   const isTaskExpanded = (id: string) => !collapsedTaskIds.has(id)
@@ -272,15 +335,62 @@ export default function TodoListPage() {
     }
   }
 
-  const handleToggleComplete = (id: string) => {
+  const handleToggleComplete = async (id: string) => {
+    if (pendingToggleIds.current.has(id)) return
     const target = tasks.find((task) => task.id === id)
     if (!target) return
     const nextCompleted = !target.isCompleted
 
-    setTasks((prev) =>
-      prev.map((task) => (task.id === id ? { ...task, isCompleted: !task.isCompleted } : task)),
-    )
-    addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
+    if (!target.tag?.id) {
+      setTasks((prev) =>
+        prev.map((task) => (task.id === id ? { ...task, isCompleted: nextCompleted } : task)),
+      )
+      addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
+      return
+    }
+
+    pendingToggleIds.current.add(id)
+    try {
+      await queryClient.cancelQueries({ queryKey: taskQueryKeys.list(target.date) })
+      const updated = await updateTask(
+        id,
+        mapDraftToUpdateTaskPayload({
+          title: target.title,
+          priority: target.priority,
+          date: target.date,
+          tagId: target.tag.id,
+          memo: target.memo,
+          isCompleted: nextCompleted,
+        }),
+      )
+      const mappedUpdated = mapTaskDtoToTask(updated)
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                ...mappedUpdated,
+                taskResultId: task.taskResultId,
+                result: task.result,
+                resultFiles: task.resultFiles,
+                resultImages: task.resultImages,
+              }
+            : task,
+        ),
+      )
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
+        prev
+          ? prev.map((task) =>
+              task.taskId === id ? { ...updated, taskResult: task.taskResult } : task,
+            )
+          : prev,
+      )
+      addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
+    } catch {
+      addToast('업무 상태 변경에 실패했어요. 다시 시도해 주세요')
+    } finally {
+      pendingToggleIds.current.delete(id)
+    }
   }
 
   const handleTaskDrop = (draggedId: string, over: DragOverInfo) => {

@@ -2,7 +2,9 @@ import type {
   CreateTaskPayload,
   ReorderTasksPayload,
   ReorderTasksResult,
+  SaveTaskResultPayload,
   TaskDto,
+  TaskResultDto,
   UpdateTaskPayload,
   MoveTaskToTomorrowPayload,
 } from '@/types/task'
@@ -12,10 +14,11 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL
 const TEMP_ACCESS_TOKEN = import.meta.env.DEV ? import.meta.env.VITE_TEMP_ACCESS_TOKEN : undefined
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const isFormData = options?.body instanceof FormData
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(TEMP_ACCESS_TOKEN ? { Authorization: `Bearer ${TEMP_ACCESS_TOKEN}` } : {}),
       ...options?.headers,
     },
@@ -84,5 +87,22 @@ export async function reorderTasks(payload: ReorderTasksPayload): Promise<Reorde
   return request<ReorderTasksResult>('/tasks/reorder', {
     method: 'PATCH',
     body: JSON.stringify(payload),
+  })
+}
+
+export async function saveTaskResult(
+  taskId: string,
+  payload: SaveTaskResultPayload,
+): Promise<TaskResultDto> {
+  const formData = new FormData()
+  formData.append('content', payload.content)
+  if (payload.removedAttachmentIds && payload.removedAttachmentIds.length > 0) {
+    formData.append('removedAttachmentIds', JSON.stringify(payload.removedAttachmentIds))
+  }
+  payload.files?.forEach((file) => formData.append('files', file))
+
+  return request<TaskResultDto>(`/tasks/${encodeURIComponent(taskId)}/result`, {
+    method: 'PUT',
+    body: formData,
   })
 }

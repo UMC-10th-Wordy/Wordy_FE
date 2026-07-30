@@ -17,6 +17,7 @@ export interface TaskDto {
   memo: string
   status: ApiTaskStatus
   taskDate: string
+  sortOrder: number
   completedAt: string | null
   createdAt: string
   updatedAt: string
@@ -24,6 +25,7 @@ export interface TaskDto {
   userId: string
   tagId: string
   tag: TaskTagSummaryDto
+  taskResult: TaskResultDto | null
 }
 
 export interface CreateTaskPayload {
@@ -61,9 +63,34 @@ export interface MoveTaskToTomorrowPayload {
   taskDate: string
 }
 
+export type TaskResultAttachmentFileType = 'file' | 'img'
+
+export interface TaskResultAttachmentDto {
+  attachmentId: string
+  fileType: TaskResultAttachmentFileType
+  fileUrl: string
+  fileName: string
+}
+
+export interface TaskResultDto {
+  taskResultId: string
+  taskId: string
+  content: string
+  attachments: TaskResultAttachmentDto[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface SaveTaskResultPayload {
+  content: string
+  removedAttachmentIds?: string[]
+  files?: File[]
+}
+
 export type TaskListResponse = ApiEnvelope<TaskDto[]>
 export type TaskDetailResponse = ApiEnvelope<TaskDto>
 export type CreateTaskResponse = ApiEnvelope<TaskDto>
 export type UpdateTaskResponse = ApiEnvelope<TaskDto>
 export type DeleteTaskResponse = ApiEnvelope<null>
 export type ReorderTasksResponse = ApiEnvelope<ReorderTasksResult>
+export type SaveTaskResultResponse = ApiEnvelope<TaskResultDto>

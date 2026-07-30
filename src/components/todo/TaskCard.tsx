@@ -19,6 +19,7 @@ function createResultFiles(files: File[]): TaskResultFile[] {
     id: crypto.randomUUID(),
     name: file.name,
     url: URL.createObjectURL(file),
+    file,
   }))
 }
 
@@ -27,6 +28,7 @@ function createResultImages(files: File[]): TaskResultImage[] {
     id: crypto.randomUUID(),
     name: file.name,
     url: URL.createObjectURL(file),
+    file,
   }))
 }
 
