@@ -15,7 +15,7 @@ export interface PerformancePreviewTaskPayload {
   completedAt?: string
   title: string
   memo?: string
-  taskResult: PerformancePreviewTaskResultPayload | null
+  taskResult?: PerformancePreviewTaskResultPayload
 }
 
 export interface PerformancePreviewProjectTagPayload {

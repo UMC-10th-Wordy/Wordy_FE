@@ -110,13 +110,14 @@ export const mapPerformancePreviewRequest = ({
       status: task.isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
       title: task.title,
       ...(task.memo?.trim() ? { memo: task.memo.trim() } : {}),
-      taskResult:
-        task.taskResultId && task.result
-          ? {
+      ...(task.taskResultId && task.result
+        ? {
+            taskResult: {
               taskResultId: task.taskResultId,
               content: task.result,
-            }
-          : null,
+            },
+          }
+        : {}),
     })),
     ...(projectTag ? { projectTag } : {}),
   }
