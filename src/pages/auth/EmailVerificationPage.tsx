@@ -1,20 +1,41 @@
+import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { VerificationCard } from '@/components/auth/VerificationCard'
 import EmailRequestIcon from '@/assets/icons/email-request.svg?react'
 import EmailSuccessIcon from '@/assets/icons/email-success.svg?react'
 import EmailFailIcon from '@/assets/icons/email-fail.svg?react'
+import { useVerifyEmail } from '@/hooks/useAuthQueries'
+import { setAuthTokens } from '@/lib/httpClient'
 
-// TODO(#45): API 연동 시 서버 검증 결과 리다이렉트 기반으로 교체
-type VerificationStatus = 'request' | 'success' | 'fail'
+type VerificationStatus = 'request' | 'loading' | 'success' | 'fail'
 
 export const EmailVerificationPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
-  const statusParam = params.get('status')
-  const status: VerificationStatus =
-    statusParam === 'success' || statusParam === 'fail' ? statusParam : 'request'
+  const token = params.get('token')
+
+  const { isPending, isSuccess, isError, data, error } = useVerifyEmail(token)
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      setAuthTokens(data.accessToken, data.refreshToken)
+    }
+    if (isError) {
+      console.error('이메일 인증 실패:', error)
+    }
+  }, [isSuccess, isError, data, error])
+
+  const status: VerificationStatus = !token
+    ? 'request'
+    : isSuccess
+      ? 'success'
+      : isError
+        ? 'fail'
+        : isPending
+          ? 'loading'
+          : 'request'
 
   // TODO(#45): API 연동 시 서버 세션 기반으로 교체
   const email: string = location.state?.email ?? 'sample.email@naver.com'
@@ -25,10 +46,26 @@ export const EmailVerificationPage = () => {
 
   const illustrationByStatus = {
     request: <EmailRequestIcon width={180} height={180} />,
+    loading: <EmailRequestIcon width={180} height={180} />,
     success: <EmailSuccessIcon width={180} height={180} />,
     fail: <EmailFailIcon width={180} height={180} />,
   }
   const illustration = illustrationByStatus[status]
+
+  if (status === 'loading') {
+    return (
+      <VerificationCard
+        illustration={illustration}
+        title="인증을 확인하고 있어요"
+        description="잠시만 기다려 주세요"
+        action={
+          <TextButton variant="fill" size="large" fullWidth disabled>
+            확인 중...
+          </TextButton>
+        }
+      />
+    )
+  }
 
   if (status === 'success') {
     return (
