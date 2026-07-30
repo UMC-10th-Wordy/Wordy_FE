@@ -18,7 +18,11 @@ export class ApiError extends Error {
 }
 
 // TODO(#Auth): Auth API 연동 후 실제 토큰 발급/저장 로직으로 채워짐
-const getAccessToken = () => localStorage.getItem('accessToken')
+const TEMP_ACCESS_TOKEN = import.meta.env.DEV ? import.meta.env.VITE_TEMP_ACCESS_TOKEN : undefined
+
+const getAccessToken = () => {
+  return localStorage.getItem('accessToken') ?? TEMP_ACCESS_TOKEN ?? null
+}
 
 const REQUEST_TIMEOUT_MS = 10000
 
