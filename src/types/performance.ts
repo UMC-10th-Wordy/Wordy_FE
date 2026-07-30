@@ -14,7 +14,7 @@ export interface PerformancePreviewTaskPayload {
   status: ApiTaskStatus
   completedAt?: string
   title: string
-  memo: string
+  memo?: string
   taskResult: PerformancePreviewTaskResultPayload | null
 }
 
@@ -25,7 +25,7 @@ export interface PerformancePreviewProjectTagPayload {
   kpis: string[]
   projectPurpose: string
   expectedOutcome: string
-  period: string
+  period?: string
 }
 
 export interface PerformanceTaskPerformance {

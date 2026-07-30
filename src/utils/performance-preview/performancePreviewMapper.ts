@@ -109,7 +109,7 @@ export const mapPerformancePreviewRequest = ({
             : 'COULD_DO',
       status: task.isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
       title: task.title,
-      memo: task.memo ?? '',
+      ...(task.memo?.trim() ? { memo: task.memo.trim() } : {}),
       taskResult:
         task.taskResultId && task.result
           ? {
@@ -125,6 +125,11 @@ export const mapPerformancePreviewRequest = ({
 export const mapTagDtoToPerformanceProjectTag = (
   tag: TagDto,
 ): PerformancePreviewProjectTagPayload => {
+  const period =
+    tag.expectedStartDate && tag.expectedEndDate
+      ? `${tag.expectedStartDate} ~ ${tag.expectedEndDate}`
+      : tag.expectedStartDate || tag.expectedEndDate || undefined
+
   return {
     projectTagId: tag.tagId,
     tagName: tag.tagName,
@@ -132,7 +137,7 @@ export const mapTagDtoToPerformanceProjectTag = (
     kpis: tag.kpis.map((kpi) => `${kpi.name}: ${kpi.target}`),
     projectPurpose: tag.projectPurpose,
     expectedOutcome: tag.expectedOutcome,
-    period: `${tag.expectedStartDate} ~ ${tag.expectedEndDate}`,
+    ...(period ? { period } : {}),
   }
 }
 
