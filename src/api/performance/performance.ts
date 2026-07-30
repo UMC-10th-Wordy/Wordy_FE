@@ -11,6 +11,8 @@ import type {
   SavePerformanceResponse,
 } from '@/types/performance'
 
+const AI_REQUEST_TIMEOUT_MS = 120_000
+
 /* AI 성과 미리보기 생성 */
 // POST /ai/performance-preview
 
@@ -20,6 +22,7 @@ export const createPerformancePreview = async (
   return request<CreatePerformancePreviewResponse>('/ai/performance-preview', {
     method: 'POST',
     body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS),
   })
 }
 
@@ -32,6 +35,7 @@ export const completePerformancePreview = async (
   return request<CompletePerformancePreviewResponse>('/ai/performance-preview/complete', {
     method: 'POST',
     body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS),
   })
 }
 
