@@ -1,4 +1,6 @@
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
+import type { AgreementType, SignupAgreement } from '@/types/auth'
+
 export interface TermsState {
   age: boolean
   service: boolean
@@ -16,21 +18,45 @@ const TERM_ITEMS: {
   required: boolean
   label: string
   hasDetail: boolean
+  agreementType: AgreementType
 }[] = [
-  { key: 'age', required: true, label: '만 14세 이상입니다', hasDetail: false },
-  { key: 'service', required: true, label: '서비스 이용약관', hasDetail: true },
-  { key: 'privacy', required: true, label: '개인정보 수집 및 이용', hasDetail: true },
+  {
+    key: 'age',
+    required: true,
+    label: '만 14세 이상입니다',
+    hasDetail: false,
+    agreementType: 'AGE_OVER_14',
+  },
+  {
+    key: 'service',
+    required: true,
+    label: '서비스 이용약관',
+    hasDetail: true,
+    agreementType: 'TERMS_OF_SERVICE',
+  },
+  {
+    key: 'privacy',
+    required: true,
+    label: '개인정보 수집 및 이용',
+    hasDetail: true,
+    agreementType: 'PRIVACY_POLICY',
+  },
   {
     key: 'marketing',
     required: false,
     label: '마케팅 정보 수신 및 프로모션 안내',
     hasDetail: true,
+    agreementType: 'MARKETING',
   },
 ]
 
 // 필수 약관 정의를 TERM_ITEMS 단일 소스로 관리하기 위한 헬퍼
 export const isRequiredTermsChecked = (terms: TermsState) =>
   TERM_ITEMS.filter((item) => item.required).every((item) => terms[item.key])
+
+// 회원가입 API 요청 바디로 변환하기 위한 헬퍼 (TERM_ITEMS 단일 소스 유지)
+export const termsToAgreements = (terms: TermsState): SignupAgreement[] =>
+  TERM_ITEMS.map((item) => ({ type: item.agreementType, isAgreed: terms[item.key] }))
 
 export const TermsSection = ({ terms, onChange }: TermsSectionProps) => {
   const allChecked = Object.values(terms).every(Boolean)

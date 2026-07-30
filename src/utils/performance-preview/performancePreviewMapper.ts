@@ -108,7 +108,6 @@ export const mapPerformancePreviewRequest = ({
             ? 'SHOULD_DO'
             : 'COULD_DO',
       status: task.isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
-      completedAt: null,
       title: task.title,
       memo: task.memo ?? '',
       taskResult:
@@ -141,18 +140,23 @@ export const mapPerformanceDetailResult = (
   result: PerformanceDetailResult,
   tasks: Task[],
 ): PerformancePreviewResultData => {
-  const incompleteTasks = tasks.filter((task) => !task.isCompleted)
-
   return {
     totalTaskCount: result.totalTaskCount,
     completedTaskCount: result.completedTaskCount,
 
-    incompleteTasks: incompleteTasks.map((task) => ({
-      id: task.id,
-      title: task.title,
-      priority: task.priority,
-      tag: task.tag,
-    })),
+    incompleteTasks: result.incompleteTasks.map((task, index) => {
+      const diaryTask = tasks.find((item) => item.title === task.title)
+
+      return {
+        id: diaryTask?.id ?? `saved-incomplete-task-${index}`,
+        title: task.title,
+        priority: diaryTask?.priority ?? 'could',
+        tag: {
+          label: task.tag.tagName,
+          color: hexToTagColor(task.tag.color),
+        },
+      }
+    }),
 
     summary: result.summary,
     insight: result.growthInsights.join('\n'),

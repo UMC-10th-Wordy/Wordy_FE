@@ -1,3 +1,6 @@
+import { useAuthStore } from '@/store/authStore'
+import type { RefreshRequest, RefreshResult } from '@/types/auth'
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 interface ApiErrorBody {
@@ -17,12 +20,67 @@ export class ApiError extends Error {
   }
 }
 
-// TODO(#Auth): Auth API 연동 후 실제 토큰 발급/저장 로직으로 채워짐
-const getAccessToken = () => localStorage.getItem('accessToken')
+const ACCESS_TOKEN_KEY = 'accessToken'
+const REFRESH_TOKEN_KEY = 'refreshToken'
+
+export const setAuthTokens = (accessToken: string, refreshToken: string) => {
+  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+  useAuthStore.getState().setAuthenticated(true)
+}
+
+export const clearAuthTokens = () => {
+  localStorage.removeItem(ACCESS_TOKEN_KEY)
+  localStorage.removeItem(REFRESH_TOKEN_KEY)
+  useAuthStore.getState().setAuthenticated(false)
+}
+
+const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY)
+export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY)
 
 const REQUEST_TIMEOUT_MS = 10000
+const REFRESH_PATH = '/auth/refresh'
 
-export const request = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
+// 동시에 여러 요청이 401을 받아도 재발급은 한 번만 호출되도록 공유
+let refreshPromise: Promise<boolean> | null = null
+
+const refreshAccessToken = (): Promise<boolean> => {
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      const refreshToken = getRefreshToken()
+      if (!refreshToken) return false
+
+      try {
+        const body: RefreshRequest = { refreshToken }
+        const response = await fetch(`${API_BASE_URL}${REFRESH_PATH}`, {
+          method: 'POST',
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+        if (!response.ok) return false
+
+        const data: { result?: RefreshResult } = await response.json()
+        if (!data.result) return false
+
+        setAuthTokens(data.result.accessToken, data.result.refreshToken)
+        return true
+      } catch {
+        return false
+      }
+    })().finally(() => {
+      refreshPromise = null
+    })
+  }
+
+  return refreshPromise
+}
+
+export const request = async <T>(
+  path: string,
+  options: RequestInit = {},
+  isRetry = false,
+): Promise<T> => {
   const accessToken = getAccessToken()
   const isFormData = options.body instanceof FormData
 
@@ -47,6 +105,19 @@ export const request = async <T>(path: string, options: RequestInit = {}): Promi
   }
 
   if (!response.ok) {
+    if (response.status === 401 && accessToken && !isRetry && path !== REFRESH_PATH) {
+      // 다른 요청이 이미 재발급을 마쳤다면 재발급 없이 최신 토큰으로 바로 재시도
+      if (getAccessToken() !== accessToken) {
+        return request<T>(path, options, true)
+      }
+
+      const refreshed = await refreshAccessToken()
+      if (refreshed) {
+        return request<T>(path, options, true)
+      }
+      clearAuthTokens()
+    }
+
     throw new ApiError(response.status, {
       success: false,
       code: data.code ?? 'UNKNOWN_ERROR',

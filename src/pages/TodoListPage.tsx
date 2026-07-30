@@ -36,6 +36,7 @@ import {
   taskQueryKeys,
   updateTask,
 } from '@/api/task/task'
+import { performanceQueryKeys } from '@/api/performance/performance'
 import { useGetTasksByDate, useMoveTaskToTomorrow } from '@/hooks/useTaskQueries'
 import {
   mapDraftToCreateTaskPayload,
@@ -49,6 +50,11 @@ import { useGetProfile } from '@/hooks/useUserQueries'
 import { usePerformancePreview } from '@/hooks/usePerformancePreview'
 import { usePerformanceQuestionChat } from '@/hooks/usePerformanceQuestionChat'
 import {
+  useGetPerformanceDetailQuery,
+  useGetPerformancesByDate,
+} from '@/hooks/usePerformanceQueries'
+import {
+  mapPerformanceDetailResult,
   mapPerformancePreviewRequest,
   mapTagDtoToPerformanceProjectTag,
 } from '@/utils/performance-preview/performancePreviewMapper'
@@ -67,6 +73,9 @@ export default function TodoListPage() {
   const [collapsedTaskIds, setCollapsedTaskIds] = useState<Set<string>>(new Set())
   const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
+
+  const currentDateKey = toDateKey(currentDate)
+
   const taskListRef = useRef<HTMLDivElement>(null)
   const pendingToggleIds = useRef<Set<string>>(new Set())
   const { toasts, addToast } = useToast()
@@ -85,9 +94,13 @@ export default function TodoListPage() {
     },
   })
 
-  const currentDateKey = toDateKey(currentDate)
-
   const { data: fetchedTasks } = useGetTasksByDate(currentDateKey)
+
+  const { data: performanceList } = useGetPerformancesByDate(currentDateKey)
+
+  const savedPerformanceId = performanceList?.performances[0]?.dailyPerformanceId ?? null
+
+  const { data: savedPerformanceDetail } = useGetPerformanceDetailQuery(savedPerformanceId)
 
   if (loadedDateKey !== currentDateKey) {
     setLoadedDateKey(currentDateKey)
@@ -96,6 +109,10 @@ export default function TodoListPage() {
 
   const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
   const retrospective = retrospectiveByDate[currentDateKey] ?? ''
+
+  const savedPerformanceResult = savedPerformanceDetail
+    ? mapPerformanceDetailResult(savedPerformanceDetail, tasksForDate)
+    : null
 
   const completedTasks = tasksForDate.filter((task) => task.isCompleted)
   const incompleteTasks = tasksForDate.filter((task) => !task.isCompleted)
@@ -433,15 +450,23 @@ export default function TodoListPage() {
 
   useFlipAnimation(taskListRef, [tasks, activeTab])
 
-  const shiftDate = (days: number) => {
-    setCurrentDate((prev) => {
-      const next = new Date(prev)
-      next.setDate(next.getDate() + days)
-      return next
-    })
+  const handleChangeDate = (date: Date) => {
+    performancePreview.resetPreview()
+    questionChat.resetQuestionChat()
+    setCurrentDate(date)
   }
 
-  const goToToday = () => setCurrentDate(new Date())
+  const shiftDate = (days: number) => {
+    const next = new Date(currentDate)
+    next.setDate(next.getDate() + days)
+
+    handleChangeDate(next)
+  }
+
+  const goToToday = () => {
+    handleChangeDate(new Date())
+  }
+
   const handleMoveTaskToTomorrow = async (taskId: string): Promise<void> => {
     const nextDate = new Date(currentDate)
     nextDate.setDate(nextDate.getDate() + 1)
@@ -466,6 +491,16 @@ export default function TodoListPage() {
   }
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
+  const handleSavePerformance = async (values: { summary: string; insight: string }) => {
+    await performancePreview.saveResult(values)
+
+    await queryClient.invalidateQueries({
+      queryKey: performanceQueryKeys.all,
+    })
+
+    performancePreview.resetPreview()
+  }
+
   const handleConvert = async () => {
     if (isProfilePending) {
       return
@@ -536,7 +571,7 @@ export default function TodoListPage() {
               onPrevDay={() => shiftDate(-1)}
               onNextDay={() => shiftDate(1)}
               onToday={goToToday}
-              onSelectDate={setCurrentDate}
+              onSelectDate={handleChangeDate}
             />
 
             <section className="flex w-full flex-col gap-2">
@@ -706,7 +741,7 @@ export default function TodoListPage() {
                 result={{
                   data: performancePreview.result,
                   isSaving: performancePreview.isSaving,
-                  onSave: performancePreview.saveResult,
+                  onSave: handleSavePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}
               />
@@ -714,6 +749,15 @@ export default function TodoListPage() {
               <PerformancePreviewPanel status="converting" />
             ) : performancePreview.status === 'failed' ? (
               <PerformancePreviewPanel status="failed" />
+            ) : savedPerformanceResult ? (
+              <PerformancePreviewPanel
+                status="success"
+                result={{
+                  data: savedPerformanceResult,
+                  readOnly: true,
+                  onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
+                }}
+              />
             ) : (
               <PerformancePreviewPanel status="empty" />
             )}
