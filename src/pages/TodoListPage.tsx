@@ -395,6 +395,8 @@ export default function TodoListPage() {
     await queryClient.invalidateQueries({
       queryKey: performanceQueryKeys.all,
     })
+
+    performancePreview.resetPreview()
   }
 
   const handleConvert = async () => {
