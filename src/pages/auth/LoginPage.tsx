@@ -2,14 +2,20 @@ import { useState } from 'react'
 import { Input1 } from '@/components/common/Input/Input1'
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
 import { TextButton } from '@/components/common/Button/TextButton'
+import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import LogoIcon from '@/assets/icons/logo.svg?react'
 import GoogleIcon from '@/assets/icons/google.svg?react'
 import { useNavigate } from 'react-router-dom'
+import { useLogin } from '@/hooks/useAuthQueries'
+import { useToast } from '@/hooks/useToast'
+import { setAuthTokens } from '@/lib/httpClient'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const LoginPage = () => {
   const navigate = useNavigate()
+  const { toasts, addToast } = useToast()
+  const { mutate: login, isPending } = useLogin()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -29,9 +35,18 @@ export const LoginPage = () => {
 
   const handleSubmit = () => {
     if (!isValid) return
-    // TODO: API 연동 시 자체 로그인 요청으로 교체
-    // TODO: 서버 응답 실패 시 "이메일 또는 비밀번호가 일치하지 않아요." 에러 표시
-    alert(`로그인 시도: ${email}`)
+    login(
+      { email, password },
+      {
+        onSuccess: (data) => {
+          setAuthTokens(data.accessToken, data.refreshToken)
+          navigate('/')
+        },
+        onError: () => {
+          addToast('이메일 또는 비밀번호가 일치하지 않아요.')
+        },
+      },
+    )
   }
 
   const handleGoogleLogin = () => {
@@ -91,7 +106,13 @@ export const LoginPage = () => {
               비밀번호 찾기
             </button>
           </div>
-          <TextButton type="submit" variant="fill" size="large" fullWidth disabled={!isValid}>
+          <TextButton
+            type="submit"
+            variant="fill"
+            size="large"
+            fullWidth
+            disabled={!isValid || isPending}
+          >
             로그인 하기
           </TextButton>
         </form>
@@ -130,6 +151,8 @@ export const LoginPage = () => {
           </button>
         </div>
       </div>
+
+      <ToastContainer toasts={toasts} />
     </div>
   )
 }
