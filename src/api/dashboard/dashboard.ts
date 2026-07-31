@@ -1,5 +1,6 @@
 import { request } from '@/lib/httpClient'
 import type {
+  AiDashboardResultDto,
   CreateDashboardPayload,
   CreateReflectionPayload,
   DashboardDetailDto,
@@ -24,14 +25,6 @@ export async function getDashboards(): Promise<DashboardListItemDto[]> {
 /* GET /dashboards/{dashboardId} — 주간 대시보드 상세 조회 (미존재 시 ApiError throw) */
 export async function getDashboardDetail(dashboardId: string): Promise<DashboardDetailDto> {
   return request<DashboardDetailDto>(`/dashboards/${dashboardId}`)
-}
-/* POST /dashboards — 주간 대시보드 생성(AI). LLM 호출로 처리 시간이 길어 타임아웃 연장 */
-export async function createDashboard(payload: CreateDashboardPayload): Promise<string> {
-  return request<string>('/dashboards', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(120_000), // Nginx AI API 타임아웃(120초)에 맞춤
-  })
 }
 
 /* POST /dashboards/{dashboardId}/reflection — 주간회고 작성 */
@@ -73,17 +66,6 @@ export async function getMonthlyDashboardDetail(dashboardId: string): Promise<Da
   return request<DashboardDetailDto>(`/dashboards/monthly/${dashboardId}`)
 }
 
-/* POST /dashboards/monthly — 월간 대시보드 생성(AI). 응답은 상세 객체 */
-export async function createMonthlyDashboard(
-  payload: CreateDashboardPayload,
-): Promise<DashboardDetailDto> {
-  return request<DashboardDetailDto>('/dashboards/monthly', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(120_000), // Nginx AI API 타임아웃(120초)에 맞춤
-  })
-}
-
 /* POST /dashboards/monthly/{dashboardId}/reflection — 월간 회고 작성 (수정 API 명세 부재) */
 export async function createMonthlyReflection(
   dashboardId: string,
@@ -92,5 +74,27 @@ export async function createMonthlyReflection(
   return request<MonthlyReflectionResultDto>(`/dashboards/monthly/${dashboardId}/reflection`, {
     method: 'POST',
     body: JSON.stringify(payload),
+  })
+}
+
+/* POST /ai/dashboard/weekly — 주간 대시보드 AI 생성. LLM 호출로 처리 시간이 길어 타임아웃 연장 */
+export async function createDashboard(
+  payload: CreateDashboardPayload,
+): Promise<AiDashboardResultDto> {
+  return request<AiDashboardResultDto>('/ai/dashboard/weekly', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(120_000),
+  })
+}
+
+/* POST /ai/dashboard/monthly — 월간 대시보드 AI 생성 */
+export async function createMonthlyDashboard(
+  payload: CreateDashboardPayload,
+): Promise<AiDashboardResultDto> {
+  return request<AiDashboardResultDto>('/ai/dashboard/monthly', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(120_000),
   })
 }

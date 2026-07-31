@@ -167,7 +167,7 @@ export const DashboardPage = () => {
     }
     setGeneration('generating')
     createDashboard({ startDate: weekRange.start, endDate: weekRange.end })
-      .then((dashboardId) => getDashboardDetail(dashboardId))
+      .then((created) => getDashboardDetail(created.dashboardId))
       .then((res) => {
         setDetail(res)
         setGeneration('complete')

@@ -140,3 +140,23 @@ export interface MonthlyReflectionResultDto {
   learning: string
   createdAt: string
 }
+
+export interface AiTagAnalysisDto {
+  tagName: string
+  objective: string
+  expectedOutcome: string
+  achievementStatus: string
+  insight: string
+}
+
+export interface AiDashboardResultDto {
+  dashboardId: string
+  startDate: string
+  endDate: string
+  summary: string
+  journalDays: number
+  performanceCount: number
+  tagCount: number
+  kpis: { kpiName: string; progress: string }[]
+  tagAnalyses: AiTagAnalysisDto[]
+}
