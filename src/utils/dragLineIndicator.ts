@@ -51,6 +51,71 @@ function groupIntoRowPairs(rows: RowSnapshot[], columnRects: DOMRect[]): RowPair
   }))
 }
 
+function computeSingleColumnLineIndicator(
+  rows: RowSnapshot[],
+  columnRect: DOMRect,
+  pointerY: number,
+): LineIndicatorResult {
+  const sortedRows = [...rows].sort((a, b) => a.rect.top - b.rect.top)
+
+  if (sortedRows.length === 0) {
+    return {
+      itemId: null,
+      insertAfter: false,
+      line: {
+        top: columnRect.top,
+        left: columnRect.left,
+        width: columnRect.width,
+        height: LINE_THICKNESS,
+      },
+    }
+  }
+
+  const candidates: Candidate[] = []
+  const firstRow = sortedRows[0]
+
+  candidates.push({
+    center: firstRow.rect.top - NEW_ROW_GAP,
+    result: {
+      itemId: firstRow.id,
+      insertAfter: false,
+      line: {
+        top: firstRow.rect.top - LINE_GAP - LINE_THICKNESS,
+        left: firstRow.rect.left,
+        width: firstRow.rect.width,
+        height: LINE_THICKNESS,
+      },
+    },
+  })
+
+  sortedRows.forEach((row, index) => {
+    const nextRow = sortedRows[index + 1]
+    const center = nextRow
+      ? (row.rect.bottom + nextRow.rect.top) / 2
+      : row.rect.bottom + NEW_ROW_GAP
+
+    candidates.push({
+      center,
+      result: {
+        itemId: row.id,
+        insertAfter: true,
+        line: {
+          top: row.rect.bottom + LINE_GAP,
+          left: row.rect.left,
+          width: row.rect.width,
+          height: LINE_THICKNESS,
+        },
+      },
+    })
+  })
+
+  return candidates.reduce((closest, candidate) =>
+    Math.abs(pointerY - candidate.center) < Math.abs(pointerY - closest.center)
+      ? candidate
+      : closest,
+  ).result
+}
+
 /* 카드 없음→가로선, 행에 1개→옆 세로선, 꽉 찬 행 사이→세로선, 행 앞(맨 앞 포함)→세로선, 맨 뒤 새 행→가로선 */
 export function computeLineIndicator(
   rows: RowSnapshot[],
@@ -61,6 +126,10 @@ export function computeLineIndicator(
   const leftColumn = columnRects[0]
   const rightColumn = columnRects[1]
   if (!leftColumn) return { itemId: null, insertAfter: false, line: null }
+
+  if (!rightColumn || rightColumn.left < leftColumn.right) {
+    return computeSingleColumnLineIndicator(rows, leftColumn, pointerY)
+  }
 
   if (rows.length === 0) {
     return {

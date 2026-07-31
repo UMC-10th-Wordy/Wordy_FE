@@ -8,6 +8,7 @@ interface PrioritySectionProps {
   title: string
   description: string
   sectionTasks: Task[]
+  isNarrow?: boolean
   draggingTask: Task | null
   startDrag: (id: string) => (event: MouseEvent<HTMLButtonElement>) => void
   isTaskExpanded: (id: string) => boolean
@@ -24,6 +25,7 @@ export function PrioritySection({
   title,
   description,
   sectionTasks,
+  isNarrow,
   draggingTask,
   startDrag,
   isTaskExpanded,
@@ -67,20 +69,26 @@ export function PrioritySection({
           {description}
         </p>
       </div>
-      <div className="flex w-full flex-wrap items-start gap-4">
-        <div
-          className="flex min-h-2 min-w-[718px] flex-1 flex-col gap-4"
-          data-drag-section-drop={priorityKey}
-        >
-          {leftColumn.map(renderEntry)}
+      {isNarrow ? (
+        <div className="flex min-h-2 w-full flex-col gap-4" data-drag-section-drop={priorityKey}>
+          {sectionTasks.map(renderEntry)}
         </div>
-        <div
-          className="flex min-h-2 min-w-[718px] flex-1 flex-col gap-4"
-          data-drag-section-drop={priorityKey}
-        >
-          {rightColumn.map(renderEntry)}
+      ) : (
+        <div className="flex w-full flex-wrap items-start gap-4">
+          <div
+            className="flex min-h-2 min-w-[718px] flex-1 flex-col gap-4"
+            data-drag-section-drop={priorityKey}
+          >
+            {leftColumn.map(renderEntry)}
+          </div>
+          <div
+            className="flex min-h-2 min-w-[718px] flex-1 flex-col gap-4"
+            data-drag-section-drop={priorityKey}
+          >
+            {rightColumn.map(renderEntry)}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

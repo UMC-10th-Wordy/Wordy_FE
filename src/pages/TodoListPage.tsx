@@ -691,6 +691,7 @@ export default function TodoListPage() {
                         title="Must do"
                         description="반드시 오늘 끝낼 거예요"
                         sectionTasks={mustDoTasks}
+                        isNarrow={isPreviewOpen}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
                         isTaskExpanded={isTaskExpanded}
@@ -705,6 +706,7 @@ export default function TodoListPage() {
                         title="Should do"
                         description="가능하면 오늘 완료할 거예요"
                         sectionTasks={shouldDoTasks}
+                        isNarrow={isPreviewOpen}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
                         isTaskExpanded={isTaskExpanded}
@@ -719,6 +721,7 @@ export default function TodoListPage() {
                         title="Could do"
                         description="여유가 있으면 진행할 거예요"
                         sectionTasks={couldDoTasks}
+                        isNarrow={isPreviewOpen}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
                         isTaskExpanded={isTaskExpanded}
