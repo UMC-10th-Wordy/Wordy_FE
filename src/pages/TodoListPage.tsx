@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import TaskForm from '@/components/todo/TaskForm'
 import TodoTabs from '@/components/todo/TodoTabs'
@@ -64,6 +64,27 @@ import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
 
+const ACTIVE_TAB_STORAGE_KEY = 'todo-active-tab'
+
+const readStoredActiveTab = (dateKey: string): TodoFilter => {
+  try {
+    const stored = JSON.parse(sessionStorage.getItem(ACTIVE_TAB_STORAGE_KEY) ?? 'null') as {
+      date: string
+      tab: TodoFilter
+    } | null
+    if (
+      stored &&
+      stored.date === dateKey &&
+      (stored.tab === 'completed' || stored.tab === 'incomplete')
+    ) {
+      return stored.tab
+    }
+    return 'incomplete'
+  } catch {
+    return 'incomplete'
+  }
+}
+
 const parseGrowthInsights = (insight: string): string[] => {
   return insight
     .split('\n')
@@ -73,8 +94,10 @@ const parseGrowthInsights = (insight: string): string[] => {
 
 export default function TodoListPage() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<TodoFilter>('incomplete')
   const [currentDate, setCurrentDate] = useState(() => new Date())
+  const [activeTab, setActiveTab] = useState<TodoFilter>(() =>
+    readStoredActiveTab(toDateKey(new Date())),
+  )
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
   const [tasks, setTasks] = useState<Task[]>([])
   const [loadedDateKey, setLoadedDateKey] = useState<string | null>(null)
@@ -83,6 +106,24 @@ export default function TodoListPage() {
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
 
   const currentDateKey = toDateKey(currentDate)
+  const previousDateKeyRef = useRef(currentDateKey)
+
+  useEffect(() => {
+    if (previousDateKeyRef.current === currentDateKey) return
+    previousDateKeyRef.current = currentDateKey
+    setActiveTab('incomplete')
+  }, [currentDateKey])
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        ACTIVE_TAB_STORAGE_KEY,
+        JSON.stringify({ date: currentDateKey, tab: activeTab }),
+      )
+    } catch {
+      return
+    }
+  }, [activeTab, currentDateKey])
 
   const taskListRef = useRef<HTMLDivElement>(null)
   const pendingToggleIds = useRef<Set<string>>(new Set())
@@ -661,6 +702,7 @@ export default function TodoListPage() {
                         title="Must do"
                         description="반드시 오늘 끝낼 거예요"
                         sectionTasks={mustDoTasks}
+                        isNarrow={isPreviewOpen}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
                         isTaskExpanded={isTaskExpanded}
@@ -675,6 +717,7 @@ export default function TodoListPage() {
                         title="Should do"
                         description="가능하면 오늘 완료할 거예요"
                         sectionTasks={shouldDoTasks}
+                        isNarrow={isPreviewOpen}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
                         isTaskExpanded={isTaskExpanded}
@@ -689,6 +732,7 @@ export default function TodoListPage() {
                         title="Could do"
                         description="여유가 있으면 진행할 거예요"
                         sectionTasks={couldDoTasks}
+                        isNarrow={isPreviewOpen}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
                         isTaskExpanded={isTaskExpanded}
