@@ -204,12 +204,12 @@ export const WeeklyRetrospective = ({
     : 0
 
   return (
-    <section className="flex flex-col gap-6 rounded-2xl border border-(--color-border-subtle) bg-(--color-bg-default) p-7">
+    <section className="flex flex-col gap-6 rounded-2xl border bg-(--color-bg-default) p-7 border-[#DDDDFF] shadow-[0px_1px_5px_0px_#0000001A]">
       <div className="flex flex-col gap-1">
-        <h2 className="[font-size:var(--font-size-body-2)] font-bold text-(--color-text-default)">
+        <h2 className="[font-size:var(--font-size-body-1)] leading-[1.6] font-semibold text-(--color-text-default)">
           {texts.title}
         </h2>
-        <p className="[font-size:var(--font-size-body-4)] text-(--color-text-tertiary)">
+        <p className="[font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-tertiary)">
           {texts.description}
         </p>
       </div>
