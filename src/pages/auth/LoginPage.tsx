@@ -11,7 +11,7 @@ import { GOOGLE_AUTH_URL } from '@/api/auth/auth'
 import { getHome, homeQueryKeys } from '@/api/home/home'
 import { useLogin } from '@/hooks/useAuthQueries'
 import { useToast } from '@/hooks/useToast'
-import { ApiError, markAuthenticated, storeAuthTokens } from '@/lib/httpClient'
+import { ApiError, clearAuthTokens, markAuthenticated, storeAuthTokens } from '@/lib/httpClient'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -55,6 +55,7 @@ export const LoginPage = () => {
             markAuthenticated()
             navigate('/')
           } catch {
+            clearAuthTokens()
             addToast('로그인 처리 중 오류가 발생했어요. 다시 시도해 주세요.')
           }
         },

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useGoogleCallback } from '@/hooks/useAuthQueries'
 import { getHome, homeQueryKeys } from '@/api/home/home'
-import { setAuthTokens } from '@/lib/httpClient'
+import { clearAuthTokens, markAuthenticated, storeAuthTokens } from '@/lib/httpClient'
 
 export const GoogleCallbackPage = () => {
   const navigate = useNavigate()
@@ -27,11 +27,22 @@ export const GoogleCallbackPage = () => {
     if (!isSuccess || !data) return
 
     if (data.status === 'login') {
-      setAuthTokens(data.accessToken, data.refreshToken)
-      // 홈 데이터를 미리 캐싱해 이동 직후 Suspense 로딩 화면이 깜빡이지 않도록 함
-      queryClient
-        .prefetchQuery({ queryKey: homeQueryKeys.all, queryFn: getHome })
-        .finally(() => navigate('/', { replace: true }))
+      // 토큰만 먼저 저장하고, 인증 상태 플래그는 홈 데이터 캐싱 후에 바꿔
+      // GuestRoute가 그 즉시 반응해서 홈으로 리다이렉트되며 Suspense가 깜빡이는 것을 막음
+      storeAuthTokens(data.accessToken, data.refreshToken)
+      // 홈 데이터와 홈 페이지 청크를 함께 미리 받아둬서 이동 직후 로딩 표시가 뜨지 않게 함
+      Promise.all([
+        queryClient.prefetchQuery({ queryKey: homeQueryKeys.all, queryFn: getHome }),
+        import('@/pages/HomePage'),
+      ])
+        .then(() => {
+          markAuthenticated()
+          navigate('/', { replace: true })
+        })
+        .catch(() => {
+          clearAuthTokens()
+          navigate('/login', { replace: true })
+        })
     } else {
       navigate('/social-signup', {
         replace: true,
