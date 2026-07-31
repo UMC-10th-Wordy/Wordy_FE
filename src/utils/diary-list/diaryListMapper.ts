@@ -187,7 +187,7 @@ const mapDailyEntryResultFiles = (task: DailyEntryDetailTask): TaskResultFile[] 
   }
 
   return result.attachments
-    .filter((attachment) => attachment.fileType === 'file')
+    .filter((attachment) => attachment.fileType === 'FILE')
     .map((attachment, index) => ({
       id: createAttachmentId(result.taskResultId, attachment, index),
       name: attachment.fileName,
@@ -203,7 +203,7 @@ const mapDailyEntryResultImages = (task: DailyEntryDetailTask): TaskResultImage[
   }
 
   return result.attachments
-    .filter((attachment) => attachment.fileType === 'img')
+    .filter((attachment) => attachment.fileType === 'IMG')
     .map((attachment, index) => ({
       id: createAttachmentId(result.taskResultId, attachment, index),
       name: attachment.fileName,
