@@ -25,6 +25,8 @@ import type { ProjectTagColor } from './ProjectTag'
 import type { TaskTag } from '@/types/todo'
 import { createTag, deleteTag, getTagDetail, updateTag } from '@/api/tag/tag'
 import { getTagKey, mapDraftToCreatePayload, mapTagDtoToTaskTag } from '@/utils/tagMapper'
+import { getKpiRecommendations } from '@/api/ai/ai'
+import { useGetProfile } from '@/hooks/useUserQueries'
 
 type Tab = 'existing' | 'new'
 
@@ -88,6 +90,8 @@ export default function TagSettingsModal({
 }: TagSettingsModalProps) {
   const [tab, setTab] = useState<Tab>(initialTab)
   const containerRef = useModalFocus<HTMLDivElement>()
+  const { data: profile, isLoading: isProfileLoading } = useGetProfile()
+  const overlayMouseDownRef = useRef(false)
 
   // 기존 태그 탭
   const [searchQuery, setSearchQuery] = useState('')
@@ -115,6 +119,7 @@ export default function TagSettingsModal({
     endDate: '',
     kpis: [''],
   })
+  const [isEditAiGenerating, setIsEditAiGenerating] = useState(false)
   const [showEditColorPicker, setShowEditColorPicker] = useState(false)
   const [showEditStartDatePicker, setShowEditStartDatePicker] = useState(false)
   const [showEditEndDatePicker, setShowEditEndDatePicker] = useState(false)
@@ -285,15 +290,51 @@ export default function TagSettingsModal({
     setShowEditEndDatePicker(false)
   }
 
-  // API 연동 시:
-  // 1. setTimeout 대신 실제 API 호출로 교체: await apiClient.getAiKpiSuggestions({ ... })
-  // 2. setNewKpis(['...']) 의 배열을 API 응답값(string[])으로 교체
+  const getPeriodLabel = (startDate: string, endDate: string) => {
+    if (!startDate || !endDate) return '4주'
+    const diffDays = Math.round(
+      (new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24),
+    )
+    const weeks = Math.max(1, Math.ceil((diffDays + 1) / 7))
+    return `${weeks}주`
+  }
+
   const handleAiRecommend = async () => {
     setIsAiGenerating(true)
-    await new Promise((r) => setTimeout(r, 1500))
-    // API 연동 시 아래 mock 배열을 응답값(string[])으로 교체 (AI는 3-4개 반환)
-    setNewKpis(['온보딩 완료율', '첫 주 핵심 기능 도달률', '사용자 이탈률'])
-    setIsAiGenerating(false)
+    try {
+      const { kpiRecommendations } = await getKpiRecommendations({
+        tagName: newLabel.trim(),
+        projectName: newProjectName.trim(),
+        goal: newPurpose.trim(),
+        expectedOutcome: newOutcome.trim(),
+        period: getPeriodLabel(newStartDate, newEndDate),
+        userJob: profile?.jobRole ?? 'ETC',
+      })
+      setNewKpis(kpiRecommendations)
+    } catch {
+      return
+    } finally {
+      setIsAiGenerating(false)
+    }
+  }
+
+  const handleEditAiRecommend = async () => {
+    setIsEditAiGenerating(true)
+    try {
+      const { kpiRecommendations } = await getKpiRecommendations({
+        tagName: editDraft.label.trim(),
+        projectName: editDraft.projectName.trim(),
+        goal: editDraft.purpose.trim(),
+        expectedOutcome: editDraft.expectedOutcome.trim(),
+        period: getPeriodLabel(editDraft.startDate, editDraft.endDate),
+        userJob: profile?.jobRole ?? 'ETC',
+      })
+      setEditDraft((d) => ({ ...d, kpis: kpiRecommendations }))
+    } catch {
+      return
+    } finally {
+      setIsEditAiGenerating(false)
+    }
   }
 
   const handleKpiChange = (index: number, value: string) =>
@@ -338,8 +379,12 @@ export default function TagSettingsModal({
   const modal = createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-(--color-bg-overlay) backdrop-blur-xs"
+      onMouseDown={(e) => {
+        overlayMouseDownRef.current = e.target === e.currentTarget
+      }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
+        if (overlayMouseDownRef.current && e.target === e.currentTarget) onClose()
+        overlayMouseDownRef.current = false
       }}
     >
       <div
@@ -690,46 +735,53 @@ export default function TagSettingsModal({
                                           size="small"
                                           className="w-26.75 shrink-0 [font-size:var(--font-size-body-4)]"
                                           iconLeft={<GenerateIcon aria-hidden className="size-5" />}
+                                          disabled={isEditAiGenerating || isProfileLoading}
+                                          onClick={handleEditAiRecommend}
                                         >
                                           AI 추천 받기
                                         </TextButton>
                                       </div>
-                                      {editDraft.kpis.map((kpi, i) => (
-                                        <Input1
-                                          key={i}
-                                          type="text"
-                                          placeholder="핵심 평가 지표를 입력해 주세요"
-                                          value={kpi}
-                                          onChange={(e) =>
-                                            setEditDraft((d) => ({
-                                              ...d,
-                                              kpis: d.kpis.map((k, ki) =>
-                                                ki === i ? e.target.value : k,
-                                              ),
-                                            }))
-                                          }
-                                          endAdornment={
-                                            <button
-                                              type="button"
-                                              aria-label="KPI 삭제"
-                                              onClick={() =>
-                                                setEditDraft((d) => ({
-                                                  ...d,
-                                                  kpis: d.kpis.filter((_, ki) => ki !== i),
-                                                }))
-                                              }
-                                              className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-icon-secondary)"
-                                            >
-                                              <TrashIcon aria-hidden className="size-6" />
-                                            </button>
-                                          }
-                                        />
-                                      ))}
+                                      {isEditAiGenerating ? (
+                                        <AiLoadingDots />
+                                      ) : (
+                                        editDraft.kpis.map((kpi, i) => (
+                                          <Input1
+                                            key={i}
+                                            type="text"
+                                            placeholder="핵심 평가 지표를 입력해 주세요"
+                                            value={kpi}
+                                            onChange={(e) =>
+                                              setEditDraft((d) => ({
+                                                ...d,
+                                                kpis: d.kpis.map((k, ki) =>
+                                                  ki === i ? e.target.value : k,
+                                                ),
+                                              }))
+                                            }
+                                            endAdornment={
+                                              <button
+                                                type="button"
+                                                aria-label="KPI 삭제"
+                                                onClick={() =>
+                                                  setEditDraft((d) => ({
+                                                    ...d,
+                                                    kpis: d.kpis.filter((_, ki) => ki !== i),
+                                                  }))
+                                                }
+                                                className="flex size-6 shrink-0 items-center justify-center text-(--color-icon-tertiary) transition-colors duration-100 ease-out hover:text-(--color-icon-secondary)"
+                                              >
+                                                <TrashIcon aria-hidden className="size-6" />
+                                              </button>
+                                            }
+                                          />
+                                        ))
+                                      )}
                                       <TextButton
                                         variant="stroke"
                                         size="small"
                                         fullWidth
                                         className="[font-size:var(--font-size-body-4)]"
+                                        disabled={isEditAiGenerating}
                                         onClick={() =>
                                           setEditDraft((d) => ({ ...d, kpis: [...d.kpis, ''] }))
                                         }
@@ -753,7 +805,7 @@ export default function TagSettingsModal({
                                         size="medium"
                                         className="w-35 [font-size:var(--font-size-body-3)]"
                                         onClick={handleConfirmEdit}
-                                        disabled={!hasEditChanges()}
+                                        disabled={!hasEditChanges() || isEditAiGenerating}
                                       >
                                         수정하기
                                       </TextButton>
@@ -989,7 +1041,7 @@ export default function TagSettingsModal({
                       size="small"
                       className="w-26.75 [font-size:var(--font-size-body-4)]"
                       iconLeft={<GenerateIcon aria-hidden className="size-5" />}
-                      disabled={isAiGenerating}
+                      disabled={isAiGenerating || isProfileLoading}
                       onClick={handleAiRecommend}
                     >
                       AI 추천 받기
@@ -1023,6 +1075,7 @@ export default function TagSettingsModal({
                     size="small"
                     fullWidth
                     className="[font-size:var(--font-size-body-4)]"
+                    disabled={isAiGenerating}
                     onClick={() => setNewKpis((prev) => [...prev, ''])}
                     iconLeft={<PlusIcon aria-hidden className="size-5" />}
                   >
@@ -1056,7 +1109,7 @@ export default function TagSettingsModal({
               variant="fill"
               size="medium"
               className="w-35 [font-size:var(--font-size-body-3)]"
-              disabled={!canAddNewTag}
+              disabled={!canAddNewTag || isAiGenerating}
               onClick={handleAddTag}
             >
               태그 추가하기
