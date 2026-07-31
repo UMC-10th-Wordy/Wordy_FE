@@ -1,18 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError, clearAuthTokens, getRefreshToken, request, setAuthTokens } from './httpClient'
 
-const jsonResponse = (status: number, body: unknown) => ({
-  ok: status >= 200 && status < 300,
-  status,
-  text: async () => JSON.stringify(body),
-  json: async () => body,
-})
+const jsonResponse = (status: number, body: unknown) =>
+  ({
+    ok: status >= 200 && status < 300,
+    status,
+    text: async () => JSON.stringify(body),
+    json: async () => body,
+  }) as unknown as Response
 
-const emptyResponse = (status: number) => ({
-  ok: status >= 200 && status < 300,
-  status,
-  text: async () => '',
-})
+const emptyResponse = (status: number) =>
+  ({
+    ok: status >= 200 && status < 300,
+    status,
+    text: async () => '',
+  }) as unknown as Response
 
 describe('httpClient', () => {
   beforeEach(() => {
