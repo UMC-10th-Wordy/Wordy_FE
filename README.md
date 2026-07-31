@@ -30,6 +30,7 @@ UMC 10th Wordy 프로젝트 프론트엔드
 - [시작하기](#시작하기)
 - [환경 변수](#환경-변수)
 - [스크립트](#스크립트)
+- [테스트](#테스트)
 - [구현 화면](#구현-화면)
 - [API 연동 현황](#api-연동-현황)
 - [협업 규칙](#협업-규칙)
@@ -39,6 +40,7 @@ UMC 10th Wordy 프로젝트 프론트엔드
 - React 19 + TypeScript
 - React Router
 - TanStack Query
+- zustand
 - Vite 8
 - Tailwind CSS v4
 - Framer Motion
@@ -46,6 +48,7 @@ UMC 10th Wordy 프로젝트 프론트엔드
 - pdfjs-dist
 - ESLint + Prettier
 - Husky + Commitlint
+- Vitest + Testing Library
 
 ## 팀원 및 역할 분담
 
@@ -71,7 +74,9 @@ src/
 ├── mocks/           # Mock 데이터
 ├── pages/           # 라우트 단위 페이지
 ├── router/          # 라우트 설정
+├── store/           # 전역 상태 (zustand)
 ├── styles/          # 전역 스타일
+├── test/            # 테스트 공통 셋업
 ├── types/           # TypeScript 타입 정의
 └── utils/           # 유틸 함수
 ```
@@ -147,7 +152,7 @@ Monthly 탭
 
 ### 요구 사항
 
-- Node.js 20 이상
+- Node.js 24 이상
 - pnpm
 
 ### 설치 및 실행
@@ -177,15 +182,30 @@ cp .env.example .env
 
 ## 스크립트
 
-| 명령어            | 설명                    |
-| ----------------- | ----------------------- |
-| `pnpm dev`        | 개발 서버 실행          |
-| `pnpm build`      | 프로덕션 빌드           |
-| `pnpm check`      | 포맷팅 + 린트 자동 수정 |
-| `pnpm lint`       | 린트 검사               |
-| `pnpm format`     | 포맷팅                  |
-| `pnpm type-check` | 타입 체크               |
-| `pnpm preview`    | 빌드 결과 로컬 미리보기 |
+| 명령어               | 설명                    |
+| -------------------- | ----------------------- |
+| `pnpm dev`           | 개발 서버 실행          |
+| `pnpm build`         | 프로덕션 빌드           |
+| `pnpm check`         | 포맷팅 + 린트 자동 수정 |
+| `pnpm lint`          | 린트 검사               |
+| `pnpm format`        | 포맷팅                  |
+| `pnpm type-check`    | 타입 체크               |
+| `pnpm preview`       | 빌드 결과 로컬 미리보기 |
+| `pnpm test`          | 테스트 실행             |
+| `pnpm test:watch`    | 테스트 watch 모드       |
+| `pnpm test:coverage` | 테스트 커버리지 측정    |
+
+## 테스트
+
+Vitest + React Testing Library로 유닛 테스트를 작성합니다.
+
+- 공통 셋업은 `src/test/setup.ts`에 있습니다.
+- 테스트 파일은 대상 파일과 같은 위치에 `*.test.ts(x)`로 둡니다. (예: `src/lib/httpClient.test.ts`)
+- 실행 환경은 `.nvmrc` 기준 Node 24입니다. jsdom이 요구하는 Node 내부 API 때문에 Node 20 이하에서는 테스트가 정상 동작하지 않습니다.
+
+```bash
+pnpm test
+```
 
 ## 구현 화면
 
