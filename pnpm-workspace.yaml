@@ -4,5 +4,5 @@ overrides:
   tldts-core: '7.4.9'
   magicast: '0.5.3'
 
-onlyBuiltDependencies:
-  - msw
+allowBuilds:
+  msw: true
