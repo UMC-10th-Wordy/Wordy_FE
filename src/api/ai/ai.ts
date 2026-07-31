@@ -5,11 +5,12 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL
 const TEMP_ACCESS_TOKEN = import.meta.env.DEV ? import.meta.env.VITE_TEMP_ACCESS_TOKEN : undefined
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const accessToken = localStorage.getItem('accessToken') ?? TEMP_ACCESS_TOKEN
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...(TEMP_ACCESS_TOKEN ? { Authorization: `Bearer ${TEMP_ACCESS_TOKEN}` } : {}),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...options?.headers,
     },
   })
