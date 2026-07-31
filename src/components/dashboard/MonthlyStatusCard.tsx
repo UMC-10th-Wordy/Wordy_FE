@@ -7,12 +7,14 @@ import { WordyGeneratingAnimation } from './WordyGeneratingAnimation'
 interface MonthlyStatusCardProps {
   status: 'insufficient' | 'ready' | 'generating'
   generatedCount: number
+  requiredCount: number
   onGenerate: () => void
 }
 
 export const MonthlyStatusCard = ({
   status,
   generatedCount,
+  requiredCount,
   onGenerate,
 }: MonthlyStatusCardProps) => {
   return (
@@ -29,7 +31,7 @@ export const MonthlyStatusCard = ({
               <br />
               월간 대시보드는{' '}
               <span className="font-semibold text-(--color-text-brand)">
-                최소 3개의 주간 대시보드 내용을 바탕으로
+                최소 {requiredCount}개의 주간 대시보드 내용을 바탕으로
               </span>{' '}
               생성돼요.
             </p>
