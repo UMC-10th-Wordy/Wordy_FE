@@ -16,7 +16,12 @@ export const useMoveTaskToTomorrow = () => {
         taskDate,
       }),
 
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      queryClient.removeQueries({
+        queryKey: taskQueryKeys.list(variables.taskDate),
+        exact: true,
+      })
+
       void queryClient.invalidateQueries({
         queryKey: taskQueryKeys.all,
       })
