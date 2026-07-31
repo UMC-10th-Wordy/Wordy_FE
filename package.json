@@ -69,5 +69,12 @@
     "*.{js,json,css,md}": [
       "prettier --write"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      "tldts": "7.4.9",
+      "tldts-core": "7.4.9",
+      "magicast": "0.5.3"
+    }
   }
 }
