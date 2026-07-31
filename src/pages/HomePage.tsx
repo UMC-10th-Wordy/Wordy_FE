@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useGetHome } from '@/hooks/useHomeQueries'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { HomeBanner } from '@/components/home/HomeBanner/HomeBanner'
@@ -23,11 +23,19 @@ export function HomePage({ className, ...rest }: HomePageProps) {
   const navigate = useNavigate()
   const { data } = useGetHome()
 
-  if (data.screenType === 'landing') {
-    return <Navigate to="/landing" replace />
-  }
-
-  const { userName, todayTasks, streakDays, weekRecords, weekTasks, recentRecord } = data
+  // /landing은 로그인하지 않은 첫 방문자 전용 페이지라 인증된 유저는 리다이렉트하지 않고
+  // 데이터가 비어있는 대시보드로 보여줌
+  const { userName, todayTasks, streakDays, weekRecords, weekTasks, recentRecord } =
+    data.screenType === 'dashboard'
+      ? data
+      : {
+          userName: undefined,
+          todayTasks: [],
+          streakDays: 0,
+          weekRecords: [],
+          weekTasks: [],
+          recentRecord: null,
+        }
   const today = new Date()
   const todayLabel = `${today.getMonth() + 1}월 ${today.getDate()}일 ${WEEK_DAYS[today.getDay()]}요일`
 
