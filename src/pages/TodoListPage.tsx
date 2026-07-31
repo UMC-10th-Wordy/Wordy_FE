@@ -176,28 +176,15 @@ export default function TodoListPage() {
   }
 
   const handleAddTask = async (values: TaskDraftValues) => {
-    if (!values.tag?.id) {
-      const newTask: Task = {
-        id: crypto.randomUUID(),
-        date: currentDateKey,
-        title: values.title,
-        memo: values.memo,
-        tag: values.tag,
-        priority: values.priority,
-        isCompleted: activeTab === 'completed',
-      }
-      setTasks((prev) => [...prev, newTask])
-      setIsTaskFormOpen(false)
-      return
-    }
     try {
       const created = await createTask(
         mapDraftToCreateTaskPayload({
           title: values.title,
           priority: values.priority,
           date: currentDateKey,
-          tagId: values.tag.id,
+          tagId: values.tag?.id,
           memo: values.memo,
+          isCompleted: activeTab === 'completed',
         }),
       )
       setTasks((prev) => [...prev, mapTaskDtoToTask(created)])
@@ -212,10 +199,7 @@ export default function TodoListPage() {
 
   const handleDeleteTask = async (id: string) => {
     const target = tasks.find((task) => task.id === id)
-    if (!target?.tag?.id) {
-      setTasks((prev) => prev.filter((task) => task.id !== id))
-      return
-    }
+    if (!target) return
     try {
       await deleteTask(id)
       setTasks((prev) => prev.filter((task) => task.id !== id))
@@ -229,22 +213,7 @@ export default function TodoListPage() {
 
   const handleEditTask = async (id: string, values: TaskDraftValues) => {
     const target = tasks.find((task) => task.id === id)
-    if (!target?.tag?.id || !values.tag?.id) {
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === id
-            ? {
-                ...task,
-                title: values.title,
-                memo: values.memo,
-                tag: values.tag,
-                priority: values.priority,
-              }
-            : task,
-        ),
-      )
-      return
-    }
+    if (!target) return
     try {
       const updated = await updateTask(
         id,
@@ -252,7 +221,7 @@ export default function TodoListPage() {
           title: values.title,
           priority: values.priority,
           date: target.date,
-          tagId: values.tag.id,
+          tagId: values.tag?.id,
           memo: values.memo,
           isCompleted: target.isCompleted,
         }),
@@ -286,21 +255,7 @@ export default function TodoListPage() {
 
   const handleSaveResult = async (id: string, values: TaskResultValues) => {
     const target = tasks.find((task) => task.id === id)
-    if (!target?.tag?.id) {
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === id
-            ? {
-                ...task,
-                result: values.result,
-                resultFiles: values.resultFiles,
-                resultImages: values.resultImages,
-              }
-            : task,
-        ),
-      )
-      return
-    }
+    if (!target) return
 
     const existingAttachmentIds = new Set(
       [...(target.resultFiles ?? []), ...(target.resultImages ?? [])]
@@ -390,14 +345,6 @@ export default function TodoListPage() {
     if (!target) return
     const nextCompleted = !target.isCompleted
 
-    if (!target.tag?.id) {
-      setTasks((prev) =>
-        prev.map((task) => (task.id === id ? { ...task, isCompleted: nextCompleted } : task)),
-      )
-      addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
-      return
-    }
-
     pendingToggleIds.current.add(id)
     try {
       await queryClient.cancelQueries({ queryKey: taskQueryKeys.list(target.date) })
@@ -407,7 +354,7 @@ export default function TodoListPage() {
           title: target.title,
           priority: target.priority,
           date: target.date,
-          tagId: target.tag.id,
+          tagId: target.tag?.id,
           memo: target.memo,
           isCompleted: nextCompleted,
         }),

@@ -29,11 +29,13 @@ export function mapTaskDtoToTask(dto: TaskDto): Task {
     date: dto.taskDate.slice(0, 10),
     title: dto.title,
     memo: dto.memo || undefined,
-    tag: {
-      id: dto.tag.tagId,
-      label: dto.tag.tagName,
-      color: hexToTagColor(dto.tag.color),
-    },
+    tag: dto.tag
+      ? {
+          id: dto.tag.tagId,
+          label: dto.tag.tagName,
+          color: hexToTagColor(dto.tag.color),
+        }
+      : undefined,
     priority: PRIORITY_FROM_API[dto.priority],
     isCompleted: dto.status === 'COMPLETED',
     taskResultId: resultValues?.taskResultId,
@@ -47,8 +49,9 @@ export interface NewTaskDraft {
   title: string
   priority: TaskPriority
   date: string
-  tagId: string
+  tagId?: string | null
   memo?: string
+  isCompleted?: boolean
 }
 
 export function mapDraftToCreateTaskPayload(draft: NewTaskDraft): CreateTaskPayload {
@@ -56,7 +59,8 @@ export function mapDraftToCreateTaskPayload(draft: NewTaskDraft): CreateTaskPayl
     title: draft.title,
     priority: PRIORITY_TO_API[draft.priority],
     taskDate: draft.date,
-    tagId: draft.tagId,
+    tagId: draft.tagId ?? null,
+    status: draft.isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
     memo: draft.memo,
   }
 }
@@ -65,7 +69,7 @@ export interface UpdateTaskDraft {
   title: string
   priority: TaskPriority
   date: string
-  tagId: string
+  tagId?: string | null
   memo?: string
   isCompleted: boolean
 }
@@ -76,7 +80,7 @@ export function mapDraftToUpdateTaskPayload(draft: UpdateTaskDraft): UpdateTaskP
     priority: PRIORITY_TO_API[draft.priority],
     status: draft.isCompleted ? 'COMPLETED' : 'IN_PROGRESS',
     taskDate: draft.date,
-    tagId: draft.tagId,
+    tagId: draft.tagId ?? null,
     memo: draft.memo,
   }
 }
@@ -116,16 +120,14 @@ export function mapTaskResultDtoToValues(dto: TaskResultDto): TaskResultDtoMappe
 
 export function mapTasksToReorderPayload(tasks: Task[]): ReorderTasksPayload {
   const counters: Record<TaskPriority, number> = { must: 0, should: 0, could: 0 }
-  const items = tasks
-    .filter((task) => task.tag?.id)
-    .map((task) => {
-      const sortOrder = counters[task.priority]
-      counters[task.priority] += 1
-      return {
-        taskId: task.id,
-        priority: PRIORITY_TO_API[task.priority],
-        sortOrder,
-      }
-    })
+  const items = tasks.map((task) => {
+    const sortOrder = counters[task.priority]
+    counters[task.priority] += 1
+    return {
+      taskId: task.id,
+      priority: PRIORITY_TO_API[task.priority],
+      sortOrder,
+    }
+  })
   return { tasks: items }
 }

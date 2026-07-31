@@ -23,8 +23,8 @@ export interface TaskDto {
   updatedAt: string
   deletedAt: string | null
   userId: string
-  tagId: string
-  tag: TaskTagSummaryDto
+  tagId: string | null
+  tag: TaskTagSummaryDto | null
   taskResult: TaskResultDto | null
 }
 
@@ -32,7 +32,8 @@ export interface CreateTaskPayload {
   title: string
   priority: ApiTaskPriority
   taskDate: string
-  tagId: string
+  tagId?: string | null
+  status?: ApiTaskStatus
   memo?: string
 }
 
@@ -41,7 +42,7 @@ export interface UpdateTaskPayload {
   priority: ApiTaskPriority
   status: ApiTaskStatus
   taskDate: string
-  tagId: string
+  tagId?: string | null
   memo?: string
 }
 
