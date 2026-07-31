@@ -18,7 +18,6 @@ interface MonthlyDashboardProps {
   eligibility: MonthlyEligibilityDto | null
   detail: DashboardDetailDto | null
   onReflectionSaved: () => void
-  requiredCount: number
 }
 
 const TAG_FALLBACK_COLORS: ProjectTagColor[] = ['green', 'pink', 'blue', 'orange']
@@ -64,10 +63,10 @@ export const MonthlyDashboard = ({
   eligibility,
   detail,
   onReflectionSaved,
-  requiredCount,
 }: MonthlyDashboardProps) => {
   const weeks = eligibility ? buildWeeks(eligibility) : []
   const generatedCount = eligibility?.weeklyDashboardCount ?? 0
+  const requiredCount = eligibility?.requiredCount ?? 3
 
   // 서버의 eligible 판정을 생성 조건으로 사용 (리뷰 반영)
   const status =
