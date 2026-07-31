@@ -23,10 +23,19 @@ export class ApiError extends Error {
 const ACCESS_TOKEN_KEY = 'accessToken'
 const REFRESH_TOKEN_KEY = 'refreshToken'
 
-export const setAuthTokens = (accessToken: string, refreshToken: string) => {
+// 토큰만 저장하고 인증 상태 플래그는 아직 바꾸지 않음 (GuestRoute 등 isAuthenticated 구독자의 즉시 리다이렉트를 미루고 싶을 때 사용)
+export const storeAuthTokens = (accessToken: string, refreshToken: string) => {
   localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
   localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+}
+
+export const markAuthenticated = () => {
   useAuthStore.getState().setAuthenticated(true)
+}
+
+export const setAuthTokens = (accessToken: string, refreshToken: string) => {
+  storeAuthTokens(accessToken, refreshToken)
+  markAuthenticated()
 }
 
 export const clearAuthTokens = () => {
