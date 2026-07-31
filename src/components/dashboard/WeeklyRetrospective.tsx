@@ -7,8 +7,11 @@ import EditIcon from '@/assets/icons/edit.svg?react'
 import TrashIcon from '@/assets/icons/trash.svg?react'
 import CheckIcon from '@/assets/icons/check-bold.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
-import { createReflection, updateReflection } from '@/api/dashboard/dashboard'
-
+import {
+  createMonthlyReflection,
+  createReflection,
+  updateReflection,
+} from '@/api/dashboard/dashboard'
 interface PlanRow {
   id: string
   content: string
@@ -161,17 +164,24 @@ export const WeeklyRetrospective = ({
       return
     }
     setIsSaving(true)
-    const request = reflectionId
-      ? updateReflection(dashboardId, reflectionId, {
-          workSummary: answers.work,
-          resourcesUsed: answers.resource,
-          learning: answers.learning,
-        })
-      : createReflection(dashboardId, {
-          workSummary: answers.work,
-          resourcesUsed: answers.resource,
-          learning: answers.learning,
-        })
+    const request =
+      period === 'monthly'
+        ? createMonthlyReflection(dashboardId, {
+            workSummary: answers.work,
+            resourcesUsed: answers.resource,
+            learning: answers.learning,
+          }).then((res) => res.weeklyReflectionId)
+        : reflectionId
+          ? updateReflection(dashboardId, reflectionId, {
+              workSummary: answers.work,
+              resourcesUsed: answers.resource,
+              learning: answers.learning,
+            })
+          : createReflection(dashboardId, {
+              workSummary: answers.work,
+              resourcesUsed: answers.resource,
+              learning: answers.learning,
+            })
     request
       .then((id) => {
         setReflectionId((prev) => prev ?? id)

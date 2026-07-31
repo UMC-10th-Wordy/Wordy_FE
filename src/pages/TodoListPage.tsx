@@ -32,14 +32,17 @@ import {
   deleteTask,
   getTaskDetail,
   reorderTasks,
+  saveTaskResult,
   taskQueryKeys,
   updateTask,
 } from '@/api/task/task'
+import { performanceQueryKeys } from '@/api/performance/performance'
 import { useGetTasksByDate, useMoveTaskToTomorrow } from '@/hooks/useTaskQueries'
 import {
   mapDraftToCreateTaskPayload,
   mapDraftToUpdateTaskPayload,
   mapTaskDtoToTask,
+  mapTaskResultDtoToValues,
   mapTasksToReorderPayload,
 } from '@/utils/taskMapper'
 import { getTagDetail } from '@/api/tag/tag'
@@ -47,6 +50,12 @@ import { useGetProfile } from '@/hooks/useUserQueries'
 import { usePerformancePreview } from '@/hooks/usePerformancePreview'
 import { usePerformanceQuestionChat } from '@/hooks/usePerformanceQuestionChat'
 import {
+  useGetPerformanceDetailQuery,
+  useGetPerformancesByDate,
+  useUpdatePerformance,
+} from '@/hooks/usePerformanceQueries'
+import {
+  mapPerformanceDetailResult,
   mapPerformancePreviewRequest,
   mapTagDtoToPerformanceProjectTag,
 } from '@/utils/performance-preview/performancePreviewMapper'
@@ -54,6 +63,13 @@ import type { TaskDto } from '@/types/task'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
+
+const parseGrowthInsights = (insight: string): string[] => {
+  return insight
+    .split('\n')
+    .map((line) => line.replace(/^-\s*/, '').trim())
+    .filter(Boolean)
+}
 
 export default function TodoListPage() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
@@ -65,12 +81,17 @@ export default function TodoListPage() {
   const [collapsedTaskIds, setCollapsedTaskIds] = useState<Set<string>>(new Set())
   const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
+
+  const currentDateKey = toDateKey(currentDate)
+
   const taskListRef = useRef<HTMLDivElement>(null)
+  const pendingToggleIds = useRef<Set<string>>(new Set())
   const { toasts, addToast } = useToast()
   const queryClient = useQueryClient()
   const { data: profile, isPending: isProfilePending } = useGetProfile()
   const performancePreview = usePerformancePreview()
   const moveTaskToTomorrowMutation = useMoveTaskToTomorrow()
+  const updatePerformanceMutation = useUpdatePerformance()
 
   const questionChat = usePerformanceQuestionChat({
     isActive: performancePreview.status === 'questioning',
@@ -82,9 +103,13 @@ export default function TodoListPage() {
     },
   })
 
-  const currentDateKey = toDateKey(currentDate)
-
   const { data: fetchedTasks } = useGetTasksByDate(currentDateKey)
+
+  const { data: performanceList } = useGetPerformancesByDate(currentDateKey)
+
+  const savedPerformanceId = performanceList?.performances?.[0]?.dailyPerformanceId ?? null
+
+  const { data: savedPerformanceDetail } = useGetPerformanceDetailQuery(savedPerformanceId)
 
   if (loadedDateKey !== currentDateKey) {
     setLoadedDateKey(currentDateKey)
@@ -93,6 +118,10 @@ export default function TodoListPage() {
 
   const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
   const retrospective = retrospectiveByDate[currentDateKey] ?? ''
+
+  const savedPerformanceResult = savedPerformanceDetail
+    ? mapPerformanceDetailResult(savedPerformanceDetail, tasksForDate)
+    : null
 
   const completedTasks = tasksForDate.filter((task) => task.isCompleted)
   const incompleteTasks = tasksForDate.filter((task) => !task.isCompleted)
@@ -190,29 +219,89 @@ export default function TodoListPage() {
       )
       const mappedUpdated = mapTaskDtoToTask(updated)
       setTasks((prev) =>
-        prev.map((task) => (task.id === id ? { ...task, ...mappedUpdated } : task)),
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                ...mappedUpdated,
+                taskResultId: task.taskResultId,
+                result: task.result,
+                resultFiles: task.resultFiles,
+                resultImages: task.resultImages,
+              }
+            : task,
+        ),
       )
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
-        prev ? prev.map((task) => (task.taskId === id ? updated : task)) : prev,
+        prev
+          ? prev.map((task) =>
+              task.taskId === id ? { ...updated, taskResult: task.taskResult } : task,
+            )
+          : prev,
       )
     } catch {
       addToast('업무 수정에 실패했어요. 다시 시도해 주세요')
     }
   }
 
-  const handleSaveResult = (id: string, values: TaskResultValues) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              result: values.result,
-              resultFiles: values.resultFiles,
-              resultImages: values.resultImages,
-            }
-          : task,
-      ),
+  const handleSaveResult = async (id: string, values: TaskResultValues) => {
+    const target = tasks.find((task) => task.id === id)
+    if (!target?.tag?.id) {
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                result: values.result,
+                resultFiles: values.resultFiles,
+                resultImages: values.resultImages,
+              }
+            : task,
+        ),
+      )
+      return
+    }
+
+    const existingAttachmentIds = new Set(
+      [...(target.resultFiles ?? []), ...(target.resultImages ?? [])]
+        .map((item) => item.attachmentId)
+        .filter((attachmentId): attachmentId is string => Boolean(attachmentId)),
     )
+    const keptAttachmentIds = new Set(
+      [...values.resultFiles, ...values.resultImages]
+        .map((item) => item.attachmentId)
+        .filter((attachmentId): attachmentId is string => Boolean(attachmentId)),
+    )
+    const removedAttachmentIds = [...existingAttachmentIds].filter(
+      (attachmentId) => !keptAttachmentIds.has(attachmentId),
+    )
+    const files = [...values.resultFiles, ...values.resultImages]
+      .map((item) => item.file)
+      .filter((file): file is File => Boolean(file))
+
+    try {
+      const saved = await saveTaskResult(id, {
+        content: values.result,
+        removedAttachmentIds,
+        files,
+      })
+      const mapped = mapTaskResultDtoToValues(saved)
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                taskResultId: mapped.taskResultId,
+                result: mapped.result,
+                resultFiles: mapped.resultFiles,
+                resultImages: mapped.resultImages,
+              }
+            : task,
+        ),
+      )
+    } catch {
+      addToast('업무 결과 저장에 실패했어요. 다시 시도해 주세요')
+    }
   }
 
   const isTaskExpanded = (id: string) => !collapsedTaskIds.has(id)
@@ -255,15 +344,62 @@ export default function TodoListPage() {
     }
   }
 
-  const handleToggleComplete = (id: string) => {
+  const handleToggleComplete = async (id: string) => {
+    if (pendingToggleIds.current.has(id)) return
     const target = tasks.find((task) => task.id === id)
     if (!target) return
     const nextCompleted = !target.isCompleted
 
-    setTasks((prev) =>
-      prev.map((task) => (task.id === id ? { ...task, isCompleted: !task.isCompleted } : task)),
-    )
-    addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
+    if (!target.tag?.id) {
+      setTasks((prev) =>
+        prev.map((task) => (task.id === id ? { ...task, isCompleted: nextCompleted } : task)),
+      )
+      addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
+      return
+    }
+
+    pendingToggleIds.current.add(id)
+    try {
+      await queryClient.cancelQueries({ queryKey: taskQueryKeys.list(target.date) })
+      const updated = await updateTask(
+        id,
+        mapDraftToUpdateTaskPayload({
+          title: target.title,
+          priority: target.priority,
+          date: target.date,
+          tagId: target.tag.id,
+          memo: target.memo,
+          isCompleted: nextCompleted,
+        }),
+      )
+      const mappedUpdated = mapTaskDtoToTask(updated)
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id
+            ? {
+                ...task,
+                ...mappedUpdated,
+                taskResultId: task.taskResultId,
+                result: task.result,
+                resultFiles: task.resultFiles,
+                resultImages: task.resultImages,
+              }
+            : task,
+        ),
+      )
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
+        prev
+          ? prev.map((task) =>
+              task.taskId === id ? { ...updated, taskResult: task.taskResult } : task,
+            )
+          : prev,
+      )
+      addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
+    } catch {
+      addToast('업무 상태 변경에 실패했어요. 다시 시도해 주세요')
+    } finally {
+      pendingToggleIds.current.delete(id)
+    }
   }
 
   const handleTaskDrop = (draggedId: string, over: DragOverInfo) => {
@@ -331,15 +467,23 @@ export default function TodoListPage() {
 
   useFlipAnimation(taskListRef, [tasks, activeTab])
 
-  const shiftDate = (days: number) => {
-    setCurrentDate((prev) => {
-      const next = new Date(prev)
-      next.setDate(next.getDate() + days)
-      return next
-    })
+  const handleChangeDate = (date: Date) => {
+    performancePreview.resetPreview()
+    questionChat.resetQuestionChat()
+    setCurrentDate(date)
   }
 
-  const goToToday = () => setCurrentDate(new Date())
+  const shiftDate = (days: number) => {
+    const next = new Date(currentDate)
+    next.setDate(next.getDate() + days)
+
+    handleChangeDate(next)
+  }
+
+  const goToToday = () => {
+    handleChangeDate(new Date())
+  }
+
   const handleMoveTaskToTomorrow = async (taskId: string): Promise<void> => {
     const nextDate = new Date(currentDate)
     nextDate.setDate(nextDate.getDate() + 1)
@@ -364,6 +508,32 @@ export default function TodoListPage() {
   }
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
+  const handleSavePerformance = async (values: { summary: string; insight: string }) => {
+    await performancePreview.saveResult(values)
+
+    await queryClient.invalidateQueries({
+      queryKey: performanceQueryKeys.all,
+    })
+  }
+
+  const handleUpdatePerformance = async (values: { summary: string; insight: string }) => {
+    if (!savedPerformanceId) {
+      throw new Error('수정할 업무 성과 ID가 없습니다.')
+    }
+
+    await updatePerformanceMutation.mutateAsync({
+      dailyPerformanceId: savedPerformanceId,
+      payload: {
+        summary: values.summary.trim(),
+        growthInsights: parseGrowthInsights(values.insight),
+      },
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: performanceQueryKeys.all,
+    })
+  }
+
   const handleConvert = async () => {
     if (isProfilePending) {
       return
@@ -434,7 +604,7 @@ export default function TodoListPage() {
               onPrevDay={() => shiftDate(-1)}
               onNextDay={() => shiftDate(1)}
               onToday={goToToday}
-              onSelectDate={setCurrentDate}
+              onSelectDate={handleChangeDate}
             />
 
             <section className="flex w-full flex-col gap-2">
@@ -600,11 +770,12 @@ export default function TodoListPage() {
               />
             ) : performancePreview.status === 'success' && performancePreview.result ? (
               <PerformancePreviewPanel
+                key={`preview-${performancePreview.reflectionSnapshotId}`}
                 status="success"
                 result={{
                   data: performancePreview.result,
                   isSaving: performancePreview.isSaving,
-                  onSave: performancePreview.saveResult,
+                  onSave: handleSavePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}
               />
@@ -612,6 +783,18 @@ export default function TodoListPage() {
               <PerformancePreviewPanel status="converting" />
             ) : performancePreview.status === 'failed' ? (
               <PerformancePreviewPanel status="failed" />
+            ) : savedPerformanceResult ? (
+              <PerformancePreviewPanel
+                key={`saved-${savedPerformanceId}`}
+                status="success"
+                result={{
+                  data: savedPerformanceResult,
+                  initiallySaved: true,
+                  isSaving: updatePerformanceMutation.isPending,
+                  onSave: handleUpdatePerformance,
+                  onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
+                }}
+              />
             ) : (
               <PerformancePreviewPanel status="empty" />
             )}

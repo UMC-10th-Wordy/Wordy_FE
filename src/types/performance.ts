@@ -12,10 +12,10 @@ export interface PerformancePreviewTaskPayload {
   taskId: string
   priority: ApiTaskPriority
   status: ApiTaskStatus
-  completedAt: string | null
+  completedAt?: string
   title: string
-  memo: string
-  taskResult: PerformancePreviewTaskResultPayload | null
+  memo?: string
+  taskResult?: PerformancePreviewTaskResultPayload
 }
 
 export interface PerformancePreviewProjectTagPayload {
@@ -25,7 +25,7 @@ export interface PerformancePreviewProjectTagPayload {
   kpis: string[]
   projectPurpose: string
   expectedOutcome: string
-  period: string
+  period?: string
 }
 
 export interface PerformanceTaskPerformance {
@@ -149,3 +149,33 @@ export interface PerformanceDetailResult {
 }
 
 export type PerformanceDetailResponse = PerformanceDetailResult
+
+/* 저장된 업무 성과 목록 조회 */
+// GET /performances?date=YYYY-MM-DD
+
+export interface PerformanceListItem {
+  dailyPerformanceId: string
+  achievementRate: number
+  summary: string
+  createdAt: string
+}
+
+export interface PerformanceListResult {
+  performances: PerformanceListItem[]
+}
+
+export type PerformanceListResponse = PerformanceListResult
+
+/* 저장된 업무 성과 수정 */
+// PATCH /performances/{dailyPerformanceId}
+
+export interface UpdatePerformancePayload {
+  summary: string
+  growthInsights: string[]
+}
+
+export interface UpdatePerformanceResult {
+  dailyPerformanceId: string
+}
+
+export type UpdatePerformanceResponse = UpdatePerformanceResult
