@@ -90,7 +90,7 @@ export default function TagSettingsModal({
 }: TagSettingsModalProps) {
   const [tab, setTab] = useState<Tab>(initialTab)
   const containerRef = useModalFocus<HTMLDivElement>()
-  const { data: profile } = useGetProfile()
+  const { data: profile, isLoading: isProfileLoading } = useGetProfile()
   const overlayMouseDownRef = useRef(false)
 
   // 기존 태그 탭
@@ -735,7 +735,7 @@ export default function TagSettingsModal({
                                           size="small"
                                           className="w-26.75 shrink-0 [font-size:var(--font-size-body-4)]"
                                           iconLeft={<GenerateIcon aria-hidden className="size-5" />}
-                                          disabled={isEditAiGenerating}
+                                          disabled={isEditAiGenerating || isProfileLoading}
                                           onClick={handleEditAiRecommend}
                                         >
                                           AI 추천 받기
@@ -781,6 +781,7 @@ export default function TagSettingsModal({
                                         size="small"
                                         fullWidth
                                         className="[font-size:var(--font-size-body-4)]"
+                                        disabled={isEditAiGenerating}
                                         onClick={() =>
                                           setEditDraft((d) => ({ ...d, kpis: [...d.kpis, ''] }))
                                         }
@@ -804,7 +805,7 @@ export default function TagSettingsModal({
                                         size="medium"
                                         className="w-35 [font-size:var(--font-size-body-3)]"
                                         onClick={handleConfirmEdit}
-                                        disabled={!hasEditChanges()}
+                                        disabled={!hasEditChanges() || isEditAiGenerating}
                                       >
                                         수정하기
                                       </TextButton>
@@ -1040,7 +1041,7 @@ export default function TagSettingsModal({
                       size="small"
                       className="w-26.75 [font-size:var(--font-size-body-4)]"
                       iconLeft={<GenerateIcon aria-hidden className="size-5" />}
-                      disabled={isAiGenerating}
+                      disabled={isAiGenerating || isProfileLoading}
                       onClick={handleAiRecommend}
                     >
                       AI 추천 받기
@@ -1074,6 +1075,7 @@ export default function TagSettingsModal({
                     size="small"
                     fullWidth
                     className="[font-size:var(--font-size-body-4)]"
+                    disabled={isAiGenerating}
                     onClick={() => setNewKpis((prev) => [...prev, ''])}
                     iconLeft={<PlusIcon aria-hidden className="size-5" />}
                   >
@@ -1107,7 +1109,7 @@ export default function TagSettingsModal({
               variant="fill"
               size="medium"
               className="w-35 [font-size:var(--font-size-body-3)]"
-              disabled={!canAddNewTag}
+              disabled={!canAddNewTag || isAiGenerating}
               onClick={handleAddTag}
             >
               태그 추가하기
