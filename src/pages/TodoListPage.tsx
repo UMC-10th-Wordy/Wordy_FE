@@ -464,6 +464,14 @@ export default function TodoListPage() {
 
   useFlipAnimation(taskListRef, [tasks, activeTab])
 
+  const handleTogglePreview = () => {
+    if (isPreviewOpen && savedPerformanceId) {
+      performancePreview.resetPreview()
+    }
+
+    setIsPreviewOpen((prev) => !prev)
+  }
+
   const handleChangeDate = (date: Date) => {
     performancePreview.resetPreview()
     questionChat.resetQuestionChat()
@@ -511,8 +519,6 @@ export default function TodoListPage() {
     await queryClient.invalidateQueries({
       queryKey: performanceQueryKeys.all,
     })
-
-    performancePreview.resetPreview()
   }
 
   const handleUpdatePerformance = async (values: { summary: string; insight: string }) => {
@@ -599,7 +605,7 @@ export default function TodoListPage() {
               tasks={tasks}
               subtitle="오늘은 어떤 업무를 하실 예정인가요?"
               isPreviewOpen={isPreviewOpen}
-              onTogglePreview={() => setIsPreviewOpen((prev) => !prev)}
+              onTogglePreview={handleTogglePreview}
               onPrevDay={() => shiftDate(-1)}
               onNextDay={() => shiftDate(1)}
               onToday={goToToday}

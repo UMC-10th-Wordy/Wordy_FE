@@ -90,14 +90,21 @@ export const useDeleteDailyEntry = () => {
   return useMutation({
     mutationFn: deleteDailyEntry,
 
-    onSuccess: ({ dailyEntryId }) => {
-      queryClient.removeQueries({
-        queryKey: dailyEntryQueryKeys.detail(dailyEntryId),
-      })
-
-      void queryClient.invalidateQueries({
-        queryKey: dailyEntryQueryKeys.all,
-      })
+    onSuccess: () => {
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.summary(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.searches(),
+        }),
+      ])
     },
   })
 }
