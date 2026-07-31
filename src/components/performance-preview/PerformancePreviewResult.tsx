@@ -15,9 +15,10 @@ import type { PerformancePreviewResultData } from '@/types/performancePreviewRes
 interface PerformancePreviewResultProps {
   data: PerformancePreviewResultData
   readOnly?: boolean
+  initiallySaved?: boolean
   isSaving?: boolean
-  onSave?: (values: { summary: string; insight: string }) => Promise<void> | void
-  onMoveTaskToTomorrow?: (taskId: string) => Promise<void> | void
+  onSave?: (values: { summary: string; insight: string }) => void | Promise<void>
+  onMoveTaskToTomorrow?: (taskId: string) => void | Promise<void>
 }
 
 const formatInsightWithBullet = (insight: string) => {
@@ -42,13 +43,14 @@ const formatInsightWithBullet = (insight: string) => {
 export const PerformancePreviewResult = ({
   data,
   readOnly = false,
+  initiallySaved = false,
   isSaving = false,
   onSave,
   onMoveTaskToTomorrow,
 }: PerformancePreviewResultProps) => {
   const [summary, setSummary] = useState(data.summary)
   const [insight, setInsight] = useState(() => formatInsightWithBullet(data.insight))
-  const [isSaved, setIsSaved] = useState(false)
+  const [isSaved, setIsSaved] = useState(initiallySaved)
   const [movedTaskIds, setMovedTaskIds] = useState<string[]>([])
   const [pendingMoveTaskIds, setPendingMoveTaskIds] = useState<string[]>([])
   const { toasts, addToast } = useToast()

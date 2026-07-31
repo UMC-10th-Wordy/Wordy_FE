@@ -30,6 +30,7 @@ interface PerformancePreviewPanelSuccessProps {
   result: {
     data: PerformancePreviewResultData
     readOnly?: boolean
+    initiallySaved?: boolean
     isSaving?: boolean
     onSave?: (values: { summary: string; insight: string }) => Promise<void> | void
     onMoveTaskToTomorrow?: (taskId: string) => Promise<void> | void

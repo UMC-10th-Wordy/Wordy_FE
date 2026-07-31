@@ -7,7 +7,15 @@ import {
   getPerformances,
   performanceQueryKeys,
   savePerformance,
+  updatePerformance,
 } from '@/api/performance/performance'
+
+import type { UpdatePerformancePayload } from '@/types/performance'
+
+interface UpdatePerformanceVariables {
+  dailyPerformanceId: string
+  payload: UpdatePerformancePayload
+}
 
 export const useCreatePerformancePreview = () => {
   return useMutation({
@@ -24,6 +32,13 @@ export const useCompletePerformancePreview = () => {
 export const useSavePerformance = () => {
   return useMutation({
     mutationFn: savePerformance,
+  })
+}
+
+export const useUpdatePerformance = () => {
+  return useMutation({
+    mutationFn: ({ dailyPerformanceId, payload }: UpdatePerformanceVariables) =>
+      updatePerformance(dailyPerformanceId, payload),
   })
 }
 

@@ -165,3 +165,17 @@ export interface PerformanceListResult {
 }
 
 export type PerformanceListResponse = PerformanceListResult
+
+/* 저장된 업무 성과 수정 */
+// PATCH /performances/{dailyPerformanceId}
+
+export interface UpdatePerformancePayload {
+  summary: string
+  growthInsights: string[]
+}
+
+export interface UpdatePerformanceResult {
+  dailyPerformanceId: string
+}
+
+export type UpdatePerformanceResponse = UpdatePerformanceResult
