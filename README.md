@@ -48,7 +48,7 @@ UMC 10th Wordy 프로젝트 프론트엔드
 - pdfjs-dist
 - ESLint + Prettier
 - Husky + Commitlint
-- Vitest + Testing Library + MSW
+- Vitest + Testing Library
 
 ## 팀원 및 역할 분담
 
@@ -197,7 +197,7 @@ cp .env.example .env
 
 ## 테스트
 
-Vitest + React Testing Library + MSW로 유닛/컴포넌트 테스트를 작성합니다.
+Vitest + React Testing Library로 유닛 테스트를 작성합니다.
 
 - 공통 셋업은 `src/test/setup.ts`에 있습니다.
 - 테스트 파일은 대상 파일과 같은 위치에 `*.test.ts(x)`로 둡니다. (예: `src/lib/httpClient.test.ts`)
