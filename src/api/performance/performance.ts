@@ -72,7 +72,12 @@ export const getPerformances = async (date?: string): Promise<PerformanceListRes
     },
   )
 
-  return response ?? { performances: [] }
+  return (
+    response ?? {
+      exists: false,
+      performance: null,
+    }
+  )
 }
 
 /* 저장된 업무 성과 상세 조회 */

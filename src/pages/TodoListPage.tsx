@@ -49,11 +49,7 @@ import { getTagDetail } from '@/api/tag/tag'
 import { useGetProfile } from '@/hooks/useUserQueries'
 import { usePerformancePreview } from '@/hooks/usePerformancePreview'
 import { usePerformanceQuestionChat } from '@/hooks/usePerformanceQuestionChat'
-import {
-  useGetPerformanceDetailQuery,
-  useGetPerformancesByDate,
-  useUpdatePerformance,
-} from '@/hooks/usePerformanceQueries'
+import { useGetPerformancesByDate, useUpdatePerformance } from '@/hooks/usePerformanceQueries'
 import {
   mapPerformanceDetailResult,
   mapPerformancePreviewRequest,
@@ -107,9 +103,10 @@ export default function TodoListPage() {
 
   const { data: performanceList } = useGetPerformancesByDate(currentDateKey)
 
-  const savedPerformanceId = performanceList?.performances?.[0]?.dailyPerformanceId ?? null
+  const savedPerformanceDetail =
+    performanceList?.exists && performanceList.performance ? performanceList.performance : null
 
-  const { data: savedPerformanceDetail } = useGetPerformanceDetailQuery(savedPerformanceId)
+  const savedPerformanceId = savedPerformanceDetail?.dailyPerformanceId ?? null
 
   if (loadedDateKey !== currentDateKey) {
     setLoadedDateKey(currentDateKey)
@@ -514,6 +511,8 @@ export default function TodoListPage() {
     await queryClient.invalidateQueries({
       queryKey: performanceQueryKeys.all,
     })
+
+    performancePreview.resetPreview()
   }
 
   const handleUpdatePerformance = async (values: { summary: string; insight: string }) => {
