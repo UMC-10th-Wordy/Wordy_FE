@@ -98,7 +98,7 @@ export default function TodoListPage() {
 
   const { data: performanceList } = useGetPerformancesByDate(currentDateKey)
 
-  const savedPerformanceId = performanceList?.performances[0]?.dailyPerformanceId ?? null
+  const savedPerformanceId = performanceList?.performances?.[0]?.dailyPerformanceId ?? null
 
   const { data: savedPerformanceDetail } = useGetPerformanceDetailQuery(savedPerformanceId)
 
