@@ -202,10 +202,18 @@ export const DashboardPage = () => {
       })
   }
 
-  const handleWeekMove = (delta: number) => {
-    if (generation === 'generating') return
+  // 기간 이동 시 이전 기간의 생성 조건 초기화 — 새 조회 완료 전 생성 방지 (리뷰 반영)
+  const resetWeeklyCondition = () => {
+    setEntries([])
+    setSelectedIds([])
+    setWeekRange({ start: '', end: '' })
     setDetail(null)
     setGeneration('idle')
+  }
+
+  const handleWeekMove = (delta: number) => {
+    if (generation === 'generating') return
+    resetWeeklyCondition()
     setWeekStartDate((prev) => {
       const stepDate =
         delta > 0
@@ -218,6 +226,7 @@ export const DashboardPage = () => {
   // 월 이동 — 이전 월의 상세/생성 상태 무효화 (리뷰 반영)
   const handleMonthMove = (delta: number) => {
     if (monthlyGeneration === 'generating') return
+    setMonthlyEligibility(null)
     setMonthlyDetail(null)
     setMonthlyGeneration('idle')
     setMonthOffset((v) => v + delta)
@@ -240,8 +249,7 @@ export const DashboardPage = () => {
   const handleGoWeekly = (weekId: string) => {
     if (weekId.startsWith('pending-')) {
       const dateStr = weekId.replace('pending-', '')
-      setDetail(null)
-      setGeneration('idle')
+      resetWeeklyCondition()
       setWeekStartDate(getTeamWeekStart(new Date(`${dateStr}T00:00:00`)))
     }
     setActiveTab('weekly')
