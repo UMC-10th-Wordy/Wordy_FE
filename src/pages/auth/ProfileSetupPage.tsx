@@ -12,6 +12,7 @@ import ProfileDefaultIcon from '@/assets/icons/profile-default.svg?react'
 import CameraBadgeIcon from '@/assets/icons/camera-badge.svg?react'
 import { useNavigate } from 'react-router-dom'
 import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
+import { getHome, homeQueryKeys } from '@/api/home/home'
 import { useGetProfile } from '@/hooks/useUserQueries'
 
 export const ProfileSetupPage = () => {
@@ -71,6 +72,15 @@ export const ProfileSetupPage = () => {
         jobRole: JOB_TO_JOB_ROLE[job],
       })
 
+      // 홈 데이터를 먼저 캐싱한 뒤 프로필을 무효화해야 함:
+      // invalidateQueries는 현재 활성화된 profile 쿼리의 리페치까지 기다리는데,
+      // 리페치 완료 시 profileData.userName이 채워지며 위 useEffect가 반응형으로 navigate('/')를 먼저 실행해버려
+      // 아래 prefetchQuery가 끝나기 전에 홈으로 이동해 Suspense가 깜빡이는 문제가 있었음
+      // 홈 페이지 청크도 함께 미리 받아둬서 이동 직후 로딩 표시가 뜨지 않게 함
+      await Promise.all([
+        queryClient.prefetchQuery({ queryKey: homeQueryKeys.all, queryFn: getHome }),
+        import('@/pages/HomePage'),
+      ])
       await queryClient.invalidateQueries({ queryKey: userQueryKeys.profile() })
       navigate('/')
     } catch {

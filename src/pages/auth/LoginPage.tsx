@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Input1 } from '@/components/common/Input/Input1'
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
 import { TextButton } from '@/components/common/Button/TextButton'
@@ -7,14 +8,16 @@ import LogoIcon from '@/assets/icons/logo.svg?react'
 import GoogleIcon from '@/assets/icons/google.svg?react'
 import { useNavigate } from 'react-router-dom'
 import { GOOGLE_AUTH_URL } from '@/api/auth/auth'
+import { getHome, homeQueryKeys } from '@/api/home/home'
 import { useLogin } from '@/hooks/useAuthQueries'
 import { useToast } from '@/hooks/useToast'
-import { ApiError, setAuthTokens } from '@/lib/httpClient'
+import { ApiError, markAuthenticated, storeAuthTokens } from '@/lib/httpClient'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const LoginPage = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { toasts, addToast } = useToast()
   const { mutate: login, isPending } = useLogin()
   const [email, setEmail] = useState('')
@@ -39,9 +42,21 @@ export const LoginPage = () => {
     login(
       { email, password },
       {
-        onSuccess: (data) => {
-          setAuthTokens(data.accessToken, data.refreshToken)
-          navigate('/')
+        onSuccess: async (data) => {
+          // 토큰만 먼저 저장(요청 인증용)하고, isAuthenticated 플래그는 홈 데이터 캐싱 후에 바꿔
+          // GuestRoute가 그 즉시 반응해서 홈으로 리다이렉트되며 Suspense가 깜빡이는 것을 막음
+          storeAuthTokens(data.accessToken, data.refreshToken)
+          // 홈 데이터와 홈 페이지 청크를 함께 미리 받아둬서 이동 직후 로딩 표시가 뜨지 않게 함
+          try {
+            await Promise.all([
+              queryClient.prefetchQuery({ queryKey: homeQueryKeys.all, queryFn: getHome }),
+              import('@/pages/HomePage'),
+            ])
+            markAuthenticated()
+            navigate('/')
+          } catch {
+            addToast('로그인 처리 중 오류가 발생했어요. 다시 시도해 주세요.')
+          }
         },
         onError: (error) => {
           addToast(
