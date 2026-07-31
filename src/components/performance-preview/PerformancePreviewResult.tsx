@@ -17,6 +17,7 @@ interface PerformancePreviewResultProps {
   readOnly?: boolean
   initiallySaved?: boolean
   isSaving?: boolean
+  movedTaskIds?: string[]
   onSave?: (values: { summary: string; insight: string }) => void | Promise<void>
   onMoveTaskToTomorrow?: (taskId: string) => void | Promise<void>
 }
@@ -45,13 +46,13 @@ export const PerformancePreviewResult = ({
   readOnly = false,
   initiallySaved = false,
   isSaving = false,
+  movedTaskIds = [],
   onSave,
   onMoveTaskToTomorrow,
 }: PerformancePreviewResultProps) => {
   const [summary, setSummary] = useState(data.summary)
   const [insight, setInsight] = useState(() => formatInsightWithBullet(data.insight))
   const [isSaved, setIsSaved] = useState(initiallySaved)
-  const [movedTaskIds, setMovedTaskIds] = useState<string[]>([])
   const [pendingMoveTaskIds, setPendingMoveTaskIds] = useState<string[]>([])
   const { toasts, addToast } = useToast()
 
@@ -79,7 +80,6 @@ export const PerformancePreviewResult = ({
     try {
       await onMoveTaskToTomorrow(taskId)
 
-      setMovedTaskIds((prev) => [...prev, taskId])
       addToast('내일 업무로 변경했어요')
     } catch {
       // 실패 시 성공 상태와 성공 토스트를 반영하지 않음
@@ -103,7 +103,13 @@ export const PerformancePreviewResult = ({
     }
   }
 
-  const disabledMoveTaskIds = [...new Set([...movedTaskIds, ...pendingMoveTaskIds])]
+  const unavailableTaskIds = data.incompleteTasks
+    .filter((task) => !task.canMoveToTomorrow)
+    .map((task) => task.id)
+
+  const disabledMoveTaskIds = [
+    ...new Set([...movedTaskIds, ...pendingMoveTaskIds, ...unavailableTaskIds]),
+  ]
 
   return (
     <div

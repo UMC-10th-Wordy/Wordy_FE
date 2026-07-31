@@ -37,6 +37,7 @@ import {
   updateTask,
 } from '@/api/task/task'
 import { performanceQueryKeys } from '@/api/performance/performance'
+import { dailyEntryQueryKeys } from '@/api/daily-entry/dailyEntry'
 import { useGetTasksByDate, useMoveTaskToTomorrow } from '@/hooks/useTaskQueries'
 import {
   mapDraftToCreateTaskPayload,
@@ -49,11 +50,7 @@ import { getTagDetail } from '@/api/tag/tag'
 import { useGetProfile } from '@/hooks/useUserQueries'
 import { usePerformancePreview } from '@/hooks/usePerformancePreview'
 import { usePerformanceQuestionChat } from '@/hooks/usePerformanceQuestionChat'
-import {
-  useGetPerformanceDetailQuery,
-  useGetPerformancesByDate,
-  useUpdatePerformance,
-} from '@/hooks/usePerformanceQueries'
+import { useGetPerformancesByDate, useUpdatePerformance } from '@/hooks/usePerformanceQueries'
 import {
   mapPerformanceDetailResult,
   mapPerformancePreviewRequest,
@@ -95,6 +92,7 @@ const parseGrowthInsights = (insight: string): string[] => {
 export default function TodoListPage() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [currentDate, setCurrentDate] = useState(() => new Date())
+  const [movedPerformanceTaskIds, setMovedPerformanceTaskIds] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<TodoFilter>(() =>
     readStoredActiveTab(toDateKey(new Date())),
   )
@@ -148,9 +146,10 @@ export default function TodoListPage() {
 
   const { data: performanceList } = useGetPerformancesByDate(currentDateKey)
 
-  const savedPerformanceId = performanceList?.performances?.[0]?.dailyPerformanceId ?? null
+  const savedPerformanceDetail =
+    performanceList?.exists && performanceList.performance ? performanceList.performance : null
 
-  const { data: savedPerformanceDetail } = useGetPerformanceDetailQuery(savedPerformanceId)
+  const savedPerformanceId = savedPerformanceDetail?.dailyPerformanceId ?? null
 
   if (loadedDateKey !== currentDateKey) {
     setLoadedDateKey(currentDateKey)
@@ -508,9 +507,18 @@ export default function TodoListPage() {
 
   useFlipAnimation(taskListRef, [tasks, activeTab])
 
+  const handleTogglePreview = () => {
+    if (isPreviewOpen && savedPerformanceId) {
+      performancePreview.resetPreview()
+    }
+
+    setIsPreviewOpen((prev) => !prev)
+  }
+
   const handleChangeDate = (date: Date) => {
     performancePreview.resetPreview()
     questionChat.resetQuestionChat()
+    setMovedPerformanceTaskIds([])
     setCurrentDate(date)
   }
 
@@ -546,15 +554,22 @@ export default function TodoListPage() {
           : task,
       ),
     )
+
+    setMovedPerformanceTaskIds((prev) => (prev.includes(taskId) ? prev : [...prev, taskId]))
   }
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
   const handleSavePerformance = async (values: { summary: string; insight: string }) => {
     await performancePreview.saveResult(values)
 
-    await queryClient.invalidateQueries({
-      queryKey: performanceQueryKeys.all,
-    })
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: performanceQueryKeys.all,
+      }),
+      queryClient.invalidateQueries({
+        queryKey: dailyEntryQueryKeys.all,
+      }),
+    ])
   }
 
   const handleUpdatePerformance = async (values: { summary: string; insight: string }) => {
@@ -570,9 +585,14 @@ export default function TodoListPage() {
       },
     })
 
-    await queryClient.invalidateQueries({
-      queryKey: performanceQueryKeys.all,
-    })
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: performanceQueryKeys.all,
+      }),
+      queryClient.invalidateQueries({
+        queryKey: dailyEntryQueryKeys.all,
+      }),
+    ])
   }
 
   const handleConvert = async () => {
@@ -641,7 +661,7 @@ export default function TodoListPage() {
               tasks={tasks}
               subtitle="오늘은 어떤 업무를 하실 예정인가요?"
               isPreviewOpen={isPreviewOpen}
-              onTogglePreview={() => setIsPreviewOpen((prev) => !prev)}
+              onTogglePreview={handleTogglePreview}
               onPrevDay={() => shiftDate(-1)}
               onNextDay={() => shiftDate(1)}
               onToday={goToToday}
@@ -819,6 +839,7 @@ export default function TodoListPage() {
                 result={{
                   data: performancePreview.result,
                   isSaving: performancePreview.isSaving,
+                  movedTaskIds: movedPerformanceTaskIds,
                   onSave: handleSavePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}
@@ -835,6 +856,7 @@ export default function TodoListPage() {
                   data: savedPerformanceResult,
                   initiallySaved: true,
                   isSaving: updatePerformanceMutation.isPending,
+                  movedTaskIds: movedPerformanceTaskIds,
                   onSave: handleUpdatePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}

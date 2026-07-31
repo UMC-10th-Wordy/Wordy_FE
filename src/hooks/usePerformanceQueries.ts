@@ -53,6 +53,7 @@ export const useGetPerformanceDetail = (dailyPerformanceId: string) => {
   return useSuspenseQuery({
     queryKey: performanceQueryKeys.detail(dailyPerformanceId),
     queryFn: () => getPerformanceDetail(dailyPerformanceId),
+    refetchOnMount: 'always',
   })
 }
 

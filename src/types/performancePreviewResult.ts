@@ -5,6 +5,7 @@ export interface PerformanceIncompleteTask {
   title: string
   priority: TaskPriority
   tag?: TaskTag
+  canMoveToTomorrow: boolean
 }
 
 export interface PerformanceTaskResult {
