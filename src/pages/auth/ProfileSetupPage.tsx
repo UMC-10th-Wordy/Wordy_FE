@@ -12,7 +12,6 @@ import ProfileDefaultIcon from '@/assets/icons/profile-default.svg?react'
 import CameraBadgeIcon from '@/assets/icons/camera-badge.svg?react'
 import { useNavigate } from 'react-router-dom'
 import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
-import { getHome, homeQueryKeys } from '@/api/home/home'
 import { useGetProfile } from '@/hooks/useUserQueries'
 
 export const ProfileSetupPage = () => {
@@ -72,17 +71,13 @@ export const ProfileSetupPage = () => {
         jobRole: JOB_TO_JOB_ROLE[job],
       })
 
-      // 홈 데이터를 먼저 캐싱한 뒤 프로필을 무효화해야 함:
-      // invalidateQueries는 현재 활성화된 profile 쿼리의 리페치까지 기다리는데,
-      // 리페치 완료 시 profileData.userName이 채워지며 위 useEffect가 반응형으로 navigate('/')를 먼저 실행해버려
-      // 아래 prefetchQuery가 끝나기 전에 홈으로 이동해 Suspense가 깜빡이는 문제가 있었음
-      // 홈 페이지 청크도 함께 미리 받아둬서 이동 직후 로딩 표시가 뜨지 않게 함
-      await Promise.all([
-        queryClient.prefetchQuery({ queryKey: homeQueryKeys.all, queryFn: getHome }),
-        import('@/pages/HomePage'),
-      ])
-      await queryClient.invalidateQueries({ queryKey: userQueryKeys.profile() })
-      navigate('/')
+      // 프로필을 무효화하면 리페치가 끝난 뒤 profileData.userName이 채워지고
+      // 위 useEffect가 반응형으로 navigate('/')를 실행함 (이동은 그 useEffect가 담당)
+      // throwOnError를 지정하지 않으면 리페치 실패가 조용히 삼켜져 catch 블록이 실행되지 않음
+      await queryClient.invalidateQueries(
+        { queryKey: userQueryKeys.profile() },
+        { throwOnError: true },
+      )
     } catch {
       alert('프로필 등록에 실패했어요. 다시 시도해 주세요.')
     } finally {
