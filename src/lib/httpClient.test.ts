@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError, clearAuthTokens, getRefreshToken, request, setAuthTokens } from './httpClient'
+import { useAuthStore } from '@/store/authStore'
 
 const jsonResponse = (status: number, body: unknown) =>
   ({
@@ -110,6 +111,7 @@ describe('httpClient', () => {
     await expect(request('/tasks')).rejects.toBeInstanceOf(ApiError)
     expect(localStorage.getItem('accessToken')).toBeNull()
     expect(getRefreshToken()).toBeNull()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
   })
 
   it('오류 응답을 ApiError로 변환한다', async () => {
@@ -143,5 +145,6 @@ describe('clearAuthTokens', () => {
 
     expect(localStorage.getItem('accessToken')).toBeNull()
     expect(getRefreshToken()).toBeNull()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
   })
 })
