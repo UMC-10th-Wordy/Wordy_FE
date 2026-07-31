@@ -92,6 +92,7 @@ const parseGrowthInsights = (insight: string): string[] => {
 export default function TodoListPage() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [currentDate, setCurrentDate] = useState(() => new Date())
+  const [movedPerformanceTaskIds, setMovedPerformanceTaskIds] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<TodoFilter>(() =>
     readStoredActiveTab(toDateKey(new Date())),
   )
@@ -517,6 +518,7 @@ export default function TodoListPage() {
   const handleChangeDate = (date: Date) => {
     performancePreview.resetPreview()
     questionChat.resetQuestionChat()
+    setMovedPerformanceTaskIds([])
     setCurrentDate(date)
   }
 
@@ -552,6 +554,8 @@ export default function TodoListPage() {
           : task,
       ),
     )
+
+    setMovedPerformanceTaskIds((prev) => (prev.includes(taskId) ? prev : [...prev, taskId]))
   }
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
@@ -835,6 +839,7 @@ export default function TodoListPage() {
                 result={{
                   data: performancePreview.result,
                   isSaving: performancePreview.isSaving,
+                  movedTaskIds: movedPerformanceTaskIds,
                   onSave: handleSavePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}
@@ -851,6 +856,7 @@ export default function TodoListPage() {
                   data: savedPerformanceResult,
                   initiallySaved: true,
                   isSaving: updatePerformanceMutation.isPending,
+                  movedTaskIds: movedPerformanceTaskIds,
                   onSave: handleUpdatePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}
