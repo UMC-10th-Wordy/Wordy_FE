@@ -103,7 +103,13 @@ export const PerformancePreviewResult = ({
     }
   }
 
-  const disabledMoveTaskIds = [...new Set([...movedTaskIds, ...pendingMoveTaskIds])]
+  const unavailableTaskIds = data.incompleteTasks
+    .filter((task) => !task.canMoveToTomorrow)
+    .map((task) => task.id)
+
+  const disabledMoveTaskIds = [
+    ...new Set([...movedTaskIds, ...pendingMoveTaskIds, ...unavailableTaskIds]),
+  ]
 
   return (
     <div

@@ -122,6 +122,7 @@ export interface PerformanceDetailTag {
 }
 
 export interface PerformanceDetailIncompleteTask {
+  taskId: string
   tag: PerformanceDetailTag
   title: string
 }

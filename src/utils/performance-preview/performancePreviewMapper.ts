@@ -28,9 +28,17 @@ const mapPerformanceTaskResult = (
     taskId: taskPerformance.taskId,
     title: task?.title ?? '',
     tag: task?.tag,
-    output: taskPerformance.output,
-    impact: taskPerformance.impact,
+    output: normalizePerformanceContent(taskPerformance.output),
+    impact: normalizePerformanceContent(taskPerformance.impact),
   }
+}
+
+const normalizePerformanceContent = (values?: string[]): string[] | undefined => {
+  const filteredValues = values
+    ?.map((value) => value.trim())
+    .filter((value) => value.length > 0 && value !== '찾지 못했어요.')
+
+  return filteredValues && filteredValues.length > 0 ? filteredValues : undefined
 }
 
 export const mapPerformancePreviewResult = (
@@ -49,6 +57,7 @@ export const mapPerformancePreviewResult = (
       title: task.title,
       priority: task.priority,
       tag: task.tag,
+      canMoveToTomorrow: true,
     })),
 
     summary: result.summary,
@@ -150,17 +159,18 @@ export const mapPerformanceDetailResult = (
     totalTaskCount: result.totalTaskCount,
     completedTaskCount: result.completedTaskCount,
 
-    incompleteTasks: result.incompleteTasks.map((task, index) => {
-      const diaryTask = tasks.find((item) => item.title === task.title)
+    incompleteTasks: result.incompleteTasks.map((task) => {
+      const currentTask = tasks.find((item) => item.id === task.taskId)
 
       return {
-        id: diaryTask?.id ?? `saved-incomplete-task-${index}`,
+        id: task.taskId,
         title: task.title,
-        priority: diaryTask?.priority ?? 'could',
+        priority: currentTask?.priority ?? 'could',
         tag: {
           label: task.tag.tagName,
           color: hexToTagColor(task.tag.color),
         },
+        canMoveToTomorrow: Boolean(currentTask),
       }
     }),
 
@@ -181,8 +191,8 @@ export const mapPerformanceDetailResult = (
               color: hexToTagColor(taskPerformance.tag.color),
             }
           : diaryTask?.tag,
-        output: taskPerformance.output,
-        impact: taskPerformance.impact,
+        output: normalizePerformanceContent(taskPerformance.output),
+        impact: normalizePerformanceContent(taskPerformance.impact),
       }
     }),
   }
