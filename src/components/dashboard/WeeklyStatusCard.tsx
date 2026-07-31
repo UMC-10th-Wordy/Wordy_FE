@@ -8,10 +8,16 @@ import type { WeeklyDashboardStatus } from '@/types/dashboard'
 interface WeeklyStatusCardProps {
   status: Exclude<WeeklyDashboardStatus, 'complete'>
   convertedCount: number
+  requiredCount: number
   onGenerate: () => void
 }
 
-export const WeeklyStatusCard = ({ status, convertedCount, onGenerate }: WeeklyStatusCardProps) => {
+export const WeeklyStatusCard = ({
+  status,
+  convertedCount,
+  requiredCount,
+  onGenerate,
+}: WeeklyStatusCardProps) => {
   return (
     <section className="flex h-[748px] min-w-0 max-w-[1172px] flex-[2] flex-col items-center justify-center gap-[56px] rounded-xl border border-(--color-border-subtle) bg-(--color-bg-default) px-5 py-10">
       {status === 'insufficient' && (
@@ -25,8 +31,10 @@ export const WeeklyStatusCard = ({ status, convertedCount, onGenerate }: WeeklyS
               조금만 더 기록해 볼까요?
               <br />
               주간 대시보드는 변환된 업무 일지가{' '}
-              <span className="font-semibold text-(--color-text-brand)">3개 이상 모이면</span> 만들
-              수 있어요
+              <span className="font-semibold text-(--color-text-brand)">
+                {requiredCount}개 이상 모이면
+              </span>{' '}
+              만들 수 있어요
             </p>
             <p className="[font-size:var(--font-size-caption-1)] text-(--color-text-tertiary)">
               *전체 일수가 3일보다 적은 주차에는 모두 변환 시 만들 수 있어요

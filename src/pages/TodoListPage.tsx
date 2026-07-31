@@ -52,6 +52,7 @@ import { usePerformanceQuestionChat } from '@/hooks/usePerformanceQuestionChat'
 import {
   useGetPerformanceDetailQuery,
   useGetPerformancesByDate,
+  useUpdatePerformance,
 } from '@/hooks/usePerformanceQueries'
 import {
   mapPerformanceDetailResult,
@@ -62,6 +63,13 @@ import type { TaskDto } from '@/types/task'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
+
+const parseGrowthInsights = (insight: string): string[] => {
+  return insight
+    .split('\n')
+    .map((line) => line.replace(/^-\s*/, '').trim())
+    .filter(Boolean)
+}
 
 export default function TodoListPage() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
@@ -83,6 +91,7 @@ export default function TodoListPage() {
   const { data: profile, isPending: isProfilePending } = useGetProfile()
   const performancePreview = usePerformancePreview()
   const moveTaskToTomorrowMutation = useMoveTaskToTomorrow()
+  const updatePerformanceMutation = useUpdatePerformance()
 
   const questionChat = usePerformanceQuestionChat({
     isActive: performancePreview.status === 'questioning',
@@ -505,8 +514,24 @@ export default function TodoListPage() {
     await queryClient.invalidateQueries({
       queryKey: performanceQueryKeys.all,
     })
+  }
 
-    performancePreview.resetPreview()
+  const handleUpdatePerformance = async (values: { summary: string; insight: string }) => {
+    if (!savedPerformanceId) {
+      throw new Error('수정할 업무 성과 ID가 없습니다.')
+    }
+
+    await updatePerformanceMutation.mutateAsync({
+      dailyPerformanceId: savedPerformanceId,
+      payload: {
+        summary: values.summary.trim(),
+        growthInsights: parseGrowthInsights(values.insight),
+      },
+    })
+
+    await queryClient.invalidateQueries({
+      queryKey: performanceQueryKeys.all,
+    })
   }
 
   const handleConvert = async () => {
@@ -745,6 +770,7 @@ export default function TodoListPage() {
               />
             ) : performancePreview.status === 'success' && performancePreview.result ? (
               <PerformancePreviewPanel
+                key={`preview-${performancePreview.reflectionSnapshotId}`}
                 status="success"
                 result={{
                   data: performancePreview.result,
@@ -759,10 +785,13 @@ export default function TodoListPage() {
               <PerformancePreviewPanel status="failed" />
             ) : savedPerformanceResult ? (
               <PerformancePreviewPanel
+                key={`saved-${savedPerformanceId}`}
                 status="success"
                 result={{
                   data: savedPerformanceResult,
-                  readOnly: true,
+                  initiallySaved: true,
+                  isSaving: updatePerformanceMutation.isPending,
+                  onSave: handleUpdatePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}
               />

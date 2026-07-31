@@ -163,6 +163,7 @@ export const usePerformancePreview = () => {
   return {
     status,
     result,
+    reflectionSnapshotId,
     questions: questionContext?.questions ?? [],
     isStarting: createDailyEntryMutation.isPending || createPerformancePreviewMutation.isPending,
     isCompleting: completePerformancePreviewMutation.isPending,
