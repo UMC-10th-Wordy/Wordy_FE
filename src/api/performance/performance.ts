@@ -9,6 +9,8 @@ import type {
   PerformanceListResponse,
   SavePerformancePayload,
   SavePerformanceResponse,
+  UpdatePerformancePayload,
+  UpdatePerformanceResponse,
 } from '@/types/performance'
 
 const AI_REQUEST_TIMEOUT_MS = 120_000
@@ -104,4 +106,20 @@ export const performanceQueryKeys = {
 
   detail: (dailyPerformanceId: string) =>
     [...performanceQueryKeys.details(), dailyPerformanceId] as const,
+}
+
+/* 저장된 업무 성과 수정 */
+// PATCH /performances/{dailyPerformanceId}
+
+export const updatePerformance = async (
+  dailyPerformanceId: string,
+  payload: UpdatePerformancePayload,
+): Promise<UpdatePerformanceResponse> => {
+  return request<UpdatePerformanceResponse>(
+    `/performances/${encodeURIComponent(dailyPerformanceId)}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  )
 }
