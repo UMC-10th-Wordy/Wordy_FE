@@ -56,6 +56,9 @@ const LandingPage = lazy(() =>
 const SocialSignupPage = lazy(() =>
   import('@/pages/auth/SocialSignupPage').then((m) => ({ default: m.SocialSignupPage })),
 )
+const GoogleCallbackPage = lazy(() =>
+  import('@/pages/auth/GoogleCallbackPage').then((m) => ({ default: m.GoogleCallbackPage })),
+)
 
 export const router = createBrowserRouter([
   {
@@ -105,6 +108,7 @@ export const router = createBrowserRouter([
       { path: '/mail-notice', element: <MailNoticePage /> },
       { path: '/profile-setup', element: <ProfileSetupPage /> },
       { path: '/social-signup', element: <SocialSignupPage /> },
+      { path: '/oauth/callback', element: <GoogleCallbackPage /> },
     ],
   },
 ])

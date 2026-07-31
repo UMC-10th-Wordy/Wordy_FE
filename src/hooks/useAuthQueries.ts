@@ -3,7 +3,9 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   authQueryKeys,
   deleteWithdraw,
+  getGoogleCallback,
   getVerifyEmail,
+  postGoogleComplete,
   postLogin,
   postLogout,
   postPassword,
@@ -46,5 +48,20 @@ export const useVerifyEmail = (token: string | null) => {
     queryFn: () => getVerifyEmail(token!),
     enabled: !!token,
     retry: false,
+  })
+}
+
+export const useGoogleCallback = (code: string | null) => {
+  return useQuery({
+    queryKey: authQueryKeys.googleCallback(code ?? ''),
+    queryFn: () => getGoogleCallback(code!),
+    enabled: !!code,
+    retry: false,
+  })
+}
+
+export const useGoogleComplete = () => {
+  return useMutation({
+    mutationFn: postGoogleComplete,
   })
 }
