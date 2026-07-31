@@ -72,7 +72,14 @@ const readStoredActiveTab = (dateKey: string): TodoFilter => {
       date: string
       tab: TodoFilter
     } | null
-    return stored && stored.date === dateKey ? stored.tab : 'incomplete'
+    if (
+      stored &&
+      stored.date === dateKey &&
+      (stored.tab === 'completed' || stored.tab === 'incomplete')
+    ) {
+      return stored.tab
+    }
+    return 'incomplete'
   } catch {
     return 'incomplete'
   }
@@ -108,10 +115,14 @@ export default function TodoListPage() {
   }, [currentDateKey])
 
   useEffect(() => {
-    sessionStorage.setItem(
-      ACTIVE_TAB_STORAGE_KEY,
-      JSON.stringify({ date: currentDateKey, tab: activeTab }),
-    )
+    try {
+      sessionStorage.setItem(
+        ACTIVE_TAB_STORAGE_KEY,
+        JSON.stringify({ date: currentDateKey, tab: activeTab }),
+      )
+    } catch {
+      return
+    }
   }, [activeTab, currentDateKey])
 
   const taskListRef = useRef<HTMLDivElement>(null)
