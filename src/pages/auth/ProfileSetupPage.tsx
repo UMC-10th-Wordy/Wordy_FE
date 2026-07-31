@@ -73,7 +73,11 @@ export const ProfileSetupPage = () => {
 
       // 프로필을 무효화하면 리페치가 끝난 뒤 profileData.userName이 채워지고
       // 위 useEffect가 반응형으로 navigate('/')를 실행함 (이동은 그 useEffect가 담당)
-      await queryClient.invalidateQueries({ queryKey: userQueryKeys.profile() })
+      // throwOnError를 지정하지 않으면 리페치 실패가 조용히 삼켜져 catch 블록이 실행되지 않음
+      await queryClient.invalidateQueries(
+        { queryKey: userQueryKeys.profile() },
+        { throwOnError: true },
+      )
     } catch {
       alert('프로필 등록에 실패했어요. 다시 시도해 주세요.')
     } finally {
