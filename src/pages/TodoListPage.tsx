@@ -37,6 +37,7 @@ import {
   updateTask,
 } from '@/api/task/task'
 import { performanceQueryKeys } from '@/api/performance/performance'
+import { dailyEntryQueryKeys } from '@/api/daily-entry/dailyEntry'
 import { useGetTasksByDate, useMoveTaskToTomorrow } from '@/hooks/useTaskQueries'
 import {
   mapDraftToCreateTaskPayload,
@@ -516,9 +517,14 @@ export default function TodoListPage() {
   const handleSavePerformance = async (values: { summary: string; insight: string }) => {
     await performancePreview.saveResult(values)
 
-    await queryClient.invalidateQueries({
-      queryKey: performanceQueryKeys.all,
-    })
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: performanceQueryKeys.all,
+      }),
+      queryClient.invalidateQueries({
+        queryKey: dailyEntryQueryKeys.all,
+      }),
+    ])
   }
 
   const handleUpdatePerformance = async (values: { summary: string; insight: string }) => {
@@ -534,9 +540,14 @@ export default function TodoListPage() {
       },
     })
 
-    await queryClient.invalidateQueries({
-      queryKey: performanceQueryKeys.all,
-    })
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: performanceQueryKeys.all,
+      }),
+      queryClient.invalidateQueries({
+        queryKey: dailyEntryQueryKeys.all,
+      }),
+    ])
   }
 
   const handleConvert = async () => {

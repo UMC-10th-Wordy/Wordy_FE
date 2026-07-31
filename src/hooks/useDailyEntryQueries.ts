@@ -67,6 +67,7 @@ export const useGetDailyEntryDetail = (dailyEntryId: string) => {
     queryKey: dailyEntryQueryKeys.detail(dailyEntryId),
     queryFn: () => getDailyEntryDetail(dailyEntryId),
     select: mapDailyEntryDetail,
+    refetchOnMount: 'always',
   })
 }
 
