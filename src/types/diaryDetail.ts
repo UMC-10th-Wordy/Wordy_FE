@@ -13,7 +13,7 @@ export type DailyEntryTaskPriority = 'MUST_DO' | 'SHOULD_DO' | 'COULD_DO'
 
 export type DailyEntryTaskStatus = 'COMPLETED' | 'INCOMPLETE'
 
-export type DailyEntryAttachmentFileType = 'file' | 'img'
+export type DailyEntryAttachmentFileType = 'FILE' | 'IMG'
 
 export interface DailyEntryAttachment {
   fileType: DailyEntryAttachmentFileType
