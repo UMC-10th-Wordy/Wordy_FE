@@ -47,11 +47,25 @@ export const DashboardPage = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [generation, setGeneration] = useState<'idle' | 'generating' | 'complete'>('idle')
   const [detail, setDetail] = useState<DashboardDetailDto | null>(null)
-  // TODO: API에 주차 이동 파라미터(BaseDate) 연결 예정. 현재는 라벨만 이동
-  const [weekOffset, setWeekOffset] = useState(0)
-  // TODO: 월간 API 명세 확정 시 월 이동 데이터 갱신 연결. 현재는 라벨만 이동
-  const [monthOffset, setMonthOffset] = useState(0)
 
+  // 팀 규칙(월 안에서 끊는 주차)의 주 시작/끝 계산 — 월간 buildWeeks와 동일 규칙
+  const getTeamWeekStart = (date: Date) => {
+    const weekIndex = Math.ceil(date.getDate() / 7)
+    return new Date(date.getFullYear(), date.getMonth(), (weekIndex - 1) * 7 + 1)
+  }
+  const getTeamWeekEnd = (start: Date) => {
+    const lastDay = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate()
+    return new Date(start.getFullYear(), start.getMonth(), Math.min(start.getDate() + 6, lastDay))
+  }
+
+  const [weekStartDate, setWeekStartDate] = useState(() => getTeamWeekStart(new Date()))
+  const weekLabel = `${weekStartDate.getFullYear()}년 ${weekStartDate.getMonth() + 1}월 ${Math.ceil(weekStartDate.getDate() / 7)}주차`
+  // TODO: 월간 API 명세 확정 시 월 이동 데이터 갱신 연결. 현재는 라벨만 이동
+
+  const currentWeekStart = getTeamWeekStart(new Date())
+  const isCurrentWeek = weekStartDate.getTime() >= currentWeekStart.getTime()
+
+  const [monthOffset, setMonthOffset] = useState(0)
   const [monthAnchor] = useState(() => {
     const now = new Date()
     return new Date(now.getFullYear(), now.getMonth(), 1)
@@ -61,6 +75,10 @@ export const DashboardPage = () => {
   const monthBaseDate = `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, '0')}-01`
   const monthLabel = `${selectedMonth.getFullYear()}년 ${selectedMonth.getMonth() + 1}월`
 
+  const isCurrentMonth =
+    selectedMonth.getFullYear() === monthAnchor.getFullYear() &&
+    selectedMonth.getMonth() === monthAnchor.getMonth()
+
   // 월간 생성 상태 — 탭 전환 시 유실되지 않도록 부모에서 소유
   const [monthlyGeneration, setMonthlyGeneration] = useState<MonthlyGeneration>('idle')
   const [monthlyEligibility, setMonthlyEligibility] = useState<MonthlyEligibilityDto | null>(null)
@@ -68,7 +86,8 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     let cancelled = false
-    getDashboardEligibility()
+    const baseDate = `${weekStartDate.getFullYear()}-${String(weekStartDate.getMonth() + 1).padStart(2, '0')}-${String(weekStartDate.getDate()).padStart(2, '0')}`
+    getDashboardEligibility(baseDate)
       .then((res) => {
         if (cancelled) return
         const mapped = res.entries.map((e) => ({
@@ -81,11 +100,11 @@ export const DashboardPage = () => {
         setWeekRange({ start: res.weekStart, end: res.weekEnd })
         setSelectedIds(mapped.map((e) => e.id)) // 기본: 전체 선택
       })
-      .catch(() => {})
+      .catch((error) => console.error('생성 조건 조회 실패:', error))
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [weekStartDate])
 
   useEffect(() => {
     let cancelled = false
@@ -98,7 +117,7 @@ export const DashboardPage = () => {
       cancelled = true
     }
   }, [monthOffset])
-  const weekLabel = `2026년 6월 ${3 + weekOffset}주차`
+
   const totalDays = entries.length
 
   // 상세 응답(DTO) → 화면 모델 매핑
@@ -183,6 +202,19 @@ export const DashboardPage = () => {
       })
   }
 
+  const handleWeekMove = (delta: number) => {
+    if (generation === 'generating') return
+    setDetail(null)
+    setGeneration('idle')
+    setWeekStartDate((prev) => {
+      const stepDate =
+        delta > 0
+          ? new Date(getTeamWeekEnd(prev).getTime() + 86400000) // 이번 주 끝 다음날
+          : new Date(prev.getTime() - 86400000) // 이번 주 시작 전날
+      return getTeamWeekStart(stepDate)
+    })
+  }
+
   // 월 이동 — 이전 월의 상세/생성 상태 무효화 (리뷰 반영)
   const handleMonthMove = (delta: number) => {
     if (monthlyGeneration === 'generating') return
@@ -205,8 +237,13 @@ export const DashboardPage = () => {
       .catch((error) => console.error('월간 상세 재조회 실패:', error))
   }
 
-  // TODO: 주간 주차 이동(BaseDate) 연동 시 해당 주차로 정확히 이동하도록 개선
-  const handleGoWeekly = (_weekId: string) => {
+  const handleGoWeekly = (weekId: string) => {
+    if (weekId.startsWith('pending-')) {
+      const dateStr = weekId.replace('pending-', '')
+      setDetail(null)
+      setGeneration('idle')
+      setWeekStartDate(getTeamWeekStart(new Date(`${dateStr}T00:00:00`)))
+    }
     setActiveTab('weekly')
   }
 
@@ -256,11 +293,7 @@ export const DashboardPage = () => {
       {activeTab === 'weekly' ? (
         <>
           <div className="flex items-center gap-2 self-start rounded-full border border-(--color-border-subtle) px-4 py-2">
-            <button
-              type="button"
-              aria-label="이전 주차"
-              onClick={() => setWeekOffset((v) => v - 1)}
-            >
+            <button type="button" aria-label="이전 주차" onClick={() => handleWeekMove(-1)}>
               <ArrowLeftIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
             </button>
             <span className="[font-size:var(--font-size-body-4)] text-(--color-text-default)">
@@ -269,7 +302,9 @@ export const DashboardPage = () => {
             <button
               type="button"
               aria-label="다음 주차"
-              onClick={() => setWeekOffset((v) => v + 1)}
+              disabled={generation === 'generating' || isCurrentWeek}
+              onClick={() => handleWeekMove(1)}
+              className="disabled:opacity-40"
             >
               <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
             </button>
@@ -293,6 +328,7 @@ export const DashboardPage = () => {
                   status={status === 'generating' ? 'generating' : status}
                   convertedCount={selectedIds.length}
                   onGenerate={handleGenerate}
+                  requiredCount={requiredCount}
                 />
                 <DiaryChecklistPanel
                   entries={entries}
@@ -323,7 +359,7 @@ export const DashboardPage = () => {
             <button
               type="button"
               aria-label="다음 달"
-              disabled={monthlyGeneration === 'generating'}
+              disabled={monthlyGeneration === 'generating' || isCurrentMonth}
               onClick={() => handleMonthMove(1)}
             >
               <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />

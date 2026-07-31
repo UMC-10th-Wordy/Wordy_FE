@@ -18,6 +18,7 @@ interface MonthlyDashboardProps {
   eligibility: MonthlyEligibilityDto | null
   detail: DashboardDetailDto | null
   onReflectionSaved: () => void
+  requiredCount: number
 }
 
 const TAG_FALLBACK_COLORS: ProjectTagColor[] = ['green', 'pink', 'blue', 'orange']
@@ -63,6 +64,7 @@ export const MonthlyDashboard = ({
   eligibility,
   detail,
   onReflectionSaved,
+  requiredCount,
 }: MonthlyDashboardProps) => {
   const weeks = eligibility ? buildWeeks(eligibility) : []
   const generatedCount = eligibility?.weeklyDashboardCount ?? 0
@@ -127,6 +129,7 @@ export const MonthlyDashboard = ({
         status={status === 'generating' ? 'generating' : status}
         generatedCount={generatedCount}
         onGenerate={onGenerate}
+        requiredCount={requiredCount}
       />
       <MonthlyWeekListPanel weeks={weeks} totalWeeks={weeks.length} onGoWeekly={onGoWeekly} />
     </>
