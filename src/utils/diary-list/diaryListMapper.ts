@@ -111,11 +111,14 @@ const mapDiarySearchDiary = (
   }
 }
 
-const mapDiarySearchTagResults = (result: DailyEntrySearchResult): DiarySearchTagResult[] => {
-  const normalizedKeyword = result.keyword.trim().toLocaleLowerCase()
+const mapDiarySearchTagResults = (
+  keyword: string,
+  entries: DailyEntrySearchItem[],
+): DiarySearchTagResult[] => {
+  const normalizedKeyword = keyword.trim().toLocaleLowerCase()
   const tagResultMap = new Map<string, DiarySearchTagResult>()
 
-  result.results.forEach((entry) => {
+  entries.forEach((entry) => {
     entry.tags.forEach((tag) => {
       const normalizedTagName = tag.tagName.toLocaleLowerCase()
 
@@ -145,18 +148,14 @@ const mapDiarySearchTagResults = (result: DailyEntrySearchResult): DiarySearchTa
 export const mapDailyEntrySearchResult = (
   result: DailyEntrySearchResult,
 ): DiarySearchResultData => {
-  const normalizedKeyword = result.keyword.trim().toLocaleLowerCase()
+  const diaries = result.journalTab.results.map((entry) => mapDiarySearchDiary(entry))
 
-  const diaries = result.results
-    .filter((entry) => entry.title.toLocaleLowerCase().includes(normalizedKeyword))
-    .map((entry) => mapDiarySearchDiary(entry))
-
-  const tagResults = mapDiarySearchTagResults(result)
+  const tagResults = mapDiarySearchTagResults(result.keyword, result.tagTab.results)
 
   return {
     keyword: result.keyword,
-    diaryCount: result.entryCount,
-    projectTagCount: result.tagCount,
+    diaryCount: result.journalTab.count,
+    projectTagCount: result.tagTab.count,
     diaries,
     tagResults,
   }

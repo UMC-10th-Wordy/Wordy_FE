@@ -47,11 +47,15 @@ export interface DailyEntrySearchItem {
   title: string
 }
 
+export interface DailyEntrySearchTabResult {
+  count: number
+  results: DailyEntrySearchItem[]
+}
+
 export interface DailyEntrySearchResult {
   keyword: string
-  entryCount: number
-  tagCount: number
-  results: DailyEntrySearchItem[]
+  journalTab: DailyEntrySearchTabResult
+  tagTab: DailyEntrySearchTabResult
 }
 
 export type DailyEntrySearchResponse = DiaryListApiResponse<DailyEntrySearchResult>
