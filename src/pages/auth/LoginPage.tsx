@@ -6,6 +6,7 @@ import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import LogoIcon from '@/assets/icons/logo.svg?react'
 import GoogleIcon from '@/assets/icons/google.svg?react'
 import { useNavigate } from 'react-router-dom'
+import { GOOGLE_AUTH_URL } from '@/api/auth/auth'
 import { useLogin } from '@/hooks/useAuthQueries'
 import { useToast } from '@/hooks/useToast'
 import { ApiError, setAuthTokens } from '@/lib/httpClient'
@@ -52,8 +53,8 @@ export const LoginPage = () => {
   }
 
   const handleGoogleLogin = () => {
-    // TODO: API 연동 시 백엔드 구글 로그인 엔드포인트로 이동
-    alert('구글 로그인은 API 연동 단계에서 구현 예정')
+    // 302 리다이렉트 응답이므로 fetch가 아닌 브라우저 이동으로 처리
+    window.location.href = GOOGLE_AUTH_URL
   }
 
   return (

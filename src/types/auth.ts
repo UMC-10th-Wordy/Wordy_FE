@@ -87,6 +87,46 @@ export type WithdrawResult = null
 
 export type WithdrawResponse = ApiEnvelope<WithdrawResult>
 
+/* 구글 로그인 콜백 */
+// GET /auth/google/callback
+
+export type GoogleCallbackResult =
+  | {
+      status: 'login'
+      accessToken: string
+      refreshToken: string
+      email: string
+      userName: string | null
+      plan: Plan
+      profileImgUrl: string | null
+    }
+  | {
+      status: 'pending'
+      pendingToken: string
+      email: string
+    }
+
+export type GoogleCallbackResponse = ApiEnvelope<GoogleCallbackResult>
+
+/* 구글 회원가입 완료 */
+// POST /auth/google/complete
+
+export interface GoogleCompleteRequest {
+  token: string
+  agreements: SignupAgreement[]
+}
+
+export interface GoogleCompleteResult {
+  accessToken: string
+  refreshToken: string
+  email: string
+  userName: string | null
+  plan: Plan
+  profileImgUrl: string | null
+}
+
+export type GoogleCompleteResponse = ApiEnvelope<GoogleCompleteResult>
+
 /* 액세스 토큰 재발급 */
 // POST /auth/refresh
 
