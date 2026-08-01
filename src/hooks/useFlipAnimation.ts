@@ -64,6 +64,7 @@ export function useFlipAnimation(containerRef: RefObject<HTMLElement | null>, de
     }
 
     prevRectsRef.current = nextRects
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deps는 호출부에서 전달하는 의도된 동적 배열
   }, deps)
 
   useEffect(() => {

@@ -16,7 +16,7 @@ export function mapHomeTaskToTodayTask(dto: HomeTaskDto): TodayTask {
   return {
     id: dto.taskId,
     title: dto.title,
-    project: dto.tag.tagName,
+    project: dto.tag?.tagName,
     priority: PRIORITY_FROM_API[dto.priority],
   }
 }
@@ -33,8 +33,8 @@ export function mapHomeTaskToRecentRecordTask(dto: HomeTaskDto): RecentRecordTas
   return {
     id: dto.taskId,
     title: dto.title,
-    project: dto.tag.tagName,
-    projectColor: hexToTagColor(dto.tag.color),
+    project: dto.tag?.tagName,
+    projectColor: dto.tag ? hexToTagColor(dto.tag.color) : undefined,
   }
 }
 

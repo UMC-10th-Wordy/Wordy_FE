@@ -36,6 +36,7 @@ import {
   taskQueryKeys,
   updateTask,
 } from '@/api/task/task'
+import { homeQueryKeys } from '@/api/home/home'
 import { performanceQueryKeys } from '@/api/performance/performance'
 import { dailyEntryQueryKeys } from '@/api/daily-entry/dailyEntry'
 import { useGetTasksByDate, useMoveTaskToTomorrow } from '@/hooks/useTaskQueries'
@@ -191,6 +192,7 @@ export default function TodoListPage() {
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(currentDateKey), (prev) =>
         prev ? [...prev, created] : [created],
       )
+      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
       setIsTaskFormOpen(false)
     } catch {
       addToast('업무 생성에 실패했어요. 다시 시도해 주세요')
@@ -206,6 +208,7 @@ export default function TodoListPage() {
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
         prev ? prev.filter((task) => task.taskId !== id) : prev,
       )
+      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
     } catch {
       addToast('업무 삭제에 실패했어요. 다시 시도해 주세요')
     }
@@ -248,6 +251,7 @@ export default function TodoListPage() {
             )
           : prev,
       )
+      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
     } catch {
       addToast('업무 수정에 실패했어요. 다시 시도해 주세요')
     }
@@ -294,6 +298,7 @@ export default function TodoListPage() {
             : task,
         ),
       )
+      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
     } catch {
       addToast('업무 결과 저장에 실패했어요. 다시 시도해 주세요')
     }
@@ -381,6 +386,7 @@ export default function TodoListPage() {
             )
           : prev,
       )
+      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
       addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
     } catch {
       addToast('업무 상태 변경에 실패했어요. 다시 시도해 주세요')
@@ -503,6 +509,7 @@ export default function TodoListPage() {
     )
 
     setMovedPerformanceTaskIds((prev) => (prev.includes(taskId) ? prev : [...prev, taskId]))
+    queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
   }
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
