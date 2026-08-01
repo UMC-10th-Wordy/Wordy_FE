@@ -4,6 +4,7 @@ import {
   INITIAL_DASHBOARD_LIST_MOCK,
   INITIAL_DASHBOARD_DETAIL_MOCK,
   INITIAL_MONTHLY_DASHBOARD_DETAIL_MOCK,
+  INITIAL_MONTHLY_DASHBOARD_LIST_MOCK,
   MONTHLY_ELIGIBILITY_MOCK,
 } from '@/mocks/dashboard/dashboardApiMock'
 import type {
@@ -105,7 +106,7 @@ export async function getMonthlyEligibility(baseDate?: string): Promise<MonthlyE
 
 /* GET /dashboards/monthly — 월간 대시보드 목록 조회 (경로 스웨거 표기 백엔드 확인 중) */
 export async function getMonthlyDashboards(): Promise<DashboardListItemDto[]> {
-  if (USE_MOCK_DASHBOARD) return INITIAL_DASHBOARD_LIST_MOCK
+  if (USE_MOCK_DASHBOARD) return INITIAL_MONTHLY_DASHBOARD_LIST_MOCK
   return request<DashboardListItemDto[]>('/dashboards/monthly')
 }
 
