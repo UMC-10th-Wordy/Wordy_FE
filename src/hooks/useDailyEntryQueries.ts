@@ -15,6 +15,7 @@ import {
   getMonthlyDailyEntriesByYearMonth,
   searchDailyEntries,
 } from '@/api/daily-entry/dailyEntry'
+import { homeQueryKeys } from '@/api/home/home'
 import {
   mapDailyEntriesSummary,
   mapDailyEntryDetail,
@@ -104,6 +105,9 @@ export const useDeleteDailyEntry = () => {
         }),
         queryClient.invalidateQueries({
           queryKey: dailyEntryQueryKeys.searches(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
         }),
       ])
     },
