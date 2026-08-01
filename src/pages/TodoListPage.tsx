@@ -523,6 +523,9 @@ export default function TodoListPage() {
       queryClient.invalidateQueries({
         queryKey: dailyEntryQueryKeys.all,
       }),
+      queryClient.invalidateQueries({
+        queryKey: homeQueryKeys.all,
+      }),
     ])
   }
 
