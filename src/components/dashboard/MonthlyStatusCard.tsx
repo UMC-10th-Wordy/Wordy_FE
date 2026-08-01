@@ -41,7 +41,7 @@ export const MonthlyStatusCard = ({
             size="large"
             disabled
             iconLeft={<GenerateIcon width={20} height={20} />}
-            className="w-[400px]"
+            className="w-full max-w-100"
           >
             월간 대시보드 생성하기
           </TextButton>
@@ -68,7 +68,7 @@ export const MonthlyStatusCard = ({
             size="large"
             iconLeft={<GenerateIcon width={20} height={20} />}
             onClick={onGenerate}
-            className="w-[400px]"
+            className="w-full max-w-100"
           >
             월간 대시보드 생성하기
           </TextButton>
