@@ -611,7 +611,7 @@ export default function TodoListPage() {
         }}
         className="flex h-full min-h-0 min-w-0 flex-none flex-col overflow-x-clip border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default)"
       >
-        <Scrollbar>
+        <Scrollbar scrollbarClassName="py-2 pr-1">
           <div className="flex w-full flex-col gap-12 px-10 pt-10">
             <DateHeader
               date={currentDate}
