@@ -115,7 +115,7 @@ export const DashboardPage = () => {
     return () => {
       cancelled = true
     }
-  }, [monthOffset])
+  }, [monthOffset, monthBaseDate])
 
   const totalDays = entries.length
 
