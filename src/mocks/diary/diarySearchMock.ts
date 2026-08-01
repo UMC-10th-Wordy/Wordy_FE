@@ -73,7 +73,7 @@ export const MOCK_TAG_SEARCH_RESULTS: DiarySearchTagResult[] = [
         id: '2026-06-20',
         entryDate: '2026-06-20',
         title:
-          'Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비Product Strategy Alignment 회의 준비Product Strategy Alignment 회의 준비',
+          'Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비',
         tag: {
           name: '회의',
           color: 'red',

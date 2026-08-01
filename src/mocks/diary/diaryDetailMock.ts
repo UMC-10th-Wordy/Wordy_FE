@@ -4,15 +4,15 @@ import type { DiaryDetailData } from '@/types/diaryDetail'
 
 // TODO(#65): 업무 일지 상세 조회 API 연결 후 목업 데이터 제거
 export const DIARY_DETAIL_MOCK: DiaryDetailData = {
-  id: '2026-08-21',
+  id: '2026-08-01',
   dailyPerformanceId: null,
-  date: '2026-08-21',
+  date: '2026-08-01',
   completedCount: 3,
   incompleteCount: 2,
   tasks: [
     {
       id: 'completed-1',
-      date: '2026-08-21',
+      date: '2026-08-01',
       title: 'Product Strategy Alignment 회의 준비',
       memo: '지난 분기 OKR 회고와 다음 분기 핵심 안건을 정리했어요.',
       tag: {
@@ -39,7 +39,7 @@ export const DIARY_DETAIL_MOCK: DiaryDetailData = {
     },
     {
       id: 'completed-2',
-      date: '2026-08-21',
+      date: '2026-08-01',
       title: '디자인 시스템 V2 컴포넌트 상태 점검',
       tag: {
         label: '디자인 시스템 V2',
@@ -51,7 +51,7 @@ export const DIARY_DETAIL_MOCK: DiaryDetailData = {
     },
     {
       id: 'completed-3',
-      date: '2026-08-21',
+      date: '2026-08-01',
       title: '사용자 리서치 결과 정리',
       memo: '인터뷰 내용을 주요 사용성 문제별로 분류했어요.',
       tag: {
@@ -62,8 +62,8 @@ export const DIARY_DETAIL_MOCK: DiaryDetailData = {
       isCompleted: true,
     },
     {
-      id: 'incomplete-1',
-      date: '2026-08-21',
+      id: 'incomplete-should-1',
+      date: '2026-08-01',
       title: '온보딩 리뉴얼 회의 액션 아이템 정리',
       memo: '회의 참석자별 담당 업무를 추가로 확인해야 해요.',
       tag: {
@@ -74,8 +74,8 @@ export const DIARY_DETAIL_MOCK: DiaryDetailData = {
       isCompleted: false,
     },
     {
-      id: 'incomplete-2',
-      date: '2026-08-21',
+      id: 'incomplete-could-1',
+      date: '2026-08-01',
       title: '다음 분기 프로젝트 일정 초안 작성',
       tag: {
         label: '광고',

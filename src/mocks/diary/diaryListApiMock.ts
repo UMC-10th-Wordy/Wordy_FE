@@ -572,6 +572,16 @@ export const DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP: Record<string, DailyEntryDeta
   ...MONTHLY_DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP,
   ...SEARCH_DAILY_ENTRY_DETAIL_RESPONSE_MOCK_MAP,
 
+  // 월간 목록과 검색 결과에 동시에 존재하는 id라 검색 쪽 제네릭 요약으로 덮어써지지 않도록 명시
+  'daily-entry-2026-02-21': createDailyEntryDetailResponseMock({
+    dailyEntryId: 'daily-entry-2026-02-21',
+    entryDate: '2026-02-21',
+    title: '프로젝트 킥오프 회의',
+    summary: '프로젝트 목표와 팀원별 역할, 진행 일정을 공유했어요.',
+    tagName: '회의',
+    tagColor: '#14c369',
+  }),
+
   'daily-entry-2026-06-21': {
     success: true,
     code: 'S200',
