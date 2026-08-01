@@ -14,7 +14,7 @@ export interface HomeTaskDto {
   title: string
   priority: ApiTaskPriority
   status: ApiTaskStatus
-  tag: HomeTaskTagDto
+  tag: HomeTaskTagDto | null
 }
 
 export interface HomeWeekRecordDto {
