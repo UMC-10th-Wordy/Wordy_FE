@@ -19,6 +19,7 @@ import {
 } from '@/constants/onboarding'
 import type { CareerOption, JobOption } from '@/constants/onboarding'
 import { updateProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
+import { homeQueryKeys } from '@/api/home/home'
 import { useGetProfile } from '@/hooks/useUserQueries'
 import { useChangePassword, useLogout, useWithdraw } from '@/hooks/useAuthQueries'
 import { ApiError, clearAuthTokens } from '@/lib/httpClient'
@@ -295,6 +296,7 @@ export function SidebarLayout() {
               })
 
               await queryClient.invalidateQueries({ queryKey: userQueryKeys.profile() })
+              await queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
               setModal(null)
             } catch {
               alert(
