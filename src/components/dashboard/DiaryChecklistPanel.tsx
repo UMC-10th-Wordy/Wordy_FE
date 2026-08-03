@@ -72,7 +72,7 @@ export const DiaryChecklistPanel = ({
                     </span>
                     <span
                       className={[
-                        '[font-size:var(--font-size-body-3)]',
+                        '[font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)',
                         disabled ? 'text-(--color-text-disabled)' : 'text-(--color-text-default)',
                       ].join(' ')}
                     >

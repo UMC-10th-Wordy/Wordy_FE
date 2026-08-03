@@ -240,8 +240,7 @@ export const WeeklyRetrospective = ({
           {texts.planLabel}
         </p>
 
-        <div className="grid grid-cols-[40px_1fr_360px_80px] items-center gap-x-4 rounded-md bg-(--color-bg-brand-light) px-4 py-3 [font-size:var(--font-size-body-4)] font-medium text-(--color-text-default)">
-          <span />
+        <div className="grid grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 rounded-md bg-(--color-bg-brand-light) py-3 pl-5 [font-size:var(--font-size-body-4)] font-medium text-(--color-text-default)">
           <span>업무 내용</span>
           <span>예상 시점</span>
           <span />
@@ -251,17 +250,31 @@ export const WeeklyRetrospective = ({
           editing?.id === row.id ? null : (
             <div
               key={row.id}
-              className="group grid h-[60px] grid-cols-[40px_1fr_360px_80px] items-center gap-x-4 border-b border-(--color-border-subtle) px-4 [font-size:var(--font-size-body-4)] text-(--color-text-default)"
+              className="group grid h-[60px] grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 border-b border-(--color-border-subtle) pl-5 [font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-default)"
             >
-              <span className="text-(--color-text-tertiary)">{String(i + 1).padStart(2, '0')}</span>
-              <span>{row.content}</span>
+              <span className="flex items-center gap-4">
+                <span className="text-(--color-text-tertiary)">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span>{row.content}</span>
+              </span>
               <span>{row.schedule}</span>
-              <span className="flex justify-end gap-3 opacity-0 transition-opacity duration-100 ease-out group-hover:opacity-100 group-focus-within:opacity-100">
-                <button type="button" aria-label="수정" onClick={() => handleEditRow(row)}>
-                  <EditIcon width={18} height={18} className="text-(--color-icon-tertiary)" />
+              <span className="flex justify-end gap-1 opacity-0 transition-opacity duration-100 ease-out group-hover:opacity-100 group-focus-within:opacity-100">
+                <button
+                  type="button"
+                  aria-label="수정"
+                  onClick={() => handleEditRow(row)}
+                  className="flex size-11 items-center justify-center rounded-lg"
+                >
+                  <EditIcon width={24} height={24} className="text-(--color-icon-secondary)" />
                 </button>
-                <button type="button" aria-label="삭제" onClick={() => handleDeleteRow(row.id)}>
-                  <TrashIcon width={18} height={18} className="text-(--color-icon-tertiary)" />
+                <button
+                  type="button"
+                  aria-label="삭제"
+                  onClick={() => handleDeleteRow(row.id)}
+                  className="flex size-11 items-center justify-center rounded-lg"
+                >
+                  <TrashIcon width={24} height={24} className="text-(--color-icon-secondary)" />
                 </button>
               </span>
             </div>
@@ -276,20 +289,22 @@ export const WeeklyRetrospective = ({
         >
           <div className="overflow-hidden">
             {editing && (
-              <div className="grid min-w-[943px] grid-cols-[40px_1fr_360px_80px] items-center gap-x-4 px-4 py-2">
-                <span className="[font-size:var(--font-size-body-4)] text-(--color-text-tertiary)">
-                  {String(editingIndex).padStart(2, '0')}
+              <div className="grid grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 py-2 pl-5">
+                <span className="flex items-center gap-4">
+                  <span className="[font-size:var(--font-size-body-2)] leading-[1.6] text-(--color-text-tertiary)">
+                    {String(editingIndex).padStart(2, '0')}
+                  </span>
+                  <input
+                    type="text"
+                    value={editing.content}
+                    onChange={(e) =>
+                      setEditing((prev) => prev && { ...prev, content: e.target.value })
+                    }
+                    placeholder={texts.planPlaceholder}
+                    aria-label="업무 내용"
+                    className="h-[53px] min-w-0 flex-1 rounded-lg border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-brand-subtle) px-5 py-3 [font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-default) outline-none transition-colors duration-100 ease-out focus:border-(--color-border-brand) placeholder:text-(--color-text-tertiary)"
+                  />
                 </span>
-                <input
-                  type="text"
-                  value={editing.content}
-                  onChange={(e) =>
-                    setEditing((prev) => prev && { ...prev, content: e.target.value })
-                  }
-                  placeholder={texts.planPlaceholder}
-                  aria-label="업무 내용"
-                  className="rounded-lg bg-(--color-bg-secondary) px-4 py-3 [font-size:var(--font-size-body-4)] outline-none placeholder:text-(--color-text-tertiary)"
-                />
                 <input
                   type="text"
                   value={editing.schedule}
@@ -298,7 +313,7 @@ export const WeeklyRetrospective = ({
                   }
                   placeholder="언제 진행하실 예정인가요?"
                   aria-label="예상 시점"
-                  className="rounded-lg bg-(--color-bg-secondary) px-4 py-3 [font-size:var(--font-size-body-4)] outline-none placeholder:text-(--color-text-tertiary)"
+                  className="h-[53px] w-full rounded-lg border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-brand-subtle) px-5 py-3 [font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-default) outline-none transition-colors duration-100 ease-out focus:border-(--color-border-brand) placeholder:text-(--color-text-tertiary)"
                 />
                 <span className="flex justify-end">
                   <button
@@ -325,7 +340,7 @@ export const WeeklyRetrospective = ({
         </button>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-end justify-between">
         <div
           className={[
             'transition-opacity duration-500',
@@ -334,7 +349,7 @@ export const WeeklyRetrospective = ({
         >
           <ToastContainer toasts={toasts} align="left" />
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-end gap-4">
           {savedAt && (
             <span className="[font-size:var(--font-size-caption-1)] text-(--color-text-tertiary)">
               임시 저장됨: {savedAt}
@@ -342,7 +357,8 @@ export const WeeklyRetrospective = ({
           )}
           <TextButton
             variant="stroke"
-            size="medium"
+            size="large"
+            className="w-[240px]"
             disabled={!canSave || isSaving}
             onClick={handleTempSave}
           >
@@ -350,7 +366,8 @@ export const WeeklyRetrospective = ({
           </TextButton>
           <TextButton
             variant="fill"
-            size="medium"
+            size="large"
+            className="w-[240px]"
             disabled={!canSave || isSaving}
             onClick={handleSave}
           >

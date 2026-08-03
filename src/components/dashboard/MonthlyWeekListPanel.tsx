@@ -59,7 +59,7 @@ export const MonthlyWeekListPanel = ({
                 >
                   {week.generated ? '생성됨' : '생성되지 않음'}
                 </span>
-                <span className="[font-size:var(--font-size-body-3)] font-medium text-(--color-text-default)">
+                <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)">
                   {week.weekLabel}
                 </span>
                 <span className="[font-size:var(--font-size-caption-1)] text-(--color-text-tertiary)">
