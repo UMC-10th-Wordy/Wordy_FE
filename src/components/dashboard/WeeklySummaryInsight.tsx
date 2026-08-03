@@ -29,8 +29,8 @@ export const WeeklySummaryInsight = ({
   focusAreas,
 }: WeeklySummaryInsightProps) => {
   return (
-    <section className="flex flex-col gap-6 rounded-2xl border border-(--color-border-subtle) bg-(--color-bg-default) p-7">
-      <h2 className="[font-size:var(--font-size-body-2)] font-bold text-(--color-text-default)">
+    <section className="flex flex-col gap-6 rounded-2xl border border-[#DDDDFF] bg-(--color-bg-default) p-7 shadow-[0px_1px_5px_0px_#0000001A]">
+      <h2 className="[font-size:var(--font-size-body-1)] leading-[1.6] font-semibold text-(--color-text-default)">
         {title}
       </h2>
 
