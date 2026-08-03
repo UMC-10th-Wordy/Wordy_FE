@@ -28,17 +28,16 @@ export const WeeklyHighlights = ({
       </div>
       <ol className="flex flex-col gap-3">
         {items.map((item, i) => (
-          <li key={item.text} className="flex items-baseline gap-3">
+          <li key={item.text} className="flex flex-wrap items-baseline gap-3">
             <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-brand)">
               {String(i + 1).padStart(2, '0')}
             </span>
-            <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-default)">
+            <span className="min-w-0 flex-1 break-words [font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-default)">
               {item.text}
             </span>
-            {/* TODO: 클릭 시 해당 일지 이동 — 스키마에 일지 id 부재로 기능 보류 (백엔드 확인 중) */}
-            <span className="flex shrink-0 items-center gap-0.5 [font-size:var(--font-size-body-4)] font-medium text-(--color-text-tertiary)">
-              {item.source}
-              <ArrowLeftIcon width={16} height={16} className="rotate-180" />
+            <span className="flex min-w-0 max-w-full shrink items-center gap-0.5 [font-size:var(--font-size-body-4)] font-medium text-(--color-text-tertiary)">
+              <span className="min-w-0 break-words">{item.source}</span>
+              <ArrowLeftIcon aria-hidden="true" width={16} height={16} className="rotate-180" />
             </span>
           </li>
         ))}

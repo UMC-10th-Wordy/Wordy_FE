@@ -56,7 +56,7 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
               aria-pressed={active}
               onClick={() => setSelectedId(tag.id)}
               className={[
-                'flex h-[45px] items-center gap-1 rounded-full border px-4 py-2 [font-size:var(--font-size-body-4)] transition-colors duration-100 ease-out',
+                'flex h-[45px] items-center gap-1 rounded-full whitespace-nowrap border px-4 py-2 [font-size:var(--font-size-body-4)] transition-colors duration-100 ease-out',
                 active
                   ? 'border-[#5D5DF1] bg-[#DDDDFF] font-semibold text-(--color-text-brand)'
                   : 'border-(--color-border-subtle) bg-[#FAFAFA] text-(--color-text-secondary)',
@@ -79,12 +79,12 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
             <ProjectTag label={selected.name} color={selected.color} />
           </div>
 
-          <div className="grid grid-cols-2 gap-x-10 gap-y-5">
+          <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2">
             <div>
               <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
                 목적
               </p>
-              <p className="[font-size:var(--font-size-body-3)] text-(--color-text-default)">
+              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-3)] text-(--color-text-default)">
                 {selected.purpose}
               </p>
             </div>
@@ -92,17 +92,17 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
               <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
                 기대 성과
               </p>
-              <p className="[font-size:var(--font-size-body-3)] text-(--color-text-default)">
+              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-3)] text-(--color-text-default)">
                 {selected.expectedResult}
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-x-10">
+          <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-3">
             <div>
               <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
                 관련 업무 수
               </p>
-              <p className="[font-size:var(--font-size-body-3)] text-(--color-text-default)">
+              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-3)] text-(--color-text-default)">
                 {selected.taskCount}
               </p>
             </div>
@@ -110,7 +110,7 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
               <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
                 기록 기간
               </p>
-              <p className="[font-size:var(--font-size-body-3)] text-(--color-text-default)">
+              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-3)] text-(--color-text-default)">
                 {selected.period}
               </p>
             </div>
@@ -118,7 +118,7 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
               <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
                 달성 현황
               </p>
-              <p className="[font-size:var(--font-size-body-3)] text-(--color-text-default)">
+              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-3)] text-(--color-text-default)">
                 {selected.achievement}
               </p>
             </div>
@@ -152,7 +152,7 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
               {kpi.highlights.map((line) => (
                 <p
                   key={line}
-                  className="flex items-start gap-2 [font-size:var(--font-size-body-4)] text-(--color-text-default)"
+                  className="flex min-w-0 items-start gap-2 [overflow-wrap:anywhere] [font-size:var(--font-size-body-4)] text-(--color-text-default)"
                 >
                   <GenerateIcon
                     width={16}
@@ -167,7 +167,7 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
                   <p className="[font-size:var(--font-size-caption-1)] text-(--color-text-tertiary)">
                     관련 산출물·원문
                   </p>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="min-w-0 [overflow-wrap:anywhere] flex flex-wrap gap-3">
                     {kpi.files.map((file) => (
                       <span
                         key={file}

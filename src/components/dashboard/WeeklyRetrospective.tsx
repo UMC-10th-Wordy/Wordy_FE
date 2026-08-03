@@ -250,15 +250,15 @@ export const WeeklyRetrospective = ({
           editing?.id === row.id ? null : (
             <div
               key={row.id}
-              className="group grid h-[60px] grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 border-b border-(--color-border-subtle) pl-5 [font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-default)"
+              className="group grid min-h-[60px] grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 border-b border-(--color-border-subtle) pl-5 [font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-default)"
             >
-              <span className="flex items-center gap-4">
+              <span className="flex min-w-0 items-center gap-4">
                 <span className="text-(--color-text-tertiary)">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <span>{row.content}</span>
+                <span className="min-w-0 break-words">{row.content}</span>
               </span>
-              <span>{row.schedule}</span>
+              <span className="min-w-0 break-words">{row.schedule}</span>
               <span className="flex justify-end gap-1 opacity-0 transition-opacity duration-100 ease-out group-hover:opacity-100 group-focus-within:opacity-100">
                 <button
                   type="button"
