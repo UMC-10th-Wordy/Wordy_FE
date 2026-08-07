@@ -29,7 +29,7 @@ export const DiaryListHeader = () => {
     <header className="relative z-50 flex w-full items-start justify-between">
       <div className="flex shrink-0 flex-col">
         <h1 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
-          업무 일지 모아보기
+          업무 일지 히스토리
         </h1>
         <p className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-[var(--font-weight-regular)] text-(--color-text-tertiary)">
           지금까지 작성한 업무 일지를
