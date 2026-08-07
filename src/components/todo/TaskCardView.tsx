@@ -42,7 +42,7 @@ export function TaskCardView({
       {/* 드래그 핸들 / 체크박스 / 프로젝트 태그 / 업무명 */}
       <div className="flex w-full items-start gap-2">
         <div className="flex min-w-0 flex-1 items-start gap-[9px]">
-          <div className="flex shrink-0 items-center gap-[9px]">
+          <div className="flex h-[calc(var(--font-size-body-2)*var(--line-height-body))] shrink-0 items-center gap-[9px]">
             <button
               type="button"
               aria-label="순서 변경"

@@ -856,7 +856,7 @@ export default function TodoListPage() {
         <RetrospectiveExampleModal onClose={() => setIsExampleModalOpen(false)} />
       )}
 
-      <ToastContainer toasts={toasts} />
+      <ToastContainer toasts={toasts} align="left" />
     </div>
   )
 }
