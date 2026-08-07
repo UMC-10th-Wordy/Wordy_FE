@@ -61,6 +61,7 @@ import {
 import type { TaskDto } from '@/types/task'
 import FailIcon from '@/assets/icons/fail.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
+import EditIcon from '@/assets/icons/edit.svg?react'
 import ExpandIcon from '@/assets/icons/Property 1=top_right.svg?react'
 
 const ACTIVE_TAB_STORAGE_KEY = 'todo-active-tab'
@@ -103,6 +104,7 @@ export default function TodoListPage() {
   const [loadedDateKey, setLoadedDateKey] = useState<string | null>(null)
   const [collapsedTaskIds, setCollapsedTaskIds] = useState<Set<string>>(new Set())
   const [retrospectiveByDate, setRetrospectiveByDate] = useState<Record<string, string>>({})
+  const [isRetrospectiveFocused, setIsRetrospectiveFocused] = useState(false)
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
 
   const currentDateKey = toDateKey(currentDate)
@@ -170,6 +172,7 @@ export default function TodoListPage() {
 
   const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
   const retrospective = retrospectiveByDate[currentDateKey] ?? ''
+  const isRetrospectiveButtonVisible = !isRetrospectiveFocused && retrospective.trim().length === 0
 
   const savedPerformanceResult = savedPerformanceDetail
     ? mapPerformanceDetailResult(savedPerformanceDetail, tasksForDate)
@@ -563,7 +566,40 @@ export default function TodoListPage() {
     ])
   }
 
+  const handleFocusRetrospectiveInput = () => {
+    const target = document.getElementById('today-retrospective-input')
+    if (!target) return
+
+    target.focus({ preventScroll: true })
+
+    const scrollContainer = target.closest('.overflow-y-scroll')
+    if (!(scrollContainer instanceof HTMLElement)) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      return
+    }
+
+    const containerRect = scrollContainer.getBoundingClientRect()
+    const targetRect = target.getBoundingClientRect()
+    const startTop = scrollContainer.scrollTop
+    const delta =
+      targetRect.top - containerRect.top - containerRect.height / 2 + targetRect.height / 2
+    const endTop = startTop + delta
+    const duration = 800
+    const startTime = performance.now()
+
+    const step = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      scrollContainer.scrollTop = startTop + (endTop - startTop) * eased
+      if (progress < 1) requestAnimationFrame(step)
+    }
+
+    requestAnimationFrame(step)
+  }
+
   const handleRetrospectiveBlur = async () => {
+    setIsRetrospectiveFocused(false)
+
     try {
       await createDailyEntryMutation.mutateAsync({
         entryDate: currentDateKey,
@@ -631,7 +667,7 @@ export default function TodoListPage() {
           duration: 0.2,
           ease: 'easeOut',
         }}
-        className="flex h-full min-h-0 min-w-0 flex-none flex-col overflow-x-clip border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default)"
+        className="relative flex h-full min-h-0 min-w-0 flex-none flex-col overflow-x-clip border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default)"
       >
         <Scrollbar scrollbarClassName="py-2 pr-1">
           <div className="flex w-full flex-col gap-12 px-10 pt-10">
@@ -764,6 +800,7 @@ export default function TodoListPage() {
                 </TextButton>
               </div>
               <Input2
+                id="today-retrospective-input"
                 value={retrospective}
                 onChange={(event) =>
                   setRetrospectiveByDate((prev) => ({
@@ -771,6 +808,7 @@ export default function TodoListPage() {
                     [currentDateKey]: event.target.value,
                   }))
                 }
+                onFocus={() => setIsRetrospectiveFocused(true)}
                 onBlur={handleRetrospectiveBlur}
                 placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."
                 className="w-full !min-h-[200px]"
@@ -783,6 +821,30 @@ export default function TodoListPage() {
             />
           </div>
         </Scrollbar>
+
+        <AnimatePresence>
+          {isRetrospectiveButtonVisible && (
+            <motion.div
+              key="retrospective-floating-button"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.1 }}
+              className="absolute right-6 bottom-8"
+            >
+              <TextButton
+                type="button"
+                variant="fill"
+                size="large"
+                iconLeft={<EditIcon aria-hidden />}
+                onClick={handleFocusRetrospectiveInput}
+                className="!rounded-[1000px] shadow-[0px_1px_15px_0px_rgba(0,0,0,0.1)]"
+              >
+                회고 작성하기
+              </TextButton>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.main>
 
       <AnimatePresence initial={false}>
