@@ -1,5 +1,6 @@
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQueries,
   useSuspenseQuery,
@@ -10,6 +11,7 @@ import {
   deleteDailyEntry,
   dailyEntryQueryKeys,
   getDailyEntriesSummary,
+  getDailyEntryByDate,
   getDailyEntryDetail,
   getMonthlyDailyEntries,
   getMonthlyDailyEntriesByYearMonth,
@@ -24,6 +26,13 @@ import {
   mapMonthlyDiaryRecords,
 } from '@/utils/diary-list/diaryListMapper'
 import type { DailyEntrySearchParams } from '@/types/diarySearch'
+
+export const useGetDailyEntryByDate = (date: string) => {
+  return useQuery({
+    queryKey: dailyEntryQueryKeys.byDate(date),
+    queryFn: () => getDailyEntryByDate(date),
+  })
+}
 
 export const useGetDiaryListPageData = () => {
   const [summaryQuery, monthlyRecordsQuery] = useSuspenseQueries({

@@ -39,6 +39,7 @@ import {
 import { homeQueryKeys } from '@/api/home/home'
 import { performanceQueryKeys } from '@/api/performance/performance'
 import { dailyEntryQueryKeys } from '@/api/daily-entry/dailyEntry'
+import { useCreateDailyEntry, useGetDailyEntryByDate } from '@/hooks/useDailyEntryQueries'
 import { useGetTasksByDate, useMoveTaskToTomorrow } from '@/hooks/useTaskQueries'
 import {
   mapDraftToCreateTaskPayload,
@@ -132,6 +133,7 @@ export default function TodoListPage() {
   const performancePreview = usePerformancePreview()
   const moveTaskToTomorrowMutation = useMoveTaskToTomorrow()
   const updatePerformanceMutation = useUpdatePerformance()
+  const createDailyEntryMutation = useCreateDailyEntry()
 
   const questionChat = usePerformanceQuestionChat({
     isActive: performancePreview.status === 'questioning',
@@ -146,6 +148,15 @@ export default function TodoListPage() {
   const { data: fetchedTasks } = useGetTasksByDate(currentDateKey)
 
   const { data: performanceList } = useGetPerformancesByDate(currentDateKey)
+
+  const { data: fetchedDailyEntry } = useGetDailyEntryByDate(currentDateKey)
+
+  if (fetchedDailyEntry !== undefined && !(currentDateKey in retrospectiveByDate)) {
+    setRetrospectiveByDate((prev) => ({
+      ...prev,
+      [currentDateKey]: fetchedDailyEntry?.reflectionContent ?? '',
+    }))
+  }
 
   const savedPerformanceDetail =
     performanceList?.exists && performanceList.performance ? performanceList.performance : null
@@ -552,6 +563,17 @@ export default function TodoListPage() {
     ])
   }
 
+  const handleRetrospectiveBlur = async () => {
+    try {
+      await createDailyEntryMutation.mutateAsync({
+        entryDate: currentDateKey,
+        reflectionContent: retrospective.trim(),
+      })
+    } catch {
+      addToast('회고 저장에 실패했어요. 다시 시도해 주세요')
+    }
+  }
+
   const handleConvert = async () => {
     if (isProfilePending) {
       return
@@ -749,6 +771,7 @@ export default function TodoListPage() {
                     [currentDateKey]: event.target.value,
                   }))
                 }
+                onBlur={handleRetrospectiveBlur}
                 placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."
                 className="w-full !min-h-[200px]"
               />

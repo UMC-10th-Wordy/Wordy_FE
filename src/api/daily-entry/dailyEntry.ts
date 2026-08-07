@@ -4,6 +4,7 @@ import type {
   CreateDailyEntryPayload,
   CreateDailyEntryResult,
   DailyEntriesSummaryResult,
+  DailyEntryByDateResult,
   DailyEntryDeleteResult,
   MonthlyDailyEntry,
   MonthlyDailyEntryRecord,
@@ -17,6 +18,14 @@ export const createDailyEntry = async (
   return request<CreateDailyEntryResult>('/daily-entries', {
     method: 'POST',
     body: JSON.stringify(payload),
+  })
+}
+
+export const getDailyEntryByDate = async (date: string): Promise<DailyEntryByDateResult | null> => {
+  const searchParams = new URLSearchParams({ date })
+
+  return request<DailyEntryByDateResult | null>(`/daily-entries?${searchParams.toString()}`, {
+    method: 'GET',
   })
 }
 
@@ -70,6 +79,8 @@ export const deleteDailyEntry = async (dailyEntryId: string): Promise<DailyEntry
 
 export const dailyEntryQueryKeys = {
   all: ['daily-entry'] as const,
+
+  byDate: (date: string) => [...dailyEntryQueryKeys.all, 'by-date', date] as const,
 
   summary: () => [...dailyEntryQueryKeys.all, 'summary'] as const,
 
