@@ -26,7 +26,7 @@ export const DiaryMonthlyEntry = ({ entry }: DiaryMonthlyEntryProps) => {
         onClick={handleEntryClick}
       >
         <div className="flex min-w-0 items-center gap-[9px]">
-          <span className="shrink-0 [font-size:var(--font-size-body-4)] leading-(--line-height-body) font-(--font-weight-medium) text-(--color-text-tertiary)">
+          <span className="flex h-[30px] w-[36px] shrink-0 items-center justify-start [font-size:var(--font-size-body-4)] leading-(--line-height-body) font-(--font-weight-medium) text-(--color-text-tertiary)">
             {entry.day}일
           </span>
 
