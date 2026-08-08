@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { OnboardingCard } from '@/components/auth/OnboardingCard'
 import {
   CAREER_OPTIONS,
@@ -10,10 +11,13 @@ import type { CareerOption, JobOption } from '@/constants/onboarding'
 import ProfileDefaultIcon from '@/assets/icons/profile-default.svg?react'
 import CameraBadgeIcon from '@/assets/icons/camera-badge.svg?react'
 import { useNavigate } from 'react-router-dom'
-import { postProfile, postProfileImage } from '@/api/user/user'
+import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
+import { useGetProfile } from '@/hooks/useUserQueries'
 
 export const ProfileSetupPage = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const { data: profileData, isLoading: isProfileLoading } = useGetProfile({ retry: false })
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [photoFile, setPhotoFile] = useState<File | null>(null)
@@ -30,6 +34,13 @@ export const ProfileSetupPage = () => {
       if (photoUrl) URL.revokeObjectURL(photoUrl)
     }
   }, [photoUrl])
+
+  // 이미 프로필을 등록한 사용자는 다시 접근할 수 없도록 홈으로 리다이렉트
+  useEffect(() => {
+    if (profileData?.userName) {
+      navigate('/', { replace: true })
+    }
+  }, [profileData, navigate])
 
   const handlePhotoChange = (file: File | undefined) => {
     if (!file) return
@@ -60,12 +71,22 @@ export const ProfileSetupPage = () => {
         jobRole: JOB_TO_JOB_ROLE[job],
       })
 
-      navigate('/')
+      // 프로필을 무효화하면 리페치가 끝난 뒤 profileData.userName이 채워지고
+      // 위 useEffect가 반응형으로 navigate('/')를 실행함 (이동은 그 useEffect가 담당)
+      // throwOnError를 지정하지 않으면 리페치 실패가 조용히 삼켜져 catch 블록이 실행되지 않음
+      await queryClient.invalidateQueries(
+        { queryKey: userQueryKeys.profile() },
+        { throwOnError: true },
+      )
     } catch {
       alert('프로필 등록에 실패했어요. 다시 시도해 주세요.')
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (isProfileLoading || profileData?.userName) {
+    return null
   }
 
   if (step === 0) {

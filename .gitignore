@@ -37,3 +37,7 @@ docs/*
 # AI tools
 .playwright-mcp/
 .superpowers/
+.vercel
+.env*
+# 비밀값 없이 데모 목데이터 플래그만 담고 있어 커밋 필요 (pnpm dev:demo가 참조)
+!.env.demo

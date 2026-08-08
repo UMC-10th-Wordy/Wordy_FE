@@ -1,12 +1,24 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { TextButton } from '@/components/common/Button/TextButton'
-import { TermsSection, isRequiredTermsChecked } from '@/components/auth/TermsSection'
+import { ToastContainer } from '@/components/common/Toast/ToastContainer'
+import {
+  TermsSection,
+  isRequiredTermsChecked,
+  termsToAgreements,
+} from '@/components/auth/TermsSection'
 import type { TermsState } from '@/components/auth/TermsSection'
 import LogoIcon from '@/assets/icons/logo.svg?react'
+import { useGoogleComplete } from '@/hooks/useAuthQueries'
+import { useToast } from '@/hooks/useToast'
+import { ApiError, setAuthTokens } from '@/lib/httpClient'
 
 export const SocialSignupPage = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { toasts, addToast } = useToast()
+  const pendingToken = (location.state as { pendingToken?: string } | null)?.pendingToken
+  const { mutate: googleComplete, isPending } = useGoogleComplete()
   const [terms, setTerms] = useState<TermsState>({
     age: false,
     service: false,
@@ -16,10 +28,29 @@ export const SocialSignupPage = () => {
 
   const isValid = isRequiredTermsChecked(terms)
 
+  // 구글 콜백에서 받은 pendingToken 없이는 가입을 완료할 수 없어 로그인 화면으로 되돌림
+  useEffect(() => {
+    if (!pendingToken) {
+      navigate('/login', { replace: true })
+    }
+  }, [pendingToken, navigate])
+
   const handleSubmit = () => {
-    if (!isValid) return
-    // TODO: API 연동 시 소셜 가입 완료 요청으로 교체
-    navigate('/profile-setup')
+    if (!isValid || !pendingToken) return
+    googleComplete(
+      { token: pendingToken, agreements: termsToAgreements(terms) },
+      {
+        onSuccess: (data) => {
+          setAuthTokens(data.accessToken, data.refreshToken)
+          navigate('/profile-setup')
+        },
+        onError: (error) => {
+          addToast(
+            error instanceof ApiError ? error.message : '가입에 실패했어요. 다시 시도해 주세요.',
+          )
+        },
+      },
+    )
   }
 
   return (
@@ -41,7 +72,7 @@ export const SocialSignupPage = () => {
           variant="fill"
           size="large"
           fullWidth
-          disabled={!isValid}
+          disabled={!isValid || isPending}
           onClick={handleSubmit}
         >
           계정 생성하기
@@ -60,6 +91,8 @@ export const SocialSignupPage = () => {
           </button>
         </div>
       </div>
+
+      <ToastContainer toasts={toasts} />
     </div>
   )
 }

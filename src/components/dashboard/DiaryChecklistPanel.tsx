@@ -21,7 +21,7 @@ export const DiaryChecklistPanel = ({
   const isEmpty = entries.length === 0
 
   return (
-    <aside className="flex h-[748px] min-w-[320px] max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-(--color-border-subtle) bg-(--color-bg-default) p-6">
+    <aside className="flex h-[748px] min-w-[513px] max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-[#DDDDFF] shadow-[0px_1px_5px_0px_#0000001A]bg-(--color-bg-default) p-6">
       <div className="flex items-baseline gap-2">
         <h2 className="[font-size:var(--font-size-body-2)] font-bold text-(--color-text-default)">
           생성에 사용할 업무 일지
@@ -36,7 +36,7 @@ export const DiaryChecklistPanel = ({
           <XMarkIcon
             width={24}
             height={24}
-            className="rounded-full bg-(--color-button-default) p-1 text-(--color-text-inverse)"
+            className="rounded-full bg-(--color-button-default) p-[3px] text-(--color-text-inverse)"
           />
           <p className="[font-size:var(--font-size-body-4)]">이번 주에 변환한 업무 일지가 없어요</p>
         </div>
@@ -72,8 +72,8 @@ export const DiaryChecklistPanel = ({
                     </span>
                     <span
                       className={[
-                        '[font-size:var(--font-size-body-3)]',
-                        disabled ? 'text-(--color-text-disabled)' : 'text-(--color-text-default)',
+                        '[font-size:var(--font-size-body-2)] leading-[1.6] font-medium',
+                        disabled ? 'text-(--color-text-disabled)' : 'text-(--color-text-secondary)',
                       ].join(' ')}
                     >
                       {entry.label}

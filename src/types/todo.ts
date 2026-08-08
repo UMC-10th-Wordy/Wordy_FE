@@ -24,6 +24,8 @@ export interface TaskResultFile {
   id: string
   name: string
   url: string
+  attachmentId?: string
+  file?: File
 }
 
 /* 업무 결과에 첨부된 이미지 */
@@ -31,6 +33,8 @@ export interface TaskResultImage {
   id: string
   name: string
   url: string
+  attachmentId?: string
+  file?: File
 }
 
 /* 업무 항목 (TaskCard가 다루는 데이터) */
@@ -44,6 +48,7 @@ export interface Task {
   priority: TaskPriority
   isCompleted: boolean
   /* 완료된 업무에 기록된 업무 결과 / 없으면 버튼 */
+  taskResultId?: string
   result?: string
   resultFiles?: TaskResultFile[]
   resultImages?: TaskResultImage[]

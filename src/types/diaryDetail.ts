@@ -2,15 +2,6 @@ import type { PerformancePreviewResultData } from '@/types/performancePreviewRes
 import type { Task } from '@/types/todo'
 import type { DailyEntryTag, DiaryListApiResponse } from '@/types/diaryList'
 
-export interface DiaryDetailContentData {
-  id: string
-  date: string
-  tasks: Task[]
-  retrospective: string
-  completedCount: number
-  incompleteCount: number
-}
-
 export interface DiaryDetailData extends DiaryDetailContentData {
   performance: PerformancePreviewResultData
 }
@@ -22,7 +13,7 @@ export type DailyEntryTaskPriority = 'MUST_DO' | 'SHOULD_DO' | 'COULD_DO'
 
 export type DailyEntryTaskStatus = 'COMPLETED' | 'INCOMPLETE'
 
-export type DailyEntryAttachmentFileType = 'file' | 'img'
+export type DailyEntryAttachmentFileType = 'FILE' | 'IMG'
 
 export interface DailyEntryAttachment {
   fileType: DailyEntryAttachmentFileType
@@ -48,11 +39,23 @@ export interface DailyEntryDetailTask {
 
 export interface DailyEntryDetailResult {
   dailyEntryId: string
+  dailyPerformanceId: string | null
   entryDate: string
   reflectionContent: string
+  converted: boolean
   completedCount: number
   incompleteCount: number
   tasks: DailyEntryDetailTask[]
+}
+
+export interface DiaryDetailContentData {
+  id: string
+  dailyPerformanceId: string | null
+  date: string
+  tasks: Task[]
+  retrospective: string
+  completedCount: number
+  incompleteCount: number
 }
 
 export type DailyEntryDetailResponse = DiaryListApiResponse<DailyEntryDetailResult>

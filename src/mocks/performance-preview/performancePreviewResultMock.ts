@@ -10,6 +10,7 @@ export const PERFORMANCE_PREVIEW_RESULT_MOCK: PerformancePreviewResultData = {
       title: '온보딩 리뉴얼 회의 액션 아이템 정리',
       priority: 'should',
       tag: { label: '온보딩 리뉴얼', color: 'green' },
+      canMoveToTomorrow: true,
     },
     {
       id: 'incomplete-could-1',
@@ -17,6 +18,7 @@ export const PERFORMANCE_PREVIEW_RESULT_MOCK: PerformancePreviewResultData = {
         '긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트 긴 텍스트',
       priority: 'could',
       tag: { label: '광고', color: 'blue' },
+      canMoveToTomorrow: true,
     },
   ],
   summary:

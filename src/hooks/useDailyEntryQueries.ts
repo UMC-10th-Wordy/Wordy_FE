@@ -6,14 +6,16 @@ import {
 } from '@tanstack/react-query'
 
 import {
+  createDailyEntry,
   deleteDailyEntry,
-  diaryListQueryKeys,
+  dailyEntryQueryKeys,
   getDailyEntriesSummary,
   getDailyEntryDetail,
   getMonthlyDailyEntries,
   getMonthlyDailyEntriesByYearMonth,
   searchDailyEntries,
-} from '@/api/diary-list/diaryList'
+} from '@/api/daily-entry/dailyEntry'
+import { homeQueryKeys } from '@/api/home/home'
 import {
   mapDailyEntriesSummary,
   mapDailyEntryDetail,
@@ -27,12 +29,12 @@ export const useGetDiaryListPageData = () => {
   const [summaryQuery, monthlyRecordsQuery] = useSuspenseQueries({
     queries: [
       {
-        queryKey: diaryListQueryKeys.summary(),
+        queryKey: dailyEntryQueryKeys.summary(),
         queryFn: getDailyEntriesSummary,
         select: mapDailyEntriesSummary,
       },
       {
-        queryKey: diaryListQueryKeys.monthlyRecords(),
+        queryKey: dailyEntryQueryKeys.monthlyRecords(),
         queryFn: getMonthlyDailyEntries,
         select: mapMonthlyDiaryRecords,
       },
@@ -47,7 +49,7 @@ export const useGetDiaryListPageData = () => {
 
 export const useGetMonthlyDailyEntriesByYearMonth = (yearMonth: string) => {
   return useSuspenseQuery({
-    queryKey: diaryListQueryKeys.monthlyEntry(yearMonth),
+    queryKey: dailyEntryQueryKeys.monthlyEntry(yearMonth),
     queryFn: () => getMonthlyDailyEntriesByYearMonth(yearMonth),
     select: mapMonthlyDiaryEntries,
   })
@@ -55,7 +57,7 @@ export const useGetMonthlyDailyEntriesByYearMonth = (yearMonth: string) => {
 
 export const useGetDailyEntrySearch = (params: DailyEntrySearchParams) => {
   return useSuspenseQuery({
-    queryKey: diaryListQueryKeys.search(params),
+    queryKey: dailyEntryQueryKeys.search(params),
     queryFn: () => searchDailyEntries(params),
     select: mapDailyEntrySearchResult,
   })
@@ -63,9 +65,24 @@ export const useGetDailyEntrySearch = (params: DailyEntrySearchParams) => {
 
 export const useGetDailyEntryDetail = (dailyEntryId: string) => {
   return useSuspenseQuery({
-    queryKey: diaryListQueryKeys.detail(dailyEntryId),
+    queryKey: dailyEntryQueryKeys.detail(dailyEntryId),
     queryFn: () => getDailyEntryDetail(dailyEntryId),
     select: mapDailyEntryDetail,
+    refetchOnMount: 'always',
+  })
+}
+
+export const useCreateDailyEntry = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createDailyEntry,
+
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: dailyEntryQueryKeys.all,
+      })
+    },
   })
 }
 
@@ -75,14 +92,24 @@ export const useDeleteDailyEntry = () => {
   return useMutation({
     mutationFn: deleteDailyEntry,
 
-    onSuccess: ({ dailyEntryId }) => {
-      queryClient.removeQueries({
-        queryKey: diaryListQueryKeys.detail(dailyEntryId),
-      })
-
-      void queryClient.invalidateQueries({
-        queryKey: diaryListQueryKeys.all,
-      })
+    onSuccess: () => {
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.summary(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.searches(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
+        }),
+      ])
     },
   })
 }

@@ -1,5 +1,6 @@
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
+import ArrowRightIcon from '@/assets/icons/arrow-left.svg?react'
 
 export interface WeeklyBoardStatus {
   id: string
@@ -22,7 +23,7 @@ export const MonthlyWeekListPanel = ({
   const isEmpty = weeks.length === 0
 
   return (
-    <aside className="flex h-[748px] min-w-[320px] max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-(--color-border-subtle) bg-(--color-bg-default) p-6">
+    <aside className="flex h-[748px] min-w-[513px] max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-[#DDDDFF] shadow-[0px_1px_5px_0px_#0000001A] bg-(--color-bg-default) p-6">
       <div className="flex items-baseline gap-2">
         <h2 className="[font-size:var(--font-size-body-2)] font-bold text-(--color-text-default)">
           생성에 사용할 주간 대시보드
@@ -58,7 +59,7 @@ export const MonthlyWeekListPanel = ({
                 >
                   {week.generated ? '생성됨' : '생성되지 않음'}
                 </span>
-                <span className="[font-size:var(--font-size-body-3)] font-medium text-(--color-text-default)">
+                <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)">
                   {week.weekLabel}
                 </span>
                 <span className="[font-size:var(--font-size-caption-1)] text-(--color-text-tertiary)">
@@ -68,9 +69,10 @@ export const MonthlyWeekListPanel = ({
                   <button
                     type="button"
                     onClick={() => onGoWeekly(week.id)}
-                    className="ml-auto [font-size:var(--font-size-body-4)] text-(--color-text-brand)"
+                    className="ml-auto flex items-center gap-1 [font-size:var(--font-size-body-4)] text-(--color-text-brand)"
                   >
-                    생성하기 &gt;
+                    생성하기
+                    <ArrowRightIcon width={16} height={16} className="rotate-180" />
                   </button>
                 )}
               </li>

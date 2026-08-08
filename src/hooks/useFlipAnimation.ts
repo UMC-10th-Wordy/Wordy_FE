@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 
 const TRANSITION_DURATION_MS = 320
+const STAGGER_STEP_MS = 15
+const MAX_STAGGER_MS = 150
 
 /* 슬라이드 훅 */
 export function useFlipAnimation(containerRef: RefObject<HTMLElement | null>, deps: unknown[]) {
@@ -26,7 +28,7 @@ export function useFlipAnimation(containerRef: RefObject<HTMLElement | null>, de
     if (container) {
       const elements = Array.from(container.querySelectorAll<HTMLElement>('[data-flip-id]'))
 
-      elements.forEach((el) => {
+      elements.forEach((el, index) => {
         const id = el.dataset.flipId
         if (!id) return
 
@@ -51,8 +53,9 @@ export function useFlipAnimation(containerRef: RefObject<HTMLElement | null>, de
         el.style.transform = `translate(${deltaX}px, ${deltaY}px)`
         el.getBoundingClientRect()
 
+        const delayMs = Math.min(index * STAGGER_STEP_MS, MAX_STAGGER_MS)
         const frameId = requestAnimationFrame(() => {
-          el.style.transition = `transform ${TRANSITION_DURATION_MS}ms ease-out`
+          el.style.transition = `transform ${TRANSITION_DURATION_MS}ms ease-out ${delayMs}ms`
           el.style.transform = ''
           pendingFrames.delete(id)
         })
@@ -61,6 +64,7 @@ export function useFlipAnimation(containerRef: RefObject<HTMLElement | null>, de
     }
 
     prevRectsRef.current = nextRects
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deps는 호출부에서 전달하는 의도된 동적 배열
   }, deps)
 
   useEffect(() => {

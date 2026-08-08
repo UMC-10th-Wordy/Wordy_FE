@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type {
+  PerformanceSupplementAnswer,
+  PerformanceSupplementQuestion,
+} from '@/types/performance'
+
 export type PerformanceQuestionMessageRole = 'wordy' | 'user'
 
 export interface PerformanceQuestionMessage {
@@ -11,29 +16,24 @@ export interface PerformanceQuestionMessage {
 
 interface UsePerformanceQuestionChatParams {
   isActive: boolean
-  onFinish: () => void
+  questions: PerformanceSupplementQuestion[]
+  onFinish: (answers: PerformanceSupplementAnswer[]) => void
 }
 
-const MAX_QUESTION_COUNT = 2
 const QUESTION_TYPING_DELAY_MS = 1200
 const RETURN_TO_CONVERTING_DELAY_MS = 3000
 
 const INITIAL_WORDY_MESSAGE =
   '반가워요!\n더 의미있는 성과를 도출하기 위해 몇 가지 질문을 드리려고 해요.\n다음 질문에 대한 내용을 입력해 주세요!'
 
-// TODO(#20): AI 추가 질문 API 연동 시 응답 데이터로 교체
-// 더미데이터
-const MOCK_PERFORMANCE_QUESTIONS = [
-  '유선 연락 20건’이라고 적어주셨는데, 요청에 응한 파트너사는 몇 곳이었나요?',
-  '이번 업무를 통해 배운 점은 무엇인가요?',
-] as const
-
 export const usePerformanceQuestionChat = ({
   isActive,
+  questions,
   onFinish,
 }: UsePerformanceQuestionChatParams) => {
   const [messages, setMessages] = useState<PerformanceQuestionMessage[]>([])
   const [answer, setAnswer] = useState('')
+  const [submittedAnswers, setSubmittedAnswers] = useState<PerformanceSupplementAnswer[]>([])
   const [isWordyTyping, setIsWordyTyping] = useState(false)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [latestQuestionMessageId, setLatestQuestionMessageId] = useState<number | null>(null)
@@ -49,44 +49,50 @@ export const usePerformanceQuestionChat = ({
   }, [])
 
   const appendMessage = useCallback((message: Omit<PerformanceQuestionMessage, 'id'>) => {
-    const nextMessage = {
+    messageIdRef.current += 1
+
+    const nextMessage: PerformanceQuestionMessage = {
       ...message,
-      id: messageIdRef.current + 1,
+      id: messageIdRef.current,
     }
 
-    messageIdRef.current += 1
-    setMessages((prevMessages) => [...prevMessages, nextMessage])
+    setMessages((previousMessages) => [...previousMessages, nextMessage])
 
     return nextMessage.id
   }, [])
 
-  const finishQuestioning = useCallback(() => {
-    setIsFinished(true)
-    setLatestQuestionMessageId(null)
+  const finishQuestioning = useCallback(
+    (answers: PerformanceSupplementAnswer[]) => {
+      setIsFinished(true)
+      setLatestQuestionMessageId(null)
 
-    const finishTimer = setTimeout(() => {
-      onFinish()
-    }, RETURN_TO_CONVERTING_DELAY_MS)
+      const finishTimer = setTimeout(() => {
+        onFinish(answers)
+      }, RETURN_TO_CONVERTING_DELAY_MS)
 
-    timersRef.current.push(finishTimer)
-  }, [onFinish])
+      timersRef.current.push(finishTimer)
+    },
+    [onFinish],
+  )
 
   const showQuestion = useCallback(
-    (questionIndex: number) => {
-      if (questionIndex >= MAX_QUESTION_COUNT) {
-        finishQuestioning()
+    (questionIndex: number, answers: PerformanceSupplementAnswer[]) => {
+      if (questionIndex >= questions.length) {
+        finishQuestioning(answers)
         return
       }
 
       setIsWordyTyping(true)
 
       const typingTimer = setTimeout(() => {
+        const currentQuestion = questions[questionIndex]
+
         setIsWordyTyping(false)
         setCurrentQuestionIndex(questionIndex)
 
         const questionMessageId = appendMessage({
           role: 'wordy',
-          content: MOCK_PERFORMANCE_QUESTIONS[questionIndex],
+          content: currentQuestion.question,
           isQuestion: true,
         })
 
@@ -95,16 +101,20 @@ export const usePerformanceQuestionChat = ({
 
       timersRef.current.push(typingTimer)
     },
-    [appendMessage, finishQuestioning],
+    [appendMessage, finishQuestioning, questions],
   )
+
   const startQuestioning = useCallback(() => {
     clearTimers()
+
     setMessages([])
     setAnswer('')
+    setSubmittedAnswers([])
     setIsWordyTyping(false)
     setCurrentQuestionIndex(0)
     setLatestQuestionMessageId(null)
     setIsFinished(false)
+
     messageIdRef.current = 0
 
     appendMessage({
@@ -112,7 +122,7 @@ export const usePerformanceQuestionChat = ({
       content: INITIAL_WORDY_MESSAGE,
     })
 
-    showQuestion(0)
+    showQuestion(0, [])
   }, [appendMessage, clearTimers, showQuestion])
 
   const handleChangeAnswer = useCallback((value: string) => {
@@ -121,8 +131,9 @@ export const usePerformanceQuestionChat = ({
 
   const handleSubmitAnswer = useCallback(() => {
     const trimmedAnswer = answer.trim()
+    const currentQuestion = questions[currentQuestionIndex]
 
-    if (!trimmedAnswer || isWordyTyping || isFinished) {
+    if (!trimmedAnswer || !currentQuestion || isWordyTyping || isFinished) {
       return
     }
 
@@ -131,43 +142,90 @@ export const usePerformanceQuestionChat = ({
       content: trimmedAnswer,
     })
 
+    const nextAnswers: PerformanceSupplementAnswer[] = [
+      ...submittedAnswers,
+      {
+        aiQuestionId: currentQuestion.aiQuestionId,
+        question: currentQuestion.question,
+        answer: trimmedAnswer,
+      },
+    ]
+
+    setSubmittedAnswers(nextAnswers)
     setAnswer('')
     setLatestQuestionMessageId(null)
 
-    const nextQuestionIndex = currentQuestionIndex + 1
-    showQuestion(nextQuestionIndex)
-  }, [answer, appendMessage, currentQuestionIndex, isFinished, isWordyTyping, showQuestion])
+    showQuestion(currentQuestionIndex + 1, nextAnswers)
+  }, [
+    answer,
+    appendMessage,
+    currentQuestionIndex,
+    isFinished,
+    isWordyTyping,
+    questions,
+    showQuestion,
+    submittedAnswers,
+  ])
 
   const handleSkipQuestion = useCallback(() => {
-    if (isWordyTyping || isFinished) {
+    const currentQuestion = questions[currentQuestionIndex]
+
+    if (!currentQuestion || isWordyTyping || isFinished) {
       return
     }
+
+    appendMessage({
+      role: 'user',
+      content: '건너뛰기',
+    })
+
+    const nextAnswers: PerformanceSupplementAnswer[] = [
+      ...submittedAnswers,
+      {
+        aiQuestionId: currentQuestion.aiQuestionId,
+        question: currentQuestion.question,
+        answer: '',
+      },
+    ]
+
+    setSubmittedAnswers(nextAnswers)
     setAnswer('')
     setLatestQuestionMessageId(null)
 
-    const nextQuestionIndex = currentQuestionIndex + 1
-    showQuestion(nextQuestionIndex)
-  }, [currentQuestionIndex, isFinished, isWordyTyping, showQuestion])
+    showQuestion(currentQuestionIndex + 1, nextAnswers)
+  }, [
+    appendMessage,
+    currentQuestionIndex,
+    isFinished,
+    isWordyTyping,
+    questions,
+    showQuestion,
+    submittedAnswers,
+  ])
 
   const resetQuestionChat = useCallback(() => {
     clearTimers()
+
     setMessages([])
     setAnswer('')
+    setSubmittedAnswers([])
     setIsWordyTyping(false)
     setCurrentQuestionIndex(0)
     setLatestQuestionMessageId(null)
     setIsFinished(false)
+
     hasStartedRef.current = false
     messageIdRef.current = 0
   }, [clearTimers])
 
   useEffect(() => {
-    if (!isActive || hasStartedRef.current) {
+    if (!isActive || hasStartedRef.current || questions.length === 0) {
       return
     }
+
     hasStartedRef.current = true
     startQuestioning()
-  }, [isActive, startQuestioning])
+  }, [isActive, questions.length, startQuestioning])
 
   useEffect(() => {
     return () => {
@@ -175,6 +233,7 @@ export const usePerformanceQuestionChat = ({
       hasStartedRef.current = false
     }
   }, [clearTimers])
+
   return {
     messages,
     answer,

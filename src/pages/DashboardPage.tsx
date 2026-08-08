@@ -7,8 +7,7 @@ import {
   getMonthlyDashboardDetail,
   getMonthlyEligibility,
 } from '@/api/dashboard/dashboard'
-import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
-import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
+import ArrowLeftIcon from '@/assets/icons/arrow-left.svg?react'
 import { useToast } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import { WeeklyStatusCard } from '@/components/dashboard/WeeklyStatusCard'
@@ -116,7 +115,7 @@ export const DashboardPage = () => {
     return () => {
       cancelled = true
     }
-  }, [monthOffset])
+  }, [monthOffset, monthBaseDate])
 
   const totalDays = entries.length
 
@@ -273,7 +272,7 @@ export const DashboardPage = () => {
         : 'insufficient'
 
   return (
-    <div className="flex flex-1 flex-col gap-6 px-(--scale-40) pt-(--scale-40) pb-[60px]">
+    <div className="flex flex-1 flex-col gap-7 bg-[#FAFAFC] px-(--scale-40) pt-(--scale-40) pb-[60px]">
       <header className="flex flex-col gap-1">
         <h1 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
           성과 대시보드
@@ -283,14 +282,14 @@ export const DashboardPage = () => {
         </p>
       </header>
 
-      <nav className="flex gap-6 border-b border-(--color-border-subtle)">
+      <nav className="-mx-10 flex gap-3 border-b border-(--color-border-subtle) px-10">
         <button
           type="button"
           onClick={() => setActiveTab('weekly')}
           className={
             activeTab === 'weekly'
-              ? 'border-b-2 border-(--color-text-default) pb-2 font-semibold text-(--color-text-default)'
-              : 'pb-2 text-(--color-text-tertiary)'
+              ? 'h-[45px] border-b-2 border-(--color-text-brand) px-5 py-2 font-semibold text-(--color-text-default)'
+              : 'h-[45px] px-5 py-2 text-(--color-text-tertiary)'
           }
         >
           주간
@@ -300,8 +299,8 @@ export const DashboardPage = () => {
           onClick={() => setActiveTab('monthly')}
           className={
             activeTab === 'monthly'
-              ? 'border-b-2 border-(--color-text-default) pb-2 font-semibold text-(--color-text-default)'
-              : 'pb-2 text-(--color-text-tertiary)'
+              ? 'h-[45px] border-b-2 border-(--color-text-brand) px-5 py-2 font-semibold text-(--color-text-default)'
+              : 'h-[45px] px-5 py-2 text-(--color-text-tertiary)'
           }
         >
           월간
@@ -310,11 +309,11 @@ export const DashboardPage = () => {
 
       {activeTab === 'weekly' ? (
         <>
-          <div className="flex items-center gap-2 self-start rounded-full border border-(--color-border-subtle) px-4 py-2">
+          <div className="flex h-[52px] w-[250px] items-center justify-between gap-1 self-start rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
             <button type="button" aria-label="이전 주차" onClick={() => handleWeekMove(-1)}>
-              <ArrowLeftIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
+              <ArrowLeftIcon width={24} height={24} className="text-(--color-icon-secondary)" />
             </button>
-            <span className="[font-size:var(--font-size-body-4)] text-(--color-text-default)">
+            <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)">
               {weekLabel}
             </span>
             <button
@@ -324,11 +323,15 @@ export const DashboardPage = () => {
               onClick={() => handleWeekMove(1)}
               className="disabled:opacity-40"
             >
-              <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
+              <ArrowLeftIcon
+                width={24}
+                height={24}
+                className="rotate-180 text-(--color-icon-secondary)"
+              />
             </button>
           </div>
 
-          <div className="flex gap-7">
+          <div className="flex gap-5">
             {status === 'complete' ? (
               <div className="flex flex-1 flex-col gap-7">
                 <WeeklySummaryInsight stats={stats} aiSummary={aiSummary} />
@@ -362,16 +365,16 @@ export const DashboardPage = () => {
       ) : (
         <>
           {/* TODO: 월간 API 명세 확정 후 월 이동 데이터 갱신 연결 */}
-          <div className="flex items-center gap-2 self-start rounded-full border border-(--color-border-subtle) px-4 py-2">
+          <div className="flex h-[52px] w-[203px] items-center justify-between gap-1 self-start rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
             <button
               type="button"
               aria-label="이전 달"
               disabled={monthlyGeneration === 'generating'}
               onClick={() => handleMonthMove(-1)}
             >
-              <ArrowLeftIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
+              <ArrowLeftIcon width={24} height={24} className="text-(--color-icon-secondary)" />
             </button>
-            <span className="[font-size:var(--font-size-body-4)] text-(--color-text-default)">
+            <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)">
               {monthLabel}
             </span>
             <button
@@ -380,11 +383,15 @@ export const DashboardPage = () => {
               disabled={monthlyGeneration === 'generating' || isCurrentMonth}
               onClick={() => handleMonthMove(1)}
             >
-              <ArrowRightIcon width={16} height={16} className="text-(--color-icon-tertiary)" />
+              <ArrowLeftIcon
+                width={24}
+                height={24}
+                className="rotate-180 text-(--color-icon-secondary)"
+              />
             </button>
           </div>
 
-          <div className="flex gap-7">
+          <div className="flex gap-5">
             <MonthlyDashboard
               generation={monthlyGeneration}
               onGenerate={handleMonthlyGenerate}
