@@ -556,10 +556,6 @@ export default function TodoListPage() {
     setMovedPerformanceTaskIds((prev) => (prev.includes(taskId) ? prev : [...prev, taskId]))
 
     queryClient.invalidateQueries({
-      queryKey: taskQueryKeys.list(nextDateKey),
-    })
-
-    queryClient.invalidateQueries({
       queryKey: homeQueryKeys.all,
     })
   }
