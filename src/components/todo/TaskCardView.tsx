@@ -42,7 +42,7 @@ export function TaskCardView({
       {/* 드래그 핸들 / 체크박스 / 프로젝트 태그 / 업무명 */}
       <div className="flex w-full items-start gap-2">
         <div className="flex min-w-0 flex-1 items-start gap-[9px]">
-          <div className="flex shrink-0 items-center gap-[9px]">
+          <div className="flex h-[calc(var(--font-size-body-2)*var(--line-height-body))] shrink-0 items-center gap-[9px]">
             <button
               type="button"
               aria-label="순서 변경"
@@ -51,11 +51,24 @@ export function TaskCardView({
             >
               <MoveIcon aria-hidden className="size-6 shrink-0" />
             </button>
-            <Checkbox
-              aria-label="업무 완료 여부"
-              checked={task.isCompleted}
-              onChange={() => onToggleComplete?.()}
-            />
+            <div className="group relative">
+              <Checkbox
+                aria-label={task.isCompleted ? '미완료 업무로 전환하기' : '완료 업무로 전환하기'}
+                checked={task.isCompleted}
+                onChange={() => onToggleComplete?.()}
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute top-full left-1/2 z-10 flex -translate-x-1/2 flex-col items-center opacity-0 transition-opacity duration-100 ease-out group-hover:opacity-100 group-focus-within:opacity-100"
+              >
+                <div className="h-0 w-0 border-x-[6px] border-x-transparent border-b-[7px] border-b-(--color-bg-dark)" />
+                <div className="rounded-lg bg-(--color-bg-dark) px-[10px] py-1">
+                  <p className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) font-medium whitespace-nowrap text-(--color-text-inverse)">
+                    {task.isCompleted ? '미완료 업무로 전환하기' : '완료 업무로 전환하기'}
+                  </p>
+                </div>
+              </div>
+            </div>
             {task.tag && <ProjectTag label={task.tag.label} color={task.tag.color} />}
           </div>
           <p className="min-w-0 flex-1 [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-semibold text-(--color-text-default)">

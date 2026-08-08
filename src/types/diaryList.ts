@@ -67,6 +67,14 @@ export interface CreateDailyEntryResult {
   createdAt: string
 }
 
+export interface DailyEntryByDateResult {
+  dailyEntryId: string
+  entryDate: string
+  reflectionContent: string
+}
+
+export type DailyEntryByDateResponse = DiaryListApiResponse<DailyEntryByDateResult>
+
 /* 일지 모아보기 요약 조회: 이번 달 작성 수, 연속 작성, 최다 기록 카테고리 */
 // GET /daily-entries/summary
 
