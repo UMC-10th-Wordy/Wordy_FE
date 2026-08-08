@@ -82,7 +82,11 @@ export const usePerformancePreview = (entryDate: string) => {
   }, [pollingResult, sourceTasks])
 
   const resolvedStatus: PerformancePreviewStatus =
-    pollingResult?.status === 'FAILED' ? 'failed' : pollingPreviewResult ? 'success' : status
+    previewStatusQuery.isPollingTimedOut || pollingResult?.status === 'FAILED'
+      ? 'failed'
+      : pollingPreviewResult
+        ? 'success'
+        : status
 
   const resolvedResult = status === 'success' && result ? result : (pollingPreviewResult ?? result)
 

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import {
@@ -17,6 +18,9 @@ interface UpdatePerformanceVariables {
   dailyPerformanceId: string
   payload: UpdatePerformancePayload
 }
+
+const PERFORMANCE_PREVIEW_POLLING_INTERVAL_MS = 1_000
+const PERFORMANCE_PREVIEW_POLLING_TIMEOUT_MS = 120_000
 
 export const useCreatePerformancePreview = () => {
   return useMutation({
@@ -78,7 +82,12 @@ export const useGetPerformancePreviewStatus = (
   reflectionSnapshotId: string | null,
   enabled: boolean,
 ) => {
-  return useQuery({
+  const [timedOutSnapshotId, setTimedOutSnapshotId] = useState<string | null>(null)
+
+  const isPollingTimedOut =
+    reflectionSnapshotId !== null && timedOutSnapshotId === reflectionSnapshotId
+
+  const query = useQuery({
     queryKey: reflectionSnapshotId
       ? performanceQueryKeys.preview(reflectionSnapshotId)
       : [...performanceQueryKeys.previews(), 'empty'],
@@ -89,14 +98,37 @@ export const useGetPerformancePreviewStatus = (
 
       return getPerformancePreviewStatus(reflectionSnapshotId)
     },
-    enabled: Boolean(reflectionSnapshotId) && enabled,
+    enabled: Boolean(reflectionSnapshotId) && enabled && !isPollingTimedOut,
     refetchInterval: (query) => {
       const data = query.state.data
 
       const shouldContinuePolling =
         !data || data.status === 'PROCESSING' || (data.status === 'TEMP' && !data.promptBResult)
 
-      return shouldContinuePolling ? 1000 : false
+      return shouldContinuePolling ? PERFORMANCE_PREVIEW_POLLING_INTERVAL_MS : false
     },
   })
+
+  const isPollingCompleted =
+    query.data?.status === 'FAILED' ||
+    (query.data?.status === 'TEMP' && Boolean(query.data.promptBResult))
+
+  useEffect(() => {
+    if (!reflectionSnapshotId || !enabled || isPollingTimedOut || isPollingCompleted) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setTimedOutSnapshotId(reflectionSnapshotId)
+    }, PERFORMANCE_PREVIEW_POLLING_TIMEOUT_MS)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [enabled, isPollingCompleted, isPollingTimedOut, reflectionSnapshotId])
+
+  return {
+    ...query,
+    isPollingTimedOut,
+  }
 }

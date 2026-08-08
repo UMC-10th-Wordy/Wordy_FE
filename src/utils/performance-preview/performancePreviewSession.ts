@@ -25,16 +25,22 @@ export const getPerformancePreviewSession = (
   entryDate: string,
 ): PerformancePreviewSession | null => {
   const key = getPerformancePreviewSessionKey(entryDate)
-  const storedSession = sessionStorage.getItem(key)
-
-  if (!storedSession) {
-    return null
-  }
 
   try {
+    const storedSession = sessionStorage.getItem(key)
+
+    if (!storedSession) {
+      return null
+    }
+
     return JSON.parse(storedSession) as PerformancePreviewSession
   } catch {
-    sessionStorage.removeItem(key)
+    try {
+      sessionStorage.removeItem(key)
+    } catch {
+      return null
+    }
+
     return null
   }
 }
@@ -43,9 +49,17 @@ export const setPerformancePreviewSession = (
   entryDate: string,
   session: PerformancePreviewSession,
 ) => {
-  sessionStorage.setItem(getPerformancePreviewSessionKey(entryDate), JSON.stringify(session))
+  try {
+    sessionStorage.setItem(getPerformancePreviewSessionKey(entryDate), JSON.stringify(session))
+  } catch {
+    return
+  }
 }
 
 export const clearPerformancePreviewSession = (entryDate: string) => {
-  sessionStorage.removeItem(getPerformancePreviewSessionKey(entryDate))
+  try {
+    sessionStorage.removeItem(getPerformancePreviewSessionKey(entryDate))
+  } catch {
+    return
+  }
 }

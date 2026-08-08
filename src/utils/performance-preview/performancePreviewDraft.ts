@@ -10,16 +10,22 @@ export const getPerformancePreviewDraft = (
   reflectionSnapshotId: string,
 ): PerformancePreviewDraft | null => {
   const key = getPerformancePreviewDraftKey(reflectionSnapshotId)
-  const storedDraft = sessionStorage.getItem(key)
-
-  if (!storedDraft) {
-    return null
-  }
 
   try {
+    const storedDraft = sessionStorage.getItem(key)
+
+    if (!storedDraft) {
+      return null
+    }
+
     return JSON.parse(storedDraft) as PerformancePreviewDraft
   } catch {
-    sessionStorage.removeItem(key)
+    try {
+      sessionStorage.removeItem(key)
+    } catch {
+      return null
+    }
+
     return null
   }
 }
@@ -28,9 +34,20 @@ export const setPerformancePreviewDraft = (
   reflectionSnapshotId: string,
   draft: PerformancePreviewDraft,
 ) => {
-  sessionStorage.setItem(getPerformancePreviewDraftKey(reflectionSnapshotId), JSON.stringify(draft))
+  try {
+    sessionStorage.setItem(
+      getPerformancePreviewDraftKey(reflectionSnapshotId),
+      JSON.stringify(draft),
+    )
+  } catch {
+    return
+  }
 }
 
 export const clearPerformancePreviewDraft = (reflectionSnapshotId: string) => {
-  sessionStorage.removeItem(getPerformancePreviewDraftKey(reflectionSnapshotId))
+  try {
+    sessionStorage.removeItem(getPerformancePreviewDraftKey(reflectionSnapshotId))
+  } catch {
+    return
+  }
 }

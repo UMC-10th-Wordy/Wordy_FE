@@ -22,7 +22,7 @@ interface UsePerformanceQuestionChatParams {
 }
 
 const QUESTION_TYPING_DELAY_MS = 1200
-const RETURN_TO_CONVERTING_DELAY_MS = 3000
+const RETURN_TO_CONVERTING_DELAY_MS = 1000
 
 const INITIAL_WORDY_MESSAGE =
   '반가워요!\n더 의미있는 성과를 도출하기 위해 몇 가지 질문을 드리려고 해요.\n다음 질문에 대한 내용을 입력해 주세요!'
@@ -252,6 +252,8 @@ export const usePerformanceQuestionChat = ({
       const session = getPerformanceQuestionChatSession(nextEntryDate)
 
       if (!session) {
+        initialSessionRestoredRef.current = false
+
         setMessages([])
         setAnswer('')
         setSubmittedAnswers([])
@@ -265,6 +267,8 @@ export const usePerformanceQuestionChat = ({
 
         return
       }
+
+      initialSessionRestoredRef.current = true
 
       setMessages(session.messages)
       setAnswer(session.answer)
@@ -322,17 +326,19 @@ export const usePerformanceQuestionChat = ({
     }
 
     const timer = setTimeout(() => {
-      if (initialSession && !initialSessionRestoredRef.current) {
+      const currentSession = getPerformanceQuestionChatSession(entryDate)
+
+      if (currentSession && !initialSessionRestoredRef.current) {
         initialSessionRestoredRef.current = true
         activeEntryDateRef.current = entryDate
 
-        if (initialSession.isFinished) {
-          finishQuestioning(initialSession.submittedAnswers)
+        if (currentSession.isFinished) {
+          finishQuestioning(currentSession.submittedAnswers)
           return
         }
 
-        if (initialSession.latestQuestionMessageId === null) {
-          showQuestion(initialSession.submittedAnswers.length, initialSession.submittedAnswers)
+        if (currentSession.latestQuestionMessageId === null) {
+          showQuestion(currentSession.submittedAnswers.length, currentSession.submittedAnswers)
         }
 
         return
@@ -348,15 +354,7 @@ export const usePerformanceQuestionChat = ({
     return () => {
       clearTimeout(timer)
     }
-  }, [
-    entryDate,
-    finishQuestioning,
-    initialSession,
-    isActive,
-    questions.length,
-    showQuestion,
-    startQuestioning,
-  ])
+  }, [entryDate, finishQuestioning, isActive, questions.length, showQuestion, startQuestioning])
 
   useEffect(() => {
     return () => {

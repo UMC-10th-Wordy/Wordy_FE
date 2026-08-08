@@ -25,16 +25,22 @@ export const getPerformanceQuestionChatSession = (
   entryDate: string,
 ): PerformanceQuestionChatSession | null => {
   const key = getPerformanceQuestionChatSessionKey(entryDate)
-  const storedSession = sessionStorage.getItem(key)
-
-  if (!storedSession) {
-    return null
-  }
 
   try {
+    const storedSession = sessionStorage.getItem(key)
+
+    if (!storedSession) {
+      return null
+    }
+
     return JSON.parse(storedSession) as PerformanceQuestionChatSession
   } catch {
-    sessionStorage.removeItem(key)
+    try {
+      sessionStorage.removeItem(key)
+    } catch {
+      return null
+    }
+
     return null
   }
 }
@@ -43,9 +49,17 @@ export const setPerformanceQuestionChatSession = (
   entryDate: string,
   session: PerformanceQuestionChatSession,
 ) => {
-  sessionStorage.setItem(getPerformanceQuestionChatSessionKey(entryDate), JSON.stringify(session))
+  try {
+    sessionStorage.setItem(getPerformanceQuestionChatSessionKey(entryDate), JSON.stringify(session))
+  } catch {
+    return
+  }
 }
 
 export const clearPerformanceQuestionChatSession = (entryDate: string) => {
-  sessionStorage.removeItem(getPerformanceQuestionChatSessionKey(entryDate))
+  try {
+    sessionStorage.removeItem(getPerformanceQuestionChatSessionKey(entryDate))
+  } catch {
+    return
+  }
 }
