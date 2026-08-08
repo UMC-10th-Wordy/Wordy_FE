@@ -40,6 +40,9 @@ export interface TagAnalysisDto {
   periodStart: string
   periodEnd: string
   achievementStatus: string
+  tagId?: string
+  tagName?: string
+  color?: string
 }
 
 export interface WeeklyReflectionDto {
@@ -52,6 +55,7 @@ export interface WeeklyReflectionDto {
 export interface PerformanceItemDto {
   output: string
   impact: string
+  dailyEntryId?: string
 }
 
 export interface PerformanceDto {
@@ -60,6 +64,7 @@ export interface PerformanceDto {
   growthInsight: string
   nextAction: string
   items: PerformanceItemDto[]
+  dailyEntryId?: string
 }
 
 export interface DashboardDetailDto {
