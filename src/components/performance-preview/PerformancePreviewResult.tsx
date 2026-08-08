@@ -12,8 +12,16 @@ import { PerformanceTaskResultCard } from './PerformanceTaskResultCard'
 
 import type { PerformancePreviewResultData } from '@/types/performancePreviewResult'
 
+import {
+  clearPerformancePreviewDraft,
+  getPerformancePreviewDraft,
+  setPerformancePreviewDraft,
+} from '@/utils/performance-preview/performancePreviewDraft'
+
 interface PerformancePreviewResultProps {
   data: PerformancePreviewResultData
+  reflectionSnapshotId?: string
+  draftId?: string
   readOnly?: boolean
   initiallySaved?: boolean
   isSaving?: boolean
@@ -43,6 +51,8 @@ const formatInsightWithBullet = (insight: string) => {
 
 export const PerformancePreviewResult = ({
   data,
+  reflectionSnapshotId,
+  draftId,
   readOnly = false,
   initiallySaved = false,
   isSaving = false,
@@ -50,20 +60,44 @@ export const PerformancePreviewResult = ({
   onSave,
   onMoveTaskToTomorrow,
 }: PerformancePreviewResultProps) => {
-  const [summary, setSummary] = useState(data.summary)
-  const [insight, setInsight] = useState(() => formatInsightWithBullet(data.insight))
-  const [isSaved, setIsSaved] = useState(initiallySaved)
+  const resolvedDraftId = draftId ?? reflectionSnapshotId
+
+  const [initialDraft] = useState(() =>
+    !readOnly && resolvedDraftId ? getPerformancePreviewDraft(resolvedDraftId) : null,
+  )
+
+  const [summary, setSummary] = useState(() => initialDraft?.summary ?? data.summary)
+
+  const [insight, setInsight] = useState(
+    () => initialDraft?.insight ?? formatInsightWithBullet(data.insight),
+  )
+  const [isSaved, setIsSaved] = useState(() => initiallySaved && !initialDraft)
   const [pendingMoveTaskIds, setPendingMoveTaskIds] = useState<string[]>([])
+  const [isSubmittingSave, setIsSubmittingSave] = useState(false)
   const { toasts, addToast } = useToast()
 
   const handleChangeSummary = (value: string) => {
     setSummary(value)
     setIsSaved(false)
+
+    if (resolvedDraftId) {
+      setPerformancePreviewDraft(resolvedDraftId, {
+        summary: value,
+        insight,
+      })
+    }
   }
 
   const handleChangeInsight = (value: string) => {
     setInsight(value)
     setIsSaved(false)
+
+    if (resolvedDraftId) {
+      setPerformancePreviewDraft(resolvedDraftId, {
+        summary,
+        insight: value,
+      })
+    }
   }
 
   const handleMoveTaskToTomorrow = async (taskId: string) => {
@@ -89,17 +123,25 @@ export const PerformancePreviewResult = ({
   }
 
   const handleSaveDiary = async () => {
-    if (!onSave || isSaving || isSaved) {
+    if (!onSave || isSaving || isSaved || isSubmittingSave) {
       return
     }
 
+    setIsSubmittingSave(true)
+
     try {
       await onSave({ summary, insight })
+
+      if (resolvedDraftId) {
+        clearPerformancePreviewDraft(resolvedDraftId)
+      }
 
       setIsSaved(true)
       addToast('업무 일지가 저장되었어요')
     } catch {
       // 실패 시 저장 완료 상태와 성공 토스트를 반영하지 않음
+    } finally {
+      setIsSubmittingSave(false)
     }
   }
 
@@ -201,7 +243,7 @@ export const PerformancePreviewResult = ({
             variant="fill"
             size="large"
             fullWidth
-            disabled={isSaved || isSaving}
+            disabled={isSaved || isSaving || isSubmittingSave}
             onClick={() => {
               void handleSaveDiary()
             }}

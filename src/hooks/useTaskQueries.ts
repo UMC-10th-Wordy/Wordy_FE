@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { moveTaskToTomorrow, getTasks, taskQueryKeys } from '@/api/task/task'
 import { mapTaskDtoToTask } from '@/utils/taskMapper'
 
@@ -8,24 +8,11 @@ interface MoveTaskToTomorrowVariables {
 }
 
 export const useMoveTaskToTomorrow = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: ({ taskId, taskDate }: MoveTaskToTomorrowVariables) =>
       moveTaskToTomorrow(taskId, {
         taskDate,
       }),
-
-    onSuccess: (_data, variables) => {
-      queryClient.removeQueries({
-        queryKey: taskQueryKeys.list(variables.taskDate),
-        exact: true,
-      })
-
-      void queryClient.invalidateQueries({
-        queryKey: taskQueryKeys.all,
-      })
-    },
   })
 }
 

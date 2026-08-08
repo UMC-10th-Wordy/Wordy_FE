@@ -112,6 +112,11 @@ export default function TodoListPage() {
   const [isExampleModalOpen, setIsExampleModalOpen] = useState(false)
 
   const currentDateKey = toDateKey(currentDate)
+
+  const nextDate = new Date(currentDate)
+  nextDate.setDate(nextDate.getDate() + 1)
+  const nextDateKey = toDateKey(nextDate)
+
   const previousDateKeyRef = useRef(currentDateKey)
 
   useEffect(() => {
@@ -136,7 +141,7 @@ export default function TodoListPage() {
   const { toasts, addToast } = useToast()
   const queryClient = useQueryClient()
   const { data: profile, isPending: isProfilePending } = useGetProfile()
-  const performancePreview = usePerformancePreview()
+  const performancePreview = usePerformancePreview(currentDateKey)
   const moveTaskToTomorrowMutation = useMoveTaskToTomorrow()
   const updatePerformanceMutation = useUpdatePerformance()
   const createDailyEntryMutation = useCreateDailyEntry()
@@ -153,6 +158,7 @@ export default function TodoListPage() {
   }, [])
 
   const questionChat = usePerformanceQuestionChat({
+    entryDate: currentDateKey,
     isActive: performancePreview.status === 'questioning',
     questions: performancePreview.questions,
     onFinish: (answers) => {
@@ -163,6 +169,7 @@ export default function TodoListPage() {
   })
 
   const { data: fetchedTasks } = useGetTasksByDate(currentDateKey)
+  const { data: fetchedTomorrowTasks } = useGetTasksByDate(nextDateKey)
 
   const { data: performanceList } = useGetPerformancesByDate(currentDateKey)
 
@@ -194,6 +201,19 @@ export default function TodoListPage() {
   const savedPerformanceResult = savedPerformanceDetail
     ? mapPerformanceDetailResult(savedPerformanceDetail, tasksForDate)
     : null
+
+  const previewIncompleteTasks =
+    performancePreview.result?.incompleteTasks ?? savedPerformanceResult?.incompleteTasks ?? []
+
+  const movedTaskIdsFromServer = previewIncompleteTasks
+    .filter((previewTask) =>
+      fetchedTomorrowTasks.some((tomorrowTask) => tomorrowTask.id === previewTask.id),
+    )
+    .map((task) => task.id)
+
+  const effectiveMovedPerformanceTaskIds = [
+    ...new Set([...movedPerformanceTaskIds, ...movedTaskIdsFromServer]),
+  ]
 
   const completedTasks = tasksForDate.filter((task) => task.isCompleted)
   const incompleteTasks = tasksForDate.filter((task) => !task.isCompleted)
@@ -492,16 +512,15 @@ export default function TodoListPage() {
   useFlipAnimation(taskListRef, [tasks, activeTab])
 
   const handleTogglePreview = () => {
-    if (isPreviewOpen && savedPerformanceId) {
-      performancePreview.resetPreview()
-    }
-
     setIsPreviewOpen((prev) => !prev)
   }
 
   const handleChangeDate = (date: Date) => {
-    performancePreview.resetPreview()
-    questionChat.resetQuestionChat()
+    const nextDateKey = toDateKey(date)
+
+    questionChat.restoreQuestionChat(nextDateKey)
+    performancePreview.restorePreview(nextDateKey)
+
     setMovedPerformanceTaskIds([])
     setCurrentDate(date)
   }
@@ -518,11 +537,6 @@ export default function TodoListPage() {
   }
 
   const handleMoveTaskToTomorrow = async (taskId: string): Promise<void> => {
-    const nextDate = new Date(currentDate)
-    nextDate.setDate(nextDate.getDate() + 1)
-
-    const nextDateKey = toDateKey(nextDate)
-
     await moveTaskToTomorrowMutation.mutateAsync({
       taskId,
       taskDate: nextDateKey,
@@ -540,7 +554,10 @@ export default function TodoListPage() {
     )
 
     setMovedPerformanceTaskIds((prev) => (prev.includes(taskId) ? prev : [...prev, taskId]))
-    queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+
+    queryClient.invalidateQueries({
+      queryKey: homeQueryKeys.all,
+    })
   }
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
@@ -926,8 +943,11 @@ export default function TodoListPage() {
                 status="success"
                 result={{
                   data: performancePreview.result,
+                  reflectionSnapshotId: performancePreview.reflectionSnapshotId ?? undefined,
+                  draftId: currentDateKey,
+                  initiallySaved: performancePreview.isSaved,
                   isSaving: performancePreview.isSaving,
-                  movedTaskIds: movedPerformanceTaskIds,
+                  movedTaskIds: effectiveMovedPerformanceTaskIds,
                   onSave: handleSavePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}
@@ -942,9 +962,10 @@ export default function TodoListPage() {
                 status="success"
                 result={{
                   data: savedPerformanceResult,
+                  draftId: currentDateKey,
                   initiallySaved: true,
                   isSaving: updatePerformanceMutation.isPending,
-                  movedTaskIds: movedPerformanceTaskIds,
+                  movedTaskIds: effectiveMovedPerformanceTaskIds,
                   onSave: handleUpdatePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}

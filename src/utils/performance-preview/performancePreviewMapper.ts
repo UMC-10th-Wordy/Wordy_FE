@@ -4,6 +4,7 @@ import type {
   PerformanceDetailResult,
   PerformancePreviewCompletedResult,
   PerformancePreviewProjectTagPayload,
+  PerformancePreviewPromptBResult,
   SavePerformancePayload,
 } from '@/types/performance'
 import type {
@@ -15,7 +16,9 @@ import type { Task } from '@/types/todo'
 import type { TagDto } from '@/types/tag'
 
 type CompletedPerformancePreviewResult =
-  PerformancePreviewCompletedResult | CompletePerformancePreviewResult
+  | PerformancePreviewCompletedResult
+  | CompletePerformancePreviewResult
+  | PerformancePreviewPromptBResult
 
 const mapPerformanceTaskResult = (
   taskPerformance: CompletedPerformancePreviewResult['taskPerformances'][number],

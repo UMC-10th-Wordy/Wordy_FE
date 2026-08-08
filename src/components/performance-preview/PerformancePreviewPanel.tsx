@@ -29,6 +29,8 @@ interface PerformancePreviewPanelSuccessProps {
   status: 'success'
   result: {
     data: PerformancePreviewResultData
+    draftId?: string
+    reflectionSnapshotId?: string
     readOnly?: boolean
     initiallySaved?: boolean
     isSaving?: boolean

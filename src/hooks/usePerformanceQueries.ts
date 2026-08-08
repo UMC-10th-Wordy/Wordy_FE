@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import {
   completePerformancePreview,
   createPerformancePreview,
   getPerformanceDetail,
+  getPerformancePreviewStatus,
   getPerformances,
   performanceQueryKeys,
   savePerformance,
@@ -16,6 +18,9 @@ interface UpdatePerformanceVariables {
   dailyPerformanceId: string
   payload: UpdatePerformancePayload
 }
+
+const PERFORMANCE_PREVIEW_POLLING_INTERVAL_MS = 1_000
+const PERFORMANCE_PREVIEW_POLLING_TIMEOUT_MS = 120_000
 
 export const useCreatePerformancePreview = () => {
   return useMutation({
@@ -71,4 +76,59 @@ export const useGetPerformanceDetailQuery = (dailyPerformanceId: string | null) 
     },
     enabled: Boolean(dailyPerformanceId),
   })
+}
+
+export const useGetPerformancePreviewStatus = (
+  reflectionSnapshotId: string | null,
+  enabled: boolean,
+) => {
+  const [timedOutSnapshotId, setTimedOutSnapshotId] = useState<string | null>(null)
+
+  const isPollingTimedOut =
+    reflectionSnapshotId !== null && timedOutSnapshotId === reflectionSnapshotId
+
+  const query = useQuery({
+    queryKey: reflectionSnapshotId
+      ? performanceQueryKeys.preview(reflectionSnapshotId)
+      : [...performanceQueryKeys.previews(), 'empty'],
+    queryFn: () => {
+      if (!reflectionSnapshotId) {
+        throw new Error('성과 미리보기 조회에 필요한 reflectionSnapshotId가 없습니다.')
+      }
+
+      return getPerformancePreviewStatus(reflectionSnapshotId)
+    },
+    enabled: Boolean(reflectionSnapshotId) && enabled && !isPollingTimedOut,
+    refetchInterval: (query) => {
+      const data = query.state.data
+
+      const shouldContinuePolling =
+        !data || data.status === 'PROCESSING' || (data.status === 'TEMP' && !data.promptBResult)
+
+      return shouldContinuePolling ? PERFORMANCE_PREVIEW_POLLING_INTERVAL_MS : false
+    },
+  })
+
+  const isPollingCompleted =
+    query.data?.status === 'FAILED' ||
+    (query.data?.status === 'TEMP' && Boolean(query.data.promptBResult))
+
+  useEffect(() => {
+    if (!reflectionSnapshotId || !enabled || isPollingTimedOut || isPollingCompleted) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setTimedOutSnapshotId(reflectionSnapshotId)
+    }, PERFORMANCE_PREVIEW_POLLING_TIMEOUT_MS)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [enabled, isPollingCompleted, isPollingTimedOut, reflectionSnapshotId])
+
+  return {
+    ...query,
+    isPollingTimedOut,
+  }
 }

@@ -52,6 +52,11 @@ export interface PerformanceSupplementQuestion {
   reason: string
 }
 
+export interface PerformancePreviewProcessingResult {
+  status: 'PROCESSING'
+  reflectionSnapshotId: string
+}
+
 export interface PerformancePreviewQuestionRequiredResult {
   status: 'QUESTION_REQUIRED'
   reflectionSnapshotId: string
@@ -68,7 +73,9 @@ export interface PerformancePreviewCompletedResult {
 }
 
 export type CreatePerformancePreviewResult =
-  PerformancePreviewQuestionRequiredResult | PerformancePreviewCompletedResult
+  | PerformancePreviewQuestionRequiredResult
+  | PerformancePreviewProcessingResult
+  | PerformancePreviewCompletedResult
 
 export type CreatePerformancePreviewResponse = CreatePerformancePreviewResult
 
@@ -87,6 +94,11 @@ export interface CompletePerformancePreviewPayload {
   answers: PerformanceSupplementAnswer[]
 }
 
+export interface CompletePerformancePreviewProcessingResult {
+  status: 'PROCESSING'
+  reflectionSnapshotId: string
+}
+
 export interface CompletePerformancePreviewResult {
   status: 'COMPLETED'
   summary: string
@@ -96,7 +108,8 @@ export interface CompletePerformancePreviewResult {
   reflectionSnapshotId: string
 }
 
-export type CompletePerformancePreviewResponse = CompletePerformancePreviewResult
+export type CompletePerformancePreviewResponse =
+  CompletePerformancePreviewProcessingResult | CompletePerformancePreviewResult
 
 /* 업무 성과 최종 저장 */
 // POST /performances
@@ -174,3 +187,24 @@ export interface UpdatePerformanceResult {
 }
 
 export type UpdatePerformanceResponse = UpdatePerformanceResult
+
+/* 성과 미리보기 상태 조회 */
+// GET /performances/preview/{reflectionSnapshotId}
+
+export type PerformancePreviewPollingStatus = 'PROCESSING' | 'TEMP' | 'FAILED'
+
+export interface PerformancePreviewPromptBResult {
+  summary: string
+  growthInsights: string[]
+  nextActions: string[]
+  taskPerformances: PerformanceTaskPerformance[]
+}
+
+export interface PerformancePreviewPollingResult {
+  reflectionSnapshotId: string
+  status: PerformancePreviewPollingStatus
+  promptBResult: PerformancePreviewPromptBResult | null
+  tasks: PerformancePreviewTaskPayload[]
+}
+
+export type PerformancePreviewPollingResponse = PerformancePreviewPollingResult
