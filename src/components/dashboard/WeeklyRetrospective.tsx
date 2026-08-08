@@ -59,6 +59,7 @@ const TEXTS: Record<RetrospectivePeriod, RetrospectiveTexts> = {
     ],
     planLabel: '다음 주 업무 계획',
     planPlaceholder: '다음 주 진행할 업무 내용을 작성해 주세요',
+    schedulePlaceholder: '예) 다음 주 월요일',
     toastTempSaved: '주간 회고가 임시 저장되었어요',
     toastSaved: '주간 회고가 저장되었어요',
   },
@@ -84,6 +85,7 @@ const TEXTS: Record<RetrospectivePeriod, RetrospectiveTexts> = {
     ],
     planLabel: '다음 달 업무 계획',
     planPlaceholder: '다음 달 진행할 업무 내용을 작성해 주세요',
+    schedulePlaceholder: '예) 다음 달 중순',
     toastTempSaved: '월간 회고가 임시 저장되었어요',
     toastSaved: '월간 회고가 저장되었어요',
   },
@@ -311,7 +313,7 @@ export const WeeklyRetrospective = ({
                   onChange={(e) =>
                     setEditing((prev) => prev && { ...prev, schedule: e.target.value })
                   }
-                  placeholder="언제 진행하실 예정인가요?"
+                  placeholder={texts.schedulePlaceholder}
                   aria-label="예상 시점"
                   className="h-[53px] w-full rounded-lg border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-brand-subtle) px-5 py-3 [font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-default) outline-none transition-colors duration-100 ease-out focus:border-(--color-border-brand) placeholder:text-(--color-text-tertiary)"
                 />

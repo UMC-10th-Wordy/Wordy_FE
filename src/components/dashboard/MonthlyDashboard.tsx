@@ -25,8 +25,7 @@ const TAG_FALLBACK_COLORS: ProjectTagColor[] = ['green', 'pink', 'blue', 'orange
 const toDateString = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
-const toRangeLabel = (start: Date, end: Date) =>
-  `${start.getMonth() + 1}월 ${start.getDate()}일 - ${end.getMonth() + 1}월 ${end.getDate()}일`
+const toRangeLabel = (start: Date, end: Date) => `${start.getDate()}일 - ${end.getDate()}일`
 
 // monthStart~monthEnd 전체를 7일 단위 주차로 나누고, 생성된 대시보드가 있는 주차만 generated 표시
 const buildWeeks = (eligibility: MonthlyEligibilityDto): WeeklyBoardStatus[] => {
@@ -109,7 +108,7 @@ export const MonthlyDashboard = ({
         <TagWorkflowSection tags={tags} period="monthly" />
         <WeeklyHighlights
           items={highlights}
-          title="이번 달 성과 요약"
+          title="기타 업무 성과"
           description="프로젝트 태그가 없는 업무의 성과를 요약했어요"
         />
         {/* 월간 회고는 별도 API — 주간 회고(weeklyReflections)로 초기값을 채우지 않음 (리뷰 반영) */}

@@ -52,7 +52,7 @@ export const DiaryChecklistPanel = ({
                     onClick={() => onToggle(entry.id)}
                     aria-pressed={checked}
                     disabled={disabled}
-                    className="flex h-[53px] w-full items-center gap-2.5 py-3 disabled:cursor-not-allowed"
+                    className="flex h-[52px] w-full items-center gap-2.5 py-2.5 disabled:cursor-not-allowed"
                   >
                     <span
                       className={[
