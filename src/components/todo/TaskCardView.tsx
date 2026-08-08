@@ -53,11 +53,14 @@ export function TaskCardView({
             </button>
             <div className="group relative">
               <Checkbox
-                aria-label="업무 완료 여부"
+                aria-label={task.isCompleted ? '미완료 업무로 전환하기' : '완료 업무로 전환하기'}
                 checked={task.isCompleted}
                 onChange={() => onToggleComplete?.()}
               />
-              <div className="pointer-events-none absolute top-full left-1/2 z-10 flex -translate-x-1/2 flex-col items-center opacity-0 transition-opacity duration-100 ease-out group-hover:opacity-100">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute top-full left-1/2 z-10 flex -translate-x-1/2 flex-col items-center opacity-0 transition-opacity duration-100 ease-out group-hover:opacity-100 group-focus-within:opacity-100"
+              >
                 <div className="h-0 w-0 border-x-[6px] border-x-transparent border-b-[7px] border-b-(--color-bg-dark)" />
                 <div className="rounded-lg bg-(--color-bg-dark) px-[10px] py-1">
                   <p className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) font-medium whitespace-nowrap text-(--color-text-inverse)">

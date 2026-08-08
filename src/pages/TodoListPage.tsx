@@ -39,7 +39,11 @@ import {
 import { homeQueryKeys } from '@/api/home/home'
 import { performanceQueryKeys } from '@/api/performance/performance'
 import { dailyEntryQueryKeys } from '@/api/daily-entry/dailyEntry'
-import { useCreateDailyEntry, useGetDailyEntryByDate } from '@/hooks/useDailyEntryQueries'
+import {
+  useCreateDailyEntry,
+  useDeleteDailyEntry,
+  useGetDailyEntryByDate,
+} from '@/hooks/useDailyEntryQueries'
 import { useGetTasksByDate, useMoveTaskToTomorrow } from '@/hooks/useTaskQueries'
 import {
   mapDraftToCreateTaskPayload,
@@ -136,6 +140,17 @@ export default function TodoListPage() {
   const moveTaskToTomorrowMutation = useMoveTaskToTomorrow()
   const updatePerformanceMutation = useUpdatePerformance()
   const createDailyEntryMutation = useCreateDailyEntry()
+  const deleteDailyEntryMutation = useDeleteDailyEntry()
+  const retrospectiveSaveQueueRef = useRef(Promise.resolve())
+  const retrospectiveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (retrospectiveDebounceRef.current) {
+        clearTimeout(retrospectiveDebounceRef.current)
+      }
+    }
+  }, [])
 
   const questionChat = usePerformanceQuestionChat({
     isActive: performancePreview.status === 'questioning',
@@ -172,7 +187,9 @@ export default function TodoListPage() {
 
   const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
   const retrospective = retrospectiveByDate[currentDateKey] ?? ''
-  const isRetrospectiveButtonVisible = !isRetrospectiveFocused && retrospective.trim().length === 0
+  const hasResolvedRetrospective = currentDateKey in retrospectiveByDate
+  const isRetrospectiveButtonVisible =
+    hasResolvedRetrospective && !isRetrospectiveFocused && retrospective.trim().length === 0
 
   const savedPerformanceResult = savedPerformanceDetail
     ? mapPerformanceDetailResult(savedPerformanceDetail, tasksForDate)
@@ -597,17 +614,51 @@ export default function TodoListPage() {
     requestAnimationFrame(step)
   }
 
-  const handleRetrospectiveBlur = async () => {
+  const saveRetrospective = (content: string) => {
+    const trimmedRetrospective = content.trim()
+    const dailyEntryIdToDelete = fetchedDailyEntry?.dailyEntryId
+
+    retrospectiveSaveQueueRef.current = retrospectiveSaveQueueRef.current
+      .then(async () => {
+        if (trimmedRetrospective.length === 0) {
+          if (dailyEntryIdToDelete) {
+            await deleteDailyEntryMutation.mutateAsync(dailyEntryIdToDelete)
+          }
+          return
+        }
+
+        await createDailyEntryMutation.mutateAsync({
+          entryDate: currentDateKey,
+          reflectionContent: trimmedRetrospective,
+        })
+      })
+      .catch(() => {
+        addToast('회고 저장에 실패했어요. 다시 시도해 주세요')
+      })
+  }
+
+  const handleRetrospectiveChange = (value: string) => {
+    setRetrospectiveByDate((prev) => ({
+      ...prev,
+      [currentDateKey]: value,
+    }))
+
+    if (retrospectiveDebounceRef.current) {
+      clearTimeout(retrospectiveDebounceRef.current)
+    }
+    retrospectiveDebounceRef.current = setTimeout(() => {
+      saveRetrospective(value)
+    }, 1000)
+  }
+
+  const handleRetrospectiveBlur = () => {
     setIsRetrospectiveFocused(false)
 
-    try {
-      await createDailyEntryMutation.mutateAsync({
-        entryDate: currentDateKey,
-        reflectionContent: retrospective.trim(),
-      })
-    } catch {
-      addToast('회고 저장에 실패했어요. 다시 시도해 주세요')
+    if (retrospectiveDebounceRef.current) {
+      clearTimeout(retrospectiveDebounceRef.current)
+      retrospectiveDebounceRef.current = null
     }
+    saveRetrospective(retrospective)
   }
 
   const handleConvert = async () => {
@@ -802,12 +853,7 @@ export default function TodoListPage() {
               <Input2
                 id="today-retrospective-input"
                 value={retrospective}
-                onChange={(event) =>
-                  setRetrospectiveByDate((prev) => ({
-                    ...prev,
-                    [currentDateKey]: event.target.value,
-                  }))
-                }
+                onChange={(event) => handleRetrospectiveChange(event.target.value)}
                 onFocus={() => setIsRetrospectiveFocused(true)}
                 onBlur={handleRetrospectiveBlur}
                 placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."

@@ -104,16 +104,7 @@ export const useDeleteDailyEntry = () => {
     onSuccess: () => {
       void Promise.all([
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.summary(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyRecords(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyEntries(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.searches(),
+          queryKey: dailyEntryQueryKeys.all,
         }),
         queryClient.invalidateQueries({
           queryKey: homeQueryKeys.all,
