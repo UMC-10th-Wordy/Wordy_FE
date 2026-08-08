@@ -19,9 +19,7 @@ import type {
   MonthlyReflectionResultDto,
 } from '@/types/dashboard'
 
-// 백엔드 대시보드 API가 불안정한 데모 환경에서 목데이터로 대체 (VITE_USE_MOCK_DASHBOARD=true)
 const USE_MOCK_DASHBOARD = import.meta.env.VITE_USE_MOCK_DASHBOARD === 'true'
-const mockDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 let weeklyDetailMock: DashboardDetailDto = structuredClone(INITIAL_DASHBOARD_DETAIL_MOCK)
 let monthlyDetailMock: DashboardDetailDto = structuredClone(INITIAL_MONTHLY_DASHBOARD_DETAIL_MOCK)

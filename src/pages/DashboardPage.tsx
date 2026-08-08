@@ -26,6 +26,7 @@ import type {
   MonthlyEligibilityDto,
 } from '@/types/dashboard'
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
+import { hexToTagColor } from '@/utils/tagMapper'
 
 // 서버 entryDate(YYYY-MM-DD) → 화면 라벨(YYYY년 M월 D일 X요일)
 const formatEntryLabel = (dateStr: string) => {
@@ -132,7 +133,9 @@ export const DashboardPage = () => {
     ? detail.tagAnalyses.map((t, i) => ({
         id: t.tagId ?? `tag-${i}`,
         name: t.tagName ?? `프로젝트 태그 ${i + 1}`,
-        color: t.color ?? TAG_FALLBACK_COLORS[i % TAG_FALLBACK_COLORS.length],
+        color: t.color
+          ? hexToTagColor(t.color)
+          : TAG_FALLBACK_COLORS[i % TAG_FALLBACK_COLORS.length],
         count: t.taskCount,
         purpose: t.goal,
         expectedResult: t.expectedOutcome,
@@ -198,7 +201,7 @@ export const DashboardPage = () => {
         if (!created.dashboardId) {
           throw new Error('생성 응답에 저장된 대시보드 ID가 없습니다')
         }
-        return getDashboardDetail(created.dashboardId)
+        return getMonthlyDashboardDetail(created.dashboardId)
       })
       .then((res) => {
         setMonthlyDetail(res)
