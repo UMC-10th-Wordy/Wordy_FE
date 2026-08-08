@@ -944,6 +944,7 @@ export default function TodoListPage() {
                 result={{
                   data: performancePreview.result,
                   reflectionSnapshotId: performancePreview.reflectionSnapshotId ?? undefined,
+                  draftId: currentDateKey,
                   initiallySaved: performancePreview.isSaved,
                   isSaving: performancePreview.isSaving,
                   movedTaskIds: effectiveMovedPerformanceTaskIds,
@@ -961,6 +962,7 @@ export default function TodoListPage() {
                 status="success"
                 result={{
                   data: savedPerformanceResult,
+                  draftId: currentDateKey,
                   initiallySaved: true,
                   isSaving: updatePerformanceMutation.isPending,
                   movedTaskIds: effectiveMovedPerformanceTaskIds,

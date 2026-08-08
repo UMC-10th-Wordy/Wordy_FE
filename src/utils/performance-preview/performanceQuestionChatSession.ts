@@ -18,6 +18,26 @@ export interface PerformanceQuestionChatSession {
   isFinished: boolean
 }
 
+const isPerformanceQuestionChatSession = (
+  value: unknown,
+): value is PerformanceQuestionChatSession => {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+
+  const session = value as Record<string, unknown>
+
+  return (
+    Array.isArray(session.messages) &&
+    typeof session.answer === 'string' &&
+    Array.isArray(session.submittedAnswers) &&
+    typeof session.currentQuestionIndex === 'number' &&
+    (typeof session.latestQuestionMessageId === 'number' ||
+      session.latestQuestionMessageId === null) &&
+    typeof session.isFinished === 'boolean'
+  )
+}
+
 const getPerformanceQuestionChatSessionKey = (entryDate: string) =>
   `performance-question-chat-session:${entryDate}`
 
@@ -33,7 +53,14 @@ export const getPerformanceQuestionChatSession = (
       return null
     }
 
-    return JSON.parse(storedSession) as PerformanceQuestionChatSession
+    const parsedSession: unknown = JSON.parse(storedSession)
+
+    if (!isPerformanceQuestionChatSession(parsedSession)) {
+      sessionStorage.removeItem(key)
+      return null
+    }
+
+    return parsedSession
   } catch {
     try {
       sessionStorage.removeItem(key)

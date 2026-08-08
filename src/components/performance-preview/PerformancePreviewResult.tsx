@@ -21,6 +21,7 @@ import {
 interface PerformancePreviewResultProps {
   data: PerformancePreviewResultData
   reflectionSnapshotId?: string
+  draftId?: string
   readOnly?: boolean
   initiallySaved?: boolean
   isSaving?: boolean
@@ -51,6 +52,7 @@ const formatInsightWithBullet = (insight: string) => {
 export const PerformancePreviewResult = ({
   data,
   reflectionSnapshotId,
+  draftId,
   readOnly = false,
   initiallySaved = false,
   isSaving = false,
@@ -58,8 +60,10 @@ export const PerformancePreviewResult = ({
   onSave,
   onMoveTaskToTomorrow,
 }: PerformancePreviewResultProps) => {
+  const resolvedDraftId = draftId ?? reflectionSnapshotId
+
   const [initialDraft] = useState(() =>
-    !readOnly && reflectionSnapshotId ? getPerformancePreviewDraft(reflectionSnapshotId) : null,
+    !readOnly && resolvedDraftId ? getPerformancePreviewDraft(resolvedDraftId) : null,
   )
 
   const [summary, setSummary] = useState(() => initialDraft?.summary ?? data.summary)
@@ -67,7 +71,7 @@ export const PerformancePreviewResult = ({
   const [insight, setInsight] = useState(
     () => initialDraft?.insight ?? formatInsightWithBullet(data.insight),
   )
-  const [isSaved, setIsSaved] = useState(initiallySaved)
+  const [isSaved, setIsSaved] = useState(() => initiallySaved && !initialDraft)
   const [pendingMoveTaskIds, setPendingMoveTaskIds] = useState<string[]>([])
   const [isSubmittingSave, setIsSubmittingSave] = useState(false)
   const { toasts, addToast } = useToast()
@@ -76,8 +80,8 @@ export const PerformancePreviewResult = ({
     setSummary(value)
     setIsSaved(false)
 
-    if (reflectionSnapshotId) {
-      setPerformancePreviewDraft(reflectionSnapshotId, {
+    if (resolvedDraftId) {
+      setPerformancePreviewDraft(resolvedDraftId, {
         summary: value,
         insight,
       })
@@ -88,8 +92,8 @@ export const PerformancePreviewResult = ({
     setInsight(value)
     setIsSaved(false)
 
-    if (reflectionSnapshotId) {
-      setPerformancePreviewDraft(reflectionSnapshotId, {
+    if (resolvedDraftId) {
+      setPerformancePreviewDraft(resolvedDraftId, {
         summary,
         insight: value,
       })
@@ -128,8 +132,8 @@ export const PerformancePreviewResult = ({
     try {
       await onSave({ summary, insight })
 
-      if (reflectionSnapshotId) {
-        clearPerformancePreviewDraft(reflectionSnapshotId)
+      if (resolvedDraftId) {
+        clearPerformancePreviewDraft(resolvedDraftId)
       }
 
       setIsSaved(true)

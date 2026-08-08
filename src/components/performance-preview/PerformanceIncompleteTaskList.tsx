@@ -31,8 +31,8 @@ export const PerformanceIncompleteTaskList = ({
           const isMoved = movedTaskIds.includes(task.id)
 
           return (
-            <div key={task.id} className="flex w-full items-start justify-between gap-[9px]">
-              <div className="flex min-w-0 flex-1 items-start gap-[9px]">
+            <div key={task.id} className="flex w-full items-center justify-between gap-[9px]">
+              <div className="flex min-w-0 flex-1 items-center gap-[9px]">
                 {task.tag && (
                   <div className="shrink-0">
                     <ProjectTag label={task.tag.label} color={task.tag.color} />
