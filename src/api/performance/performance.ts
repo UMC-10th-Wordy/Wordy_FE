@@ -7,6 +7,7 @@ import type {
   CreatePerformancePreviewResponse,
   PerformanceDetailResponse,
   PerformanceListResponse,
+  PerformancePreviewPollingResponse,
   SavePerformancePayload,
   SavePerformanceResponse,
   UpdatePerformancePayload,
@@ -103,6 +104,11 @@ export const getPerformanceDetail = async (
 export const performanceQueryKeys = {
   all: ['performances'] as const,
 
+  previews: () => [...performanceQueryKeys.all, 'preview'] as const,
+
+  preview: (reflectionSnapshotId: string) =>
+    [...performanceQueryKeys.previews(), reflectionSnapshotId] as const,
+
   lists: () => [...performanceQueryKeys.all, 'list'] as const,
 
   list: (date?: string) => [...performanceQueryKeys.lists(), { date: date ?? null }] as const,
@@ -125,6 +131,20 @@ export const updatePerformance = async (
     {
       method: 'PATCH',
       body: JSON.stringify(payload),
+    },
+  )
+}
+
+/* 성과 미리보기 상태 조회 */
+// GET /performances/preview/{reflectionSnapshotId}
+
+export const getPerformancePreviewStatus = async (
+  reflectionSnapshotId: string,
+): Promise<PerformancePreviewPollingResponse> => {
+  return request<PerformancePreviewPollingResponse>(
+    `/performances/preview/${encodeURIComponent(reflectionSnapshotId)}`,
+    {
+      method: 'GET',
     },
   )
 }

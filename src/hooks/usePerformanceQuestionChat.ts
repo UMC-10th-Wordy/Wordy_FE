@@ -1,20 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import {
+  clearPerformanceQuestionChatSession,
+  getPerformanceQuestionChatSession,
+  setPerformanceQuestionChatSession,
+} from '@/utils/performance-preview/performanceQuestionChatSession'
+
+import type { PerformanceQuestionChatMessage } from '@/utils/performance-preview/performanceQuestionChatSession'
 import type {
   PerformanceSupplementAnswer,
   PerformanceSupplementQuestion,
 } from '@/types/performance'
 
-export type PerformanceQuestionMessageRole = 'wordy' | 'user'
-
-export interface PerformanceQuestionMessage {
-  id: number
-  role: PerformanceQuestionMessageRole
-  content: string
-  isQuestion?: boolean
-}
+export type PerformanceQuestionMessage = PerformanceQuestionChatMessage
 
 interface UsePerformanceQuestionChatParams {
+  entryDate: string
   isActive: boolean
   questions: PerformanceSupplementQuestion[]
   onFinish: (answers: PerformanceSupplementAnswer[]) => void
@@ -27,21 +28,36 @@ const INITIAL_WORDY_MESSAGE =
   '반가워요!\n더 의미있는 성과를 도출하기 위해 몇 가지 질문을 드리려고 해요.\n다음 질문에 대한 내용을 입력해 주세요!'
 
 export const usePerformanceQuestionChat = ({
+  entryDate,
   isActive,
   questions,
   onFinish,
 }: UsePerformanceQuestionChatParams) => {
-  const [messages, setMessages] = useState<PerformanceQuestionMessage[]>([])
-  const [answer, setAnswer] = useState('')
-  const [submittedAnswers, setSubmittedAnswers] = useState<PerformanceSupplementAnswer[]>([])
-  const [isWordyTyping, setIsWordyTyping] = useState(false)
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [latestQuestionMessageId, setLatestQuestionMessageId] = useState<number | null>(null)
-  const [isFinished, setIsFinished] = useState(false)
+  const [initialSession] = useState(() => getPerformanceQuestionChatSession(entryDate))
 
-  const messageIdRef = useRef(0)
-  const hasStartedRef = useRef(false)
+  const [messages, setMessages] = useState<PerformanceQuestionMessage[]>(
+    () => initialSession?.messages ?? [],
+  )
+  const [answer, setAnswer] = useState(() => initialSession?.answer ?? '')
+  const [submittedAnswers, setSubmittedAnswers] = useState<PerformanceSupplementAnswer[]>(
+    () => initialSession?.submittedAnswers ?? [],
+  )
+  const [isWordyTyping, setIsWordyTyping] = useState(false)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(
+    () => initialSession?.currentQuestionIndex ?? 0,
+  )
+  const [latestQuestionMessageId, setLatestQuestionMessageId] = useState<number | null>(
+    () => initialSession?.latestQuestionMessageId ?? null,
+  )
+  const [isFinished, setIsFinished] = useState(() => initialSession?.isFinished ?? false)
+
+  const messageIdRef = useRef(
+    initialSession?.messages.reduce((maxId, message) => Math.max(maxId, message.id), 0) ?? 0,
+  )
+  const hasStartedRef = useRef(Boolean(initialSession))
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  const activeEntryDateRef = useRef(entryDate)
+  const initialSessionRestoredRef = useRef(false)
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((timer) => clearTimeout(timer))
@@ -66,7 +82,10 @@ export const usePerformanceQuestionChat = ({
       setIsFinished(true)
       setLatestQuestionMessageId(null)
 
+      const targetEntryDate = activeEntryDateRef.current
+
       const finishTimer = setTimeout(() => {
+        clearPerformanceQuestionChatSession(targetEntryDate)
         onFinish(answers)
       }, RETURN_TO_CONVERTING_DELAY_MS)
 
@@ -86,6 +105,10 @@ export const usePerformanceQuestionChat = ({
 
       const typingTimer = setTimeout(() => {
         const currentQuestion = questions[questionIndex]
+
+        if (!currentQuestion) {
+          return
+        }
 
         setIsWordyTyping(false)
         setCurrentQuestionIndex(questionIndex)
@@ -116,6 +139,7 @@ export const usePerformanceQuestionChat = ({
     setIsFinished(false)
 
     messageIdRef.current = 0
+    hasStartedRef.current = true
 
     appendMessage({
       role: 'wordy',
@@ -216,21 +240,127 @@ export const usePerformanceQuestionChat = ({
 
     hasStartedRef.current = false
     messageIdRef.current = 0
+
+    clearPerformanceQuestionChatSession(activeEntryDateRef.current)
   }, [clearTimers])
 
+  const restoreQuestionChat = useCallback(
+    (nextEntryDate: string) => {
+      clearTimers()
+      activeEntryDateRef.current = nextEntryDate
+
+      const session = getPerformanceQuestionChatSession(nextEntryDate)
+
+      if (!session) {
+        setMessages([])
+        setAnswer('')
+        setSubmittedAnswers([])
+        setIsWordyTyping(false)
+        setCurrentQuestionIndex(0)
+        setLatestQuestionMessageId(null)
+        setIsFinished(false)
+
+        hasStartedRef.current = false
+        messageIdRef.current = 0
+
+        return
+      }
+
+      setMessages(session.messages)
+      setAnswer(session.answer)
+      setSubmittedAnswers(session.submittedAnswers)
+      setIsWordyTyping(false)
+      setCurrentQuestionIndex(session.currentQuestionIndex)
+      setLatestQuestionMessageId(session.latestQuestionMessageId)
+      setIsFinished(session.isFinished)
+
+      hasStartedRef.current = true
+
+      messageIdRef.current = session.messages.reduce(
+        (maxId, message) => Math.max(maxId, message.id),
+        0,
+      )
+
+      if (session.isFinished) {
+        finishQuestioning(session.submittedAnswers)
+        return
+      }
+
+      if (session.latestQuestionMessageId === null) {
+        showQuestion(session.submittedAnswers.length, session.submittedAnswers)
+      }
+    },
+    [clearTimers, finishQuestioning, showQuestion],
+  )
+
   useEffect(() => {
-    if (!isActive || hasStartedRef.current || questions.length === 0) {
+    if (!isActive) {
       return
     }
 
-    hasStartedRef.current = true
-    startQuestioning()
-  }, [isActive, questions.length, startQuestioning])
+    setPerformanceQuestionChatSession(activeEntryDateRef.current, {
+      messages,
+      answer,
+      submittedAnswers,
+      currentQuestionIndex,
+      latestQuestionMessageId,
+      isFinished,
+    })
+  }, [
+    answer,
+    currentQuestionIndex,
+    isActive,
+    isFinished,
+    latestQuestionMessageId,
+    messages,
+    submittedAnswers,
+  ])
+
+  useEffect(() => {
+    if (!isActive || questions.length === 0) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      if (initialSession && !initialSessionRestoredRef.current) {
+        initialSessionRestoredRef.current = true
+        activeEntryDateRef.current = entryDate
+
+        if (initialSession.isFinished) {
+          finishQuestioning(initialSession.submittedAnswers)
+          return
+        }
+
+        if (initialSession.latestQuestionMessageId === null) {
+          showQuestion(initialSession.submittedAnswers.length, initialSession.submittedAnswers)
+        }
+
+        return
+      }
+
+      if (hasStartedRef.current) {
+        return
+      }
+
+      startQuestioning()
+    }, 0)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [
+    entryDate,
+    finishQuestioning,
+    initialSession,
+    isActive,
+    questions.length,
+    showQuestion,
+    startQuestioning,
+  ])
 
   useEffect(() => {
     return () => {
       clearTimers()
-      hasStartedRef.current = false
     }
   }, [clearTimers])
 
@@ -244,5 +374,6 @@ export const usePerformanceQuestionChat = ({
     onSubmitAnswer: handleSubmitAnswer,
     onSkipQuestion: handleSkipQuestion,
     resetQuestionChat,
+    restoreQuestionChat,
   }
 }

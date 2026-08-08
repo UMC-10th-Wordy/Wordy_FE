@@ -129,11 +129,12 @@ export default function TodoListPage() {
   const { toasts, addToast } = useToast()
   const queryClient = useQueryClient()
   const { data: profile, isPending: isProfilePending } = useGetProfile()
-  const performancePreview = usePerformancePreview()
+  const performancePreview = usePerformancePreview(currentDateKey)
   const moveTaskToTomorrowMutation = useMoveTaskToTomorrow()
   const updatePerformanceMutation = useUpdatePerformance()
 
   const questionChat = usePerformanceQuestionChat({
+    entryDate: currentDateKey,
     isActive: performancePreview.status === 'questioning',
     questions: performancePreview.questions,
     onFinish: (answers) => {
@@ -461,16 +462,15 @@ export default function TodoListPage() {
   useFlipAnimation(taskListRef, [tasks, activeTab])
 
   const handleTogglePreview = () => {
-    if (isPreviewOpen && savedPerformanceId) {
-      performancePreview.resetPreview()
-    }
-
     setIsPreviewOpen((prev) => !prev)
   }
 
   const handleChangeDate = (date: Date) => {
-    performancePreview.resetPreview()
-    questionChat.resetQuestionChat()
+    const nextDateKey = toDateKey(date)
+
+    questionChat.restoreQuestionChat(nextDateKey)
+    performancePreview.restorePreview(nextDateKey)
+
     setMovedPerformanceTaskIds([])
     setCurrentDate(date)
   }
@@ -795,6 +795,8 @@ export default function TodoListPage() {
                 status="success"
                 result={{
                   data: performancePreview.result,
+                  reflectionSnapshotId: performancePreview.reflectionSnapshotId ?? undefined,
+                  initiallySaved: performancePreview.isSaved,
                   isSaving: performancePreview.isSaving,
                   movedTaskIds: movedPerformanceTaskIds,
                   onSave: handleSavePerformance,

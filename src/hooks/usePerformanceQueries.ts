@@ -4,6 +4,7 @@ import {
   completePerformancePreview,
   createPerformancePreview,
   getPerformanceDetail,
+  getPerformancePreviewStatus,
   getPerformances,
   performanceQueryKeys,
   savePerformance,
@@ -70,5 +71,32 @@ export const useGetPerformanceDetailQuery = (dailyPerformanceId: string | null) 
       return getPerformanceDetail(dailyPerformanceId)
     },
     enabled: Boolean(dailyPerformanceId),
+  })
+}
+
+export const useGetPerformancePreviewStatus = (
+  reflectionSnapshotId: string | null,
+  enabled: boolean,
+) => {
+  return useQuery({
+    queryKey: reflectionSnapshotId
+      ? performanceQueryKeys.preview(reflectionSnapshotId)
+      : [...performanceQueryKeys.previews(), 'empty'],
+    queryFn: () => {
+      if (!reflectionSnapshotId) {
+        throw new Error('성과 미리보기 조회에 필요한 reflectionSnapshotId가 없습니다.')
+      }
+
+      return getPerformancePreviewStatus(reflectionSnapshotId)
+    },
+    enabled: Boolean(reflectionSnapshotId) && enabled,
+    refetchInterval: (query) => {
+      const data = query.state.data
+
+      const shouldContinuePolling =
+        !data || data.status === 'PROCESSING' || (data.status === 'TEMP' && !data.promptBResult)
+
+      return shouldContinuePolling ? 1000 : false
+    },
   })
 }
