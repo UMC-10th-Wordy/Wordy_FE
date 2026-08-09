@@ -6,6 +6,8 @@ import {
   getDashboardEligibility,
   getMonthlyDashboardDetail,
   getMonthlyEligibility,
+  getDashboards,
+  getMonthlyDashboards,
 } from '@/api/dashboard/dashboard'
 import ArrowLeftIcon from '@/assets/icons/arrow-left.svg?react'
 import { useToast } from '@/hooks/useToast'
@@ -35,7 +37,6 @@ const formatEntryLabel = (dateStr: string) => {
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${days[date.getDay()]}요일`
 }
 
-// TODO: 스키마에 태그명/색상 없음 (백엔드 확인 중) — 임시 순환 배정
 const TAG_FALLBACK_COLORS: ProjectTagColor[] = ['green', 'pink', 'blue', 'orange']
 
 export const DashboardPage = () => {
@@ -48,23 +49,22 @@ export const DashboardPage = () => {
   const [generation, setGeneration] = useState<'idle' | 'generating' | 'complete'>('idle')
   const [detail, setDetail] = useState<DashboardDetailDto | null>(null)
 
-  // 팀 규칙(월 안에서 끊는 주차)의 주 시작/끝 계산 — 월간 buildWeeks와 동일 규칙
   const getTeamWeekStart = (date: Date) => {
-    const weekIndex = Math.ceil(date.getDate() / 7)
-    return new Date(date.getFullYear(), date.getMonth(), (weekIndex - 1) * 7 + 1)
+    const sunday = new Date(date)
+    sunday.setDate(sunday.getDate() - sunday.getDay())
+    const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
+    return sunday < monthStart ? monthStart : sunday
   }
   const getTeamWeekEnd = (start: Date) => {
-    const lastDay = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate()
-    return new Date(start.getFullYear(), start.getMonth(), Math.min(start.getDate() + 6, lastDay))
+    const saturday = new Date(start)
+    saturday.setDate(saturday.getDate() + (6 - saturday.getDay()))
+    const lastDay = new Date(start.getFullYear(), start.getMonth() + 1, 0)
+    return saturday > lastDay ? lastDay : saturday
   }
 
   const [weekStartDate, setWeekStartDate] = useState(() => getTeamWeekStart(new Date()))
-  const weekLabel = `${weekStartDate.getFullYear()}년 ${weekStartDate.getMonth() + 1}월 ${Math.ceil(weekStartDate.getDate() / 7)}주차`
+  const weekLabel = `${weekStartDate.getFullYear()}년 ${weekStartDate.getMonth() + 1}월 ${Math.ceil((weekStartDate.getDate() + new Date(weekStartDate.getFullYear(), weekStartDate.getMonth(), 1).getDay()) / 7)}주차`
   // TODO: 월간 API 명세 확정 시 월 이동 데이터 갱신 연결. 현재는 라벨만 이동
-
-  const currentWeekStart = getTeamWeekStart(new Date())
-  const isCurrentWeek = weekStartDate.getTime() >= currentWeekStart.getTime()
-
   const [monthOffset, setMonthOffset] = useState(0)
   const [monthAnchor] = useState(() => {
     const now = new Date()
@@ -75,10 +75,6 @@ export const DashboardPage = () => {
   const monthBaseDate = `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, '0')}-01`
   const monthLabel = `${selectedMonth.getFullYear()}년 ${selectedMonth.getMonth() + 1}월`
 
-  const isCurrentMonth =
-    selectedMonth.getFullYear() === monthAnchor.getFullYear() &&
-    selectedMonth.getMonth() === monthAnchor.getMonth()
-
   // 월간 생성 상태 — 탭 전환 시 유실되지 않도록 부모에서 소유
   const [monthlyGeneration, setMonthlyGeneration] = useState<MonthlyGeneration>('idle')
   const [monthlyEligibility, setMonthlyEligibility] = useState<MonthlyEligibilityDto | null>(null)
@@ -87,17 +83,31 @@ export const DashboardPage = () => {
   useEffect(() => {
     let cancelled = false
     const baseDate = `${weekStartDate.getFullYear()}-${String(weekStartDate.getMonth() + 1).padStart(2, '0')}-${String(weekStartDate.getDate()).padStart(2, '0')}`
+    const viewedEndDate = getTeamWeekEnd(weekStartDate)
+    const viewedEnd = `${viewedEndDate.getFullYear()}-${String(viewedEndDate.getMonth() + 1).padStart(2, '0')}-${String(viewedEndDate.getDate()).padStart(2, '0')}`
     getDashboardEligibility(baseDate)
       .then((res) => {
         if (cancelled) return
         const mapped = res.entries.map((e) => ({
           id: e.dailyEntryId,
           label: formatEntryLabel(e.entryDate),
-          converted: true,
+          converted: undefined, // TODO: 서버 변환 여부 필드 확정 시 e.필드명 연결
+          date: e.entryDate,
         }))
         setEntries(mapped)
         setRequiredCount(res.requiredDays)
         setWeekRange({ start: res.weekStart, end: res.weekEnd })
+        getDashboards()
+          .then((list) => {
+            const saved = list.find((d) => d.startDate === res.weekStart)
+            // 서버가 요청과 다른 주를 반환하면(현 BaseDate 버그) 복원하지 않음 — 보는 주와 응답 주가 겹칠 때만 복원
+            if (!saved || res.weekEnd < baseDate || viewedEnd < res.weekStart) return
+            return getDashboardDetail(saved.dashboardId).then((detailRes) => {
+              setDetail(detailRes)
+              setGeneration('complete')
+            })
+          })
+          .catch(() => {})
         setSelectedIds(mapped.map((e) => e.id)) // 기본: 전체 선택
       })
       .catch((error) => console.error('생성 조건 조회 실패:', error))
@@ -108,10 +118,19 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     let cancelled = false
-    getMonthlyEligibility(monthBaseDate)
-      .then((res) => {
-        if (!cancelled) setMonthlyEligibility(res)
+    getMonthlyEligibility(monthBaseDate).then((res) => {
+      if (!cancelled) setMonthlyEligibility(res)
+    })
+    getMonthlyDashboards()
+      .then((list) => {
+        const saved = list.find((d) => d.startDate.slice(0, 7) === monthBaseDate.slice(0, 7))
+        if (!saved) return
+        return getMonthlyDashboardDetail(saved.dashboardId).then((detailRes) => {
+          setMonthlyDetail(detailRes)
+          setMonthlyGeneration('complete')
+        })
       })
+      .catch(() => {})
       .catch(() => {})
     return () => {
       cancelled = true
@@ -124,7 +143,18 @@ export const DashboardPage = () => {
   const stats = detail
     ? [
         { label: '일지 기록', value: String(detail.journalDays), unit: '일' },
-        { label: '성과 업무', value: String(detail.performanceCount), unit: '개' },
+        {
+          label: '업무 완료율',
+          value: String(
+            detail.performances.length
+              ? Math.round(
+                  detail.performances.reduce((sum, p) => sum + (p.achievementRate ?? 0), 0) /
+                    detail.performances.length,
+                )
+              : 0,
+          ),
+          unit: '%',
+        },
         { label: '사용된 프로젝트 태그', value: String(detail.tagCount), unit: '개' },
       ]
     : []
@@ -136,10 +166,10 @@ export const DashboardPage = () => {
         color: t.color
           ? hexToTagColor(t.color)
           : TAG_FALLBACK_COLORS[i % TAG_FALLBACK_COLORS.length],
-        count: t.taskCount,
+        count: t.taskCount ?? 0,
         purpose: t.goal,
         expectedResult: t.expectedOutcome,
-        taskCount: `${t.taskCount}건`,
+        taskCount: `${t.taskCount ?? 0}건`,
         period: `${t.periodStart} - ${t.periodEnd}`,
         achievement: t.achievementStatus,
         kpis: detail.kpis.map((k) => ({
@@ -151,10 +181,13 @@ export const DashboardPage = () => {
       }))
     : []
   const highlights = detail
-    ? detail.performances.map((p) => ({
-        text: p.summary,
-        source: p.items[0]?.output ?? '업무 일지',
-      }))
+    ? detail.performances.map((p) => {
+        const entryDate = entries.find((e) => e.id === p.dailyEntryId)?.date
+        const sourceLabel = entryDate
+          ? `${new Date(`${entryDate}T00:00:00`).getFullYear()}년 ${new Date(`${entryDate}T00:00:00`).getMonth() + 1}월 ${new Date(`${entryDate}T00:00:00`).getDate()}일 업무 일지`
+          : '업무 일지'
+        return { text: p.summary, source: sourceLabel, dailyEntryId: p.dailyEntryId }
+      })
     : []
 
   const handleToggle = (id: string) => {
@@ -322,7 +355,7 @@ export const DashboardPage = () => {
             <button
               type="button"
               aria-label="다음 주차"
-              disabled={generation === 'generating' || isCurrentWeek}
+              disabled={generation === 'generating'}
               onClick={() => handleWeekMove(1)}
               className="disabled:opacity-40"
             >
@@ -383,7 +416,7 @@ export const DashboardPage = () => {
             <button
               type="button"
               aria-label="다음 달"
-              disabled={monthlyGeneration === 'generating' || isCurrentMonth}
+              disabled={monthlyGeneration === 'generating'}
               onClick={() => handleMonthMove(1)}
             >
               <ArrowLeftIcon

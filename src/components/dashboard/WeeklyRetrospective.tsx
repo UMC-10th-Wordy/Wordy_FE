@@ -32,6 +32,7 @@ interface RetrospectiveTexts {
   questions: RetrospectiveQuestion[]
   planLabel: string
   planPlaceholder: string
+  schedulePlaceholder: string
   toastTempSaved: string
   toastSaved: string
 }
@@ -291,7 +292,7 @@ export const WeeklyRetrospective = ({
         >
           <div className="overflow-hidden">
             {editing && (
-              <div className="grid grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 py-2 pl-5">
+              <div className="grid grid-cols-[1.4fr_1fr_auto] items-center gap-x-3 py-2 pl-5">
                 <span className="flex items-center gap-4">
                   <span className="[font-size:var(--font-size-body-2)] leading-[1.6] text-(--color-text-tertiary)">
                     {String(editingIndex).padStart(2, '0')}
@@ -353,7 +354,7 @@ export const WeeklyRetrospective = ({
         </div>
         <div className="flex items-end gap-4">
           {savedAt && (
-            <span className="[font-size:var(--font-size-caption-1)] text-(--color-text-tertiary)">
+            <span className="[font-size:var(--font-size-body-2)] leading-[1.6] text-(--color-text-tertiary)">
               임시 저장됨: {savedAt}
             </span>
           )}

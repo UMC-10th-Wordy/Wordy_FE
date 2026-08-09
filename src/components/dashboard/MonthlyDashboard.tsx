@@ -25,18 +25,21 @@ const TAG_FALLBACK_COLORS: ProjectTagColor[] = ['green', 'pink', 'blue', 'orange
 const toDateString = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
-const toRangeLabel = (start: Date, end: Date) => `${start.getDate()}일 - ${end.getDate()}일`
+const toRangeLabel = (start: Date, end: Date) =>
+  start.getTime() === end.getTime()
+    ? `${start.getDate()}일`
+    : `${start.getDate()}일 - ${end.getDate()}일`
 
-// monthStart~monthEnd 전체를 7일 단위 주차로 나누고, 생성된 대시보드가 있는 주차만 generated 표시
 const buildWeeks = (eligibility: MonthlyEligibilityDto): WeeklyBoardStatus[] => {
   const weeks: WeeklyBoardStatus[] = []
-  const monthEnd = new Date(`${eligibility.monthEnd}T00:00:00`)
-  const cursor = new Date(`${eligibility.monthStart}T00:00:00`)
+  const monthStart = new Date(`${eligibility.monthStart}T00:00:00`)
+  const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0)
+  const cursor = new Date(monthStart)
   let index = 0
   while (cursor <= monthEnd) {
     const weekStart = new Date(cursor)
     const weekEnd = new Date(cursor)
-    weekEnd.setDate(weekEnd.getDate() + 6)
+    weekEnd.setDate(weekEnd.getDate() + (6 - weekEnd.getDay()))
     if (weekEnd > monthEnd) weekEnd.setTime(monthEnd.getTime())
     const startStr = toDateString(weekStart)
     const endStr = toDateString(weekEnd)
@@ -49,7 +52,8 @@ const buildWeeks = (eligibility: MonthlyEligibilityDto): WeeklyBoardStatus[] => 
       rangeLabel: toRangeLabel(weekStart, weekEnd),
       generated: Boolean(matched),
     })
-    cursor.setDate(cursor.getDate() + 7)
+    cursor.setTime(weekEnd.getTime())
+    cursor.setDate(cursor.getDate() + 1)
     index += 1
   }
   return weeks
@@ -76,7 +80,18 @@ export const MonthlyDashboard = ({
 
     const stats = [
       { label: '일지 기록', value: String(detail.journalDays), unit: '일' },
-      { label: '성과 업무', value: String(detail.performanceCount), unit: '개' },
+      {
+        label: '업무 완료율',
+        value: String(
+          detail.performances.length
+            ? Math.round(
+                detail.performances.reduce((sum, p) => sum + (p.achievementRate ?? 0), 0) /
+                  detail.performances.length,
+              )
+            : 0,
+        ),
+        unit: '%',
+      },
       { label: '사용된 프로젝트 태그', value: String(detail.tagCount), unit: '개' },
     ]
     // TODO: 스키마에 태그 식별자가 없어 전체 KPI를 태그마다 표시 중 — 태그별 KPI 매핑은 백엔드 스키마 확장 후 반영
@@ -84,10 +99,10 @@ export const MonthlyDashboard = ({
       id: `monthly-tag-${i}`,
       name: `프로젝트 태그 ${i + 1}`, // TODO: 스키마에 태그명 없음 — 백엔드 확인 중
       color: TAG_FALLBACK_COLORS[i % TAG_FALLBACK_COLORS.length],
-      count: t.taskCount,
+      count: t.taskCount ?? 0,
       purpose: t.goal,
       expectedResult: t.expectedOutcome,
-      taskCount: `${t.taskCount}건`,
+      taskCount: `${t.taskCount ?? 0}건`,
       period: `${t.periodStart} - ${t.periodEnd}`,
       achievement: t.achievementStatus,
       kpis: detail.kpis.map((k) => ({
