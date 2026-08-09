@@ -101,8 +101,9 @@ export const DashboardPage = () => {
           .then((list) => {
             const saved = list.find((d) => d.startDate === res.weekStart)
             // 서버가 요청과 다른 주를 반환하면(현 BaseDate 버그) 복원하지 않음 — 보는 주와 응답 주가 겹칠 때만 복원
-            if (!saved || res.weekEnd < baseDate || viewedEnd < res.weekStart) return
+            if (!saved || res.weekStart !== baseDate || res.weekEnd !== viewedEnd) return
             return getDashboardDetail(saved.dashboardId).then((detailRes) => {
+              if (cancelled) return
               setDetail(detailRes)
               setGeneration('complete')
             })
@@ -118,14 +119,22 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     let cancelled = false
-    getMonthlyEligibility(monthBaseDate).then((res) => {
-      if (!cancelled) setMonthlyEligibility(res)
-    })
+    getMonthlyEligibility(monthBaseDate)
+      .then((res) => {
+        if (!cancelled) setMonthlyEligibility(res)
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error('월간 생성 조건 조회 실패:', error)
+          setMonthlyEligibility(null)
+        }
+      })
     getMonthlyDashboards()
       .then((list) => {
         const saved = list.find((d) => d.startDate.slice(0, 7) === monthBaseDate.slice(0, 7))
         if (!saved) return
         return getMonthlyDashboardDetail(saved.dashboardId).then((detailRes) => {
+          if (cancelled) return
           setMonthlyDetail(detailRes)
           setMonthlyGeneration('complete')
         })

@@ -90,10 +90,10 @@ export const DiaryChecklistPanel = ({
                       {entry.label}
                     </span>
                   </button>
-                  {unconverted && (
+                  {unconverted && entry.date && (
                     <button
                       type="button"
-                      onClick={() => navigate(`/today?date=${entry.date ?? ''}`)}
+                      onClick={() => navigate(`/today?date=${entry.date}`)}
                       className="flex shrink-0 items-center gap-1 [font-size:var(--font-size-body-4)] leading-[1.6] font-medium text-(--color-button-default)"
                     >
                       성과 생성하기
