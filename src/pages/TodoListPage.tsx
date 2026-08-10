@@ -997,9 +997,7 @@ export default function TodoListPage() {
                   onSkipQuestion: questionChat.onSkipQuestion,
                 }}
               />
-            ) : performancePreview.status === 'success' &&
-              performancePreview.result &&
-              !performancePreview.isSaved ? (
+            ) : performancePreview.status === 'success' && performancePreview.result ? (
               <PerformancePreviewPanel
                 key={`preview-${performancePreview.reflectionSnapshotId}`}
                 status="success"
@@ -1007,10 +1005,14 @@ export default function TodoListPage() {
                   data: performancePreview.result,
                   reflectionSnapshotId: performancePreview.reflectionSnapshotId ?? undefined,
                   draftId: currentDateKey,
-                  initiallySaved: false,
-                  isSaving: performancePreview.isSaving,
+                  initiallySaved: performancePreview.isSaved,
+                  isSaving: performancePreview.isSaved
+                    ? updatePerformanceMutation.isPending
+                    : performancePreview.isSaving,
                   movedTaskIds: effectiveMovedPerformanceTaskIds,
-                  onSave: handleSavePerformance,
+                  onSave: performancePreview.isSaved
+                    ? handleUpdatePerformance
+                    : handleSavePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}
               />
