@@ -8,16 +8,16 @@ import {
   getCalendarDayStatus,
   getMonthGridDates,
   isSameDay,
+  toDateKey,
 } from '@/utils/calendar'
-import type { Task } from '@/types/todo'
+import { useGetTasksCalendar } from '@/hooks/useTaskQueries'
 
 interface CalendarModalProps {
   selectedDate: Date
-  tasks: Task[]
   onSelectDate: (date: Date) => void
 }
 
-export function CalendarModal({ selectedDate, tasks, onSelectDate }: CalendarModalProps) {
+export function CalendarModal({ selectedDate, onSelectDate }: CalendarModalProps) {
   const [viewDate, setViewDate] = useState(
     () => new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1),
   )
@@ -25,6 +25,9 @@ export function CalendarModal({ selectedDate, tasks, onSelectDate }: CalendarMod
   const year = viewDate.getFullYear()
   const month = viewDate.getMonth()
   const gridDates = getMonthGridDates(year, month)
+  const rangeStart = toDateKey(gridDates[0])
+  const rangeEnd = toDateKey(gridDates[gridDates.length - 1])
+  const { data: calendarEntries } = useGetTasksCalendar(year, month, rangeStart, rangeEnd)
 
   const goToPrevMonth = () =>
     setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
@@ -81,7 +84,7 @@ export function CalendarModal({ selectedDate, tasks, onSelectDate }: CalendarMod
             <CalendarDayCell
               key={date.toISOString()}
               date={date}
-              status={getCalendarDayStatus(tasks, date)}
+              status={getCalendarDayStatus(calendarEntries ?? [], date)}
               isCurrentMonth={date.getMonth() === month}
               isSelected={isSameDay(date, selectedDate)}
               onSelect={onSelectDate}

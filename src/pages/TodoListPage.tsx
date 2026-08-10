@@ -244,6 +244,7 @@ export default function TodoListPage() {
         prev ? [...prev, created] : [created],
       )
       queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars() })
       setIsTaskFormOpen(false)
     } catch {
       addToast('업무 생성에 실패했어요. 다시 시도해 주세요')
@@ -260,6 +261,7 @@ export default function TodoListPage() {
         prev ? prev.filter((task) => task.taskId !== id) : prev,
       )
       queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars() })
     } catch {
       addToast('업무 삭제에 실패했어요. 다시 시도해 주세요')
     }
@@ -438,6 +440,7 @@ export default function TodoListPage() {
           : prev,
       )
       queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars() })
       addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
     } catch {
       addToast('업무 상태 변경에 실패했어요. 다시 시도해 주세요')
@@ -557,6 +560,9 @@ export default function TodoListPage() {
 
     queryClient.invalidateQueries({
       queryKey: homeQueryKeys.all,
+    })
+    queryClient.invalidateQueries({
+      queryKey: taskQueryKeys.calendars(),
     })
   }
 
@@ -741,7 +747,6 @@ export default function TodoListPage() {
           <div className="flex w-full flex-col gap-12 px-10 pt-10">
             <DateHeader
               date={currentDate}
-              tasks={tasks}
               subtitle="오늘은 어떤 업무를 하실 예정인가요?"
               isPreviewOpen={isPreviewOpen}
               onTogglePreview={handleTogglePreview}

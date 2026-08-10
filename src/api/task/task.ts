@@ -3,6 +3,7 @@ import type {
   ReorderTasksPayload,
   ReorderTasksResult,
   SaveTaskResultPayload,
+  TaskCalendarEntryDto,
   TaskDto,
   TaskResultDto,
   UpdateTaskPayload,
@@ -39,6 +40,8 @@ export const taskQueryKeys = {
   all: ['tasks'] as const,
   lists: () => [...taskQueryKeys.all, 'list'] as const,
   list: (date: string) => [...taskQueryKeys.lists(), date] as const,
+  calendars: () => [...taskQueryKeys.all, 'calendar'] as const,
+  calendar: (year: number, month: number) => [...taskQueryKeys.calendars(), year, month] as const,
 }
 
 export const moveTaskToTomorrow = async (
@@ -53,6 +56,14 @@ export const moveTaskToTomorrow = async (
 
 export async function getTasks(date: string): Promise<TaskDto[]> {
   return request<TaskDto[]>(`/tasks?date=${encodeURIComponent(date)}`)
+}
+
+export async function getTasksCalendar(
+  startDate: string,
+  endDate: string,
+): Promise<TaskCalendarEntryDto[]> {
+  const searchParams = new URLSearchParams({ startDate, endDate })
+  return request<TaskCalendarEntryDto[]>(`/tasks/calendar?${searchParams.toString()}`)
 }
 
 export async function getTaskDetail(taskId: string): Promise<TaskDto | null> {

@@ -6,11 +6,9 @@ import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { CalendarModal } from './CalendarModal'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
-import type { Task } from '@/types/todo'
 
 interface DateHeaderProps {
   date: Date
-  tasks: Task[]
   subtitle: string
   isPreviewOpen: boolean
   onTogglePreview: () => void
@@ -22,7 +20,6 @@ interface DateHeaderProps {
 
 export default function DateHeader({
   date,
-  tasks,
   subtitle,
   isPreviewOpen,
   onTogglePreview,
@@ -90,7 +87,6 @@ export default function DateHeader({
           {isCalendarOpen && (
             <CalendarModal
               selectedDate={date}
-              tasks={tasks}
               onSelectDate={(selected) => {
                 onSelectDate(selected)
                 setIsCalendarOpen(false)

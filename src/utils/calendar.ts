@@ -1,4 +1,4 @@
-import type { Task } from '@/types/todo'
+import type { TaskCalendarEntryDto } from '@/types/task'
 
 export const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const
 
@@ -36,9 +36,12 @@ export function isSameDay(a: Date, b: Date): boolean {
 
 export type CalendarDayStatus = 'none' | 'all-done' | 'has-incomplete'
 
-export function getCalendarDayStatus(tasks: Task[], date: Date): CalendarDayStatus {
+export function getCalendarDayStatus(
+  entries: TaskCalendarEntryDto[],
+  date: Date,
+): CalendarDayStatus {
   const dateKey = toDateKey(date)
-  const tasksOnDate = tasks.filter((task) => task.date === dateKey)
-  if (tasksOnDate.length === 0) return 'none'
-  return tasksOnDate.every((task) => task.isCompleted) ? 'all-done' : 'has-incomplete'
+  const entry = entries.find((item) => item.date === dateKey)
+  if (!entry || entry.completedCount + entry.incompleteCount === 0) return 'none'
+  return entry.incompleteCount === 0 ? 'all-done' : 'has-incomplete'
 }

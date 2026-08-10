@@ -1,5 +1,5 @@
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { moveTaskToTomorrow, getTasks, taskQueryKeys } from '@/api/task/task'
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { getTasksCalendar, moveTaskToTomorrow, getTasks, taskQueryKeys } from '@/api/task/task'
 import { mapTaskDtoToTask } from '@/utils/taskMapper'
 
 interface MoveTaskToTomorrowVariables {
@@ -21,5 +21,17 @@ export const useGetTasksByDate = (date: string) => {
     queryKey: taskQueryKeys.list(date),
     queryFn: () => getTasks(date),
     select: (dtos) => dtos.map(mapTaskDtoToTask),
+  })
+}
+
+export const useGetTasksCalendar = (
+  year: number,
+  month: number,
+  startDate: string,
+  endDate: string,
+) => {
+  return useQuery({
+    queryKey: taskQueryKeys.calendar(year, month),
+    queryFn: () => getTasksCalendar(startDate, endDate),
   })
 }
