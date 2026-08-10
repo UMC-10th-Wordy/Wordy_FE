@@ -71,6 +71,10 @@ export const PerformancePreviewResult = ({
   const [insight, setInsight] = useState(
     () => initialDraft?.insight ?? formatInsightWithBullet(data.insight),
   )
+
+  const displaySummary = readOnly ? data.summary : summary
+  const displayInsight = readOnly ? formatInsightWithBullet(data.insight) : insight
+
   const [isSaved, setIsSaved] = useState(() => initiallySaved && !initialDraft)
   const [pendingMoveTaskIds, setPendingMoveTaskIds] = useState<string[]>([])
   const [isSubmittingSave, setIsSubmittingSave] = useState(false)
@@ -178,7 +182,7 @@ export const PerformancePreviewResult = ({
 
       <div className="mt-(--scale-48)">
         {readOnly ? (
-          <PerformanceReadOnlySection title="오늘의 성과 요약" value={summary} />
+          <PerformanceReadOnlySection title="오늘의 성과 요약" value={displaySummary} />
         ) : (
           <PerformanceEditableSection
             title="오늘의 성과 요약"
@@ -191,7 +195,7 @@ export const PerformancePreviewResult = ({
 
       <div className="mt-(--scale-48)">
         {readOnly ? (
-          <PerformanceReadOnlySection title="성장 인사이트" value={insight} showBullet />
+          <PerformanceReadOnlySection title="성장 인사이트" value={displayInsight} showBullet />
         ) : (
           <PerformanceEditableSection
             title="성장 인사이트"

@@ -239,8 +239,28 @@ export default function TodoListPage() {
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(currentDateKey), (prev) =>
         prev ? [...prev, created] : [created],
       )
-      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
-      queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars() })
+
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.summary(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.searches(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: taskQueryKeys.calendars(),
+        }),
+      ])
+
       setIsTaskFormOpen(false)
     } catch {
       addToast('업무 생성에 실패했어요. 다시 시도해 주세요')
@@ -938,7 +958,9 @@ export default function TodoListPage() {
                   onSkipQuestion: questionChat.onSkipQuestion,
                 }}
               />
-            ) : performancePreview.status === 'success' && performancePreview.result ? (
+            ) : performancePreview.status === 'success' &&
+              performancePreview.result &&
+              !performancePreview.isSaved ? (
               <PerformancePreviewPanel
                 key={`preview-${performancePreview.reflectionSnapshotId}`}
                 status="success"
@@ -946,7 +968,7 @@ export default function TodoListPage() {
                   data: performancePreview.result,
                   reflectionSnapshotId: performancePreview.reflectionSnapshotId ?? undefined,
                   draftId: currentDateKey,
-                  initiallySaved: performancePreview.isSaved,
+                  initiallySaved: false,
                   isSaving: performancePreview.isSaving,
                   movedTaskIds: effectiveMovedPerformanceTaskIds,
                   onSave: handleSavePerformance,
