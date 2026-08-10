@@ -34,8 +34,9 @@ export function HomePage({ className, ...rest }: HomePageProps) {
           streakDays: 0,
           weekRecords: [],
           weekTasks: [],
-          recentRecord: null,
+          recentRecord: [],
         }
+  const latestRecord = recentRecord[0]
   const today = new Date()
   const todayLabel = `${today.getMonth() + 1}월 ${today.getDate()}일 ${WEEK_DAYS[today.getDay()]}요일`
 
@@ -109,12 +110,12 @@ export function HomePage({ className, ...rest }: HomePageProps) {
               onClick={() => navigate('/records')}
             />
           </div>
-          {recentRecord ? (
+          {latestRecord ? (
             <RecentRecordCard
-              date={formatRecordDate(recentRecord.date)}
-              totalCount={recentRecord.tasks.length}
-              tasks={recentRecord.tasks.map(mapHomeTaskToRecentRecordTask)}
-              onClick={() => navigate(`/records/${recentRecord.date}`)}
+              date={formatRecordDate(latestRecord.date)}
+              totalCount={latestRecord.tasks.length}
+              tasks={latestRecord.tasks.map(mapHomeTaskToRecentRecordTask)}
+              onClick={() => navigate(`/records/${latestRecord.date}`)}
             />
           ) : (
             <div className="flex items-center justify-center py-16">
