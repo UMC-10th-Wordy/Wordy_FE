@@ -101,8 +101,13 @@ export const router = createBrowserRouter([
       },
       { path: '/landing-preview', element: <LandingPreview /> },
       { path: '/records/search', element: <DiarySearchPage /> },
-      { path: '/trash', element: <TrashPage /> },
-      { path: '/trash/:diaryId', element: <TrashDiaryDetailPage /> },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: '/trash', element: <TrashPage /> },
+          { path: '/trash/:diaryId', element: <TrashDiaryDetailPage /> },
+        ],
+      },
       { path: '/plan', element: <PlanPage /> },
       { path: '/verify-email', element: <EmailVerificationPage /> },
       { path: '/mail-notice', element: <MailNoticePage /> },

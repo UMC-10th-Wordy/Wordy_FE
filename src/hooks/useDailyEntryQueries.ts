@@ -18,6 +18,7 @@ import {
   searchDailyEntries,
 } from '@/api/daily-entry/dailyEntry'
 import { homeQueryKeys } from '@/api/home/home'
+import { trashQueryKeys } from '@/api/trash/trash'
 import {
   mapDailyEntriesSummary,
   mapDailyEntryDetail,
@@ -108,6 +109,9 @@ export const useDeleteDailyEntry = () => {
         }),
         queryClient.invalidateQueries({
           queryKey: homeQueryKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: trashQueryKeys.lists(),
         }),
       ])
     },

@@ -5,44 +5,35 @@ import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import { useToast } from '@/hooks/useToast'
 import { TrashMoreMenu } from '@/components/sidebar/TrashMoreMenu/TrashMoreMenu'
+import {
+  useDeleteDailyEntryPermanently,
+  useGetTrashDailyEntries,
+  useRestoreDailyEntry,
+} from '@/hooks/useTrashQueries'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 import MeatballIcon from '@/assets/icons/meatball.svg?react'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
 import trashEmptyIllustration from '@/assets/images/trash-empty-illustration.svg'
 
-export interface TrashItem {
-  id: string
-  title: string
-  deletedAt: string
+const formatEntryTitle = (entryDate: string) => {
+  const [year, month, day] = entryDate.split('-').map(Number)
+
+  return `${year}년 ${month}월 ${day}일의 업무 일지`
 }
 
-export interface TrashPageProps {
-  items?: TrashItem[]
+const formatDeletedAt = (deletedAt: string) => {
+  const date = new Date(deletedAt)
+
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일에 삭제함`
 }
 
 type ConfirmState = { type: 'delete'; itemId: string } | null
 
-export function TrashPage({ items: initialItems }: TrashPageProps) {
+export function TrashPage() {
   const navigate = useNavigate()
-  const [items, setItems] = useState<TrashItem[]>(
-    initialItems ?? [
-      {
-        id: '2026-02-18',
-        title: '2026년 2월 18일의 업무 일지',
-        deletedAt: '2026년 5월 10일에 삭제함',
-      },
-      {
-        id: '2026-02-17',
-        title: '2026년 2월 17일의 업무 일지',
-        deletedAt: '2026년 5월 9일에 삭제함',
-      },
-      {
-        id: '2026-02-16',
-        title: '2026년 2월 16일의 업무 일지',
-        deletedAt: '2026년 5월 8일에 삭제함',
-      },
-    ],
-  )
+  const { data: items } = useGetTrashDailyEntries()
+  const { mutate: restoreDailyEntry } = useRestoreDailyEntry()
+  const { mutate: deleteDailyEntryPermanently } = useDeleteDailyEntryPermanently()
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [confirm, setConfirm] = useState<ConfirmState>(null)
   const { toasts, addToast } = useToast()
@@ -61,9 +52,14 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
   }, [openMenuId])
 
   function handleRestore(itemId: string) {
-    setItems((prev) => prev.filter((i) => i.id !== itemId))
     setOpenMenuId(null)
-    addToast('업무 일지가 복원되었어요')
+    restoreDailyEntry(itemId, {
+      onSuccess: () => addToast('업무 일지가 복원되었어요'),
+      onError: (error) => {
+        console.error('업무 일지 복원에 실패했습니다.', error)
+        addToast('업무 일지 복원에 실패했어요')
+      },
+    })
   }
 
   function handleDeletePermanently(itemId: string) {
@@ -73,9 +69,14 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
 
   function handleConfirmDelete() {
     if (!confirm) return
-    setItems((prev) => prev.filter((i) => i.id !== confirm.itemId))
+    deleteDailyEntryPermanently(confirm.itemId, {
+      onSuccess: () => addToast('업무 일지가 영구 삭제되었어요'),
+      onError: (error) => {
+        console.error('업무 일지 영구 삭제에 실패했습니다.', error)
+        addToast('업무 일지 영구 삭제에 실패했어요')
+      },
+    })
     setConfirm(null)
-    addToast('업무 일지가 영구 삭제되었어요')
   }
 
   return (
@@ -118,26 +119,28 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
           <div className="flex flex-col gap-5 isolate items-start w-full">
             {items.map((item) => (
               <div
-                key={item.id}
+                key={item.dailyEntryId}
                 className="relative bg-(--color-bg-default) border border-(--color-border-brand-subtle) rounded-lg shadow-[0px_1px_5px_rgba(0,0,0,0.1)] p-5 flex flex-col gap-4 items-end w-full"
               >
                 {/* 더보기 버튼 — absolute 우상단 */}
                 <div
                   className="absolute top-5 right-5 z-10"
-                  ref={openMenuId === item.id ? menuRef : undefined}
+                  ref={openMenuId === item.dailyEntryId ? menuRef : undefined}
                 >
                   <IconButton
                     variant="text_neutral"
                     size="small"
                     icon={<MeatballIcon className="size-6" />}
-                    onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
+                    onClick={() =>
+                      setOpenMenuId(openMenuId === item.dailyEntryId ? null : item.dailyEntryId)
+                    }
                     aria-label="더보기"
                   />
-                  {openMenuId === item.id && (
+                  {openMenuId === item.dailyEntryId && (
                     <div className="absolute right-0 top-8 z-10">
                       <TrashMoreMenu
-                        onRestore={() => handleRestore(item.id)}
-                        onDeletePermanently={() => handleDeletePermanently(item.id)}
+                        onRestore={() => handleRestore(item.dailyEntryId)}
+                        onDeletePermanently={() => handleDeletePermanently(item.dailyEntryId)}
                       />
                     </div>
                   )}
@@ -149,18 +152,18 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
                     <div className="flex flex-col items-start">
                       <div className="flex gap-2 items-center">
                         <span className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-semibold text-(--color-text-default) break-keep">
-                          {item.title}
+                          {formatEntryTitle(item.entryDate)}
                         </span>
                         <IconButton
                           variant="text_neutral"
                           size="medium"
                           icon={<ArrowRightIcon className="size-8" />}
-                          onClick={() => navigate(`/trash/${item.id}`)}
+                          onClick={() => navigate(`/trash/${item.dailyEntryId}`)}
                           aria-label="일지 더보기"
                         />
                       </div>
                       <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary) whitespace-nowrap">
-                        {item.deletedAt}
+                        {formatDeletedAt(item.deletedAt)}
                       </span>
                     </div>
                   </div>
@@ -176,7 +179,12 @@ export function TrashPage({ items: initialItems }: TrashPageProps) {
         <ConfirmDialog
           message={
             <>
-              <p>{items.find((i) => i.id === confirm.itemId)?.title}를 영원히 삭제할까요?</p>
+              <p>
+                {formatEntryTitle(
+                  items.find((i) => i.dailyEntryId === confirm.itemId)?.entryDate ?? '',
+                )}
+                를 영원히 삭제할까요?
+              </p>
               <p>삭제하면 되돌릴 수 없어요</p>
             </>
           }
