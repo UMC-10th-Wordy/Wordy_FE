@@ -31,13 +31,15 @@ type ConfirmState = { type: 'delete'; itemId: string } | null
 
 export function TrashPage() {
   const navigate = useNavigate()
-  const { data: items } = useGetTrashDailyEntries()
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetTrashDailyEntries()
+  const items = data.pages.flatMap((page) => page.items)
   const { mutate: restoreDailyEntry } = useRestoreDailyEntry()
   const { mutate: deleteDailyEntryPermanently } = useDeleteDailyEntryPermanently()
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [confirm, setConfirm] = useState<ConfirmState>(null)
   const { toasts, addToast } = useToast()
   const menuRef = useRef<HTMLDivElement>(null)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -50,6 +52,22 @@ export function TrashPage() {
     }
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [openMenuId])
+
+  useEffect(() => {
+    if (!hasNextPage) return
+
+    const target = loadMoreRef.current
+    if (!target) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        void fetchNextPage()
+      }
+    })
+    observer.observe(target)
+
+    return () => observer.disconnect()
+  }, [hasNextPage, fetchNextPage])
 
   function handleRestore(itemId: string) {
     setOpenMenuId(null)
@@ -170,6 +188,16 @@ export function TrashPage() {
                 </div>
               </div>
             ))}
+
+            {hasNextPage && (
+              <div ref={loadMoreRef} className="flex justify-center w-full py-4">
+                {isFetchingNextPage && (
+                  <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
+                    불러오는 중...
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
