@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
 import { dailyEntryQueryKeys } from '@/api/daily-entry/dailyEntry'
 import { homeQueryKeys } from '@/api/home/home'
@@ -9,10 +9,14 @@ import {
   trashQueryKeys,
 } from '@/api/trash/trash'
 
+const TRASH_PAGE_SIZE = 10
+
 export const useGetTrashDailyEntries = () => {
-  return useSuspenseQuery({
+  return useSuspenseInfiniteQuery({
     queryKey: trashQueryKeys.lists(),
-    queryFn: getTrashDailyEntries,
+    queryFn: ({ pageParam }) => getTrashDailyEntries({ page: pageParam, size: TRASH_PAGE_SIZE }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => (lastPage.hasNext ? lastPage.page + 1 : undefined),
   })
 }
 
