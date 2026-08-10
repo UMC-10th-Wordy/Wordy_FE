@@ -10,7 +10,6 @@ import {
 } from '@/components/sidebar'
 import type { NotificationSettings } from '@/components/sidebar/SettingPanel/SettingPanel'
 import { INITIAL_WORKSPACES_MOCK } from '@/mocks/workspace/workspaceMock'
-import { NOTIFICATION_ITEMS_MOCK } from '@/mocks/notification/notificationMock'
 import {
   CAREER_TO_YEARS_OF_SERVICE,
   JOB_TO_JOB_ROLE,
@@ -22,8 +21,16 @@ import { updateProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
 import { homeQueryKeys } from '@/api/home/home'
 import { useGetProfile } from '@/hooks/useUserQueries'
 import { useChangePassword, useLogout, useWithdraw } from '@/hooks/useAuthQueries'
+import {
+  useGetNotificationSettings,
+  useGetNotifications,
+  useReadNotification,
+  useUpdateNotificationSetting,
+} from '@/hooks/useNotificationQueries'
+import type { NotificationSettingKey } from '@/types/notification'
 import { ApiError, clearAuthTokens } from '@/lib/httpClient'
 import HomeIcon from '@/assets/icons/home.svg?react'
+import BellIcon from '@/assets/icons/bell.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
 import DocumentIcon from '@/assets/icons/document.svg?react'
@@ -47,6 +54,20 @@ const PAGE_BY_PATH: Record<string, SidebarPageName> = {
 }
 
 const FALLBACK_PLAN = '무료 요금제'
+
+const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
+  emailMarketing: false,
+  inboxMarketing: false,
+  inboxPerformanceReady: false,
+  inboxPerformanceNudge: false,
+}
+
+const NOTIFICATION_SETTING_KEY_MAP: Record<keyof NotificationSettings, NotificationSettingKey> = {
+  emailMarketing: 'EMAIL_MARKETING',
+  inboxMarketing: 'INBOX_MARKETING_PROMOTION',
+  inboxPerformanceReady: 'DASHBOARD_COMPLETED',
+  inboxPerformanceNudge: 'DASHBOARD_INDUCE',
+}
 
 const getPageByPath = (pathname: string): SidebarPageName => {
   if (pathname.startsWith('/records/')) {
@@ -136,21 +157,35 @@ export function SidebarLayout() {
   )
 
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
-  const [notifications, setNotifications] = useState<NotificationSettings>({
-    emailMarketing: false,
-    inboxMarketing: false,
-    inboxPerformanceReady: false,
-    inboxPerformanceNudge: false,
-  })
+  const { data: notificationsData } = useGetNotifications()
+  const { mutate: readNotification } = useReadNotification()
+  const { data: notificationSettingsData } = useGetNotificationSettings()
+  const { mutate: updateNotificationSetting } = useUpdateNotificationSetting()
 
-  const notificationItems = NOTIFICATION_ITEMS_MOCK
+  const notificationItems = (Array.isArray(notificationsData) ? notificationsData : []).filter(
+    (item) => !item.isRead,
+  )
+  const unreadNotificationCount = notificationItems.length
+  const notificationSettings: NotificationSettings = notificationSettingsData
+    ? {
+        emailMarketing: notificationSettingsData.emailMarketing,
+        inboxMarketing: notificationSettingsData.inboxMarketingPromotion,
+        inboxPerformanceReady: notificationSettingsData.dashboardCompleted,
+        inboxPerformanceNudge: notificationSettingsData.dashboardInduce,
+      }
+    : DEFAULT_NOTIFICATION_SETTINGS
 
   const pages = [
     { page: '홈' as const, icon: <HomeIcon className="size-6" />, category: 'general' as const },
     {
       page: '알림함' as const,
-      icon: <BellDotIcon className="size-6" />,
-      badge: 99,
+      icon:
+        unreadNotificationCount > 0 ? (
+          <BellDotIcon className="size-6" />
+        ) : (
+          <BellIcon className="size-6" />
+        ),
+      badge: unreadNotificationCount,
       category: 'general' as const,
     },
     {
@@ -227,10 +262,13 @@ export function SidebarLayout() {
         notificationMenu={
           modal === 'notification' ? (
             <NotificationModal
+              isEmpty={notificationItems.length === 0}
               notifications={notificationItems.map((item) => ({
-                ...item,
+                title: item.title,
+                body: item.content,
                 onClick: () => {
                   setModal(null)
+                  readNotification(item.notificationId)
                   navigate(PAGE_ROUTES['성과 대시보드'])
                 },
               }))}
@@ -271,9 +309,12 @@ export function SidebarLayout() {
           isChangingPassword={isChangingPassword}
           onWithdraw={handleWithdraw}
           isWithdrawing={isWithdrawing}
-          notificationSettings={notifications}
+          notificationSettings={notificationSettings}
           onChangeNotification={(key, value) =>
-            setNotifications((prev) => ({ ...prev, [key]: value }))
+            updateNotificationSetting({
+              settingKey: NOTIFICATION_SETTING_KEY_MAP[key],
+              isEnabled: value,
+            })
           }
           onSaveProfile={async ({ name, job, career, avatarFile }) => {
             if (!job || !career) {

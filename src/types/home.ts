@@ -45,7 +45,7 @@ export interface HomeDashboardResult {
   streakDays: number
   weekRecords: HomeWeekRecordDto[]
   weekTasks: HomeWeekTaskDto[]
-  recentRecord: HomeRecentRecordDto | null
+  recentRecord: HomeRecentRecordDto[]
 }
 
 export type HomeResult = HomeLandingResult | HomeDashboardResult
