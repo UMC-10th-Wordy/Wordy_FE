@@ -113,7 +113,7 @@ export function LandingPage() {
           onSignup={() => navigate('/signup')}
           onLogin={() => navigate('/login')}
         />
-        <LandingHeroSection onStart={() => navigate('/signup')} />
+        <LandingHeroSection onStart={() => navigate('/login')} />
       </div>
 
       <LandingScrollCardsSection />
@@ -134,10 +134,10 @@ export function LandingPage() {
       </section>
 
       <div ref={pricingRef}>
-        <LandingPricingSection onStart={() => navigate('/signup')} />
+        <LandingPricingSection onStart={() => navigate('/login')} />
       </div>
 
-      <LandingCTASection onStart={() => navigate('/signup')} />
+      <LandingCTASection onStart={() => navigate('/login')} />
       <LandingFooter onNavigate={handleNavigate} onNavigateToFeature={handleNavigateToFeature} />
     </div>
   )
