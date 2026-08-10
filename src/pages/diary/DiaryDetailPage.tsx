@@ -128,9 +128,11 @@ const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) =>
               </div>
             </section>
 
-            <div className="mt-(--scale-48)">
-              <DiaryRetrospective content={diary.retrospective} />
-            </div>
+            {diary.retrospective?.trim() && (
+              <div className="mt-(--scale-48)">
+                <DiaryRetrospective content={diary.retrospective} />
+              </div>
+            )}
           </div>
         </Scrollbar>
       </main>
@@ -148,7 +150,7 @@ const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) =>
             />
           </AsyncBoundary>
         ) : (
-          <PerformancePreviewPanel status="empty" />
+          <PerformancePreviewPanel status="empty" emptyMessage="변환된 성과가 없어요" />
         )}
       </div>
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
 import {
   completePerformancePreview,
@@ -12,7 +12,7 @@ import {
   updatePerformance,
 } from '@/api/performance/performance'
 
-import type { UpdatePerformancePayload } from '@/types/performance'
+import type { PerformanceDetailResponse, UpdatePerformancePayload } from '@/types/performance'
 
 interface UpdatePerformanceVariables {
   dailyPerformanceId: string
@@ -41,9 +41,37 @@ export const useSavePerformance = () => {
 }
 
 export const useUpdatePerformance = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: ({ dailyPerformanceId, payload }: UpdatePerformanceVariables) =>
       updatePerformance(dailyPerformanceId, payload),
+
+    onSuccess: (_, { dailyPerformanceId, payload }) => {
+      queryClient.setQueryData<PerformanceDetailResponse>(
+        performanceQueryKeys.detail(dailyPerformanceId),
+        (prev) => {
+          if (!prev) {
+            return prev
+          }
+
+          return {
+            ...prev,
+            summary: payload.summary,
+            growthInsights: payload.growthInsights,
+          }
+        },
+      )
+
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: performanceQueryKeys.detail(dailyPerformanceId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: performanceQueryKeys.lists(),
+        }),
+      ])
+    },
   })
 }
 

@@ -18,6 +18,7 @@ type PerformanceNoticeStatus = Extract<PerformancePreviewStatus, 'empty' | 'fail
 
 interface PerformancePreviewPanelBaseProps {
   status?: 'empty' | 'converting' | 'failed'
+  emptyMessage?: string
 }
 
 interface PerformancePreviewPanelQuestioningProps {
@@ -86,6 +87,10 @@ export const PerformancePreviewPanel = (props: PerformancePreviewPanelProps) => 
 
     const status = props.status ?? 'empty'
     const currentStatusContent = STATUS_CONTENT[status]
+
+    if (status === 'empty' && props.emptyMessage) {
+      return <PerformanceStatusNotice {...currentStatusContent} message={props.emptyMessage} />
+    }
 
     return <PerformanceStatusNotice {...currentStatusContent} />
   }

@@ -51,6 +51,25 @@ export const mapPerformancePreviewResult = (
   const completedTasks = tasks.filter((task) => task.isCompleted)
   const incompleteTasks = tasks.filter((task) => !task.isCompleted)
 
+  const mappedTaskResults = result.taskPerformances.map((taskPerformance) =>
+    mapPerformanceTaskResult(taskPerformance, tasks),
+  )
+
+  const mappedTaskResultIds = new Set(
+    result.taskPerformances.map((taskPerformance) => taskPerformance.taskId),
+  )
+
+  const emptyTaskResults: PerformanceTaskResult[] = completedTasks
+    .filter((task) => !mappedTaskResultIds.has(task.id))
+    .map((task) => ({
+      id: task.id,
+      taskId: task.id,
+      title: task.title,
+      tag: task.tag,
+      output: undefined,
+      impact: undefined,
+    }))
+
   return {
     totalTaskCount: tasks.length,
     completedTaskCount: completedTasks.length,
@@ -67,9 +86,7 @@ export const mapPerformancePreviewResult = (
     insight: result.growthInsights.join('\n'),
     nextTasks: result.nextActions,
 
-    taskResults: result.taskPerformances.map((taskPerformance) =>
-      mapPerformanceTaskResult(taskPerformance, tasks),
-    ),
+    taskResults: [...mappedTaskResults, ...emptyTaskResults],
   }
 }
 
@@ -169,10 +186,12 @@ export const mapPerformanceDetailResult = (
         id: task.taskId,
         title: task.title,
         priority: currentTask?.priority ?? 'could',
-        tag: {
-          label: task.tag.tagName,
-          color: hexToTagColor(task.tag.color),
-        },
+        tag: task.tag
+          ? {
+              label: task.tag.tagName,
+              color: hexToTagColor(task.tag.color),
+            }
+          : undefined,
         canMoveToTomorrow: Boolean(currentTask),
       }
     }),

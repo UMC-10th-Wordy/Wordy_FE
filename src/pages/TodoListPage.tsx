@@ -175,13 +175,6 @@ export default function TodoListPage() {
 
   const { data: fetchedDailyEntry } = useGetDailyEntryByDate(currentDateKey)
 
-  if (fetchedDailyEntry !== undefined && !(currentDateKey in retrospectiveByDate)) {
-    setRetrospectiveByDate((prev) => ({
-      ...prev,
-      [currentDateKey]: fetchedDailyEntry?.reflectionContent ?? '',
-    }))
-  }
-
   const savedPerformanceDetail =
     performanceList?.exists && performanceList.performance ? performanceList.performance : null
 
@@ -193,8 +186,11 @@ export default function TodoListPage() {
   }
 
   const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
-  const retrospective = retrospectiveByDate[currentDateKey] ?? ''
-  const hasResolvedRetrospective = currentDateKey in retrospectiveByDate
+  const retrospective =
+    retrospectiveByDate[currentDateKey] ?? fetchedDailyEntry?.reflectionContent ?? ''
+
+  const hasResolvedRetrospective =
+    currentDateKey in retrospectiveByDate || fetchedDailyEntry !== undefined
   const isRetrospectiveButtonVisible =
     hasResolvedRetrospective && !isRetrospectiveFocused && retrospective.trim().length === 0
 
@@ -243,8 +239,28 @@ export default function TodoListPage() {
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(currentDateKey), (prev) =>
         prev ? [...prev, created] : [created],
       )
-      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
-      queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars() })
+
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.summary(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.searches(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: taskQueryKeys.calendars(),
+        }),
+      ])
+
       setIsTaskFormOpen(false)
     } catch {
       addToast('업무 생성에 실패했어요. 다시 시도해 주세요')
@@ -260,8 +276,26 @@ export default function TodoListPage() {
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
         prev ? prev.filter((task) => task.taskId !== id) : prev,
       )
-      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
-      queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars() })
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.summary(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.searches(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: taskQueryKeys.calendars(),
+        }),
+      ])
     } catch {
       addToast('업무 삭제에 실패했어요. 다시 시도해 주세요')
     }
@@ -304,7 +338,23 @@ export default function TodoListPage() {
             )
           : prev,
       )
-      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.summary(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.searches(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
+        }),
+      ])
     } catch {
       addToast('업무 수정에 실패했어요. 다시 시도해 주세요')
     }
@@ -693,6 +743,11 @@ export default function TodoListPage() {
     performancePreview.preparePreview()
     setIsPreviewOpen(true)
 
+    if (completedTasks.length === 0) {
+      performancePreview.failPreview()
+      return
+    }
+
     if (!profile) {
       performancePreview.failPreview()
       return
@@ -951,9 +1006,13 @@ export default function TodoListPage() {
                   reflectionSnapshotId: performancePreview.reflectionSnapshotId ?? undefined,
                   draftId: currentDateKey,
                   initiallySaved: performancePreview.isSaved,
-                  isSaving: performancePreview.isSaving,
+                  isSaving: performancePreview.isSaved
+                    ? updatePerformanceMutation.isPending
+                    : performancePreview.isSaving,
                   movedTaskIds: effectiveMovedPerformanceTaskIds,
-                  onSave: handleSavePerformance,
+                  onSave: performancePreview.isSaved
+                    ? handleUpdatePerformance
+                    : handleSavePerformance,
                   onMoveTaskToTomorrow: handleMoveTaskToTomorrow,
                 }}
               />
