@@ -55,7 +55,10 @@ export function TrashPage() {
     setOpenMenuId(null)
     restoreDailyEntry(itemId, {
       onSuccess: () => addToast('업무 일지가 복원되었어요'),
-      onError: (error) => console.error('업무 일지 복원에 실패했습니다.', error),
+      onError: (error) => {
+        console.error('업무 일지 복원에 실패했습니다.', error)
+        addToast('업무 일지 복원에 실패했어요')
+      },
     })
   }
 
@@ -68,7 +71,10 @@ export function TrashPage() {
     if (!confirm) return
     deleteDailyEntryPermanently(confirm.itemId, {
       onSuccess: () => addToast('업무 일지가 영구 삭제되었어요'),
-      onError: (error) => console.error('업무 일지 영구 삭제에 실패했습니다.', error),
+      onError: (error) => {
+        console.error('업무 일지 영구 삭제에 실패했습니다.', error)
+        addToast('업무 일지 영구 삭제에 실패했어요')
+      },
     })
     setConfirm(null)
   }
