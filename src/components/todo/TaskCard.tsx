@@ -32,6 +32,12 @@ function createResultImages(files: File[]): TaskResultImage[] {
   }))
 }
 
+function hasAttachmentsChanged(baseline: { id: string }[], draft: { id: string }[]): boolean {
+  if (baseline.length !== draft.length) return true
+  const baselineIds = new Set(baseline.map((item) => item.id))
+  return draft.some((item) => !baselineIds.has(item.id))
+}
+
 interface TaskCardProps {
   task: Task
   isExpanded: boolean
@@ -64,7 +70,6 @@ export default function TaskCard({
   const [draftResultImages, setDraftResultImages] = useState<TaskResultImage[]>(
     task.resultImages ?? [],
   )
-  const [isAttachmentsDirty, setIsAttachmentsDirty] = useState(false)
 
   /* 업무 결과 새로 작성하기 */
   const [isWritingResult, setIsWritingResult] = useState(false)
@@ -89,14 +94,22 @@ export default function TaskCard({
     newAttachmentUrlsRef.current.delete(url)
   }
 
+  const existingResult = (task.result ?? '').trim()
+  const attachmentsChanged =
+    hasAttachmentsChanged(task.resultFiles ?? [], draftResultFiles) ||
+    hasAttachmentsChanged(task.resultImages ?? [], draftResultImages)
+  const isResultDirty =
+    task.isCompleted && (draftResult.trim() !== existingResult || attachmentsChanged)
   const isDirty =
     draftPriority !== task.priority ||
     (draftTag?.label ?? null) !== (task.tag?.label ?? null) ||
     draftTitle.trim() !== task.title ||
     draftMemo.trim() !== (task.memo ?? '') ||
-    (task.isCompleted && draftResult.trim() !== (task.result ?? '')) ||
-    (task.isCompleted && isAttachmentsDirty)
-  const isDraftValid = draftPriority !== null && draftTitle.trim() !== ''
+    isResultDirty
+  const isClearingExistingResult =
+    task.isCompleted && existingResult !== '' && draftResult.trim() === ''
+  const isDraftValid =
+    draftPriority !== null && draftTitle.trim() !== '' && !isClearingExistingResult
 
   const handleStartEdit = () => {
     setDraftPriority(task.priority)
@@ -106,7 +119,6 @@ export default function TaskCard({
     setDraftResult(task.result ?? '')
     setDraftResultFiles(task.resultFiles ?? [])
     setDraftResultImages(task.resultImages ?? [])
-    setIsAttachmentsDirty(false)
     setIsEditing(true)
   }
 
@@ -124,7 +136,7 @@ export default function TaskCard({
       title: draftTitle.trim(),
       memo: draftMemo.trim() || undefined,
     })
-    if (task.isCompleted) {
+    if (isResultDirty) {
       onSaveResult?.({
         result: draftResult.trim(),
         resultFiles: draftResultFiles,
@@ -182,13 +194,11 @@ export default function TaskCard({
             const created = createResultFiles(files)
             trackNewUrls(created)
             setDraftResultFiles((prev) => [...prev, ...created])
-            setIsAttachmentsDirty(true)
           }}
           onAddResultImages={(files) => {
             const created = createResultImages(files)
             trackNewUrls(created)
             setDraftResultImages((prev) => [...prev, ...created])
-            setIsAttachmentsDirty(true)
           }}
           onRemoveResultFile={(id) => {
             setDraftResultFiles((prev) => {
@@ -196,7 +206,6 @@ export default function TaskCard({
               if (removed) releaseIfNew(removed.url)
               return prev.filter((file) => file.id !== id)
             })
-            setIsAttachmentsDirty(true)
           }}
           onRemoveResultImage={(id) => {
             setDraftResultImages((prev) => {
@@ -204,7 +213,6 @@ export default function TaskCard({
               if (removed) releaseIfNew(removed.url)
               return prev.filter((image) => image.id !== id)
             })
-            setIsAttachmentsDirty(true)
           }}
           isDirty={isDirty}
           isDraftValid={isDraftValid}
