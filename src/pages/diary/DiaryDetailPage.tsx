@@ -150,7 +150,7 @@ const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) =>
             />
           </AsyncBoundary>
         ) : (
-          <PerformancePreviewPanel status="empty" />
+          <PerformancePreviewPanel status="empty" emptyMessage="변환된 성과가 없어요" />
         )}
       </div>
 
