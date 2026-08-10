@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { HTMLAttributes, ReactNode } from 'react'
+import type { HTMLAttributes, ReactNode, RefObject } from 'react'
 import type { SidebarPage } from '../Sidebar/Sidebar'
 import { SidebarIcon } from '@/components/sidebar/SidebarIcon/SidebarIcon'
 import { IconButton } from '@/components/common/Button/IconButton'
@@ -15,6 +15,8 @@ export interface SidebarCollapsedHoverProps extends HTMLAttributes<HTMLDivElemen
   onExpand?: () => void
   avatarSrc?: string
   userName?: string
+  notificationTriggerRef?: RefObject<HTMLButtonElement | null>
+  profileTriggerRef?: RefObject<HTMLButtonElement | null>
 }
 
 export function SidebarCollapsedHover({
@@ -26,6 +28,8 @@ export function SidebarCollapsedHover({
   onExpand,
   avatarSrc,
   userName = '',
+  notificationTriggerRef,
+  profileTriggerRef,
   className,
   ...rest
 }: SidebarCollapsedHoverProps) {
@@ -64,6 +68,7 @@ export function SidebarCollapsedHover({
             return (
               <SidebarIcon
                 key={page}
+                ref={page === '알림함' ? notificationTriggerRef : undefined}
                 icon={icon}
                 tooltip={page}
                 state={isFocused ? 'focused' : 'default'}
@@ -79,6 +84,7 @@ export function SidebarCollapsedHover({
       {/* 하단 아바타 */}
       <button
         type="button"
+        ref={profileTriggerRef}
         onClick={onProfileClick}
         className="shrink-0 size-12 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-brand)"
         aria-label="프로필"

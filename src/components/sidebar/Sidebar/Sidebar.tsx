@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from 'react'
+import type { HTMLAttributes, ReactNode, RefObject } from 'react'
 import { SidebarTap } from '../SidebarTap/SidebarTap'
 import { SidebarProfile } from '../SidebarProfile/SidebarProfile'
 import { SidebarWorkspace } from '../SidebarWorkspace/SidebarWorkspace'
@@ -8,7 +8,7 @@ import SidebarIcon from '@/assets/icons/sidebar.svg?react'
 import LogoIcon from '@/assets/icons/logo.svg?react'
 
 export type SidebarStatus = 'open' | 'closed'
-export type SidebarPage = '홈' | '알림함' | '오늘의 업무' | '일지 모아보기' | '성과 대시보드'
+export type SidebarPage = '홈' | '알림함' | '오늘의 업무' | '일지 히스토리' | '성과 리포트'
 
 export type SidebarPageCategory = 'general' | 'feature'
 
@@ -34,6 +34,9 @@ export interface SidebarProps extends HTMLAttributes<HTMLDivElement> {
   profileMenu?: ReactNode
   notificationMenu?: ReactNode
   workspaceMenu?: ReactNode
+  workspaceTriggerRef?: RefObject<HTMLButtonElement | null>
+  notificationTriggerRef?: RefObject<HTMLButtonElement | null>
+  profileTriggerRef?: RefObject<HTMLButtonElement | null>
 }
 
 export function Sidebar({
@@ -53,6 +56,9 @@ export function Sidebar({
   profileMenu,
   notificationMenu,
   workspaceMenu,
+  workspaceTriggerRef,
+  notificationTriggerRef,
+  profileTriggerRef,
   className,
   ...rest
 }: SidebarProps) {
@@ -104,6 +110,7 @@ export function Sidebar({
             {/* 워크스페이스 */}
             <div className="relative w-full">
               <SidebarWorkspace
+                ref={workspaceTriggerRef}
                 workspaceName={workspaceName}
                 isOpen={!!workspaceMenu}
                 onClick={onWorkspaceClick}
@@ -129,6 +136,7 @@ export function Sidebar({
                     .map(({ page: p, icon, badge }) => (
                       <SidebarTap
                         key={p}
+                        ref={p === '알림함' ? notificationTriggerRef : undefined}
                         icon={icon}
                         label={p}
                         badge={badge}
@@ -176,6 +184,7 @@ export function Sidebar({
               <div className="absolute bottom-full left-0 z-40 px-2 pb-2">{profileMenu}</div>
             )}
             <SidebarProfile
+              ref={profileTriggerRef}
               name={userName}
               plan={userPlan}
               avatarSrc={avatarSrc}
@@ -194,6 +203,8 @@ export function Sidebar({
             onExpand={() => onChangeStatus?.('open')}
             avatarSrc={avatarSrc}
             userName={userName}
+            notificationTriggerRef={notificationTriggerRef}
+            profileTriggerRef={profileTriggerRef}
           />
           {workspaceMenu && (
             <div className="absolute top-full mt-4 left-5 z-40 pointer-events-auto">

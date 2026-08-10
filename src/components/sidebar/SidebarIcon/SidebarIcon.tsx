@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react'
 
 const sidebarIcon = cva(
   [
@@ -25,6 +25,7 @@ export interface SidebarIconProps extends ButtonHTMLAttributes<HTMLButtonElement
   tooltip: string
   state?: SidebarIconState
   dot?: boolean
+  ref?: Ref<HTMLButtonElement>
 }
 
 export function SidebarIcon({
@@ -33,20 +34,21 @@ export function SidebarIcon({
   state = 'default',
   dot = false,
   className,
+  ref,
   ...rest
 }: SidebarIconProps) {
   return (
-    <button type="button" className={sidebarIcon({ state, className })} {...rest}>
+    <button type="button" ref={ref} className={sidebarIcon({ state, className })} {...rest}>
       <span className="relative shrink-0 size-6">
         {icon}
         {dot && (
           <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-(--color-status-error)" />
         )}
       </span>
-      <span className="absolute left-full ml-3 hidden group-hover:flex items-center z-10 pointer-events-none">
+      <span className="absolute left-full ml-3 hidden group-hover:flex items-center z-20 pointer-events-none">
         {/* 말풍선 꼬리 */}
         <span className="w-0 h-0 border-y-[6px] border-y-transparent border-r-[7px] border-r-(--color-bg-dark)" />
-        <span className="bg-(--color-bg-dark) text-(--color-text-inverse) [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium px-2.5 py-1 rounded-lg whitespace-nowrap">
+        <span className="bg-(--color-bg-dark) text-(--color-text-inverse) [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-[0px_4px_12px_0px_rgba(0,0,0,0.25)]">
           {tooltip}
         </span>
       </span>

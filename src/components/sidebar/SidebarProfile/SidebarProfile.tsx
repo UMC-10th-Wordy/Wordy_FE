@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import type { ButtonHTMLAttributes } from 'react'
+import type { ButtonHTMLAttributes, Ref } from 'react'
 
 const sidebarProfile = cva([
   'flex items-center gap-[13px] px-5 py-3 w-full text-left',
@@ -12,11 +12,19 @@ export interface SidebarProfileProps extends ButtonHTMLAttributes<HTMLButtonElem
   avatarSrc?: string
   name: string
   plan: string
+  ref?: Ref<HTMLButtonElement>
 }
 
-export function SidebarProfile({ avatarSrc, name, plan, className, ...rest }: SidebarProfileProps) {
+export function SidebarProfile({
+  avatarSrc,
+  name,
+  plan,
+  className,
+  ref,
+  ...rest
+}: SidebarProfileProps) {
   return (
-    <button type="button" className={sidebarProfile({ className })} {...rest}>
+    <button type="button" ref={ref} className={sidebarProfile({ className })} {...rest}>
       <span className="relative shrink-0 size-12 rounded-(--scale-1000) border border-(--color-border-opacity) overflow-hidden">
         {avatarSrc ? (
           <img src={avatarSrc} alt={name} className="absolute inset-0 size-full object-cover" />
