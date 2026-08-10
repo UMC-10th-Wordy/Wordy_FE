@@ -23,7 +23,7 @@ export const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
-  const [touched, setTouched] = useState({ email: false, password: false })
+  const [submitted, setSubmitted] = useState(false)
 
   const emailError = !email
     ? '이메일을 입력해주세요.'
@@ -38,6 +38,7 @@ export const LoginPage = () => {
   const isValid = !emailError && !passwordError
 
   const handleSubmit = () => {
+    setSubmitted(true)
     if (!isValid) return
     login(
       { email, password },
@@ -98,18 +99,16 @@ export const LoginPage = () => {
             aria-label="이메일"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            onBlur={() => setTouched((t) => ({ ...t, email: true }))}
             placeholder="이메일을 입력해주세요"
-            error={touched.email && emailError ? emailError : undefined}
+            error={submitted && emailError ? emailError : undefined}
           />
           <Input1
             type="password"
             aria-label="비밀번호"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            onBlur={() => setTouched((t) => ({ ...t, password: true }))}
             placeholder="비밀번호를 입력해주세요"
-            error={touched.password && passwordError ? passwordError : undefined}
+            error={submitted && passwordError ? passwordError : undefined}
           />
           <div className="mb-4 flex items-center justify-between">
             <Checkbox
@@ -125,13 +124,7 @@ export const LoginPage = () => {
               비밀번호 찾기
             </button>
           </div>
-          <TextButton
-            type="submit"
-            variant="fill"
-            size="large"
-            fullWidth
-            disabled={!isValid || isPending}
-          >
+          <TextButton type="submit" variant="fill" size="large" fullWidth disabled={isPending}>
             로그인 하기
           </TextButton>
         </form>
