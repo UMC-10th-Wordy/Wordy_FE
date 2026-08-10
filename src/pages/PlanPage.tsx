@@ -58,7 +58,7 @@ export function PlanPage() {
         </div>
 
         {/* 카드 목록 */}
-        <div className="flex gap-8 w-full h-145">
+        <div className="flex gap-8 w-full h-170">
           {/* Free 카드 */}
           <div className="flex flex-1 flex-col justify-between bg-(--color-bg-default) border border-(--color-border-brand-subtle) rounded-(--scale-16) shadow-[0px_1px_5px_rgba(0,0,0,0.1)] p-8 overflow-hidden">
             <div className="flex flex-col gap-4 items-start w-full">
@@ -88,7 +88,9 @@ export function PlanPage() {
               <div className="flex flex-col gap-3 items-start">
                 {FREE_FEATURES.map((feature) => (
                   <div key={feature.text} className="flex gap-1 items-center">
-                    <CheckIcon className="size-8 shrink-0 text-(--color-icon-brand)" />
+                    <span className="flex size-8 shrink-0 items-center justify-center">
+                      <CheckIcon className="size-4.5 text-(--color-icon-brand)" />
+                    </span>
                     <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)">
                       {feature.text}
                       {feature.subText && (
@@ -142,7 +144,9 @@ export function PlanPage() {
               <div className="flex flex-col gap-3 items-start">
                 {PRO_FEATURES.map((feature) => (
                   <div key={feature.text} className="flex gap-1 items-center">
-                    <CheckIcon className="size-8 shrink-0 text-(--color-icon-brand)" />
+                    <span className="flex size-8 shrink-0 items-center justify-center">
+                      <CheckIcon className="size-4.5 text-(--color-icon-brand)" />
+                    </span>
                     <span
                       className={`[font-size:var(--font-size-body-2)] leading-(--line-height-body) ${feature.bold ? 'font-medium' : 'font-normal'} text-(--color-text-default)`}
                     >

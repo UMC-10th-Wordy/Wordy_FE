@@ -55,7 +55,9 @@ export function LandingPricingSection({ onStart }: { onStart?: () => void }) {
               <div className="flex shrink-0 flex-col items-start gap-3">
                 {FREE_FEATURES.map((f) => (
                   <div key={f.text} className="flex shrink-0 items-center gap-1">
-                    <CheckIcon className="size-8 shrink-0" />
+                    <span className="flex size-8 shrink-0 items-center justify-center">
+                      <CheckIcon className="size-4.5 text-(--color-icon-brand)" />
+                    </span>
                     <p className="[font-size:var(--font-size-body-2)] font-normal leading-(--line-height-body) text-(--color-text-default) whitespace-nowrap">
                       {f.text}
                       {f.sub && <span className="text-(--color-text-tertiary)">{f.sub}</span>}
@@ -118,7 +120,9 @@ export function LandingPricingSection({ onStart }: { onStart?: () => void }) {
               <div className="flex shrink-0 flex-col items-start gap-3">
                 {PRO_FEATURES.map((f) => (
                   <div key={f.text} className="flex shrink-0 items-center gap-1">
-                    <CheckIcon className="size-8 shrink-0" />
+                    <span className="flex size-8 shrink-0 items-center justify-center">
+                      <CheckIcon className="size-4.5 text-(--color-icon-brand)" />
+                    </span>
                     <p
                       className={`[font-size:var(--font-size-body-2)] leading-(--line-height-body) text-(--color-text-default) whitespace-nowrap ${f.medium ? 'font-medium' : 'font-normal'}`}
                     >
