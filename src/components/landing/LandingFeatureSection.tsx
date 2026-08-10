@@ -66,7 +66,7 @@ export function LandingFeatureSection({
   }
 
   return (
-    <div className="flex w-full max-w-7xl h-151.25 items-start gap-10 rounded-(--scale-20) border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) p-10 shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]">
+    <div className="flex w-full max-w-7xl h-151.25 items-center gap-10 rounded-(--scale-20) border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) p-10 shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]">
       {/* 좌측 아코디언 메뉴 — justify-center로 수직 중앙 */}
       <div className="flex h-full w-80.75 shrink-0 flex-col gap-5 justify-center">
         {FEATURES.map((f, i) => {
@@ -99,7 +99,7 @@ export function LandingFeatureSection({
       </div>
 
       {/* 우측 이미지 — fade + slide 전환 */}
-      <div className="relative min-w-0 flex-1 h-full">
+      <div className="relative min-w-0 flex-1 aspect-2880/1732">
         {FEATURES.map((f) => (
           <img
             key={f.key}
