@@ -7,7 +7,7 @@ import {
   readNotification,
   updateNotificationSetting,
 } from '@/api/notification/notification'
-import type { NotificationSettingKey } from '@/types/notification'
+import type { NotificationResult, NotificationSettingKey } from '@/types/notification'
 
 export const useGetNotifications = () => {
   return useQuery({
@@ -25,7 +25,29 @@ export const useReadNotification = () => {
   return useMutation({
     mutationFn: readNotification,
 
-    onSuccess: () => {
+    onMutate: async (notificationId) => {
+      await queryClient.cancelQueries({ queryKey: notificationQueryKeys.lists() })
+
+      const previousNotifications = queryClient.getQueryData<NotificationResult[]>(
+        notificationQueryKeys.lists(),
+      )
+
+      queryClient.setQueryData<NotificationResult[]>(notificationQueryKeys.lists(), (old) =>
+        old?.map((item) =>
+          item.notificationId === notificationId ? { ...item, isRead: true } : item,
+        ),
+      )
+
+      return { previousNotifications }
+    },
+
+    onError: (_error, _notificationId, context) => {
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(notificationQueryKeys.lists(), context.previousNotifications)
+      }
+    },
+
+    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.lists() })
     },
   })
