@@ -89,14 +89,18 @@ export default function TaskCard({
     newAttachmentUrlsRef.current.delete(url)
   }
 
+  const isResultDirty =
+    task.isCompleted && (draftResult.trim() !== (task.result ?? '') || isAttachmentsDirty)
   const isDirty =
     draftPriority !== task.priority ||
     (draftTag?.label ?? null) !== (task.tag?.label ?? null) ||
     draftTitle.trim() !== task.title ||
     draftMemo.trim() !== (task.memo ?? '') ||
-    (task.isCompleted && draftResult.trim() !== (task.result ?? '')) ||
-    (task.isCompleted && isAttachmentsDirty)
-  const isDraftValid = draftPriority !== null && draftTitle.trim() !== ''
+    isResultDirty
+  const isClearingExistingResult =
+    task.isCompleted && Boolean(task.result) && draftResult.trim() === ''
+  const isDraftValid =
+    draftPriority !== null && draftTitle.trim() !== '' && !isClearingExistingResult
 
   const handleStartEdit = () => {
     setDraftPriority(task.priority)
@@ -124,7 +128,7 @@ export default function TaskCard({
       title: draftTitle.trim(),
       memo: draftMemo.trim() || undefined,
     })
-    if (task.isCompleted) {
+    if (isResultDirty) {
       onSaveResult?.({
         result: draftResult.trim(),
         resultFiles: draftResultFiles,
