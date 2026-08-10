@@ -3,11 +3,24 @@ import { request } from '@/lib/httpClient'
 import type {
   DeleteDailyEntryPermanentlyResult,
   RestoreDailyEntryResult,
-  TrashDailyEntry,
+  TrashDailyEntriesResult,
 } from '@/types/trash'
 
-export const getTrashDailyEntries = async (): Promise<TrashDailyEntry[]> => {
-  return request<TrashDailyEntry[]>('/trash/daily-entries', {
+export interface GetTrashDailyEntriesParams {
+  page: number
+  size: number
+}
+
+export const getTrashDailyEntries = async ({
+  page,
+  size,
+}: GetTrashDailyEntriesParams): Promise<TrashDailyEntriesResult> => {
+  const searchParams = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  })
+
+  return request<TrashDailyEntriesResult>(`/trash/daily-entries?${searchParams.toString()}`, {
     method: 'GET',
   })
 }

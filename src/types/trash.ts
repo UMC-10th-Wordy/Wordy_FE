@@ -10,7 +10,16 @@ export interface TrashDailyEntry {
   deletedAt: string
 }
 
-export type TrashDailyEntriesResponse = DiaryListApiResponse<TrashDailyEntry[]>
+export interface TrashDailyEntriesResult {
+  items: TrashDailyEntry[]
+  page: number
+  size: number
+  totalCount: number
+  totalPages: number
+  hasNext: boolean
+}
+
+export type TrashDailyEntriesResponse = DiaryListApiResponse<TrashDailyEntriesResult>
 
 /* 일지 복원 */
 // PATCH /trash/daily-entries/{dailyEntryId}/restore
