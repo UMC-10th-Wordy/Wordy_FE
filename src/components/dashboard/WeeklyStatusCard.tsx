@@ -21,7 +21,7 @@ export const WeeklyStatusCard = ({
   periodLabel,
 }: WeeklyStatusCardProps) => {
   return (
-    <section className="flex h-[748px]min-w-0 min-w-0 min-[1700px]:min-w-[1047px] flex-[2] flex-col items-center justify-center gap-[56px] rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-5 py-10 shadow-[0px_1px_5px_0px_#0000001A]">
+    <section className="flex h-[748px] min-w-0 min-w-0 min-[1700px]:min-w-[1047px] flex-[2] flex-col items-center justify-center gap-[56px] rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-5 py-10 shadow-[0px_1px_5px_0px_#0000001A]">
       {status === 'insufficient' && (
         <div className="flex flex-col items-center gap-8">
           <WordySleepingIcon width={220} height={220} className="shrink-0" />
@@ -47,7 +47,7 @@ export const WeeklyStatusCard = ({
             size="large"
             disabled
             iconLeft={<GenerateIcon width={20} height={20} />}
-            className="w-[400px]"
+            className="w-full max-w-100"
           >
             주간 대시보드 생성하기
           </TextButton>
@@ -74,7 +74,7 @@ export const WeeklyStatusCard = ({
             size="large"
             iconLeft={<GenerateIcon width={20} height={20} />}
             onClick={onGenerate}
-            className="w-[400px]"
+            className="w-full max-w-100"
           >
             주간 대시보드 생성하기
           </TextButton>
