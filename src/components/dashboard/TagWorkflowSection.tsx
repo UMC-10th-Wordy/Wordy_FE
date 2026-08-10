@@ -1,8 +1,19 @@
 import { useState } from 'react'
 import GenerateIcon from '@/assets/icons/generate.svg?react'
 import ClipIcon from '@/assets/icons/clip.svg?react'
-import ProjectTag from '@/components/todo/ProjectTag'
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
+
+const OVERVIEW_TAG_CLASS: Record<ProjectTagColor, string> = {
+  black: 'bg-(--color-tag-black-bg) text-(--color-tag-black-text)',
+  red: 'bg-(--color-tag-red-bg) text-(--color-tag-red-text)',
+  orange: 'bg-(--color-tag-orange-bg) text-(--color-tag-orange-text)',
+  yellow: 'bg-(--color-tag-yellow-bg) text-(--color-tag-yellow-text)',
+  green: 'bg-(--color-tag-green-bg) text-(--color-tag-green-text)',
+  blue: 'bg-(--color-tag-blue-bg) text-(--color-tag-blue-text)',
+  navy: 'bg-(--color-tag-navy-bg) text-(--color-tag-navy-text)',
+  pink: 'bg-(--color-tag-pink-bg) text-(--color-tag-pink-text)',
+  brown: 'bg-(--color-tag-brown-bg) text-(--color-tag-brown-text)',
+}
 
 export interface TagWorkflow {
   id: string
@@ -71,12 +82,15 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
       {/* 오버뷰 */}
       <div className="flex flex-col gap-10 rounded-lg border border-(--color-border-subtle) p-5">
         <div className="flex flex-col gap-5">
-          <span className="[font-size:var(--font-size-body-1)] leading-[1.6] font-semibold text-(--color-text-brand)">
+          <span className="[font-size:var(--font-size-body-4)] text-(--color-text-secondary)">
             프로젝트 태그 오버뷰
           </span>
           <div className="self-start">
-            {/* TODO: 피그마 태그 스펙(154×46, radius 8)이 공용 ProjectTag와 상이 — 파트장 확인 후 반영 */}
-            <ProjectTag label={selected.name} color={selected.color} />
+            <div
+              className={`inline-flex h-[46px] items-center rounded-lg px-3 py-1 ${OVERVIEW_TAG_CLASS[selected.color]}`}
+            >
+              <span className="[font-size:var(--font-size-heading-4)] leading-[1.6] font-bold whitespace-nowrap">{`${selected.name}(${selected.count})`}</span>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2">
