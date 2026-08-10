@@ -3,6 +3,7 @@ import { EASE_SPRING } from './constants'
 import imgVector from '@/assets/images/banner/vector.svg'
 import imgEllipse122 from '@/assets/images/banner/ellipse122.svg'
 import imgVector1 from '@/assets/images/banner/vector1.svg'
+import imgVectorLeftCorner from '@/assets/images/banner/vector_left_corner.svg'
 import imgFlower1 from '@/assets/images/banner/flower1.svg'
 import imgFlower2 from '@/assets/images/banner/flower2.svg'
 import imgCharacter from '@/assets/images/banner/character.svg'
@@ -49,7 +50,7 @@ export function BannerIllustration({ className }: { className?: string }) {
     >
       {/* ── Vector: 배경 짙은 언덕 (y: 0→22) ── */}
       {(() => {
-        const r = inset(19.47, 0, 8.26, 53.5)
+        const r = inset(23.6, 0, 4.13, 53.5)
         return (
           <motion.image
             href={imgVector}
@@ -72,16 +73,16 @@ export function BannerIllustration({ className }: { className?: string }) {
         animate={{ x: [0, -21, -21] }}
         transition={{ duration: 2, times: [0, 0.3959, 1], ease: EASE_SPRING_LINEAR }}
       >
-        {/* Ellipse122: 절대 px (피그마 코드: h-[144px] left-0 top-[196px] w-[718.265px]) */}
-        <image href={imgEllipse122} x={0} y={196} width={718.265} height={144} />
+        {/* Ellipse122: 절대 px (피그마 코드: h-[144px] left-0 top-[210px] w-[718.265px]) */}
+        <image href={imgEllipse122} x={0} y={210} width={718.265} height={144} />
 
-        {/* Vector_2: inset [72.42% 57.61% 15.21% 17.15%] 캔버스 기준 */}
-        <image href={imgVector1} {...inset(72.42, 57.61, 15.21, 17.15)} />
+        {/* Vector_2: inset [76.55% 57.61% 11.08% 17.15%] 캔버스 기준 */}
+        <image href={imgVector1} {...inset(76.55, 57.61, 11.08, 17.15)} />
 
-        {/* 꽃1 (1778:42177): inset [80.24% 84.4% 7.59% 11.94%] 캔버스 기준, rotate -21→3→-5→0 */}
+        {/* 꽃1 (3330:30838): inset [84.37% 84.4% 3.46% 11.94%] 캔버스 기준, rotate -21→3→-5→0 */}
         {(() => {
-          const r = inset(80.24, 84.4, 7.59, 11.94)
-          const { cx: ox, cy: oy } = cx(80.24, 84.4, 7.59, 11.94)
+          const r = inset(84.37, 84.4, 3.46, 11.94)
+          const { cx: ox, cy: oy } = cx(84.37, 84.4, 3.46, 11.94)
           return (
             <motion.g
               style={{ transformOrigin: `${ox}px ${oy}px` }}
@@ -98,10 +99,10 @@ export function BannerIllustration({ className }: { className?: string }) {
           )
         })()}
 
-        {/* 꽃2 (1778:42198): inset [80.24% 71.61% -6.99% 20.56%] 캔버스 기준, rotate -44→-14→-24→-18 */}
+        {/* 꽃2 (3330:30847): inset [84.37% 71.61% -11.12% 20.56%] 캔버스 기준, rotate -44→-14→-24→-18 */}
         {(() => {
-          const r = inset(80.24, 71.61, -6.99, 20.56)
-          const { cx: ox, cy: oy } = cx(80.24, 71.61, -6.99, 20.56)
+          const r = inset(84.37, 71.61, -11.12, 20.56)
+          const { cx: ox, cy: oy } = cx(84.37, 71.61, -11.12, 20.56)
           return (
             <motion.g
               style={{ transformOrigin: `${ox}px ${oy}px` }}
@@ -121,8 +122,8 @@ export function BannerIllustration({ className }: { className?: string }) {
 
       {/* ── Group 29: 캐릭터 (opacity+rotate+scale+y) ── */}
       {(() => {
-        const r = inset(27.14, 11.83, 12.68, 65.19)
-        const { cx: ox, cy: oy } = cx(27.14, 11.83, 12.68, 65.19)
+        const r = inset(31.27, 11.83, 8.55, 65.19)
+        const { cx: ox, cy: oy } = cx(31.27, 11.83, 8.55, 65.19)
         return (
           <motion.g
             style={{ transformOrigin: `${ox}px ${oy}px` }}
@@ -161,6 +162,24 @@ export function BannerIllustration({ className }: { className?: string }) {
         )
       })()}
 
+      {/* ── Vector: 좌측 하단 코너 언덕 (x: 0→-22) ── */}
+      {(() => {
+        const r = inset(83.78, 90.1, -4.13, 0)
+        return (
+          <motion.image
+            href={imgVectorLeftCorner}
+            {...r}
+            initial={{ x: 0 }}
+            animate={{ x: [0, -22, -22] }}
+            transition={{
+              duration: 2,
+              times: [0, 0.3959, 1],
+              ease: EASE_SPRING_LINEAR,
+            }}
+          />
+        )
+      })()}
+
       {/* ── Group 31: 우측 언덕+꽃 (x: 0→+30.01) ── */}
       {/* 자식들도 캔버스 기준 절대좌표 */}
       <motion.g
@@ -168,13 +187,13 @@ export function BannerIllustration({ className }: { className?: string }) {
         animate={{ x: [0, 30.01, 30.01] }}
         transition={{ duration: 2, times: [0, 0.3959, 1], ease: EASE_SPRING_LINEAR }}
       >
-        {/* 우측 언덕 배경: inset [20.11% 0 0 53.5%] */}
-        <image href={imgVector3} {...inset(20.11, 0, 0, 53.5)} />
+        {/* 우측 언덕 배경: inset [24.24% 0 -4.13% 53.5%] */}
+        <image href={imgVector3} {...inset(24.24, 0, -4.13, 53.5)} />
 
-        {/* 꽃 R1 (1778:42259): inset [46.61% 2.06% 29.8% 91.72%] */}
+        {/* 꽃 R1 (3330:30868): inset [50.74% 2.06% 25.67% 91.72%] */}
         {(() => {
-          const r = inset(46.61, 2.06, 29.8, 91.72)
-          const { cx: ox, cy: oy } = cx(46.61, 2.06, 29.8, 91.72)
+          const r = inset(50.74, 2.06, 25.67, 91.72)
+          const { cx: ox, cy: oy } = cx(50.74, 2.06, 25.67, 91.72)
           return (
             <motion.g
               style={{ transformOrigin: `${ox}px ${oy}px` }}
@@ -191,10 +210,10 @@ export function BannerIllustration({ className }: { className?: string }) {
           )
         })()}
 
-        {/* 꽃 R2 (1778:42280): inset [80.06% 36.81% 4.97% 58.69%] */}
+        {/* 꽃 R2 (3330:30877): inset [84.19% 36.81% 0.84% 58.69%] */}
         {(() => {
-          const r = inset(80.06, 36.81, 4.97, 58.69)
-          const { cx: ox, cy: oy } = cx(80.06, 36.81, 4.97, 58.69)
+          const r = inset(84.19, 36.81, 0.84, 58.69)
+          const { cx: ox, cy: oy } = cx(84.19, 36.81, 0.84, 58.69)
           return (
             <motion.g
               style={{ transformOrigin: `${ox}px ${oy}px` }}
@@ -211,10 +230,10 @@ export function BannerIllustration({ className }: { className?: string }) {
           )
         })()}
 
-        {/* 꽃 R3 (1778:42301): inset [84.66% 26.32% 3.16% 69.97%] */}
+        {/* 꽃 R3 (3330:30886): inset [88.79% 26.32% -0.97% 69.97%] */}
         {(() => {
-          const r = inset(84.66, 26.32, 3.16, 69.97)
-          const { cx: ox, cy: oy } = cx(84.66, 26.32, 3.16, 69.97)
+          const r = inset(88.79, 26.32, -0.97, 69.97)
+          const { cx: ox, cy: oy } = cx(88.79, 26.32, -0.97, 69.97)
           return (
             <motion.g
               style={{ transformOrigin: `${ox}px ${oy}px` }}
@@ -231,10 +250,10 @@ export function BannerIllustration({ className }: { className?: string }) {
           )
         })()}
 
-        {/* 꽃 R4 (1778:42319): inset [24.48% 0.48% 63% 95.82%] */}
+        {/* 꽃 R4 (3330:30892): inset [28.61% 0.48% 58.87% 95.82%] */}
         {(() => {
-          const r = inset(24.48, 0.48, 63, 95.82)
-          const { cx: ox, cy: oy } = cx(24.48, 0.48, 63, 95.82)
+          const r = inset(28.61, 0.48, 58.87, 95.82)
+          const { cx: ox, cy: oy } = cx(28.61, 0.48, 58.87, 95.82)
           return (
             <motion.g
               style={{ transformOrigin: `${ox}px ${oy}px` }}
@@ -247,10 +266,10 @@ export function BannerIllustration({ className }: { className?: string }) {
           )
         })()}
 
-        {/* 꽃 R5 (1778:42337): inset [65.06% 14.5% 23.56% 82.1%] */}
+        {/* 꽃 R5 (3330:30898): inset [69.19% 14.5% 19.43% 82.1%] */}
         {(() => {
-          const r = inset(65.06, 14.5, 23.56, 82.1)
-          const { cx: ox, cy: oy } = cx(65.06, 14.5, 23.56, 82.1)
+          const r = inset(69.19, 14.5, 19.43, 82.1)
+          const { cx: ox, cy: oy } = cx(69.19, 14.5, 19.43, 82.1)
           return (
             <motion.g
               style={{ transformOrigin: `${ox}px ${oy}px` }}
@@ -267,10 +286,10 @@ export function BannerIllustration({ className }: { className?: string }) {
           )
         })()}
 
-        {/* 꽃 R6 (1778:42358): inset [80.97% 6.57% 7.64% 90.03%] */}
+        {/* 꽃 R6 (3330:30907): inset [85.1% 6.57% 3.51% 90.03%] */}
         {(() => {
-          const r = inset(80.97, 6.57, 7.64, 90.03)
-          const { cx: ox, cy: oy } = cx(80.97, 6.57, 7.64, 90.03)
+          const r = inset(85.1, 6.57, 3.51, 90.03)
+          const { cx: ox, cy: oy } = cx(85.1, 6.57, 3.51, 90.03)
           return (
             <motion.g
               style={{ transformOrigin: `${ox}px ${oy}px` }}
