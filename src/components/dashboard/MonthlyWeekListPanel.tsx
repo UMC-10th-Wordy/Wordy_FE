@@ -46,10 +46,10 @@ export const MonthlyWeekListPanel = ({
         <Scrollbar className="flex-1">
           <ul className="flex flex-col">
             {weeks.map((week) => (
-              <li key={week.id} className="flex h-[48px] items-center gap-2.5">
+              <li key={week.id} className="flex h-[52px] items-center gap-2.5 py-2.5">
                 <span
                   className={[
-                    'rounded-lg px-2 py-1 [font-size:var(--font-size-caption-1)] font-medium',
+                    'shrink-0 rounded-lg px-2 py-1 [font-size:var(--font-size-caption-1)] font-medium',
                     week.generated
                       ? 'bg-(--color-tag-green-bg) text-(--color-tag-green-text)'
                       : 'bg-[#FFE9EC] text-(--color-tag-red-text)',
@@ -57,17 +57,17 @@ export const MonthlyWeekListPanel = ({
                 >
                   {week.generated ? '생성됨' : '생성되지 않음'}
                 </span>
-                <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)">
+                <span className="shrink-0 [font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)">
                   {week.weekLabel}
                 </span>
-                <span className="[font-size:var(--font-size-body-3)] leading-[1.6] font-medium text-(--color-text-tertiary)">
-                  · {week.rangeLabel}
+                <span className="min-w-0 truncate [font-size:var(--font-size-body-3)] leading-[1.6] font-medium text-(--color-text-tertiary)">
+                  {week.rangeLabel}
                 </span>
                 {!week.generated && (
                   <button
                     type="button"
                     onClick={() => onGoWeekly(week.id)}
-                    className="ml-auto [font-size:var(--font-size-body-4)] text-(--color-text-brand)"
+                    className="ml-auto shrink-0 [font-size:var(--font-size-body-4)] text-(--color-text-brand)"
                   >
                     생성하기 &gt;
                   </button>
