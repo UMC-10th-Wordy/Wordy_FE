@@ -28,9 +28,9 @@ export const useReadNotification = () => {
     onMutate: async (notificationId) => {
       await queryClient.cancelQueries({ queryKey: notificationQueryKeys.lists() })
 
-      const previousNotifications = queryClient.getQueryData<NotificationResult[]>(
-        notificationQueryKeys.lists(),
-      )
+      const previousItem = queryClient
+        .getQueryData<NotificationResult[]>(notificationQueryKeys.lists())
+        ?.find((item) => item.notificationId === notificationId)
 
       queryClient.setQueryData<NotificationResult[]>(notificationQueryKeys.lists(), (old) =>
         old?.map((item) =>
@@ -38,13 +38,15 @@ export const useReadNotification = () => {
         ),
       )
 
-      return { previousNotifications }
+      return { previousItem }
     },
 
-    onError: (_error, _notificationId, context) => {
-      if (context?.previousNotifications) {
-        queryClient.setQueryData(notificationQueryKeys.lists(), context.previousNotifications)
-      }
+    onError: (_error, notificationId, context) => {
+      if (!context?.previousItem) return
+
+      queryClient.setQueryData<NotificationResult[]>(notificationQueryKeys.lists(), (old) =>
+        old?.map((item) => (item.notificationId === notificationId ? context.previousItem! : item)),
+      )
     },
 
     onSettled: () => {
