@@ -128,9 +128,11 @@ const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) =>
               </div>
             </section>
 
-            <div className="mt-(--scale-48)">
-              <DiaryRetrospective content={diary.retrospective} />
-            </div>
+            {diary.retrospective?.trim() && (
+              <div className="mt-(--scale-48)">
+                <DiaryRetrospective content={diary.retrospective} />
+              </div>
+            )}
           </div>
         </Scrollbar>
       </main>
