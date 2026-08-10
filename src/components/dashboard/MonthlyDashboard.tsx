@@ -43,9 +43,12 @@ const buildWeeks = (eligibility: MonthlyEligibilityDto): WeeklyBoardStatus[] => 
     if (weekEnd > monthEnd) weekEnd.setTime(monthEnd.getTime())
     const startStr = toDateString(weekStart)
     const endStr = toDateString(weekEnd)
-    const matched = eligibility.weeklyDashboards.find(
-      (w) => w.startDate >= startStr && w.startDate <= endStr,
-    )
+    const matched = eligibility.weeklyDashboards.find((w) => {
+      const s = new Date(`${w.startDate}T00:00:00`)
+      const e = new Date(`${w.endDate}T00:00:00`)
+      const isWeekly = (e.getTime() - s.getTime()) / 86400000 <= 7
+      return isWeekly && w.startDate >= startStr && w.startDate <= endStr
+    })
     weeks.push({
       id: matched?.dashboardId ?? `pending-${startStr}`,
       weekLabel: `${weekStart.getMonth() + 1}월 ${index + 1}주차`,
@@ -143,6 +146,7 @@ export const MonthlyDashboard = ({
         generatedCount={generatedCount}
         onGenerate={onGenerate}
         requiredCount={requiredCount}
+        periodLabel={eligibility ? `${Number(eligibility.monthStart.slice(5, 7))}월 달` : undefined}
       />
       <MonthlyWeekListPanel weeks={weeks} totalWeeks={weeks.length} onGoWeekly={onGoWeekly} />
     </>

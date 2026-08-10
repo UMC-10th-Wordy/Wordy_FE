@@ -9,6 +9,7 @@ interface MonthlyStatusCardProps {
   generatedCount: number
   requiredCount: number
   onGenerate: () => void
+  periodLabel?: string
 }
 
 export const MonthlyStatusCard = ({
@@ -16,15 +17,16 @@ export const MonthlyStatusCard = ({
   generatedCount,
   requiredCount,
   onGenerate,
+  periodLabel,
 }: MonthlyStatusCardProps) => {
   return (
-    <section className="flex h-[748px] min-w-0 max-w-[1172px] flex-[2] flex-col items-center justify-center gap-[56px] rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-5 py-10 shadow-[0px_1px_5px_0px_#0000001A]">
+    <section className="flex h-[748px] min-w-0 min-[1700px]:min-w-[1047px] flex-[2] flex-col items-center justify-center gap-[56px] rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-5 py-10 shadow-[0px_1px_5px_0px_#0000001A]">
       {status === 'insufficient' && (
         <div className="flex flex-col items-center gap-8">
           <WordySleepingIcon width={220} height={220} className="shrink-0" />
           <div className="flex flex-col items-center gap-2 text-center">
             <h2 className="[font-size:var(--font-size-heading-4)] font-bold text-(--color-text-default)">
-              이번 달의 대시보드를 아직 생성할 수 없어요
+              {`${periodLabel ?? '이번 달'}의 대시보드를 아직 생성할 수 없어요`}
             </h2>
             <p className="[font-size:var(--font-size-body-3)] text-(--color-text-secondary)">
               주간 대시보드를 더 변환해 주세요!

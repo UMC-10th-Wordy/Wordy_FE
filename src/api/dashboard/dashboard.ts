@@ -27,7 +27,7 @@ let monthlyDetailMock: DashboardDetailDto = structuredClone(INITIAL_MONTHLY_DASH
 /* GET /dashboards/eligibility — 주간 대시보드 생성 조건 조회 */
 export async function getDashboardEligibility(baseDate?: string): Promise<EligibilityDto> {
   if (USE_MOCK_DASHBOARD) return INITIAL_ELIGIBILITY_MOCK
-  const query = baseDate ? `?BaseDate=${baseDate}` : ''
+  const query = baseDate ? `?baseDate=${baseDate}` : ''
   return request<EligibilityDto>(`/dashboards/eligibility${query}`)
 }
 
@@ -86,7 +86,7 @@ export async function updateReflection(
 /* GET /dashboards/monthly/eligibility — 월간 대시보드 생성 조건 조회 */
 export async function getMonthlyEligibility(baseDate?: string): Promise<MonthlyEligibilityDto> {
   if (USE_MOCK_DASHBOARD) return MONTHLY_ELIGIBILITY_MOCK
-  const query = baseDate ? `?BaseDate=${baseDate}` : ''
+  const query = baseDate ? `?baseDate=${baseDate}` : ''
   return request<MonthlyEligibilityDto>(`/dashboards/monthly/eligibility${query}`)
 }
 

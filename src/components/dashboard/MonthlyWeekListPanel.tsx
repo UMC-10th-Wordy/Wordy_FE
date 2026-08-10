@@ -22,7 +22,7 @@ export const MonthlyWeekListPanel = ({
   const isEmpty = weeks.length === 0
 
   return (
-    <aside className="flex h-[748px] min-w-[320px] max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-(--color-border-subtle) bg-(--color-bg-default) p-6">
+    <aside className="flex h-[748px] min-w-0 min-[1700px]:min-w-[513px] max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-[#DDDDFF] shadow-[0px_1px_5px_0px_#0000001A] bg-(--color-bg-default) p-6">
       <div className="flex items-baseline gap-2">
         <h2 className="[font-size:var(--font-size-body-2)] font-bold text-(--color-text-default)">
           생성에 사용할 주간 대시보드
