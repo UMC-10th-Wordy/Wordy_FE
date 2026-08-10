@@ -743,6 +743,11 @@ export default function TodoListPage() {
     performancePreview.preparePreview()
     setIsPreviewOpen(true)
 
+    if (completedTasks.length === 0) {
+      performancePreview.failPreview()
+      return
+    }
+
     if (!profile) {
       performancePreview.failPreview()
       return
