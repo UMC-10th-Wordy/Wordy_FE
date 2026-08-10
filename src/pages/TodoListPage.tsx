@@ -276,8 +276,26 @@ export default function TodoListPage() {
       queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
         prev ? prev.filter((task) => task.taskId !== id) : prev,
       )
-      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
-      queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars() })
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.summary(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.searches(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: taskQueryKeys.calendars(),
+        }),
+      ])
     } catch {
       addToast('업무 삭제에 실패했어요. 다시 시도해 주세요')
     }
@@ -320,7 +338,23 @@ export default function TodoListPage() {
             )
           : prev,
       )
-      queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.summary(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.searches(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
+        }),
+      ])
     } catch {
       addToast('업무 수정에 실패했어요. 다시 시도해 주세요')
     }
