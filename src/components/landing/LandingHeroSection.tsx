@@ -6,7 +6,7 @@ export function LandingHeroSection({ onStart }: { onStart?: () => void }) {
     >
       <div className="flex flex-col items-center gap-5 whitespace-nowrap">
         <p className="[font-size:var(--font-size-body-1)] font-medium leading-(--line-height-body) text-(--color-text-tertiary)">
-          나만의 업무 성과 관리 도우미, Wordy
+          나만의 업무 성과 관리 파트너, Wordy
         </p>
         <div className="flex flex-col items-center">
           <p className="[font-size:var(--font-size-heading-1)] font-semibold leading-(--line-height-body) text-(--color-text-default)">
