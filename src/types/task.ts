@@ -88,7 +88,14 @@ export interface SaveTaskResultPayload {
   files?: File[]
 }
 
+export interface TaskCalendarEntryDto {
+  date: string
+  completedCount: number
+  incompleteCount: number
+}
+
 export type TaskListResponse = ApiEnvelope<TaskDto[]>
+export type TaskCalendarResponse = ApiEnvelope<TaskCalendarEntryDto[]>
 export type TaskDetailResponse = ApiEnvelope<TaskDto>
 export type CreateTaskResponse = ApiEnvelope<TaskDto>
 export type UpdateTaskResponse = ApiEnvelope<TaskDto>
