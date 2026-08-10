@@ -1,6 +1,5 @@
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
-import ArrowRightIcon from '@/assets/icons/arrow-left.svg?react'
 
 export interface WeeklyBoardStatus {
   id: string
@@ -23,7 +22,7 @@ export const MonthlyWeekListPanel = ({
   const isEmpty = weeks.length === 0
 
   return (
-    <aside className="flex h-[748px] min-w-[513px] max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-[#DDDDFF] shadow-[0px_1px_5px_0px_#0000001A] bg-(--color-bg-default) p-6">
+    <aside className="flex h-[748px] min-w-[320px] max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-(--color-border-subtle) bg-(--color-bg-default) p-6">
       <div className="flex items-baseline gap-2">
         <h2 className="[font-size:var(--font-size-body-2)] font-bold text-(--color-text-default)">
           생성에 사용할 주간 대시보드
@@ -35,12 +34,11 @@ export const MonthlyWeekListPanel = ({
       {isEmpty ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-(--color-text-tertiary)">
           <XMarkIcon
-            width={24}
-            height={24}
+            width={32}
+            height={32}
             className="rounded-full bg-(--color-button-default) p-1 text-(--color-text-inverse)"
           />
-          {/* TODO: 월간 빈 상태 문구는 임시 — 디자인 확인 필요 */}
-          <p className="[font-size:var(--font-size-body-4)]">
+          <p className="[font-size:var(--font-size-body-2)] leading-[1.6] text-center text-(--color-text-tertiary)">
             이번 달에 생성한 주간 대시보드가 없어요
           </p>
         </div>
@@ -62,17 +60,16 @@ export const MonthlyWeekListPanel = ({
                 <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)">
                   {week.weekLabel}
                 </span>
-                <span className="[font-size:var(--font-size-caption-1)] text-(--color-text-tertiary)">
+                <span className="[font-size:var(--font-size-body-3)] leading-[1.6] font-medium text-(--color-text-tertiary)">
                   · {week.rangeLabel}
                 </span>
                 {!week.generated && (
                   <button
                     type="button"
                     onClick={() => onGoWeekly(week.id)}
-                    className="ml-auto flex items-center gap-1 [font-size:var(--font-size-body-4)] text-(--color-text-brand)"
+                    className="ml-auto [font-size:var(--font-size-body-4)] text-(--color-text-brand)"
                   >
-                    생성하기
-                    <ArrowRightIcon width={16} height={16} className="rotate-180" />
+                    생성하기 &gt;
                   </button>
                 )}
               </li>
