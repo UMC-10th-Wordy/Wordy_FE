@@ -175,13 +175,6 @@ export default function TodoListPage() {
 
   const { data: fetchedDailyEntry } = useGetDailyEntryByDate(currentDateKey)
 
-  if (fetchedDailyEntry !== undefined && !(currentDateKey in retrospectiveByDate)) {
-    setRetrospectiveByDate((prev) => ({
-      ...prev,
-      [currentDateKey]: fetchedDailyEntry?.reflectionContent ?? '',
-    }))
-  }
-
   const savedPerformanceDetail =
     performanceList?.exists && performanceList.performance ? performanceList.performance : null
 
@@ -193,8 +186,11 @@ export default function TodoListPage() {
   }
 
   const tasksForDate = tasks.filter((task) => task.date === currentDateKey)
-  const retrospective = retrospectiveByDate[currentDateKey] ?? ''
-  const hasResolvedRetrospective = currentDateKey in retrospectiveByDate
+  const retrospective =
+    retrospectiveByDate[currentDateKey] ?? fetchedDailyEntry?.reflectionContent ?? ''
+
+  const hasResolvedRetrospective =
+    currentDateKey in retrospectiveByDate || fetchedDailyEntry !== undefined
   const isRetrospectiveButtonVisible =
     hasResolvedRetrospective && !isRetrospectiveFocused && retrospective.trim().length === 0
 

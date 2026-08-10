@@ -80,7 +80,8 @@ export const deleteDailyEntry = async (dailyEntryId: string): Promise<DailyEntry
 export const dailyEntryQueryKeys = {
   all: ['daily-entry'] as const,
 
-  byDate: (date: string) => [...dailyEntryQueryKeys.all, 'by-date', date] as const,
+  byDates: () => [...dailyEntryQueryKeys.all, 'by-date'] as const,
+  byDate: (date: string) => [...dailyEntryQueryKeys.byDates(), date] as const,
 
   summary: () => [...dailyEntryQueryKeys.all, 'summary'] as const,
 
