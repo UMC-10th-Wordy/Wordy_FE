@@ -125,6 +125,7 @@ export async function createMonthlyReflection(
 
 export async function saveDraft(
   type: 'WEEKLY' | 'MONTHLY',
+  dashboardId: string | undefined,
   payload: {
     workSummary: string
     resourcesUsed: string
@@ -132,15 +133,20 @@ export async function saveDraft(
     taskPlans: { content: string; expectedTime: string }[]
   },
 ): Promise<DraftDto> {
-  return request<DraftDto>(`/dashboards/drafts?type=${type}`, {
+  const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
+  return request<DraftDto>(`/dashboards/drafts${query}`, {
     method: 'POST',
     body: JSON.stringify(payload),
   })
 }
 
-export async function getDraft(type: 'WEEKLY' | 'MONTHLY'): Promise<DraftDto | null> {
+export async function getDraft(
+  type: 'WEEKLY' | 'MONTHLY',
+  dashboardId: string | undefined,
+): Promise<DraftDto | null> {
   try {
-    return await request<DraftDto>(`/dashboards/drafts?type=${type}`)
+    const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
+    return await request<DraftDto>(`/dashboards/drafts${query}`)
   } catch {
     return null
   }

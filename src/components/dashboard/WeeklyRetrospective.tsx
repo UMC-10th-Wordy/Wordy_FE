@@ -124,8 +124,9 @@ export const WeeklyRetrospective = ({
   const [plans, setPlans] = useState<PlanRow[]>([])
 
   useEffect(() => {
-    getDraft(period === 'monthly' ? 'MONTHLY' : 'WEEKLY').then((draft) => {
-      if (!draft) return
+    let cancelled = false
+    getDraft(period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId).then((draft) => {
+      if (cancelled || !draft) return
       if (!initialReflection) {
         setAnswers({
           work: draft.workSummary,
@@ -141,7 +142,10 @@ export const WeeklyRetrospective = ({
         })),
       )
     })
-  }, [period])
+    return () => {
+      cancelled = true
+    }
+  }, [period, initialReflection, dashboardId])
 
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
@@ -179,7 +183,7 @@ export const WeeklyRetrospective = ({
   const handleDeleteRow = (id: string) => setPlans((prev) => prev.filter((p) => p.id !== id))
 
   const handleTempSave = () => {
-    saveDraft(period === 'monthly' ? 'MONTHLY' : 'WEEKLY', {
+    saveDraft(period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId, {
       workSummary: answers.work,
       resourcesUsed: answers.resource,
       learning: answers.learning,
