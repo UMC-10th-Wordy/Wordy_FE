@@ -2,7 +2,9 @@ import type { HTMLAttributes } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGetHome } from '@/hooks/useHomeQueries'
 import { getDailyEntryByDate } from '@/api/daily-entry/dailyEntry'
+import { useToast } from '@/hooks/useToast'
 import { IconButton } from '@/components/common/Button/IconButton'
+import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import { HomeBanner } from '@/components/home/HomeBanner/HomeBanner'
 import { TodayTaskCard } from '@/components/home/TodayTaskCard/TodayTaskCard'
 import { StreakCard } from '@/components/home/StreakCard/StreakCard'
@@ -23,6 +25,7 @@ export type HomePageProps = HTMLAttributes<HTMLDivElement>
 export function HomePage({ className, ...rest }: HomePageProps) {
   const navigate = useNavigate()
   const { data } = useGetHome()
+  const { toasts, addToast } = useToast()
 
   // /landing은 로그인하지 않은 첫 방문자 전용 페이지라 인증된 유저는 리다이렉트하지 않고
   // 데이터가 비어있는 대시보드로 보여줌
@@ -42,8 +45,16 @@ export function HomePage({ className, ...rest }: HomePageProps) {
   const todayLabel = `${today.getMonth() + 1}월 ${today.getDate()}일 ${WEEK_DAYS[today.getDay()]}요일`
 
   const goToDailyEntryByDate = async (date: string) => {
-    const entry = await getDailyEntryByDate(date)
-    if (entry) navigate(`/records/${entry.dailyEntryId}`)
+    try {
+      const entry = await getDailyEntryByDate(date)
+      if (entry) {
+        navigate(`/records/${entry.dailyEntryId}`)
+      } else {
+        addToast('해당 날짜의 기록을 찾을 수 없어요')
+      }
+    } catch {
+      addToast('기록을 불러오지 못했어요. 다시 시도해 주세요')
+    }
   }
 
   return (
@@ -138,6 +149,8 @@ export function HomePage({ className, ...rest }: HomePageProps) {
           </div>
         </div>
       </div>
+
+      <ToastContainer toasts={toasts} />
     </div>
   )
 }

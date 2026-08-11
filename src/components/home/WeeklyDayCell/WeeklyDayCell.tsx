@@ -7,7 +7,7 @@ export interface WeeklyTask {
   priority: TaskPriority
 }
 
-export interface WeeklyDayCellProps extends HTMLAttributes<HTMLDivElement> {
+export interface WeeklyDayCellProps extends HTMLAttributes<HTMLElement> {
   date: number
   day: string
   tasks: WeeklyTask[]
@@ -30,17 +30,18 @@ export function WeeklyDayCell({
   className,
   ...rest
 }: WeeklyDayCellProps) {
-  return (
-    <div
-      className={[
-        'group flex flex-1 flex-col gap-2 h-50 items-start min-w-0 overflow-hidden p-1',
-        hasRecord ? 'cursor-pointer' : 'cursor-default',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      {...rest}
-    >
+  const containerClassName = [
+    'group flex flex-1 flex-col gap-2 h-50 items-start min-w-0 overflow-hidden p-1 text-left',
+    hasRecord
+      ? 'cursor-pointer focus-visible:outline-2 focus-visible:outline-(--color-border-brand) focus-visible:outline-offset-2'
+      : 'cursor-default',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const content = (
+    <>
       {/* 날짜 헤더 */}
       <div className="flex gap-2 items-start shrink-0 px-1 w-full rounded-(--scale-4) transition-colors duration-100 ease-out group-hover:bg-(--color-bg-brand-subtle)">
         <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-default) whitespace-nowrap">
@@ -67,6 +68,20 @@ export function WeeklyDayCell({
           </div>
         ))}
       </div>
+    </>
+  )
+
+  if (hasRecord) {
+    return (
+      <button type="button" className={containerClassName} {...rest}>
+        {content}
+      </button>
+    )
+  }
+
+  return (
+    <div className={containerClassName} {...rest}>
+      {content}
     </div>
   )
 }
