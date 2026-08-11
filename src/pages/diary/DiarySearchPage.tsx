@@ -1,6 +1,8 @@
 import { Suspense, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
+
 import { SearchInput } from '@/components/common/SearchInput/SearchInput'
 import { DiarySearchBackButton } from '@/components/diary-search/DiarySearchBackButton'
 import { DiarySearchSkeleton } from '@/components/diary-search/DiarySearchSkeleton'
@@ -15,6 +17,7 @@ interface SearchInputState {
 export const DiarySearchPage = () => {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const activeWorkspaceId = useActiveWorkspaceId()
 
   const searchedKeyword = searchParams.get('keyword') ?? ''
 
@@ -120,15 +123,18 @@ export const DiarySearchPage = () => {
             />
           </div>
 
-          {searchedKeyword.trim().length > 0 && (
-            <Suspense fallback={<DiarySearchSkeleton />}>
-              <DiarySearchResults
-                key={searchedKeyword}
-                keyword={searchedKeyword}
-                onDetailClick={handleDetailClick}
-              />
-            </Suspense>
-          )}
+          {searchedKeyword.trim().length > 0 &&
+            (!activeWorkspaceId ? (
+              <DiarySearchSkeleton />
+            ) : (
+              <Suspense fallback={<DiarySearchSkeleton />}>
+                <DiarySearchResults
+                  key={searchedKeyword}
+                  keyword={searchedKeyword}
+                  onDetailClick={handleDetailClick}
+                />
+              </Suspense>
+            ))}
         </div>
       </div>
     </main>
