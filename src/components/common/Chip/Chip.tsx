@@ -30,6 +30,7 @@ const chip = cva(
           'hover:bg-(--color-chip-hover)',
           'active:bg-(--color-chip-pressed)',
           'focus-visible:bg-(--color-chip-focused)',
+          'focus-visible:outline-2 focus-visible:outline-(--color-border-brand) focus-visible:outline-offset-2',
           'disabled:bg-(--color-bg-disabled) disabled:text-(--color-text-disabled)',
         ],
         small_round: [

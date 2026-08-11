@@ -17,6 +17,9 @@ import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
 import { homeQueryKeys } from '@/api/home/home'
 import { useGetProfile } from '@/hooks/useUserQueries'
 
+const NICKNAME_INVALID_CHARS_REGEX = /[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9\s]/g
+const sanitizeNickname = (value: string) => value.replace(NICKNAME_INVALID_CHARS_REGEX, '')
+
 export const ProfileSetupPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -140,7 +143,7 @@ export const ProfileSetupPage = () => {
             <Input1
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setName(sanitizeNickname(e.target.value))}
               placeholder="닉네임을 입력해 주세요"
               aria-label="닉네임"
               maxLength={10}

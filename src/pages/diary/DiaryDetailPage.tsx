@@ -177,5 +177,5 @@ export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
     throw new Error('업무 일지 ID가 없습니다.')
   }
 
-  return <DiaryDetailContent diaryId={diaryId} hideDelete={hideDelete} />
+  return <DiaryDetailContent key={diaryId} diaryId={diaryId} hideDelete={hideDelete} />
 }
