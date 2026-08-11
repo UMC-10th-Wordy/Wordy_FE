@@ -139,6 +139,19 @@ export const MonthlyDashboard = ({
         <WeeklyRetrospective
           period="monthly"
           dashboardId={detail.dashboardId}
+          initialReflection={(() => {
+            const list = detail.weeklyReflections
+            if (!list?.length) return undefined
+            const latest = [...list].sort(
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+            )[0]
+            return {
+              reflectionId: latest.weeklyReflectionId,
+              workSummary: latest.workSummary,
+              resourcesUsed: latest.resourcesUsed,
+              learning: latest.learning,
+            }
+          })()}
           onSaved={onReflectionSaved}
         />
       </div>

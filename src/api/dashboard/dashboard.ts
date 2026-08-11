@@ -50,12 +50,14 @@ export async function createReflection(
   payload: CreateReflectionPayload,
 ): Promise<string> {
   if (USE_MOCK_DASHBOARD) {
-    const reflectionId = `mock-reflection-${Date.now()}`
+    const weeklyReflectionId = `mock-reflection-${Date.now()}`
     weeklyDetailMock = {
       ...weeklyDetailMock,
-      weeklyReflections: [{ reflectionId, ...payload }],
+      weeklyReflections: [
+        { weeklyReflectionId, dashboardId, createdAt: new Date().toISOString(), ...payload },
+      ],
     }
-    return reflectionId
+    return weeklyReflectionId
   }
   return request<string>(`/dashboards/${dashboardId}/reflection`, {
     method: 'POST',
@@ -73,7 +75,7 @@ export async function updateReflection(
     weeklyDetailMock = {
       ...weeklyDetailMock,
       weeklyReflections: weeklyDetailMock.weeklyReflections.map((r) =>
-        r.reflectionId === reflectionId ? { ...r, ...payload } : r,
+        r.weeklyReflectionId === reflectionId ? { ...r, ...payload } : r,
       ),
     }
     return reflectionId
@@ -113,7 +115,7 @@ export async function createMonthlyReflection(
     const createdAt = new Date().toISOString()
     monthlyDetailMock = {
       ...monthlyDetailMock,
-      weeklyReflections: [{ reflectionId: weeklyReflectionId, ...payload }],
+      weeklyReflections: [{ weeklyReflectionId, dashboardId, createdAt, ...payload }],
     }
     return { weeklyReflectionId, ...payload, createdAt }
   }
