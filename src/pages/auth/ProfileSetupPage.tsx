@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { OnboardingCard } from '@/components/auth/OnboardingCard'
+import { Input1 } from '@/components/common/Input/Input1'
+import { Chip } from '@/components/common/Chip/Chip'
 import {
   CAREER_OPTIONS,
   CAREER_TO_YEARS_OF_SERVICE,
@@ -12,7 +14,11 @@ import ProfileDefaultIcon from '@/assets/icons/profile-default.svg?react'
 import CameraBadgeIcon from '@/assets/icons/camera-badge.svg?react'
 import { useNavigate } from 'react-router-dom'
 import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
+import { homeQueryKeys } from '@/api/home/home'
 import { useGetProfile } from '@/hooks/useUserQueries'
+
+const NICKNAME_INVALID_CHARS_REGEX = /[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9\s]/g
+const sanitizeNickname = (value: string) => value.replace(NICKNAME_INVALID_CHARS_REGEX, '')
 
 export const ProfileSetupPage = () => {
   const navigate = useNavigate()
@@ -78,6 +84,8 @@ export const ProfileSetupPage = () => {
         { queryKey: userQueryKeys.profile() },
         { throwOnError: true },
       )
+      // 홈 화면 캐시도 함께 무효화해야 이동 직후 이름이 정상 반영됨
+      await queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
     } catch {
       alert('프로필 등록에 실패했어요. 다시 시도해 주세요.')
     } finally {
@@ -105,7 +113,7 @@ export const ProfileSetupPage = () => {
         nextDisabled={!name.trim()}
         onNext={() => setStep(1)}
       >
-        <div className="flex w-full flex-col items-center gap-12">
+        <div className="flex w-full flex-col items-center gap-20">
           <button
             type="button"
             className="relative"
@@ -116,12 +124,12 @@ export const ProfileSetupPage = () => {
               <img
                 src={photoUrl}
                 alt="프로필 미리보기"
-                className="size-[160px] rounded-full object-cover"
+                className="size-40 rounded-full object-cover"
               />
             ) : (
               <ProfileDefaultIcon width={160} height={160} />
             )}
-            <CameraBadgeIcon width={40} height={40} className="absolute bottom-1 right-1" />
+            <CameraBadgeIcon width={52} height={52} className="absolute -bottom-0.5 -right-0.5" />
           </button>
           <input
             ref={fileInputRef}
@@ -131,15 +139,22 @@ export const ProfileSetupPage = () => {
             onChange={(e) => handlePhotoChange(e.target.files?.[0])}
           />
 
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="닉네임을 입력해 주세요"
-            aria-label="이름"
-            maxLength={5}
-            className="w-full rounded-lg border border-(--color-border-subtle) px-5 py-4 text-(--color-text-default) placeholder:text-(--color-text-tertiary) focus:border-(--color-border-brand) focus:outline-none"
-          />
+          <div className="flex w-full flex-col gap-2">
+            <Input1
+              type="text"
+              value={name}
+              onChange={(e) => setName(sanitizeNickname(e.target.value))}
+              placeholder="닉네임을 입력해 주세요"
+              aria-label="닉네임"
+              maxLength={10}
+            />
+            <div className="flex w-full flex-col rounded-lg bg-(--color-bg-secondary) p-2 [font-size:var(--font-size-body-4)] leading-(--line-height-body) text-(--color-text-tertiary)">
+              <ul className="list-disc pl-5">
+                <li>공백 포함 10글자 이내로 입력해 주세요</li>
+                <li>특수문자를 제외한 숫자, 한글, 영문만 입력할 수 있어요</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </OnboardingCard>
     )
@@ -164,20 +179,15 @@ export const ProfileSetupPage = () => {
       >
         <div className="flex w-full flex-col gap-5">
           {CAREER_OPTIONS.map((option) => (
-            <button
+            <Chip
               key={option}
-              type="button"
-              aria-pressed={career === option}
+              variant="rectangle"
+              focused={career === option}
               onClick={() => setCareer(option)}
-              className={[
-                'flex h-[56px] w-full items-center justify-center rounded-lg px-5 transition-colors duration-100 ease-out',
-                career === option
-                  ? 'bg-(--primitive-primary-300) text-(--color-text-default)'
-                  : 'bg-(--color-bg-secondary) text-(--color-text-default) hover:bg-(--color-bg-tertiary)',
-              ].join(' ')}
+              className="w-full"
             >
               {option}
-            </button>
+            </Chip>
           ))}
         </div>
       </OnboardingCard>
@@ -201,22 +211,16 @@ export const ProfileSetupPage = () => {
       onPrev={() => setStep(1)}
       onNext={handleComplete}
     >
-      <div className="flex w-full flex-wrap content-start gap-5">
+      <div className="flex w-full flex-wrap content-start gap-x-5 gap-y-6">
         {JOB_OPTIONS.map((option) => (
-          <button
+          <Chip
             key={option}
-            type="button"
-            aria-pressed={job === option}
+            variant="rectangle"
+            focused={job === option}
             onClick={() => setJob(option)}
-            className={[
-              'flex h-[56px] items-center justify-center rounded-lg px-5 transition-colors duration-100 ease-out',
-              job === option
-                ? 'bg-(--primitive-primary-300) text-(--color-text-default)'
-                : 'bg-(--color-bg-secondary) text-(--color-text-default) hover:bg-(--color-bg-tertiary)',
-            ].join(' ')}
           >
             {option}
-          </button>
+          </Chip>
         ))}
       </div>
     </OnboardingCard>

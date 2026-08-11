@@ -1,4 +1,5 @@
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
+import { TextButton } from '@/components/common/Button/TextButton'
 import type { AgreementType, SignupAgreement } from '@/types/auth'
 
 export interface TermsState {
@@ -70,46 +71,47 @@ export const TermsSection = ({ terms, onChange }: TermsSectionProps) => {
   }
 
   return (
-    <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold text-(--color-text-default)">약관 동의</h2>
+    <section className="flex flex-col gap-5">
+      <h2 className="[font-size:var(--font-size-heading-4)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
+        약관 동의
+      </h2>
 
-      <Checkbox
-        label={<span className="font-bold">아래 내용에 모두 동의합니다</span>}
-        checked={allChecked}
-        onChange={(e) => handleAllChange(e.target.checked)}
-      />
+      <div className="flex flex-col gap-10">
+        <Checkbox
+          label={<span className="font-bold">아래 내용에 모두 동의합니다</span>}
+          checked={allChecked}
+          onChange={(e) => handleAllChange(e.target.checked)}
+        />
 
-      <div className="h-px w-full bg-(--color-border-subtle)" />
-
-      {TERM_ITEMS.map(({ key, required, label, hasDetail }) => (
-        <div key={key} className="flex items-center justify-between">
-          <Checkbox
-            label={
-              <span>
-                <span
-                  className={
-                    required ? 'text-(--color-button-default)' : 'text-(--color-text-tertiary)'
-                  }
-                >
-                  ({required ? '필수' : '선택'})
-                </span>{' '}
-                {label}
-              </span>
-            }
-            checked={terms[key]}
-            onChange={(e) => handleItemChange(key, e.target.checked)}
-          />
-          {hasDetail && (
-            // TODO(#18): 약관 전문 모달/페이지 연결
-            <button
-              type="button"
-              className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-button-default)"
-            >
-              전체보기
-            </button>
-          )}
+        <div className="flex flex-col gap-4">
+          {TERM_ITEMS.map(({ key, required, label, hasDetail }) => (
+            <div key={key} className="flex items-center justify-between">
+              <Checkbox
+                label={
+                  <span>
+                    <span
+                      className={
+                        required ? 'text-(--color-button-default)' : 'text-(--color-text-tertiary)'
+                      }
+                    >
+                      ({required ? '필수' : '선택'})
+                    </span>{' '}
+                    {label}
+                  </span>
+                }
+                checked={terms[key]}
+                onChange={(e) => handleItemChange(key, e.target.checked)}
+              />
+              {hasDetail && (
+                // TODO(#18): 약관 전문 모달/페이지 연결
+                <TextButton variant="text_only" size="small">
+                  전체보기
+                </TextButton>
+              )}
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
     </section>
   )
 }

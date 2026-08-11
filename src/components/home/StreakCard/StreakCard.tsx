@@ -34,7 +34,7 @@ export function StreakCard({ streak, weekRecord, className, ...rest }: StreakCar
         나의 기록 현황
       </span>
 
-      <div className="flex flex-col gap-10 flex-1 items-center py-4">
+      <div className="flex flex-col gap-5 flex-1 items-center py-4">
         {/* 연속 기록 */}
         <div className="flex gap-2 items-start justify-center w-full">
           <FireIcon

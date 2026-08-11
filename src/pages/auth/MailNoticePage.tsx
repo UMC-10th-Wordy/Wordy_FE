@@ -13,13 +13,17 @@ export const MailNoticePage = () => {
     <div className="flex min-h-screen items-center justify-center bg-(--color-bg-secondary) px-6 py-16">
       <div className="flex w-full max-w-[800px] flex-col gap-[60px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-[80px] shadow-xl shadow-black/5">
         <div className="flex flex-col gap-3">
-          <LogoIcon className="mb-3 h-7 w-auto self-start" />
-          <h1 className="text-3xl font-bold text-(--color-text-default)">메일 인증 알림</h1>
-          <p className="leading-relaxed text-(--color-text-tertiary)">
-            환영합니다! 워디를 시작해볼까요?
-            <br />
-            계정을 활성화하려면 아래 버튼을 눌러 메일을 인증해 주세요
-          </p>
+          <LogoIcon className="h-7 w-auto self-start" />
+          <div className="flex flex-col">
+            <h1 className="[font-size:var(--font-size-heading-1)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
+              메일 인증 알림
+            </h1>
+            <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) text-(--color-text-tertiary)">
+              환영합니다! 워디를 시작해볼까요?
+              <br />
+              계정을 활성화하려면 아래 버튼을 눌러 메일을 인증해 주세요
+            </p>
+          </div>
         </div>
 
         <TextButton variant="fill" size="large" fullWidth onClick={handleVerify}>

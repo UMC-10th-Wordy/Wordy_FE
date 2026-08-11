@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from 'react'
+import type { ButtonHTMLAttributes } from 'react'
 import ProjectTag from '@/components/todo/ProjectTag'
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
 
@@ -9,7 +9,10 @@ export interface RecentRecordTask {
   title: string
 }
 
-export interface RecentRecordCardProps extends HTMLAttributes<HTMLDivElement> {
+export interface RecentRecordCardProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'type'
+> {
   date: string
   totalCount: number
   tasks: RecentRecordTask[]
@@ -23,13 +26,15 @@ export function RecentRecordCard({
   ...rest
 }: RecentRecordCardProps) {
   return (
-    <div
+    <button
+      type="button"
       className={[
-        'flex flex-col gap-4 p-4 rounded-(--scale-16)',
+        'flex flex-col gap-4 p-4 rounded-(--scale-16) w-full text-left',
         'border-[0.5px] border-(--color-border-brand-subtle)',
         'drop-shadow-[0px_1px_2.5px_rgba(0,0,0,0.1)]',
         'bg-(--color-bg-default) hover:bg-(--color-bg-secondary)',
         'transition-colors duration-100 cursor-pointer',
+        'focus-visible:outline-2 focus-visible:outline-(--color-border-brand) focus-visible:outline-offset-2',
         className,
       ]
         .filter(Boolean)
@@ -59,6 +64,6 @@ export function RecentRecordCard({
           </div>
         ))}
       </div>
-    </div>
+    </button>
   )
 }
