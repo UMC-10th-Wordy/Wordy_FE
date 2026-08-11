@@ -45,10 +45,10 @@ export const EmailVerificationPage = () => {
   }
 
   const illustrationByStatus = {
-    request: <EmailRequestIcon width={180} height={180} />,
-    loading: <EmailRequestIcon width={180} height={180} />,
-    success: <EmailSuccessIcon width={180} height={180} />,
-    fail: <EmailFailIcon width={180} height={180} />,
+    request: <EmailRequestIcon width={180} height={195} />,
+    loading: <EmailRequestIcon width={180} height={195} />,
+    success: <EmailSuccessIcon width={180} height={201} />,
+    fail: <EmailFailIcon width={180} height={201} />,
   }
   const illustration = illustrationByStatus[status]
 
@@ -99,15 +99,12 @@ export const EmailVerificationPage = () => {
           </TextButton>
         }
         footer={
-          <div className="flex items-center justify-center gap-3 [font-size:var(--font-size-body-3)] text-(--color-text-tertiary)">
+          <div className="flex items-center justify-center gap-2 [font-size:var(--font-size-body-3)] text-(--color-text-tertiary)">
             <span>제대로 인증되지 않나요?</span>
             {/* TODO(#35): 문의하기 연결 */}
-            <button
-              type="button"
-              className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-button-default)"
-            >
+            <TextButton variant="text_only" size="small">
               문의하기
-            </button>
+            </TextButton>
           </div>
         }
       />
@@ -134,16 +131,12 @@ export const EmailVerificationPage = () => {
         </TextButton>
       }
       footer={
-        <div className="flex items-center justify-center gap-3 [font-size:var(--font-size-body-3)] text-(--color-text-tertiary)">
+        <div className="flex items-center justify-center gap-2 [font-size:var(--font-size-body-3)] text-(--color-text-tertiary)">
           <span>이메일이 잘못되었나요?</span>
           {/* TODO(#35): 회원가입 페이지로 돌아가기 라우팅 연결 */}
-          <button
-            type="button"
-            onClick={() => navigate('/signup')}
-            className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-button-default)"
-          >
+          <TextButton variant="text_only" size="small" onClick={() => navigate('/signup')}>
             이메일 주소 바꾸기
-          </button>
+          </TextButton>
         </div>
       }
     />

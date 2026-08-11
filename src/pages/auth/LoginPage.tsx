@@ -78,7 +78,7 @@ export const LoginPage = () => {
     <div className="flex min-h-screen items-center justify-center bg-(--color-bg-secondary) px-6 py-8">
       <div className="flex w-full max-w-[800px] flex-col gap-8 rounded-[32px] bg-(--color-bg-default) px-[100px] py-10 shadow-xl shadow-black/5 [@media(min-height:960px)]:gap-[52px] [@media(min-height:960px)]:py-[80px]">
         <div className="flex flex-col">
-          <LogoIcon className="mb-4 h-8 w-auto self-start" />
+          <LogoIcon className="mb-3 h-7 w-auto self-start" />
           <h1 className="[font-size:var(--font-size-heading-1)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
             로그인
           </h1>
@@ -92,7 +92,7 @@ export const LoginPage = () => {
             e.preventDefault()
             handleSubmit()
           }}
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
         >
           <Input1
             type="email"
@@ -110,21 +110,25 @@ export const LoginPage = () => {
             placeholder="비밀번호를 입력해주세요"
             error={submitted && passwordError ? passwordError : undefined}
           />
-          <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <Checkbox
               label="로그인 정보 기억하기"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
             />
             {/* TODO: 비밀번호 찾기 페이지 연결 */}
-            <button
-              type="button"
-              className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-button-default)"
-            >
+            <TextButton variant="text_only" size="small">
               비밀번호 찾기
-            </button>
+            </TextButton>
           </div>
-          <TextButton type="submit" variant="fill" size="large" fullWidth disabled={isPending}>
+          <TextButton
+            type="submit"
+            variant="fill"
+            size="large"
+            fullWidth
+            disabled={isPending}
+            className="mt-3"
+          >
             로그인 하기
           </TextButton>
         </form>
@@ -142,25 +146,21 @@ export const LoginPage = () => {
             variant="stroke_neutral"
             size="large"
             fullWidth
-            iconLeft={<GoogleIcon width={20} height={20} />}
+            iconLeft={<GoogleIcon width={32} height={32} />}
             onClick={handleGoogleLogin}
-            className="gap-2.5 border-[#747775] hover:border-[#747775] active:border-[#747775]"
+            className="border-[#747775] hover:border-[#747775] active:border-[#747775]"
           >
             Google로 시작하기
           </TextButton>
         </div>
 
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-2 [@media(min-height:960px)]:-mt-3">
           <span className="[font-size:var(--font-size-body-3)] font-normal leading-(--line-height-body) text-(--color-text-tertiary)">
             아직 회원이 아니신가요?
           </span>
-          <button
-            type="button"
-            onClick={() => navigate('/signup')}
-            className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-text-brand)"
-          >
+          <TextButton variant="text_only" size="small" onClick={() => navigate('/signup')}>
             회원가입
-          </button>
+          </TextButton>
         </div>
       </div>
 

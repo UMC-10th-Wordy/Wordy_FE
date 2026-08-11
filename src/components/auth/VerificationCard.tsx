@@ -18,14 +18,16 @@ export const VerificationCard = ({
   return (
     <div className="flex min-h-screen items-center justify-center bg-(--color-bg-secondary) px-6 py-16">
       <div className="flex w-full max-w-[800px] flex-col items-center gap-[60px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-[80px] shadow-xl shadow-black/5">
-        <div className="flex flex-col items-center gap-8">
-          {illustration}
-          <div className="flex flex-col items-center gap-4 text-center">
-            <h1 className="text-3xl font-bold text-(--color-text-default)">{title}</h1>
-            <p className="leading-relaxed text-(--color-text-tertiary)">{description}</p>
-          </div>
+        {illustration}
+        <div className="flex flex-col items-center gap-5 text-center">
+          <h1 className="[font-size:var(--font-size-heading-1)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
+            {title}
+          </h1>
+          <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) text-(--color-text-tertiary)">
+            {description}
+          </p>
         </div>
-        <div className="flex w-full flex-col items-center gap-6">
+        <div className="flex w-full flex-col items-center gap-5">
           {action}
           {footer}
         </div>

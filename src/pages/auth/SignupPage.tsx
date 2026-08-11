@@ -78,7 +78,7 @@ export const SignupPage = () => {
     <div className="flex min-h-screen justify-center bg-(--color-bg-secondary) px-6 py-16">
       <div className="flex h-fit w-full max-w-[800px] flex-col gap-[52px] rounded-[32px] bg-(--color-bg-default) px-[100px] py-10 [@media(min-height:960px)]:py-[80px] shadow-xl shadow-black/5">
         <header>
-          <LogoIcon className="mb-6 h-7 w-auto" />
+          <LogoIcon className="mb-3 h-7 w-auto" />
           <h1 className="[font-size:var(--font-size-heading-1)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
             회원가입
           </h1>
@@ -92,8 +92,10 @@ export const SignupPage = () => {
           }}
           className="flex flex-col gap-[52px]"
         >
-          <section className="flex flex-col gap-4">
-            <h2 className="text-lg font-bold text-(--color-text-default)">기본 정보</h2>
+          <section className="flex flex-col gap-5">
+            <h2 className="[font-size:var(--font-size-heading-4)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
+              기본 정보
+            </h2>
 
             <Input1
               type="email"
@@ -154,17 +156,13 @@ export const SignupPage = () => {
           </TextButton>
         </form>
 
-        <div className="flex items-center justify-center gap-3">
+        <div className="-mt-3 flex items-center justify-center gap-2">
           <span className="[font-size:var(--font-size-body-3)] font-normal leading-(--line-height-body) text-(--color-text-tertiary)">
             이미 회원이신가요?
           </span>
-          <button
-            type="button"
-            onClick={() => navigate('/login')}
-            className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-text-brand)"
-          >
+          <TextButton variant="text_only" size="small" onClick={() => navigate('/login')}>
             로그인
-          </button>
+          </TextButton>
         </div>
       </div>
 

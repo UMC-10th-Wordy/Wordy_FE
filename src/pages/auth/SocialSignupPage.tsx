@@ -57,7 +57,7 @@ export const SocialSignupPage = () => {
     <div className="flex min-h-screen items-center justify-center bg-(--color-bg-secondary) px-6 py-8">
       <div className="flex w-full max-w-[800px] flex-col gap-8 rounded-[32px] bg-(--color-bg-default) px-[100px] py-10 shadow-xl shadow-black/5 [@media(min-height:960px)]:gap-[52px] [@media(min-height:960px)]:py-[80px]">
         <div className="flex flex-col">
-          <LogoIcon className="mb-4 h-8 w-auto self-start" />
+          <LogoIcon className="mb-3 h-7 w-auto self-start" />
           <h1 className="[font-size:var(--font-size-heading-1)] font-semibold leading-(--line-height-heading) text-(--color-text-default)">
             회원가입
           </h1>
@@ -78,17 +78,13 @@ export const SocialSignupPage = () => {
           계정 생성하기
         </TextButton>
 
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-2 [@media(min-height:960px)]:-mt-3">
           <span className="[font-size:var(--font-size-body-3)] font-normal leading-(--line-height-body) text-(--color-text-tertiary)">
             이미 회원이신가요?
           </span>
-          <button
-            type="button"
-            onClick={() => navigate('/login')}
-            className="[font-size:var(--font-size-body-4)] font-medium leading-(--line-height-body) text-(--color-button-default)"
-          >
+          <TextButton variant="text_only" size="small" onClick={() => navigate('/login')}>
             로그인
-          </button>
+          </TextButton>
         </div>
       </div>
 
