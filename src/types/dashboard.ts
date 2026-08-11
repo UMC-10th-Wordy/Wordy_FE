@@ -46,10 +46,12 @@ export interface TagAnalysisDto {
 }
 
 export interface WeeklyReflectionDto {
-  reflectionId: string
+  weeklyReflectionId: string
   workSummary: string
   resourcesUsed: string
   learning: string
+  createdAt: string
+  dashboardId: string
 }
 
 export interface PerformanceItemDto {
