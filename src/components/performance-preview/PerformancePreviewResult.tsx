@@ -257,7 +257,7 @@ export const PerformancePreviewResult = ({
           </TextButton>
         </div>
       )}
-      <ToastContainer toasts={toasts} />
+      <ToastContainer toasts={toasts} align="left" contained />
     </div>
   )
 }
