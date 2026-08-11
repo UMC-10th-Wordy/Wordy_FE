@@ -6,6 +6,8 @@ import type {
 import type { DailyEntryDetailResponse } from '@/types/diaryDetail'
 import type { DailyEntrySearchItem } from '@/types/diarySearch'
 
+const MOCK_WORKSPACE_ID = 'a3c59e7f-956d-11f1-871e-42010ab20002'
+
 export const DAILY_ENTRIES_SUMMARY_RESPONSE_MOCK = {
   success: true,
   code: 'S200',
@@ -176,6 +178,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '온보딩 사용자 흐름 정리',
         extraTaskCount: 4,
         summary: '신규 사용자의 주요 이탈 구간을 기준으로 진입 흐름을 개선했어요.',
+        converted: false,
       },
       {
         dailyEntryId: 'daily-entry-2026-07-24',
@@ -190,6 +193,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '경쟁 서비스 리서치',
         extraTaskCount: 3,
         summary: '유사 서비스의 핵심 기능과 온보딩 구조를 비교했어요.',
+        converted: false,
       },
       {
         dailyEntryId: 'daily-entry-2026-07-18',
@@ -204,6 +208,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '온보딩 QA 테스트 진행',
         extraTaskCount: 5,
         summary: '신규 사용자 흐름을 점검하고 주요 오류 항목을 정리했어요.',
+        converted: false,
       },
     ],
   },
@@ -225,6 +230,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: 'Product Strategy Alignment 회의 준비',
         extraTaskCount: 2,
         summary: '회의 자료와 주요 논의 내용을 정리하고 프로젝트 문서를 마무리했어요.',
+        converted: false,
       },
       {
         dailyEntryId: 'daily-entry-2026-06-17',
@@ -239,6 +245,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '업무 데이터 분석',
         extraTaskCount: 3,
         summary: '기존 업무 데이터를 분석해 반복적으로 발생하는 작업을 분류했어요.',
+        converted: false,
       },
     ],
   },
@@ -260,6 +267,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '팀 업무 가이드 문서화',
         extraTaskCount: 2,
         summary: '팀에서 반복적으로 사용하는 업무 절차를 문서로 정리했어요.',
+        converted: false,
       },
       {
         dailyEntryId: 'daily-entry-2026-05-12',
@@ -274,6 +282,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '주간 업무 공유 회의',
         extraTaskCount: 3,
         summary: '진행 중인 업무의 상태와 다음 주 우선순위를 공유했어요.',
+        converted: false,
       },
     ],
   },
@@ -295,6 +304,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '신규 프로젝트 기능 정의',
         extraTaskCount: 4,
         summary: '사용자 문제를 기준으로 신규 프로젝트의 핵심 기능을 정의했어요.',
+        converted: false,
       },
       {
         dailyEntryId: 'daily-entry-2026-04-15',
@@ -309,6 +319,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '주요 화면 와이어프레임 제작',
         extraTaskCount: 2,
         summary: '핵심 사용자 흐름을 기준으로 주요 화면 구조를 설계했어요.',
+        converted: false,
       },
     ],
   },
@@ -330,6 +341,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '경쟁 서비스 기능 조사',
         extraTaskCount: 3,
         summary: '경쟁 서비스의 주요 기능과 차별화 요소를 비교했어요.',
+        converted: false,
       },
     ],
   },
@@ -351,6 +363,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '프로젝트 킥오프 회의',
         extraTaskCount: 3,
         summary: '프로젝트 목표와 팀원별 역할, 진행 일정을 공유했어요.',
+        converted: false,
       },
     ],
   },
@@ -372,6 +385,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
         mainTaskTitle: '연간 업무 목표 설정',
         extraTaskCount: 2,
         summary: '연간 목표를 기준으로 분기별 주요 업무 계획을 정리했어요.',
+        converted: false,
       },
     ],
   },
@@ -380,6 +394,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
 export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   {
     dailyEntryId: 'daily-entry-2026-06-21',
+    workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-21',
     tags: [
       {
@@ -391,6 +406,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-long-title-2026-06-20',
+    workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-20',
     tags: [
       {
@@ -403,12 +419,14 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-06-19',
+    workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-19',
     tags: [],
     title: 'Product Strategy Alignment 회의 준비',
   },
   {
     dailyEntryId: 'daily-entry-2026-06-18',
+    workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-18',
     tags: [
       {
@@ -420,6 +438,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-06-15',
+    workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-15',
     tags: [
       {
@@ -431,6 +450,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-06-03',
+    workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-03',
     tags: [
       {
@@ -442,6 +462,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-02-21',
+    workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-02-21',
     tags: [
       {
@@ -453,12 +474,14 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-01-21',
+    workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-01-21',
     tags: [],
     title: 'Product Strategy Alignment 회의 준비',
   },
   {
     dailyEntryId: 'daily-entry-2026-01-20',
+    workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-01-20',
     tags: [],
     title: '주간 회의 내용 정리 및 다음 업무 계획 수립',
