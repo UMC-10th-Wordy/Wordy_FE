@@ -36,7 +36,8 @@ export function Scrollbar({ children, className, scrollbarClassName, inline }: S
     const newThumbHeight = Math.min(Math.max(trackHeight * ratio, 32), trackHeight)
     const maxScroll = scrollHeight - clientHeight
     const maxThumbTop = trackHeight - newThumbHeight
-    const newThumbTop = maxScroll > 0 && maxThumbTop > 0 ? (scrollTop / maxScroll) * maxThumbTop : 0
+    const rawThumbTop = maxScroll > 0 && maxThumbTop > 0 ? (scrollTop / maxScroll) * maxThumbTop : 0
+    const newThumbTop = Math.min(Math.max(rawThumbTop, 0), maxThumbTop)
 
     setIsScrollable(scrollHeight > clientHeight)
     setThumbHeight(newThumbHeight)
@@ -138,7 +139,7 @@ export function Scrollbar({ children, className, scrollbarClassName, inline }: S
       <div
         ref={contentRef}
         className={[
-          'overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden',
+          'overflow-y-scroll overscroll-contain scrollbar-none [&::-webkit-scrollbar]:hidden',
           inline ? 'flex-1 min-w-0' : 'flex flex-col h-full',
         ].join(' ')}
       >
