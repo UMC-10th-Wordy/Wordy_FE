@@ -54,10 +54,10 @@
     --color-button-disabled: var(--primitive-neutral-200);
 
     /* Chip */
-    --color-chip-default: var(--primitive-primary-200);
-    --color-chip-hover: var(--primitive-primary-300);
-    --color-chip-pressed: var(--primitive-primary-300);
-    --color-chip-focused: var(--primitive-primary-700);
+    --color-chip-default: var(--primitive-neutral-100);
+    --color-chip-hover: var(--primitive-primary-200);
+    --color-chip-pressed: var(--primitive-primary-200);
+    --color-chip-focused: var(--primitive-primary-300);
     --color-chip-disabled: var(--primitive-neutral-200);
 
     /* Sidebar */

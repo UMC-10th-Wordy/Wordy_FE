@@ -29,8 +29,9 @@ const chip = cva(
           'bg-(--color-chip-default) text-(--color-text-default)',
           'hover:bg-(--color-chip-hover)',
           'active:bg-(--color-chip-pressed)',
-          'focus-visible:bg-(--color-chip-focused) focus-visible:font-semibold focus-visible:text-(--color-text-brand)',
-          'disabled:bg-(--color-chip-disabled) disabled:text-(--color-text-disabled)',
+          'focus-visible:bg-(--color-chip-focused)',
+          'focus-visible:outline-2 focus-visible:outline-(--color-border-brand) focus-visible:outline-offset-2',
+          'disabled:bg-(--color-bg-disabled) disabled:text-(--color-text-disabled)',
         ],
         small_round: [
           'rounded-(--scale-1000)',
@@ -44,9 +45,21 @@ const chip = cva(
           'disabled:bg-(--color-chip-disabled) disabled:border-(--color-border-disabled) disabled:font-medium disabled:text-(--color-text-disabled)',
         ],
       },
+      focused: {
+        true: '',
+        false: '',
+      },
     },
+    compoundVariants: [
+      {
+        variant: 'rectangle',
+        focused: true,
+        class: 'bg-(--color-chip-focused) hover:bg-(--color-chip-focused)',
+      },
+    ],
     defaultVariants: {
       variant: 'round',
+      focused: false,
     },
   },
 )
@@ -55,12 +68,19 @@ export type ChipVariant = NonNullable<VariantProps<typeof chip>['variant']>
 
 export interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ChipVariant
+  /** Figma Chip 컴포넌트의 states="Focused"에 대응 (클릭으로 선택된 상태를 표시할 때 사용) */
+  focused?: boolean
   children?: ReactNode
 }
 
-export function Chip({ variant, className, children, ...rest }: ChipProps) {
+export function Chip({ variant, focused, className, children, ...rest }: ChipProps) {
   return (
-    <button type="button" className={chip({ variant, className })} {...rest}>
+    <button
+      type="button"
+      aria-pressed={focused}
+      className={chip({ variant, focused, className })}
+      {...rest}
+    >
       {children}
     </button>
   )
