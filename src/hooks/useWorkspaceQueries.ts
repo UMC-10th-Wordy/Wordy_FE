@@ -7,12 +7,22 @@ import {
   updateWorkspace,
   workspaceQueryKeys,
 } from '@/api/workspace/workspace'
+import { useWorkspaceStore } from '@/store/workspaceStore'
 
 export const useGetWorkspaces = () => {
   return useQuery({
     queryKey: workspaceQueryKeys.lists(),
     queryFn: getWorkspaces,
   })
+}
+
+export const useActiveWorkspaceId = () => {
+  const { data: workspacesData } = useGetWorkspaces()
+  const { selectedWorkspaceId } = useWorkspaceStore()
+  const defaultWorkspaceId =
+    workspacesData?.find((w) => w.isDefault)?.workspaceId ?? workspacesData?.[0]?.workspaceId ?? ''
+
+  return selectedWorkspaceId ?? defaultWorkspaceId
 }
 
 export const useCreateWorkspace = () => {
