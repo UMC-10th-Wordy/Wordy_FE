@@ -15,12 +15,19 @@ import { SettingAccordion } from '../SettingAccordion/SettingAccordion'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 import CameraIcon from '@/assets/icons/camera.svg?react'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
+import EditIcon from '@/assets/icons/edit.svg?react'
+import CheckIcon from '@/assets/icons/check.svg?react'
 
 export type SettingTab = 'profile' | 'notification'
 type InnerView = 'main' | 'password'
 
 // 영문, 숫자, 특수문자 모두 포함 8자 이상 (회원가입 규칙과 동일)
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/
+
+const NICKNAME_MAX_LENGTH = 10
+const NICKNAME_INVALID_CHARS_REGEX = /[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9\s]/g
+const sanitizeNickname = (value: string) =>
+  value.replace(NICKNAME_INVALID_CHARS_REGEX, '').slice(0, NICKNAME_MAX_LENGTH)
 
 export interface NotificationSettings {
   emailMarketing: boolean
@@ -81,6 +88,8 @@ export function SettingPanel({
   const [currentTab, setCurrentTab] = useState<SettingTab>(initialTab)
   const [innerView, setInnerView] = useState<InnerView>('main')
   const [name, setName] = useState(profileName)
+  const [isEditingName, setIsEditingName] = useState(false)
+  const nameInputRef = useRef<HTMLInputElement>(null)
   const [job, setJob] = useState(profileJob)
   const [career, setCareer] = useState(profileCareer)
   const [openDropdown, setOpenDropdown] = useState<'job' | 'career' | null>(null)
@@ -104,6 +113,10 @@ export function SettingPanel({
       setCareerRect(careerAnchorRef.current.getBoundingClientRect())
     }
   }, [openDropdown])
+
+  useEffect(() => {
+    if (isEditingName) nameInputRef.current?.focus()
+  }, [isEditingName])
 
   useEffect(() => {
     if (!openDropdown) return
@@ -137,6 +150,7 @@ export function SettingPanel({
     setAvatarFile(file)
   }
 
+  const nameTrimmed = name.trim()
   const profileChanged =
     name !== profileName || job !== profileJob || career !== profileCareer || avatarFile !== null
 
@@ -309,18 +323,73 @@ export function SettingPanel({
                   {/* 입력 필드 */}
                   <div className="flex flex-col gap-3 flex-1 min-w-0 isolate">
                     {/* 닉네임 */}
-                    <div className="flex items-center gap-5">
-                      <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-tertiary) text-right w-17 shrink-0">
-                        닉네임
-                      </span>
-                      <div className="flex-1 bg-(--color-bg-brand-subtle) border-[0.5px] border-(--color-border-brand-subtle) rounded-lg px-5 py-3">
-                        <input
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          maxLength={5}
-                          className="w-full bg-transparent outline-none [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)"
-                        />
+                    <div className="flex flex-col gap-2">
+                      <div
+                        className={`flex items-center gap-5 ${isEditingName ? 'h-11' : 'h-13.25'}`}
+                      >
+                        <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-tertiary) text-right w-17 shrink-0">
+                          닉네임
+                        </span>
+                        {isEditingName ? (
+                          <div className="flex flex-1 items-center gap-2 h-full min-w-0">
+                            <div className="flex flex-1 items-center h-full min-w-0 bg-(--color-bg-brand-subtle) border-[0.5px] border-(--color-border-brand) rounded-lg px-5">
+                              <input
+                                ref={nameInputRef}
+                                value={name}
+                                onChange={(e) => setName(sanitizeNickname(e.target.value))}
+                                maxLength={NICKNAME_MAX_LENGTH}
+                                aria-label="닉네임"
+                                aria-describedby="nickname-edit-hint"
+                                className="w-full bg-transparent outline-none [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)"
+                              />
+                            </div>
+                            <IconButton
+                              variant="stroke"
+                              size="medium"
+                              icon={
+                                <span className="flex size-full items-center justify-center">
+                                  <span className="size-4.5">
+                                    <CheckIcon className="size-full" />
+                                  </span>
+                                </span>
+                              }
+                              aria-label="닉네임 수정 완료"
+                              disabled={nameTrimmed.length === 0}
+                              onClick={() => setIsEditingName(false)}
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)">
+                              {name}
+                            </span>
+                            <IconButton
+                              variant="text_neutral"
+                              size="small"
+                              icon={<EditIcon className="size-6" />}
+                              aria-label="닉네임 수정"
+                              onClick={() => setIsEditingName(true)}
+                            />
+                          </div>
+                        )}
                       </div>
+                      {isEditingName && (
+                        <div className="flex items-start pl-22 w-full">
+                          <div
+                            id="nickname-edit-hint"
+                            className="flex-1 min-w-0 bg-(--color-bg-secondary) p-2 rounded-lg"
+                          >
+                            <ul className="list-disc pl-5 space-y-1">
+                              <li className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) text-(--color-text-tertiary)">
+                                공백 포함 10글자 이내로 입력해 주세요
+                              </li>
+                              <li className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) text-(--color-text-tertiary)">
+                                특수문자를 제외한 숫자, 한글, 영문만 입력할 수 있어요
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {/* 이메일 */}
                     <div className="flex items-center gap-5 h-13.25">
@@ -390,7 +459,7 @@ export function SettingPanel({
                   variant="fill"
                   size="large"
                   onClick={handleSave}
-                  disabled={!profileChanged || isSubmitting}
+                  disabled={!profileChanged || nameTrimmed.length === 0 || isSubmitting}
                 >
                   프로필 저장하기
                 </TextButton>
