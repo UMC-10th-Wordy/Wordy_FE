@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react'
+import { useRef, useState, type CSSProperties } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import {
@@ -8,6 +8,7 @@ import {
   NotificationModal,
   WorkspaceModal,
 } from '@/components/sidebar'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
 import type { NotificationSettings } from '@/components/sidebar/SettingPanel/SettingPanel'
 import { INITIAL_WORKSPACES_MOCK } from '@/mocks/workspace/workspaceMock'
 import {
@@ -36,21 +37,22 @@ import CalendarIcon from '@/assets/icons/calendar.svg?react'
 import DocumentIcon from '@/assets/icons/document.svg?react'
 import DashboardIcon from '@/assets/icons/dashboard.svg?react'
 
-type ModalState = null | 'profile-menu' | 'setting' | 'notification' | 'workspace'
+type ModalState =
+  null | 'profile-menu' | 'setting' | 'notification' | 'workspace' | 'logout-confirm'
 
 const PAGE_ROUTES: Record<string, string> = {
   홈: '/',
   '오늘의 업무': '/today',
-  '일지 모아보기': '/records',
-  '성과 대시보드': '/dashboard',
+  '일지 히스토리': '/records',
+  '성과 리포트': '/dashboard',
 }
-type SidebarPageName = '홈' | '알림함' | '오늘의 업무' | '일지 모아보기' | '성과 대시보드'
+type SidebarPageName = '홈' | '알림함' | '오늘의 업무' | '일지 히스토리' | '성과 리포트'
 
 const PAGE_BY_PATH: Record<string, SidebarPageName> = {
   '/': '홈',
   '/today': '오늘의 업무',
-  '/records': '일지 모아보기',
-  '/dashboard': '성과 대시보드',
+  '/records': '일지 히스토리',
+  '/dashboard': '성과 리포트',
 }
 
 const FALLBACK_PLAN = '무료 요금제'
@@ -71,7 +73,7 @@ const NOTIFICATION_SETTING_KEY_MAP: Record<keyof NotificationSettings, Notificat
 
 const getPageByPath = (pathname: string): SidebarPageName => {
   if (pathname.startsWith('/records/')) {
-    return '일지 모아보기'
+    return '일지 히스토리'
   }
 
   return PAGE_BY_PATH[pathname] ?? '홈'
@@ -81,6 +83,9 @@ export function SidebarLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const [modal, setModal] = useState<ModalState>(null)
+  const workspaceTriggerRef = useRef<HTMLButtonElement>(null)
+  const notificationTriggerRef = useRef<HTMLButtonElement>(null)
+  const profileTriggerRef = useRef<HTMLButtonElement>(null)
   const [sidebarStatus, setSidebarStatus] = useState<'open' | 'closed'>(() => {
     const stored = localStorage.getItem('sidebarStatus')
     return stored === 'open' || stored === 'closed' ? stored : 'open'
@@ -194,12 +199,12 @@ export function SidebarLayout() {
       category: 'feature' as const,
     },
     {
-      page: '일지 모아보기' as const,
+      page: '일지 히스토리' as const,
       icon: <DocumentIcon className="size-6" />,
       category: 'feature' as const,
     },
     {
-      page: '성과 대시보드' as const,
+      page: '성과 리포트' as const,
       icon: <DashboardIcon className="size-6" />,
       category: 'feature' as const,
     },
@@ -233,9 +238,13 @@ export function SidebarLayout() {
           setModal((prev) => (prev === 'notification' ? null : 'notification'))
         }
         onProfileClick={() => setModal((prev) => (prev === 'profile-menu' ? null : 'profile-menu'))}
+        workspaceTriggerRef={workspaceTriggerRef}
+        notificationTriggerRef={notificationTriggerRef}
+        profileTriggerRef={profileTriggerRef}
         workspaceMenu={
           modal === 'workspace' ? (
             <WorkspaceModal
+              triggerRef={workspaceTriggerRef}
               workspaces={resolvedWorkspaces}
               selectedId={selectedWorkspaceId}
               onAdd={(name) => setWorkspaces((prev) => [...prev, { id: String(Date.now()), name }])}
@@ -262,6 +271,7 @@ export function SidebarLayout() {
         notificationMenu={
           modal === 'notification' ? (
             <NotificationModal
+              triggerRef={notificationTriggerRef}
               isEmpty={notificationItems.length === 0}
               notifications={notificationItems.map((item) => ({
                 title: item.title,
@@ -269,7 +279,7 @@ export function SidebarLayout() {
                 onClick: () => {
                   setModal(null)
                   readNotification(item.notificationId)
-                  navigate(PAGE_ROUTES['성과 대시보드'])
+                  navigate(PAGE_ROUTES['성과 리포트'])
                 },
               }))}
               onClose={() => setModal(null)}
@@ -279,6 +289,7 @@ export function SidebarLayout() {
         profileMenu={
           modal === 'profile-menu' ? (
             <ProfileModal
+              triggerRef={profileTriggerRef}
               email={profile.email}
               onTrash={() => {
                 setModal(null)
@@ -289,7 +300,7 @@ export function SidebarLayout() {
                 navigate('/plan')
               }}
               onSetting={() => setModal('setting')}
-              onLogout={handleLogout}
+              onLogout={() => setModal('logout-confirm')}
               onClose={() => setModal(null)}
             />
           ) : undefined
@@ -348,6 +359,16 @@ export function SidebarLayout() {
             }
           }}
           onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal === 'logout-confirm' && (
+        <ConfirmDialog
+          message="현재 계정에서 로그아웃 할까요?"
+          confirmLabel="로그아웃 하기"
+          cancelLabel="취소하기"
+          onConfirm={handleLogout}
+          onCancel={() => setModal(null)}
         />
       )}
     </div>

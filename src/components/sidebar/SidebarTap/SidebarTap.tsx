@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react'
 
 const sidebarTap = cva(
   [
@@ -29,6 +29,7 @@ export interface SidebarTapProps extends ButtonHTMLAttributes<HTMLButtonElement>
   label: string
   badge?: number
   state?: SidebarTapState
+  ref?: Ref<HTMLButtonElement>
 }
 
 export function SidebarTap({
@@ -37,10 +38,11 @@ export function SidebarTap({
   badge,
   state = 'default',
   className,
+  ref,
   ...rest
 }: SidebarTapProps) {
   return (
-    <button type="button" className={sidebarTap({ state, className })} {...rest}>
+    <button type="button" ref={ref} className={sidebarTap({ state, className })} {...rest}>
       <span className="flex flex-1 items-center gap-2 min-w-0">
         {icon && <span className="shrink-0 size-6 text-(--color-icon-secondary)">{icon}</span>}
         <span
