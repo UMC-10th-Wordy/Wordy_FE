@@ -28,6 +28,7 @@ import {
   useUpdateNotificationSetting,
 } from '@/hooks/useNotificationQueries'
 import {
+  useActiveWorkspaceId,
   useCreateWorkspace,
   useDeleteWorkspace,
   useGetWorkspaces,
@@ -35,6 +36,7 @@ import {
 } from '@/hooks/useWorkspaceQueries'
 import type { NotificationSettingKey } from '@/types/notification'
 import { ApiError, clearAuthTokens } from '@/lib/httpClient'
+import { useWorkspaceStore } from '@/store/workspaceStore'
 import HomeIcon from '@/assets/icons/home.svg?react'
 import BellIcon from '@/assets/icons/bell.svg?react'
 import BellDotIcon from '@/assets/icons/bell-dot.svg?react'
@@ -168,10 +170,8 @@ export function SidebarLayout() {
     name: w.name,
   }))
 
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null)
-  const defaultWorkspaceId =
-    workspacesData?.find((w) => w.isDefault)?.workspaceId ?? workspacesData?.[0]?.workspaceId ?? ''
-  const activeWorkspaceId = selectedWorkspaceId ?? defaultWorkspaceId
+  const { selectedWorkspaceId, setSelectedWorkspaceId } = useWorkspaceStore()
+  const activeWorkspaceId = useActiveWorkspaceId()
   const { data: notificationsData } = useGetNotifications()
   const { mutate: readNotification } = useReadNotification()
   const { data: notificationSettingsData } = useGetNotificationSettings()

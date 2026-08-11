@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Input2 } from '@/components/common/Input/Input2'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { useToast } from '@/hooks/useToast'
@@ -13,7 +13,6 @@ import {
   updateReflection,
 } from '@/api/dashboard/dashboard'
 import { saveDraft, getDraft } from '@/api/dashboard/dashboard'
-import { useEffect } from 'react'
 interface PlanRow {
   id: string
   content: string
@@ -145,7 +144,7 @@ export const WeeklyRetrospective = ({
     return () => {
       cancelled = true
     }
-  }, [period, initialReflection, dashboardId])
+  }, [])
 
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
@@ -153,6 +152,11 @@ export const WeeklyRetrospective = ({
   const [reflectionId, setReflectionId] = useState<string | null>(
     initialReflection?.reflectionId ?? null,
   )
+  const resolvedReflectionId = useMemo(() => {
+    if (initialReflection?.reflectionId) return initialReflection.reflectionId
+    return reflectionId
+  }, [initialReflection?.reflectionId, reflectionId])
+
   const [isSaving, setIsSaving] = useState(false)
   const [savedAt, setSavedAt] = useState<string | null>(null)
   const { toasts, addToast } = useToast()
@@ -210,8 +214,8 @@ export const WeeklyRetrospective = ({
             resourcesUsed: answers.resource,
             learning: answers.learning,
           }).then((res) => res.weeklyReflectionId)
-        : reflectionId
-          ? updateReflection(dashboardId, reflectionId, {
+        : resolvedReflectionId
+          ? updateReflection(dashboardId, resolvedReflectionId, {
               workSummary: answers.work,
               resourcesUsed: answers.resource,
               learning: answers.learning,
