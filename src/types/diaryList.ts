@@ -55,12 +55,14 @@ export interface DailyEntryTag {
 // POST /daily-entries
 
 export interface CreateDailyEntryPayload {
+  title?: string
   entryDate: string
   reflectionContent: string
 }
 
 export interface CreateDailyEntryResult {
   dailyEntryId: string
+  title: string
   entryDate: string
   reflectionContent: string
   linkedTaskCount: number
