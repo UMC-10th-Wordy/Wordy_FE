@@ -28,6 +28,7 @@ import {
   useUpdateNotificationSetting,
 } from '@/hooks/useNotificationQueries'
 import {
+  useActiveWorkspaceId,
   useCreateWorkspace,
   useDeleteWorkspace,
   useGetWorkspaces,
@@ -170,9 +171,7 @@ export function SidebarLayout() {
   }))
 
   const { selectedWorkspaceId, setSelectedWorkspaceId } = useWorkspaceStore()
-  const defaultWorkspaceId =
-    workspacesData?.find((w) => w.isDefault)?.workspaceId ?? workspacesData?.[0]?.workspaceId ?? ''
-  const activeWorkspaceId = selectedWorkspaceId ?? defaultWorkspaceId
+  const activeWorkspaceId = useActiveWorkspaceId()
   const { data: notificationsData } = useGetNotifications()
   const { mutate: readNotification } = useReadNotification()
   const { data: notificationSettingsData } = useGetNotificationSettings()
