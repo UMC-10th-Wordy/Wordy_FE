@@ -17,7 +17,7 @@ export function mapHomeTaskToTodayTask(dto: HomeTaskDto): TodayTask {
     id: dto.taskId,
     title: dto.title,
     project: dto.tag?.tagName,
-    priority: PRIORITY_FROM_API[dto.priority],
+    projectColor: dto.tag ? hexToTagColor(dto.tag.color) : undefined,
   }
 }
 
@@ -38,10 +38,16 @@ export function mapHomeTaskToRecentRecordTask(dto: HomeTaskDto): RecentRecordTas
   }
 }
 
-export function mapWeekTasksToWeeklyDays(weekTasks: HomeWeekTaskDto[]): WeeklyDay[] {
+export function mapWeekTasksToWeeklyDays(
+  weekTasks: HomeWeekTaskDto[],
+  weekRecords: HomeWeekRecordDto[],
+): WeeklyDay[] {
+  const recordDates = new Set(weekRecords.filter((r) => r.hasRecord).map((r) => r.date))
   return weekTasks.map(({ date, tasks }) => ({
     date: toLocalDate(date).getDate(),
     day: WEEK_DAYS[toLocalDate(date).getDay()],
+    fullDate: date,
+    hasRecord: recordDates.has(date),
     tasks: tasks.map(mapHomeTaskToWeeklyTask),
   }))
 }
@@ -50,10 +56,10 @@ export function mapWeekRecordsToDayRecords(records: HomeWeekRecordDto[]): DayRec
   const today = new Date()
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-  return records.map(({ date, hasRecord }): DayRecord => {
+  return records.map(({ date, hasRecord, isConnected }): DayRecord => {
     if (date > todayKey) return 'none'
     if (!hasRecord) return 'fail'
-    return date === todayKey ? 'success' : 'success-dim'
+    return isConnected ? 'success' : 'success-dim'
   })
 }
 

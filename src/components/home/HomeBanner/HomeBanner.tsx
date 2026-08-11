@@ -11,7 +11,7 @@ export function HomeBanner({ onNavigate, className, ...rest }: HomeBannerProps) 
   return (
     <div
       className={[
-        'relative flex flex-col p-16 rounded-(--scale-20) overflow-hidden',
+        'relative flex flex-col p-8 rounded-(--scale-20) overflow-hidden',
         'border-[0.5px] border-(--color-border-brand-subtle)',
         'shadow-[0px_1px_5px_0px_rgba(0,0,0,0.1)]',
         'bg-(--color-bg-brand-subtle)',
@@ -22,12 +22,12 @@ export function HomeBanner({ onNavigate, className, ...rest }: HomeBannerProps) 
       {...rest}
     >
       {/* 텍스트 + 버튼 */}
-      <div className="flex flex-col gap-12 items-start relative z-10 shrink-0">
+      <div className="flex flex-col gap-6 items-start relative z-10 shrink-0">
         <div className="flex flex-col items-start">
-          <span className="[font-size:var(--font-size-heading-2)] leading-(--line-height-heading) font-semibold text-(--color-text-default)">
+          <span className="[font-size:var(--font-size-heading-3)] leading-(--line-height-heading) font-semibold text-(--color-text-default)">
             오늘은 어떤 업무를 할까요?
           </span>
-          <span className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
+          <span className="[font-size:var(--font-size-body-2)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
             오늘의 업무를 기록하고 성과를 쌓아보세요!
           </span>
         </div>

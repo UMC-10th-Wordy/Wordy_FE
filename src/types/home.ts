@@ -20,6 +20,7 @@ export interface HomeTaskDto {
 export interface HomeWeekRecordDto {
   date: string
   hasRecord: boolean
+  isConnected: boolean
 }
 
 export interface HomeWeekTaskDto {

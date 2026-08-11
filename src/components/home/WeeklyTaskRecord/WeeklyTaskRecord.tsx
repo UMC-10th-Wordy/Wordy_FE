@@ -1,27 +1,22 @@
 import { Fragment } from 'react'
 import type { HTMLAttributes } from 'react'
 import type { TaskPriority } from '@/components/home/TodayTaskCard/TodayTaskCard'
+import { WeeklyDayCell, PRIORITY_BG } from '@/components/home/WeeklyDayCell/WeeklyDayCell'
+import type { WeeklyTask } from '@/components/home/WeeklyDayCell/WeeklyDayCell'
 
-export interface WeeklyTask {
-  id: string
-  title: string
-  priority: TaskPriority
-}
+export type { WeeklyTask }
 
 export interface WeeklyDay {
   date: number
   day: string
+  fullDate: string
+  hasRecord: boolean
   tasks: WeeklyTask[]
 }
 
 export interface WeeklyTaskRecordProps extends HTMLAttributes<HTMLDivElement> {
   days: WeeklyDay[]
-}
-
-const PRIORITY_BG: Record<TaskPriority, string> = {
-  must: 'bg-[var(--primitive-primary-300)]',
-  should: 'bg-[var(--primitive-secondary-300)]',
-  could: 'bg-(--color-bg-tertiary)',
+  onDayClick?: (fullDate: string) => void
 }
 
 const LEGEND: { label: string; priority: TaskPriority }[] = [
@@ -30,7 +25,7 @@ const LEGEND: { label: string; priority: TaskPriority }[] = [
   { label: 'Could do', priority: 'could' },
 ]
 
-export function WeeklyTaskRecord({ days, className, ...rest }: WeeklyTaskRecordProps) {
+export function WeeklyTaskRecord({ days, onDayClick, className, ...rest }: WeeklyTaskRecordProps) {
   return (
     <div
       className={[
@@ -53,7 +48,7 @@ export function WeeklyTaskRecord({ days, className, ...rest }: WeeklyTaskRecordP
           {LEGEND.map(({ label, priority }) => (
             <div key={label} className="flex items-center gap-1">
               <span
-                className={['size-3.5 rounded-full shrink-0', PRIORITY_BG[priority]].join(' ')}
+                className={['size-3.75 rounded-full shrink-0', PRIORITY_BG[priority]].join(' ')}
               />
               <span className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) font-semibold text-(--color-text-tertiary) whitespace-nowrap">
                 {label}
@@ -64,43 +59,17 @@ export function WeeklyTaskRecord({ days, className, ...rest }: WeeklyTaskRecordP
       </div>
 
       {/* 7일 */}
-      <div className="flex flex-1 items-start min-h-0">
+      <div className="flex flex-1 items-end min-h-0 gap-px">
         {days.map((col, i) => (
           <Fragment key={col.date}>
-            {i > 0 && (
-              <div className="flex flex-col self-stretch shrink-0">
-                <div className="shrink-0" style={{ height: 26 }} />
-                <div className="flex-1 w-px bg-(--color-border-brand-subtle)" />
-              </div>
-            )}
-            <div className="flex flex-1 flex-col gap-2 h-full items-start min-w-0 overflow-hidden px-3">
-              {/* 날짜 헤더 */}
-              <div className="flex gap-2 items-start shrink-0">
-                <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-default) whitespace-nowrap">
-                  {col.date}일
-                </span>
-                <span className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-medium text-(--color-text-tertiary)">
-                  {col.day}
-                </span>
-              </div>
-
-              {/* 업무 칩 */}
-              <div className="flex flex-col gap-1.25 w-full">
-                {col.tasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className={[
-                      'flex items-center h-9.25 px-2 py-1 rounded-lg shrink-0 w-full',
-                      PRIORITY_BG[task.priority],
-                    ].join(' ')}
-                  >
-                    <span className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) font-medium text-(--color-text-default) truncate">
-                      {task.title}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {i > 0 && <div className="h-50 w-px bg-(--color-border-brand-subtle) shrink-0" />}
+            <WeeklyDayCell
+              date={col.date}
+              day={col.day}
+              tasks={col.tasks}
+              hasRecord={col.hasRecord}
+              onClick={col.hasRecord ? () => onDayClick?.(col.fullDate) : undefined}
+            />
           </Fragment>
         ))}
       </div>
