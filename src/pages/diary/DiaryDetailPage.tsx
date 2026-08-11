@@ -63,10 +63,12 @@ const DiaryPerformancePanel = ({
 const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) => {
   const navigate = useNavigate()
 
-  const [activeTab, setActiveTab] = useState<TodoFilter>('completed')
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-
   const { data: diary } = useGetDailyEntryDetail(diaryId)
+
+  const [activeTab, setActiveTab] = useState<TodoFilter>(
+    diary.completedCount > 0 ? 'completed' : 'incomplete',
+  )
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const { mutate: deleteDiary, isPending: isDeletePending } = useDeleteDailyEntry()
 
