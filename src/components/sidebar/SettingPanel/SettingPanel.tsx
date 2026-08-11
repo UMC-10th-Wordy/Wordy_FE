@@ -338,6 +338,8 @@ export function SettingPanel({
                                 value={name}
                                 onChange={(e) => setName(sanitizeNickname(e.target.value))}
                                 maxLength={NICKNAME_MAX_LENGTH}
+                                aria-label="닉네임"
+                                aria-describedby="nickname-edit-hint"
                                 className="w-full bg-transparent outline-none [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-default)"
                               />
                             </div>
@@ -373,7 +375,10 @@ export function SettingPanel({
                       </div>
                       {isEditingName && (
                         <div className="flex items-start pl-22 w-full">
-                          <div className="flex-1 min-w-0 bg-(--color-bg-secondary) p-2 rounded-lg">
+                          <div
+                            id="nickname-edit-hint"
+                            className="flex-1 min-w-0 bg-(--color-bg-secondary) p-2 rounded-lg"
+                          >
                             <ul className="list-disc pl-5 space-y-1">
                               <li className="[font-size:var(--font-size-body-4)] leading-(--line-height-body) text-(--color-text-tertiary)">
                                 공백 포함 10글자 이내로 입력해 주세요
