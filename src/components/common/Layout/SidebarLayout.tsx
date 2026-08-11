@@ -10,7 +10,6 @@ import {
 } from '@/components/sidebar'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
 import type { NotificationSettings } from '@/components/sidebar/SettingPanel/SettingPanel'
-import { INITIAL_WORKSPACES_MOCK } from '@/mocks/workspace/workspaceMock'
 import {
   CAREER_TO_YEARS_OF_SERVICE,
   JOB_TO_JOB_ROLE,
@@ -28,6 +27,12 @@ import {
   useReadNotification,
   useUpdateNotificationSetting,
 } from '@/hooks/useNotificationQueries'
+import {
+  useCreateWorkspace,
+  useDeleteWorkspace,
+  useGetWorkspaces,
+  useUpdateWorkspace,
+} from '@/hooks/useWorkspaceQueries'
 import type { NotificationSettingKey } from '@/types/notification'
 import { ApiError, clearAuthTokens } from '@/lib/httpClient'
 import HomeIcon from '@/assets/icons/home.svg?react'
@@ -92,7 +97,10 @@ export function SidebarLayout() {
   })
   const currentPage = getPageByPath(location.pathname)
   const queryClient = useQueryClient()
-  const [workspaces, setWorkspaces] = useState(INITIAL_WORKSPACES_MOCK)
+  const { data: workspacesData } = useGetWorkspaces()
+  const { mutate: createWorkspace } = useCreateWorkspace()
+  const { mutate: updateWorkspace } = useUpdateWorkspace()
+  const { mutate: deleteWorkspace } = useDeleteWorkspace()
   const { data: profileData } = useGetProfile()
   const { mutate: logout } = useLogout()
   const { mutate: changePassword, isPending: isChangingPassword } = useChangePassword()
@@ -155,13 +163,15 @@ export function SidebarLayout() {
     career,
     profileImgUrl: profileData?.profileImgUrl ?? '',
   }
-  const resolvedWorkspaces = workspaces.map((w) =>
-    w.id === '1' && !w.name && profileData
-      ? { ...w, name: `${profileData.userName}의 워크스페이스` }
-      : w,
-  )
+  const resolvedWorkspaces = (workspacesData ?? []).map((w) => ({
+    id: w.workspaceId,
+    name: w.name,
+  }))
 
-  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('1')
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null)
+  const defaultWorkspaceId =
+    workspacesData?.find((w) => w.isDefault)?.workspaceId ?? workspacesData?.[0]?.workspaceId ?? ''
+  const activeWorkspaceId = selectedWorkspaceId ?? defaultWorkspaceId
   const { data: notificationsData } = useGetNotifications()
   const { mutate: readNotification } = useReadNotification()
   const { data: notificationSettingsData } = useGetNotificationSettings()
@@ -228,7 +238,7 @@ export function SidebarLayout() {
           if (route) navigate(route)
         }}
         pages={pages}
-        workspaceName={resolvedWorkspaces.find((w) => w.id === selectedWorkspaceId)?.name ?? ''}
+        workspaceName={resolvedWorkspaces.find((w) => w.id === activeWorkspaceId)?.name ?? ''}
         userName={profile.name}
         userPlan={profile.plan}
         avatarSrc={profile.profileImgUrl}
@@ -246,18 +256,52 @@ export function SidebarLayout() {
             <WorkspaceModal
               triggerRef={workspaceTriggerRef}
               workspaces={resolvedWorkspaces}
-              selectedId={selectedWorkspaceId}
-              onAdd={(name) => setWorkspaces((prev) => [...prev, { id: String(Date.now()), name }])}
-              onEdit={(id, name) =>
-                setWorkspaces((prev) => prev.map((w) => (w.id === id ? { ...w, name } : w)))
-              }
+              selectedId={activeWorkspaceId}
+              onAdd={(name) => {
+                createWorkspace(
+                  { name },
+                  {
+                    onSuccess: (data) => {
+                      setSelectedWorkspaceId(data.workspaceId)
+                    },
+                    onError: (error) => {
+                      alert(
+                        error instanceof ApiError
+                          ? error.message
+                          : '워크스페이스 생성에 실패했어요. 다시 시도해 주세요.',
+                      )
+                    },
+                  },
+                )
+              }}
+              onEdit={(id, name) => {
+                updateWorkspace(
+                  { workspaceId: id, name },
+                  {
+                    onError: (error) => {
+                      alert(
+                        error instanceof ApiError
+                          ? error.message
+                          : '워크스페이스 이름 수정에 실패했어요. 다시 시도해 주세요.',
+                      )
+                    },
+                  },
+                )
+              }}
               onDelete={(id) => {
-                setWorkspaces((prev) => {
-                  const next = prev.filter((w) => w.id !== id)
-                  if (selectedWorkspaceId === id) {
-                    setSelectedWorkspaceId(next[0]?.id ?? '')
-                  }
-                  return next
+                deleteWorkspace(id, {
+                  onSuccess: () => {
+                    if (selectedWorkspaceId === id) {
+                      setSelectedWorkspaceId(null)
+                    }
+                  },
+                  onError: (error) => {
+                    alert(
+                      error instanceof ApiError
+                        ? error.message
+                        : '워크스페이스 삭제에 실패했어요. 다시 시도해 주세요.',
+                    )
+                  },
                 })
               }}
               onSelectWorkspace={(id) => {
