@@ -129,6 +129,7 @@ export interface MonthlyDailyEntry {
   mainTaskTitle: string
   extraTaskCount: number
   summary: string
+  converted: boolean
 }
 
 export type MonthlyDailyEntriesDetailResponse = DiaryListApiResponse<MonthlyDailyEntry[]>
