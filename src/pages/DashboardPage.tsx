@@ -395,6 +395,7 @@ export const DashboardPage = () => {
                   convertedCount={selectedIds.length}
                   onGenerate={handleGenerate}
                   requiredCount={requiredCount}
+                  periodLabel={weekLabel.replace(/^\d+년\s*/, '')}
                 />
                 <DiaryChecklistPanel
                   entries={entries}

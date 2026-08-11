@@ -31,23 +31,23 @@ export const WeeklyHighlights = ({
       </div>
       <ol className="flex flex-col gap-3">
         {items.map((item, i) => (
-          <li key={item.text} className="flex flex-wrap items-baseline gap-3">
-            <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-brand)">
+          <li key={item.text} className="flex items-baseline gap-3">
+            <span className="shrink-0 [font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-brand)">
               {String(i + 1).padStart(2, '0')}
             </span>
             <span className="min-w-0 break-words [font-size:var(--font-size-body-2)] leading-[1.6] font-normal text-(--color-text-default)">
               {item.text}
+              {item.dailyEntryId ? (
+                <button
+                  type="button"
+                  onClick={() => navigate(`/records/${item.dailyEntryId}`)}
+                  className="ml-2 inline-flex h-8 items-center gap-1 rounded-md px-2 align-middle [font-size:var(--font-size-body-4)] leading-[1.6] font-medium text-(--color-text-tertiary)"
+                >
+                  {item.source}
+                  <ArrowLeftIcon aria-hidden="true" width={20} height={20} className="rotate-180" />
+                </button>
+              ) : null}
             </span>
-            {item.dailyEntryId ? (
-              <button
-                type="button"
-                onClick={() => item.dailyEntryId && navigate(`/records/${item.dailyEntryId}`)}
-                className="flex h-8 shrink-0 items-center gap-1 rounded-md px-2 [font-size:var(--font-size-body-4)] leading-[1.6] font-medium text-(--color-text-tertiary)"
-              >
-                {item.source}
-                <ArrowLeftIcon aria-hidden="true" width={20} height={20} className="rotate-180" />
-              </button>
-            ) : null}
           </li>
         ))}
       </ol>

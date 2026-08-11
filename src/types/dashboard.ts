@@ -165,3 +165,13 @@ export interface AiDashboardResultDto {
   kpis: { kpiName: string; progress: string }[]
   tagAnalyses: AiTagAnalysisDto[]
 }
+
+export interface DraftDto {
+  reflectionDraftId: string
+  type: 'WEEKLY' | 'MONTHLY'
+  workSummary: string
+  resourcesUsed: string
+  learning: string
+  taskPlans: { content: string; expectedTime: string }[]
+  updatedAt: string
+}

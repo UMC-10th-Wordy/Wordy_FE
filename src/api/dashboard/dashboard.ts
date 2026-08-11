@@ -17,9 +17,10 @@ import type {
   UpdateReflectionPayload,
   MonthlyEligibilityDto,
   MonthlyReflectionResultDto,
+  DraftDto,
 } from '@/types/dashboard'
 
-const USE_MOCK_DASHBOARD = import.meta.env.VITE_USE_MOCK_DASHBOARD === 'true'
+const USE_MOCK_DASHBOARD = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_DASHBOARD === 'true'
 
 let weeklyDetailMock: DashboardDetailDto = structuredClone(INITIAL_DASHBOARD_DETAIL_MOCK)
 let monthlyDetailMock: DashboardDetailDto = structuredClone(INITIAL_MONTHLY_DASHBOARD_DETAIL_MOCK)
@@ -27,7 +28,7 @@ let monthlyDetailMock: DashboardDetailDto = structuredClone(INITIAL_MONTHLY_DASH
 /* GET /dashboards/eligibility — 주간 대시보드 생성 조건 조회 */
 export async function getDashboardEligibility(baseDate?: string): Promise<EligibilityDto> {
   if (USE_MOCK_DASHBOARD) return INITIAL_ELIGIBILITY_MOCK
-  const query = baseDate ? `?BaseDate=${baseDate}` : ''
+  const query = baseDate ? `?baseDate=${baseDate}` : ''
   return request<EligibilityDto>(`/dashboards/eligibility${query}`)
 }
 
@@ -86,7 +87,7 @@ export async function updateReflection(
 /* GET /dashboards/monthly/eligibility — 월간 대시보드 생성 조건 조회 */
 export async function getMonthlyEligibility(baseDate?: string): Promise<MonthlyEligibilityDto> {
   if (USE_MOCK_DASHBOARD) return MONTHLY_ELIGIBILITY_MOCK
-  const query = baseDate ? `?BaseDate=${baseDate}` : ''
+  const query = baseDate ? `?baseDate=${baseDate}` : ''
   return request<MonthlyEligibilityDto>(`/dashboards/monthly/eligibility${query}`)
 }
 
@@ -120,6 +121,35 @@ export async function createMonthlyReflection(
     method: 'POST',
     body: JSON.stringify(payload),
   })
+}
+
+export async function saveDraft(
+  type: 'WEEKLY' | 'MONTHLY',
+  dashboardId: string | undefined,
+  payload: {
+    workSummary: string
+    resourcesUsed: string
+    learning: string
+    taskPlans: { content: string; expectedTime: string }[]
+  },
+): Promise<DraftDto> {
+  const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
+  return request<DraftDto>(`/dashboards/drafts${query}`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function getDraft(
+  type: 'WEEKLY' | 'MONTHLY',
+  dashboardId: string | undefined,
+): Promise<DraftDto | null> {
+  try {
+    const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
+    return await request<DraftDto>(`/dashboards/drafts${query}`)
+  } catch {
+    return null
+  }
 }
 
 /* POST /ai/dashboard/weekly — 주간 대시보드 AI 생성. LLM 호출로 처리 시간이 길어 타임아웃 연장 */

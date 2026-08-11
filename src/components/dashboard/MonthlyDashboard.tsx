@@ -8,6 +8,7 @@ import type { DashboardDetailDto, MonthlyEligibilityDto } from '@/types/dashboar
 import type { WeeklyBoardStatus } from './MonthlyWeekListPanel'
 import type { TagWorkflow } from './TagWorkflowSection'
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
+import { hexToTagColor } from '@/utils/tagMapper'
 
 export type MonthlyGeneration = 'idle' | 'generating' | 'complete'
 
@@ -43,9 +44,16 @@ const buildWeeks = (eligibility: MonthlyEligibilityDto): WeeklyBoardStatus[] => 
     if (weekEnd > monthEnd) weekEnd.setTime(monthEnd.getTime())
     const startStr = toDateString(weekStart)
     const endStr = toDateString(weekEnd)
-    const matched = eligibility.weeklyDashboards.find(
-      (w) => w.startDate >= startStr && w.startDate <= endStr,
-    )
+    const matched = eligibility.weeklyDashboards.find((w) => {
+      const [sy, sm, sd] = w.startDate.split('-').map(Number)
+      const [ey, em, ed] = w.endDate.split('-').map(Number)
+      const s = Date.UTC(sy, sm - 1, sd)
+      const e = Date.UTC(ey, em - 1, ed)
+      const durationDays = (e - s) / 86400000
+      const isWeekly = durationDays >= 0 && durationDays <= 7
+
+      return isWeekly && w.startDate >= startStr && w.startDate <= endStr
+    })
     weeks.push({
       id: matched?.dashboardId ?? `pending-${startStr}`,
       weekLabel: `${weekStart.getMonth() + 1}월 ${index + 1}주차`,
@@ -94,11 +102,11 @@ export const MonthlyDashboard = ({
       },
       { label: '사용된 프로젝트 태그', value: String(detail.tagCount), unit: '개' },
     ]
-    // TODO: 스키마에 태그 식별자가 없어 전체 KPI를 태그마다 표시 중 — 태그별 KPI 매핑은 백엔드 스키마 확장 후 반영
+
     const tags: TagWorkflow[] = detail.tagAnalyses.map((t, i) => ({
-      id: `monthly-tag-${i}`,
-      name: `프로젝트 태그 ${i + 1}`, // TODO: 스키마에 태그명 없음 — 백엔드 확인 중
-      color: TAG_FALLBACK_COLORS[i % TAG_FALLBACK_COLORS.length],
+      id: t.tagId ?? `monthly-tag-${i}`,
+      name: t.tagName ?? `프로젝트 태그 ${i + 1}`,
+      color: t.color ? hexToTagColor(t.color) : TAG_FALLBACK_COLORS[i % TAG_FALLBACK_COLORS.length],
       count: t.taskCount ?? 0,
       purpose: t.goal,
       expectedResult: t.expectedOutcome,
@@ -115,6 +123,7 @@ export const MonthlyDashboard = ({
     const highlights = detail.performances.map((p) => ({
       text: p.summary,
       source: p.items[0]?.output ?? '업무 일지',
+      dailyEntryId: p.dailyEntryId ?? p.items[0]?.dailyEntryId,
     }))
 
     return (
@@ -143,6 +152,7 @@ export const MonthlyDashboard = ({
         generatedCount={generatedCount}
         onGenerate={onGenerate}
         requiredCount={requiredCount}
+        periodLabel={eligibility ? `${Number(eligibility.monthStart.slice(5, 7))}월` : undefined}
       />
       <MonthlyWeekListPanel weeks={weeks} totalWeeks={weeks.length} onGoWeekly={onGoWeekly} />
     </>
