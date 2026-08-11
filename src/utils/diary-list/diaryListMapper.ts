@@ -20,6 +20,7 @@ import type {
 import type {
   DailyEntrySearchItem,
   DailyEntrySearchResult,
+  DailyEntryTagSearchItem,
   DiarySearchDiary,
   DiarySearchProjectTag,
   DiarySearchResultData,
@@ -111,38 +112,22 @@ const mapDiarySearchDiary = (
   }
 }
 
-const mapDiarySearchTagResults = (
-  keyword: string,
-  entries: DailyEntrySearchItem[],
-): DiarySearchTagResult[] => {
-  const normalizedKeyword = keyword.trim().toLocaleLowerCase()
-  const tagResultMap = new Map<string, DiarySearchTagResult>()
+const mapDiarySearchTagResult = (result: DailyEntryTagSearchItem): DiarySearchTagResult => {
+  const tag = {
+    name: result.tagName,
+    color: hexToTagColor(result.color),
+  }
 
-  entries.forEach((entry) => {
-    entry.tags.forEach((tag) => {
-      const normalizedTagName = tag.tagName.toLocaleLowerCase()
-
-      if (!normalizedTagName.includes(normalizedKeyword)) {
-        return
-      }
-
-      const existingTagResult = tagResultMap.get(normalizedTagName)
-      const diary = mapDiarySearchDiary(entry, tag)
-
-      if (existingTagResult) {
-        existingTagResult.diaries.push(diary)
-        return
-      }
-
-      tagResultMap.set(normalizedTagName, {
-        name: tag.tagName,
-        color: hexToTagColor(tag.color),
-        diaries: [diary],
-      })
-    })
-  })
-
-  return Array.from(tagResultMap.values())
+  return {
+    name: result.tagName,
+    color: hexToTagColor(result.color),
+    diaries: result.diaries.map((diary) => ({
+      id: diary.dailyEntryId,
+      entryDate: diary.entryDate,
+      title: diary.title,
+      tag,
+    })),
+  }
 }
 
 export const mapDailyEntrySearchResult = (
@@ -150,7 +135,7 @@ export const mapDailyEntrySearchResult = (
 ): DiarySearchResultData => {
   const diaries = result.journalTab.results.map((entry) => mapDiarySearchDiary(entry))
 
-  const tagResults = mapDiarySearchTagResults(result.keyword, result.tagTab.results)
+  const tagResults = result.tagTab.results.map((tagResult) => mapDiarySearchTagResult(tagResult))
 
   return {
     keyword: result.keyword,

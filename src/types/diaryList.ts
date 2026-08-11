@@ -55,12 +55,14 @@ export interface DailyEntryTag {
 // POST /daily-entries
 
 export interface CreateDailyEntryPayload {
+  title?: string
   entryDate: string
   reflectionContent: string
 }
 
 export interface CreateDailyEntryResult {
   dailyEntryId: string
+  title: string
   entryDate: string
   reflectionContent: string
   linkedTaskCount: number
@@ -127,6 +129,7 @@ export interface MonthlyDailyEntry {
   mainTaskTitle: string
   extraTaskCount: number
   summary: string
+  converted: boolean
 }
 
 export type MonthlyDailyEntriesDetailResponse = DiaryListApiResponse<MonthlyDailyEntry[]>

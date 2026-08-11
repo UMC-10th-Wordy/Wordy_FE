@@ -7,6 +7,9 @@ import { useGetPerformanceDetail } from '@/hooks/usePerformanceQueries'
 
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 
+import { LoadingState } from '@/components/common/AsyncState/AsyncState'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
+
 import { DeleteDiaryDialog } from '@/components/diary-detail/DeleteDiaryDialog'
 import { DiaryDetailHeader } from '@/components/diary-detail/DiaryDetailHeader'
 import { DiaryRetrospective } from '@/components/diary-detail/DiaryRetrospective'
@@ -172,9 +175,14 @@ const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) =>
 
 export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
   const { diaryId } = useParams<{ diaryId: string }>()
+  const activeWorkspaceId = useActiveWorkspaceId()
 
   if (!diaryId) {
     throw new Error('업무 일지 ID가 없습니다.')
+  }
+
+  if (!activeWorkspaceId) {
+    return <LoadingState message="불러오는 중입니다" className="h-full w-full" />
   }
 
   return <DiaryDetailContent key={diaryId} diaryId={diaryId} hideDelete={hideDelete} />

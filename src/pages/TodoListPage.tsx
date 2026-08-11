@@ -57,6 +57,7 @@ import { useGetProfile } from '@/hooks/useUserQueries'
 import { usePerformancePreview } from '@/hooks/usePerformancePreview'
 import { usePerformanceQuestionChat } from '@/hooks/usePerformanceQuestionChat'
 import { useGetPerformancesByDate, useUpdatePerformance } from '@/hooks/usePerformanceQueries'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import {
   mapPerformanceDetailResult,
   mapPerformancePreviewRequest,
@@ -140,6 +141,7 @@ export default function TodoListPage() {
   const pendingToggleIds = useRef<Set<string>>(new Set())
   const { toasts, addToast } = useToast()
   const queryClient = useQueryClient()
+  const activeWorkspaceId = useActiveWorkspaceId()
   const { data: profile, isPending: isProfilePending } = useGetProfile()
   const performancePreview = usePerformancePreview(currentDateKey)
   const moveTaskToTomorrowMutation = useMoveTaskToTomorrow()
@@ -242,16 +244,16 @@ export default function TodoListPage() {
 
       void Promise.all([
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.summary(),
+          queryKey: dailyEntryQueryKeys.summary(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+          queryKey: dailyEntryQueryKeys.monthlyRecords(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+          queryKey: dailyEntryQueryKeys.monthlyEntries(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.searches(),
+          queryKey: dailyEntryQueryKeys.searches(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
           queryKey: homeQueryKeys.all,
@@ -278,16 +280,16 @@ export default function TodoListPage() {
       )
       void Promise.all([
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.summary(),
+          queryKey: dailyEntryQueryKeys.summary(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+          queryKey: dailyEntryQueryKeys.monthlyRecords(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+          queryKey: dailyEntryQueryKeys.monthlyEntries(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.searches(),
+          queryKey: dailyEntryQueryKeys.searches(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
           queryKey: homeQueryKeys.all,
@@ -340,16 +342,16 @@ export default function TodoListPage() {
       )
       void Promise.all([
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.summary(),
+          queryKey: dailyEntryQueryKeys.summary(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+          queryKey: dailyEntryQueryKeys.monthlyRecords(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+          queryKey: dailyEntryQueryKeys.monthlyEntries(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.searches(),
+          queryKey: dailyEntryQueryKeys.searches(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
           queryKey: homeQueryKeys.all,
@@ -622,10 +624,10 @@ export default function TodoListPage() {
 
     await Promise.all([
       queryClient.invalidateQueries({
-        queryKey: performanceQueryKeys.all,
+        queryKey: performanceQueryKeys.workspace(activeWorkspaceId),
       }),
       queryClient.invalidateQueries({
-        queryKey: dailyEntryQueryKeys.all,
+        queryKey: dailyEntryQueryKeys.workspace(activeWorkspaceId),
       }),
       queryClient.invalidateQueries({
         queryKey: homeQueryKeys.all,
@@ -648,10 +650,10 @@ export default function TodoListPage() {
 
     await Promise.all([
       queryClient.invalidateQueries({
-        queryKey: performanceQueryKeys.all,
+        queryKey: performanceQueryKeys.workspace(activeWorkspaceId),
       }),
       queryClient.invalidateQueries({
-        queryKey: dailyEntryQueryKeys.all,
+        queryKey: dailyEntryQueryKeys.workspace(activeWorkspaceId),
       }),
     ])
   }

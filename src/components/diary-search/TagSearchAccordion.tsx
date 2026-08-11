@@ -22,6 +22,7 @@ interface TagSearchAccordionProps {
 
 export const TagSearchAccordion = ({ result, keyword, onDetailClick }: TagSearchAccordionProps) => {
   const [expanded, setExpanded] = useState(false)
+  const hasDiaries = result.diaries.length > 0
 
   return (
     <article className="w-full rounded-(--scale-12) border-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default) p-5 shadow-[0_1px_5px_rgba(0,0,0,0.1)]">
@@ -35,31 +36,33 @@ export const TagSearchAccordion = ({ result, keyword, onDetailClick }: TagSearch
             이 태그로 작성한 업무 일지 {result.diaries.length}건
           </span>
 
-          <IconButton
-            variant="text_neutral"
-            size="small"
-            icon={
-              expanded ? (
-                <DirectionTopIcon
-                  aria-hidden
-                  className="size-(--scale-24) text-(--color-icon-secondary)"
-                />
-              ) : (
-                <DirectionBottomIcon
-                  aria-hidden
-                  className="size-(--scale-24) text-(--color-icon-secondary)"
-                />
-              )
-            }
-            onClick={() => setExpanded((previousExpanded) => !previousExpanded)}
-            aria-label={`${result.name} 태그 업무 일지 ${expanded ? '접기' : '펼치기'}`}
-            aria-expanded={expanded}
-          />
+          {hasDiaries && (
+            <IconButton
+              variant="text_neutral"
+              size="small"
+              icon={
+                expanded ? (
+                  <DirectionTopIcon
+                    aria-hidden
+                    className="size-(--scale-24) text-(--color-icon-secondary)"
+                  />
+                ) : (
+                  <DirectionBottomIcon
+                    aria-hidden
+                    className="size-(--scale-24) text-(--color-icon-secondary)"
+                  />
+                )
+              }
+              onClick={() => setExpanded((previousExpanded) => !previousExpanded)}
+              aria-label={`${result.name} 태그 업무 일지 ${expanded ? '접기' : '펼치기'}`}
+              aria-expanded={expanded}
+            />
+          )}
         </div>
       </div>
 
       <AnimatePresence initial={false}>
-        {expanded && (
+        {expanded && hasDiaries && (
           <motion.div
             key="tag-search-results"
             initial={{ height: 0 }}
@@ -75,7 +78,7 @@ export const TagSearchAccordion = ({ result, keyword, onDetailClick }: TagSearch
               {result.diaries.map((diary) => {
                 const dateLabel = formatDiaryDate(diary.entryDate)
                 return (
-                  <article key={diary.id} className="w-full py-(--scale-8)">
+                  <article key={`${diary.id}-${diary.title}`} className="w-full py-(--scale-8)">
                     <time
                       dateTime={diary.entryDate}
                       className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)"
