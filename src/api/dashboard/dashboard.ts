@@ -17,9 +17,10 @@ import type {
   UpdateReflectionPayload,
   MonthlyEligibilityDto,
   MonthlyReflectionResultDto,
+  DraftDto,
 } from '@/types/dashboard'
 
-const USE_MOCK_DASHBOARD = import.meta.env.VITE_USE_MOCK_DASHBOARD === 'true'
+const USE_MOCK_DASHBOARD = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_DASHBOARD === 'true'
 
 let weeklyDetailMock: DashboardDetailDto = structuredClone(INITIAL_DASHBOARD_DETAIL_MOCK)
 let monthlyDetailMock: DashboardDetailDto = structuredClone(INITIAL_MONTHLY_DASHBOARD_DETAIL_MOCK)
@@ -120,6 +121,29 @@ export async function createMonthlyReflection(
     method: 'POST',
     body: JSON.stringify(payload),
   })
+}
+
+export async function saveDraft(
+  type: 'WEEKLY' | 'MONTHLY',
+  payload: {
+    workSummary: string
+    resourcesUsed: string
+    learning: string
+    taskPlans: { content: string; expectedTime: string }[]
+  },
+): Promise<DraftDto> {
+  return request<DraftDto>(`/dashboards/drafts?type=${type}`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function getDraft(type: 'WEEKLY' | 'MONTHLY'): Promise<DraftDto | null> {
+  try {
+    return await request<DraftDto>(`/dashboards/drafts?type=${type}`)
+  } catch {
+    return null
+  }
 }
 
 /* POST /ai/dashboard/weekly — 주간 대시보드 AI 생성. LLM 호출로 처리 시간이 길어 타임아웃 연장 */

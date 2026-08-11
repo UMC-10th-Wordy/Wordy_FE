@@ -12,6 +12,8 @@ import {
   createReflection,
   updateReflection,
 } from '@/api/dashboard/dashboard'
+import { saveDraft, getDraft } from '@/api/dashboard/dashboard'
+import { useEffect } from 'react'
 interface PlanRow {
   id: string
   content: string
@@ -118,7 +120,28 @@ export const WeeklyRetrospective = ({
     resource: initialReflection?.resourcesUsed ?? '',
     learning: initialReflection?.learning ?? '',
   })
+
   const [plans, setPlans] = useState<PlanRow[]>([])
+
+  useEffect(() => {
+    if (initialReflection) return // 이미 저장된 회고 있으면 draft 복원 안 함
+    getDraft(period === 'monthly' ? 'MONTHLY' : 'WEEKLY').then((draft) => {
+      if (!draft) return
+      setAnswers({
+        work: draft.workSummary,
+        resource: draft.resourcesUsed,
+        learning: draft.learning,
+      })
+      setPlans(
+        draft.taskPlans.map((tp, i) => ({
+          id: `draft-${i}`,
+          content: tp.content,
+          schedule: tp.expectedTime,
+        })),
+      )
+    })
+  }, [period])
+
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
   )
@@ -155,9 +178,17 @@ export const WeeklyRetrospective = ({
   const handleDeleteRow = (id: string) => setPlans((prev) => prev.filter((p) => p.id !== id))
 
   const handleTempSave = () => {
-    // TODO(#번호): API 연동 시 임시 저장 요청으로 교체
-    setSavedAt(new Date().toLocaleString('ko-KR'))
-    addToast(texts.toastTempSaved)
+    saveDraft(period === 'monthly' ? 'MONTHLY' : 'WEEKLY', {
+      workSummary: answers.work,
+      resourcesUsed: answers.resource,
+      learning: answers.learning,
+      taskPlans: plans.map((p) => ({ content: p.content, expectedTime: p.schedule })),
+    })
+      .then(() => {
+        setSavedAt(new Date().toLocaleString('ko-KR'))
+        addToast(texts.toastTempSaved)
+      })
+      .catch(() => addToast('임시 저장에 실패했어요'))
   }
 
   const handleSave = () => {

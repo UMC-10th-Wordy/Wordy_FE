@@ -45,10 +45,13 @@ const buildWeeks = (eligibility: MonthlyEligibilityDto): WeeklyBoardStatus[] => 
     const startStr = toDateString(weekStart)
     const endStr = toDateString(weekEnd)
     const matched = eligibility.weeklyDashboards.find((w) => {
-      const s = new Date(`${w.startDate}T00:00:00`)
-      const e = new Date(`${w.endDate}T00:00:00`)
-      const durationDays = (e.getTime() - s.getTime()) / 86400000
+      const [sy, sm, sd] = w.startDate.split('-').map(Number)
+      const [ey, em, ed] = w.endDate.split('-').map(Number)
+      const s = Date.UTC(sy, sm - 1, sd)
+      const e = Date.UTC(ey, em - 1, ed)
+      const durationDays = (e - s) / 86400000
       const isWeekly = durationDays >= 0 && durationDays <= 7
+
       return isWeekly && w.startDate >= startStr && w.startDate <= endStr
     })
     weeks.push({
