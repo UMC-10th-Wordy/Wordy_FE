@@ -3,6 +3,7 @@ overrides:
   tldts: '7.4.9'
   tldts-core: '7.4.9'
   magicast: '0.5.3'
+  postcss: '^8.5.18'
 
 allowBuilds:
   msw: false
