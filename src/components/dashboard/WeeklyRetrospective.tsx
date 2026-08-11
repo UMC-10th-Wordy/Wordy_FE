@@ -124,14 +124,15 @@ export const WeeklyRetrospective = ({
   const [plans, setPlans] = useState<PlanRow[]>([])
 
   useEffect(() => {
-    if (initialReflection) return // 이미 저장된 회고 있으면 draft 복원 안 함
     getDraft(period === 'monthly' ? 'MONTHLY' : 'WEEKLY').then((draft) => {
       if (!draft) return
-      setAnswers({
-        work: draft.workSummary,
-        resource: draft.resourcesUsed,
-        learning: draft.learning,
-      })
+      if (!initialReflection) {
+        setAnswers({
+          work: draft.workSummary,
+          resource: draft.resourcesUsed,
+          learning: draft.learning,
+        })
+      }
       setPlans(
         draft.taskPlans.map((tp, i) => ({
           id: `draft-${i}`,
