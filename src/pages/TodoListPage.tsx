@@ -628,6 +628,15 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
     )
 
     setMovedPerformanceTaskIds((prev) => (prev.includes(taskId) ? prev : [...prev, taskId]))
+
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: taskQueryKeys.list(workspaceId, currentDateKey),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: taskQueryKeys.list(workspaceId, nextDateKey),
+      }),
+    ])
   }
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
