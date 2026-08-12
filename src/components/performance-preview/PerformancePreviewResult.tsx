@@ -120,7 +120,7 @@ export const PerformancePreviewResult = ({
 
       addToast('내일 업무로 변경했어요')
     } catch {
-      // 실패 시 성공 상태와 성공 토스트를 반영하지 않음
+      addToast('내일 업무로 변경하지 못했어요. 다시 시도해 주세요')
     } finally {
       setPendingMoveTaskIds((prev) => prev.filter((id) => id !== taskId))
     }
@@ -143,7 +143,7 @@ export const PerformancePreviewResult = ({
       setIsSaved(true)
       addToast('업무 일지가 저장되었어요')
     } catch {
-      // 실패 시 저장 완료 상태와 성공 토스트를 반영하지 않음
+      addToast('업무 일지 저장에 실패했어요. 다시 시도해 주세요')
     } finally {
       setIsSubmittingSave(false)
     }

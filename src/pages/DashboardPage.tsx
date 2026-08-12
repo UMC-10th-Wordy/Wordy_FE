@@ -284,11 +284,21 @@ export const DashboardPage = () => {
   }
 
   const refreshDetail = () => {
-    void weeklyDetailQuery.refetch()
+    void weeklyDetailQuery.refetch().then((result) => {
+      if (result.isError) {
+        console.error('상세 재조회 실패:', result.error)
+        addToast('최신 내용을 불러오지 못했어요. 다시 시도해 주세요')
+      }
+    })
   }
 
   const refreshMonthlyDetail = () => {
-    void monthlyDetailQuery.refetch()
+    void monthlyDetailQuery.refetch().then((result) => {
+      if (result.isError) {
+        console.error('월간 상세 재조회 실패:', result.error)
+        addToast('최신 내용을 불러오지 못했어요. 다시 시도해 주세요')
+      }
+    })
   }
 
   const handleGoWeekly = (weekId: string) => {
