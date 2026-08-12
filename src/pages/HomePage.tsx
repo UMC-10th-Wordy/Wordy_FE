@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useGetHome } from '@/hooks/useHomeQueries'
 import { getDailyEntryByDate } from '@/api/daily-entry/dailyEntry'
 import { useToast } from '@/hooks/useToast'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import { HomeBanner } from '@/components/home/HomeBanner/HomeBanner'
@@ -24,6 +25,7 @@ export type HomePageProps = HTMLAttributes<HTMLDivElement>
 
 export function HomePage({ className, ...rest }: HomePageProps) {
   const navigate = useNavigate()
+  const activeWorkspaceId = useActiveWorkspaceId()
   const { data } = useGetHome()
   const { toasts, addToast } = useToast()
 
@@ -46,7 +48,7 @@ export function HomePage({ className, ...rest }: HomePageProps) {
 
   const goToDailyEntryByDate = async (date: string) => {
     try {
-      const entry = await getDailyEntryByDate(date)
+      const entry = await getDailyEntryByDate(activeWorkspaceId, date)
       if (entry) {
         navigate(`/records/${entry.dailyEntryId}`)
       } else {

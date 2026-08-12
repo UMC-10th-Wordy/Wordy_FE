@@ -1,4 +1,5 @@
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
+
 import type { DailyEntryTag, DiaryListApiResponse } from '@/types/diaryList'
 
 export type DiarySearchTab = 'diary' | 'projectTag'
@@ -31,7 +32,7 @@ export interface DiarySearchResultData {
 }
 
 /* 일지 검색 */
-// GET /daily-entries/search
+// GET /workspaces/{workspaceId}/daily-entries/search
 
 export type DailyEntrySearchSort = 'latest' | 'oldest'
 
@@ -40,22 +41,44 @@ export interface DailyEntrySearchParams {
   sort: DailyEntrySearchSort
 }
 
+/* 업무 일지 탭 결과 */
 export interface DailyEntrySearchItem {
   dailyEntryId: string
+  workspaceId: string
   entryDate: string
   tags: DailyEntryTag[]
   title: string
 }
 
-export interface DailyEntrySearchTabResult {
+/* 프로젝트 태그 탭 내부 일지 */
+export interface DailyEntryTagSearchDiary {
+  dailyEntryId: string
+  workspaceId: string
+  entryDate: string
+  title: string
+}
+
+/* 프로젝트 태그 탭 결과 */
+export interface DailyEntryTagSearchItem {
+  tagName: string
+  color: string
+  diaries: DailyEntryTagSearchDiary[]
+}
+
+export interface DailyEntryJournalSearchTabResult {
   count: number
   results: DailyEntrySearchItem[]
 }
 
+export interface DailyEntryTagSearchTabResult {
+  count: number
+  results: DailyEntryTagSearchItem[]
+}
+
 export interface DailyEntrySearchResult {
   keyword: string
-  journalTab: DailyEntrySearchTabResult
-  tagTab: DailyEntrySearchTabResult
+  journalTab: DailyEntryJournalSearchTabResult
+  tagTab: DailyEntryTagSearchTabResult
 }
 
 export type DailyEntrySearchResponse = DiaryListApiResponse<DailyEntrySearchResult>

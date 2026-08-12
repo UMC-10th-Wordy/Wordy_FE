@@ -8,6 +8,7 @@ import {
   restoreDailyEntry,
   trashQueryKeys,
 } from '@/api/trash/trash'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 
 const TRASH_PAGE_SIZE = 10
 
@@ -22,6 +23,7 @@ export const useGetTrashDailyEntries = () => {
 
 export const useRestoreDailyEntry = () => {
   const queryClient = useQueryClient()
+  const activeWorkspaceId = useActiveWorkspaceId()
 
   return useMutation({
     mutationFn: restoreDailyEntry,
@@ -30,7 +32,9 @@ export const useRestoreDailyEntry = () => {
       void Promise.all([
         queryClient.invalidateQueries({ queryKey: trashQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: dailyEntryQueryKeys.all }),
-        queryClient.resetQueries({ queryKey: dailyEntryQueryKeys.detail(dailyEntryId) }),
+        queryClient.resetQueries({
+          queryKey: dailyEntryQueryKeys.detail(activeWorkspaceId, dailyEntryId),
+        }),
         queryClient.invalidateQueries({ queryKey: homeQueryKeys.all }),
       ])
     },

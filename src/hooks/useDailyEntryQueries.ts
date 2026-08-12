@@ -19,6 +19,7 @@ import {
 } from '@/api/daily-entry/dailyEntry'
 import { homeQueryKeys } from '@/api/home/home'
 import { trashQueryKeys } from '@/api/trash/trash'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import {
   mapDailyEntriesSummary,
   mapDailyEntryDetail,
@@ -26,26 +27,32 @@ import {
   mapMonthlyDiaryEntries,
   mapMonthlyDiaryRecords,
 } from '@/utils/diary-list/diaryListMapper'
+import type { CreateDailyEntryPayload } from '@/types/diaryList'
 import type { DailyEntrySearchParams } from '@/types/diarySearch'
 
 export const useGetDailyEntryByDate = (date: string) => {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
   return useQuery({
-    queryKey: dailyEntryQueryKeys.byDate(date),
-    queryFn: () => getDailyEntryByDate(date),
+    queryKey: dailyEntryQueryKeys.byDate(activeWorkspaceId, date),
+    queryFn: () => getDailyEntryByDate(activeWorkspaceId, date),
+    enabled: !!activeWorkspaceId,
   })
 }
 
 export const useGetDiaryListPageData = () => {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
   const [summaryQuery, monthlyRecordsQuery] = useSuspenseQueries({
     queries: [
       {
-        queryKey: dailyEntryQueryKeys.summary(),
-        queryFn: getDailyEntriesSummary,
+        queryKey: dailyEntryQueryKeys.summary(activeWorkspaceId),
+        queryFn: () => getDailyEntriesSummary(activeWorkspaceId),
         select: mapDailyEntriesSummary,
       },
       {
-        queryKey: dailyEntryQueryKeys.monthlyRecords(),
-        queryFn: getMonthlyDailyEntries,
+        queryKey: dailyEntryQueryKeys.monthlyRecords(activeWorkspaceId),
+        queryFn: () => getMonthlyDailyEntries(activeWorkspaceId),
         select: mapMonthlyDiaryRecords,
       },
     ],
@@ -58,25 +65,31 @@ export const useGetDiaryListPageData = () => {
 }
 
 export const useGetMonthlyDailyEntriesByYearMonth = (yearMonth: string) => {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
   return useSuspenseQuery({
-    queryKey: dailyEntryQueryKeys.monthlyEntry(yearMonth),
-    queryFn: () => getMonthlyDailyEntriesByYearMonth(yearMonth),
+    queryKey: dailyEntryQueryKeys.monthlyEntry(activeWorkspaceId, yearMonth),
+    queryFn: () => getMonthlyDailyEntriesByYearMonth(activeWorkspaceId, yearMonth),
     select: mapMonthlyDiaryEntries,
   })
 }
 
 export const useGetDailyEntrySearch = (params: DailyEntrySearchParams) => {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
   return useSuspenseQuery({
-    queryKey: dailyEntryQueryKeys.search(params),
-    queryFn: () => searchDailyEntries(params),
+    queryKey: dailyEntryQueryKeys.search(activeWorkspaceId, params),
+    queryFn: () => searchDailyEntries(activeWorkspaceId, params),
     select: mapDailyEntrySearchResult,
   })
 }
 
 export const useGetDailyEntryDetail = (dailyEntryId: string) => {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
   return useSuspenseQuery({
-    queryKey: dailyEntryQueryKeys.detail(dailyEntryId),
-    queryFn: () => getDailyEntryDetail(dailyEntryId),
+    queryKey: dailyEntryQueryKeys.detail(activeWorkspaceId, dailyEntryId),
+    queryFn: () => getDailyEntryDetail(activeWorkspaceId, dailyEntryId),
     select: mapDailyEntryDetail,
     refetchOnMount: 'always',
   })
@@ -84,13 +97,20 @@ export const useGetDailyEntryDetail = (dailyEntryId: string) => {
 
 export const useCreateDailyEntry = () => {
   const queryClient = useQueryClient()
+  const activeWorkspaceId = useActiveWorkspaceId()
 
   return useMutation({
-    mutationFn: createDailyEntry,
+    mutationFn: (payload: CreateDailyEntryPayload) => {
+      if (!activeWorkspaceId) {
+        throw new Error('워크스페이스 ID가 없습니다.')
+      }
+
+      return createDailyEntry(activeWorkspaceId, payload)
+    },
 
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: dailyEntryQueryKeys.all,
+        queryKey: dailyEntryQueryKeys.workspace(activeWorkspaceId),
       })
     },
   })
@@ -98,27 +118,34 @@ export const useCreateDailyEntry = () => {
 
 export const useDeleteDailyEntry = () => {
   const queryClient = useQueryClient()
+  const activeWorkspaceId = useActiveWorkspaceId()
 
   return useMutation({
-    mutationFn: deleteDailyEntry,
+    mutationFn: (dailyEntryId: string) => {
+      if (!activeWorkspaceId) {
+        throw new Error('워크스페이스 ID가 없습니다.')
+      }
+
+      return deleteDailyEntry(activeWorkspaceId, dailyEntryId)
+    },
 
     onSuccess: () => {
       queryClient.removeQueries({
-        queryKey: dailyEntryQueryKeys.byDates(),
+        queryKey: dailyEntryQueryKeys.byDates(activeWorkspaceId),
       })
 
       void Promise.all([
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.summary(),
+          queryKey: dailyEntryQueryKeys.summary(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyRecords(),
+          queryKey: dailyEntryQueryKeys.monthlyRecords(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.monthlyEntries(),
+          queryKey: dailyEntryQueryKeys.monthlyEntries(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: dailyEntryQueryKeys.searches(),
+          queryKey: dailyEntryQueryKeys.searches(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
           queryKey: homeQueryKeys.all,

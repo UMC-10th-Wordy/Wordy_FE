@@ -14,6 +14,7 @@ export type MonthlyGeneration = 'idle' | 'generating' | 'complete'
 
 interface MonthlyDashboardProps {
   generation: MonthlyGeneration
+  workspaceId: string
   onGenerate: () => void
   onGoWeekly: (weekId: string) => void
   eligibility: MonthlyEligibilityDto | null
@@ -73,6 +74,7 @@ export const MonthlyDashboard = ({
   onGoWeekly,
   eligibility,
   detail,
+  workspaceId,
   onReflectionSaved,
 }: MonthlyDashboardProps) => {
   const weeks = eligibility ? buildWeeks(eligibility) : []
@@ -137,7 +139,9 @@ export const MonthlyDashboard = ({
         />
         {/* 월간 회고는 별도 API — 주간 회고(weeklyReflections)로 초기값을 채우지 않음 (리뷰 반영) */}
         <WeeklyRetrospective
+          key={detail.dashboardId}
           period="monthly"
+          workspaceId={workspaceId}
           dashboardId={detail.dashboardId}
           initialReflection={(() => {
             const list = detail.weeklyReflections
@@ -167,7 +171,12 @@ export const MonthlyDashboard = ({
         requiredCount={requiredCount}
         periodLabel={eligibility ? `${Number(eligibility.monthStart.slice(5, 7))}월` : undefined}
       />
-      <MonthlyWeekListPanel weeks={weeks} totalWeeks={weeks.length} onGoWeekly={onGoWeekly} />
+      <MonthlyWeekListPanel
+        weeks={weeks}
+        totalWeeks={weeks.length}
+        onGoWeekly={onGoWeekly}
+        periodLabel={eligibility ? `${Number(eligibility.monthStart.slice(5, 7))}월` : undefined}
+      />
     </>
   )
 }

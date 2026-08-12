@@ -1,9 +1,12 @@
 import { useGetDiaryListPageData } from '@/hooks/useDailyEntryQueries'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
+
+import { LoadingState } from '@/components/common/AsyncState/AsyncState'
 import { DiaryListHeader } from '@/components/diary-list/DiaryListHeader'
 import { DiaryMonthlySection } from '@/components/diary-list/DiaryMonthlySection'
 import { DiarySummarySection } from '@/components/diary-list/DiarySummarySection'
 
-export const DiaryListPage = () => {
+const DiaryListContent = () => {
   const { summary, records } = useGetDiaryListPageData()
 
   return (
@@ -16,4 +19,14 @@ export const DiaryListPage = () => {
       </div>
     </main>
   )
+}
+
+export const DiaryListPage = () => {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
+  if (!activeWorkspaceId) {
+    return <LoadingState message="불러오는 중입니다" className="h-full w-full" />
+  }
+
+  return <DiaryListContent />
 }

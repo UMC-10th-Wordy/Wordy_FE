@@ -16,13 +16,20 @@ import type {
 
 const AI_REQUEST_TIMEOUT_MS = 120_000
 
+const getPerformancesPath = (workspaceId: string) =>
+  `/workspaces/${encodeURIComponent(workspaceId)}/performances`
+
+const getPerformancePreviewPath = (workspaceId: string) =>
+  `/ai/workspaces/${encodeURIComponent(workspaceId)}/performance-preview`
+
 /* AI 성과 미리보기 생성 */
-// POST /ai/performance-preview
+// POST /ai/workspaces/{workspaceId}/performance-preview
 
 export const createPerformancePreview = async (
+  workspaceId: string,
   payload: CreatePerformancePreviewPayload,
 ): Promise<CreatePerformancePreviewResponse> => {
-  return request<CreatePerformancePreviewResponse>('/ai/performance-preview', {
+  return request<CreatePerformancePreviewResponse>(getPerformancePreviewPath(workspaceId), {
     method: 'POST',
     body: JSON.stringify(payload),
     signal: AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS),
@@ -30,34 +37,42 @@ export const createPerformancePreview = async (
 }
 
 /* 보충 질문 답변 후 성과 미리보기 생성 완료 */
-// POST /ai/performance-preview/complete
+// POST /ai/workspaces/{workspaceId}/performance-preview/complete
 
 export const completePerformancePreview = async (
+  workspaceId: string,
   payload: CompletePerformancePreviewPayload,
 ): Promise<CompletePerformancePreviewResponse> => {
-  return request<CompletePerformancePreviewResponse>('/ai/performance-preview/complete', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS),
-  })
+  return request<CompletePerformancePreviewResponse>(
+    `${getPerformancePreviewPath(workspaceId)}/complete`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS),
+    },
+  )
 }
 
 /* 업무 성과 저장 */
-// POST /performances
+// POST /workspaces/{workspaceId}/performances
 
 export const savePerformance = async (
+  workspaceId: string,
   payload: SavePerformancePayload,
 ): Promise<SavePerformanceResponse> => {
-  return request<SavePerformanceResponse>('/performances', {
+  return request<SavePerformanceResponse>(getPerformancesPath(workspaceId), {
     method: 'POST',
     body: JSON.stringify(payload),
   })
 }
 
 /* 저장된 업무 성과 목록 조회 */
-// GET /performances?date=YYYY-MM-DD
+// GET /workspaces/{workspaceId}/performances?date=YYYY-MM-DD
 
-export const getPerformances = async (date?: string): Promise<PerformanceListResponse> => {
+export const getPerformances = async (
+  workspaceId: string,
+  date?: string,
+): Promise<PerformanceListResponse> => {
   const searchParams = new URLSearchParams()
 
   if (date) {
@@ -67,7 +82,7 @@ export const getPerformances = async (date?: string): Promise<PerformanceListRes
   const queryString = searchParams.toString()
 
   const response = await request<PerformanceListResponse | null>(
-    `/performances${queryString ? `?${queryString}` : ''}`,
+    `${getPerformancesPath(workspaceId)}${queryString ? `?${queryString}` : ''}`,
     {
       method: 'GET',
     },
@@ -82,13 +97,14 @@ export const getPerformances = async (date?: string): Promise<PerformanceListRes
 }
 
 /* 저장된 업무 성과 상세 조회 */
-// GET /performances/{dailyPerformanceId}
+// GET /workspaces/{workspaceId}/performances/{dailyPerformanceId}
 
 export const getPerformanceDetail = async (
+  workspaceId: string,
   dailyPerformanceId: string,
 ): Promise<PerformanceDetailResponse> => {
   const response = await request<PerformanceDetailResponse | null>(
-    `/performances/${encodeURIComponent(dailyPerformanceId)}`,
+    `${getPerformancesPath(workspaceId)}/${encodeURIComponent(dailyPerformanceId)}`,
     {
       method: 'GET',
     },
@@ -101,33 +117,16 @@ export const getPerformanceDetail = async (
   return response
 }
 
-export const performanceQueryKeys = {
-  all: ['performances'] as const,
-
-  previews: () => [...performanceQueryKeys.all, 'preview'] as const,
-
-  preview: (reflectionSnapshotId: string) =>
-    [...performanceQueryKeys.previews(), reflectionSnapshotId] as const,
-
-  lists: () => [...performanceQueryKeys.all, 'list'] as const,
-
-  list: (date?: string) => [...performanceQueryKeys.lists(), { date: date ?? null }] as const,
-
-  details: () => [...performanceQueryKeys.all, 'detail'] as const,
-
-  detail: (dailyPerformanceId: string) =>
-    [...performanceQueryKeys.details(), dailyPerformanceId] as const,
-}
-
 /* 저장된 업무 성과 수정 */
-// PATCH /performances/{dailyPerformanceId}
+// PATCH /workspaces/{workspaceId}/performances/{dailyPerformanceId}
 
 export const updatePerformance = async (
+  workspaceId: string,
   dailyPerformanceId: string,
   payload: UpdatePerformancePayload,
 ): Promise<UpdatePerformanceResponse> => {
   return request<UpdatePerformanceResponse>(
-    `/performances/${encodeURIComponent(dailyPerformanceId)}`,
+    `${getPerformancesPath(workspaceId)}/${encodeURIComponent(dailyPerformanceId)}`,
     {
       method: 'PATCH',
       body: JSON.stringify(payload),
@@ -136,15 +135,39 @@ export const updatePerformance = async (
 }
 
 /* 성과 미리보기 상태 조회 */
-// GET /performances/preview/{reflectionSnapshotId}
+// GET /workspaces/{workspaceId}/performances/preview/{reflectionSnapshotId}
 
 export const getPerformancePreviewStatus = async (
+  workspaceId: string,
   reflectionSnapshotId: string,
 ): Promise<PerformancePreviewPollingResponse> => {
   return request<PerformancePreviewPollingResponse>(
-    `/performances/preview/${encodeURIComponent(reflectionSnapshotId)}`,
+    `${getPerformancesPath(workspaceId)}/preview/${encodeURIComponent(reflectionSnapshotId)}`,
     {
       method: 'GET',
     },
   )
+}
+
+export const performanceQueryKeys = {
+  all: ['performances'] as const,
+
+  workspace: (workspaceId: string) => [...performanceQueryKeys.all, workspaceId] as const,
+
+  previews: (workspaceId: string) =>
+    [...performanceQueryKeys.workspace(workspaceId), 'preview'] as const,
+
+  preview: (workspaceId: string, reflectionSnapshotId: string) =>
+    [...performanceQueryKeys.previews(workspaceId), reflectionSnapshotId] as const,
+
+  lists: (workspaceId: string) => [...performanceQueryKeys.workspace(workspaceId), 'list'] as const,
+
+  list: (workspaceId: string, date?: string) =>
+    [...performanceQueryKeys.lists(workspaceId), { date: date ?? null }] as const,
+
+  details: (workspaceId: string) =>
+    [...performanceQueryKeys.workspace(workspaceId), 'detail'] as const,
+
+  detail: (workspaceId: string, dailyPerformanceId: string) =>
+    [...performanceQueryKeys.details(workspaceId), dailyPerformanceId] as const,
 }
