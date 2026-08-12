@@ -1,3 +1,4 @@
+import type { QueryClient } from '@tanstack/react-query'
 import { request } from '@/lib/httpClient'
 
 import type {
@@ -48,3 +49,11 @@ export const workspaceQueryKeys = {
 
 export const getDefaultWorkspaceId = (workspaces: WorkspaceListResult): string =>
   workspaces.find((w) => w.isDefault)?.workspaceId ?? workspaces[0]?.workspaceId ?? ''
+
+export const fetchDefaultWorkspaceId = async (queryClient: QueryClient): Promise<string> => {
+  const workspaces = await queryClient.fetchQuery({
+    queryKey: workspaceQueryKeys.lists(),
+    queryFn: getWorkspaces,
+  })
+  return getDefaultWorkspaceId(workspaces)
+}
