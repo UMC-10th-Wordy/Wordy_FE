@@ -17,6 +17,7 @@ import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
 import { homeQueryKeys } from '@/api/home/home'
 import { fetchDefaultWorkspaceId } from '@/api/workspace/workspace'
 import { useGetProfile } from '@/hooks/useUserQueries'
+import { LoadingState } from '@/components/common/AsyncState/AsyncState'
 
 const NICKNAME_INVALID_CHARS_REGEX = /[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9\s]/g
 const sanitizeNickname = (value: string) => value.replace(NICKNAME_INVALID_CHARS_REGEX, '')
@@ -102,7 +103,11 @@ export const ProfileSetupPage = () => {
     }
   }
 
-  if (isProfileLoading || profileData?.userName) {
+  if (isProfileLoading) {
+    return <LoadingState message="불러오는 중이에요" className="h-screen" />
+  }
+
+  if (profileData?.userName) {
     return null
   }
 
