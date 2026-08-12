@@ -6,5 +6,6 @@ export const useGetHome = () => {
   return useSuspenseQuery({
     queryKey: homeQueryKeys.all,
     queryFn: getHome,
+    refetchOnMount: 'always',
   })
 }

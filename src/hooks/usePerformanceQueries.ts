@@ -11,6 +11,8 @@ import {
   savePerformance,
   updatePerformance,
 } from '@/api/performance/performance'
+import { dailyEntryQueryKeys } from '@/api/daily-entry/dailyEntry'
+import { homeQueryKeys } from '@/api/home/home'
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 
 import type {
@@ -58,6 +60,7 @@ export const useCompletePerformancePreview = () => {
 }
 
 export const useSavePerformance = () => {
+  const queryClient = useQueryClient()
   const activeWorkspaceId = useActiveWorkspaceId()
 
   return useMutation({
@@ -67,6 +70,20 @@ export const useSavePerformance = () => {
       }
 
       return savePerformance(activeWorkspaceId, payload)
+    },
+
+    onSuccess: () => {
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: performanceQueryKeys.workspace(activeWorkspaceId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.workspace(activeWorkspaceId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
+        }),
+      ])
     },
   })
 }

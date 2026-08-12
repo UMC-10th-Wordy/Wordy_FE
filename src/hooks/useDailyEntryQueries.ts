@@ -109,9 +109,14 @@ export const useCreateDailyEntry = () => {
     },
 
     onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: dailyEntryQueryKeys.workspace(activeWorkspaceId),
-      })
+      void Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dailyEntryQueryKeys.workspace(activeWorkspaceId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: homeQueryKeys.all,
+        }),
+      ])
     },
   })
 }
