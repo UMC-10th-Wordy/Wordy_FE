@@ -59,7 +59,6 @@ import { LoadingState } from '@/components/common/AsyncState/AsyncState'
 import { usePerformancePreview } from '@/hooks/usePerformancePreview'
 import { usePerformanceQuestionChat } from '@/hooks/usePerformanceQuestionChat'
 import { useGetPerformancesByDate, useUpdatePerformance } from '@/hooks/usePerformanceQueries'
-import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import {
   mapPerformanceDetailResult,
   mapPerformancePreviewRequest,
@@ -106,7 +105,7 @@ export default function TodoListPage() {
     return <LoadingState message="불러오는 중입니다" className="h-screen w-full" />
   }
 
-  return <TodoListPageContent workspaceId={workspaceId} />
+  return <TodoListPageContent key={workspaceId} workspaceId={workspaceId} />
 }
 
 function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
