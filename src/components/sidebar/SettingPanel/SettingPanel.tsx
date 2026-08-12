@@ -105,12 +105,20 @@ export function SettingPanel({
   const [careerRect, setCareerRect] = useState<DOMRect | null>(null)
 
   useEffect(() => {
-    if (openDropdown === 'job' && jobAnchorRef.current) {
-      setJobRect(jobAnchorRef.current.getBoundingClientRect())
+    if (!openDropdown) return
+
+    const updateRect = () => {
+      if (openDropdown === 'job' && jobAnchorRef.current) {
+        setJobRect(jobAnchorRef.current.getBoundingClientRect())
+      }
+      if (openDropdown === 'career' && careerAnchorRef.current) {
+        setCareerRect(careerAnchorRef.current.getBoundingClientRect())
+      }
     }
-    if (openDropdown === 'career' && careerAnchorRef.current) {
-      setCareerRect(careerAnchorRef.current.getBoundingClientRect())
-    }
+
+    updateRect()
+    window.addEventListener('resize', updateRect)
+    return () => window.removeEventListener('resize', updateRect)
   }, [openDropdown])
 
   useEffect(() => {
