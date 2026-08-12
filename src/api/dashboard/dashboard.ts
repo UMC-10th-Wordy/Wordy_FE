@@ -101,6 +101,22 @@ export async function createMonthlyReflection(
   )
 }
 
+/* PATCH /workspaces/{workspaceId}/dashboards/monthly/{dashboardId}/reflection/{reflectionId} — 월간 회고 수정 */
+export async function updateMonthlyReflection(
+  workspaceId: string,
+  dashboardId: string,
+  reflectionId: string,
+  payload: UpdateReflectionPayload,
+): Promise<void> {
+  await request<void>(
+    `/workspaces/${workspaceId}/dashboards/monthly/${dashboardId}/reflection/${reflectionId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  )
+}
+
 /* POST /workspaces/{workspaceId}/dashboards/drafts — 회고 draft 임시저장 */
 export async function saveDraft(
   workspaceId: string,
