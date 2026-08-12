@@ -13,8 +13,8 @@ import { useNavigate } from 'react-router-dom'
 import { useSignup } from '@/hooks/useAuthQueries'
 import { useToast } from '@/hooks/useToast'
 import { ApiError } from '@/lib/httpClient'
+import { EMAIL_REGEX } from '@/utils/validation'
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 // 영문, 숫자, 특수문자 모두 포함 8자 이상 (피그마 힌트 문구 기준)
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/
 

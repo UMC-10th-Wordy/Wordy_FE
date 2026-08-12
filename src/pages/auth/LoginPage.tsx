@@ -13,8 +13,7 @@ import { fetchDefaultWorkspaceId } from '@/api/workspace/workspace'
 import { useLogin } from '@/hooks/useAuthQueries'
 import { useToast } from '@/hooks/useToast'
 import { ApiError, clearAuthTokens, markAuthenticated, storeAuthTokens } from '@/lib/httpClient'
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+import { EMAIL_REGEX } from '@/utils/validation'
 
 export const LoginPage = () => {
   const navigate = useNavigate()
