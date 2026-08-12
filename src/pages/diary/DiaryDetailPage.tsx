@@ -12,7 +12,7 @@ import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import { useToast } from '@/hooks/useToast'
 
-import { DeleteDiaryDialog } from '@/components/diary-detail/DeleteDiaryDialog'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
 import { DiaryDetailHeader } from '@/components/diary-detail/DiaryDetailHeader'
 import { DiaryRetrospective } from '@/components/diary-detail/DiaryRetrospective'
 import { ReadOnlyTaskCard } from '@/components/diary-detail/ReadOnlyTaskCard'
@@ -163,7 +163,8 @@ export const DiaryDetailContent = ({ diary, hideDelete }: DiaryDetailContentProp
       </div>
 
       {isDeleteDialogOpen && (
-        <DeleteDiaryDialog
+        <ConfirmDialog
+          message="이 날의 업무 일지를 삭제할까요?"
           onCancel={() => {
             if (!isDeletePending) {
               setIsDeleteDialogOpen(false)
