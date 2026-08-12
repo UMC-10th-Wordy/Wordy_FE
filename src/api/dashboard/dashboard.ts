@@ -173,3 +173,27 @@ export async function createMonthlyDashboard(
     signal: AbortSignal.timeout(120_000),
   })
 }
+
+export const dashboardQueryKeys = {
+  all: ['dashboards'] as const,
+
+  workspace: (workspaceId: string) => [...dashboardQueryKeys.all, workspaceId] as const,
+
+  weeklyEligibility: (workspaceId: string, baseDate: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'weekly-eligibility', baseDate] as const,
+
+  weeklyList: (workspaceId: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'weekly-list'] as const,
+
+  weeklyDetail: (workspaceId: string, dashboardId: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'weekly-detail', dashboardId] as const,
+
+  monthlyEligibility: (workspaceId: string, baseDate: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'monthly-eligibility', baseDate] as const,
+
+  monthlyList: (workspaceId: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'monthly-list'] as const,
+
+  monthlyDetail: (workspaceId: string, dashboardId: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'monthly-detail', dashboardId] as const,
+}
