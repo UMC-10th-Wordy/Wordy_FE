@@ -177,6 +177,7 @@ export const usePerformanceQuestionChat = ({
         aiQuestionId: currentQuestion.aiQuestionId,
         question: currentQuestion.question,
         answer: trimmedAnswer,
+        status: 'ANSWERED',
       },
     ]
 
@@ -214,6 +215,7 @@ export const usePerformanceQuestionChat = ({
         aiQuestionId: currentQuestion.aiQuestionId,
         question: currentQuestion.question,
         answer: '',
+        status: 'SKIPPED',
       },
     ]
 

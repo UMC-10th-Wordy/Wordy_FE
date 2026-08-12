@@ -83,10 +83,13 @@ export type CreatePerformancePreviewResponse = CreatePerformancePreviewResult
 /* 보충 질문 답변 후 성과 미리보기 생성 완료 */
 // POST /ai/performance-preview/complete
 
+export type PerformanceSupplementAnswerStatus = 'ANSWERED' | 'SKIPPED'
+
 export interface PerformanceSupplementAnswer {
   aiQuestionId: string
   question: string
   answer: string
+  status: PerformanceSupplementAnswerStatus
 }
 
 export interface CompletePerformancePreviewPayload {
