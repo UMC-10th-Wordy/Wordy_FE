@@ -61,6 +61,7 @@ interface TagSelectProps {
 export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [tagOptions, setTagOptions] = useState<TaskTag[]>([])
+  const [tagOptionsWorkspaceId, setTagOptionsWorkspaceId] = useState<string | null>(null)
   const [showModal, setShowModal] = useState<'existing' | 'new' | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
@@ -72,7 +73,10 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
     let cancelled = false
     getTags(workspaceId)
       .then((dtos) => {
-        if (!cancelled) setTagOptions(dtos.map(mapTagDtoToTaskTag))
+        if (!cancelled) {
+          setTagOptions(dtos.map(mapTagDtoToTaskTag))
+          setTagOptionsWorkspaceId(workspaceId)
+        }
       })
       .catch(() => {})
     return () => {
@@ -80,7 +84,7 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
     }
   }, [tags, workspaceId])
 
-  const effectiveTags = tags ?? tagOptions
+  const effectiveTags = tags ?? (tagOptionsWorkspaceId === workspaceId ? tagOptions : [])
   const updateTags = (updater: (prev: TaskTag[]) => TaskTag[]) => {
     if (tags !== undefined) {
       onTagsChange?.(updater(tags))
