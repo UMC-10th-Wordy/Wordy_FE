@@ -571,6 +571,7 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
               .sort((a, b) => (orderIndex.get(a.taskId) ?? 0) - (orderIndex.get(b.taskId) ?? 0))
           },
         )
+        queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
       })
       .catch(() => {
         addToast('업무 순서 변경에 실패했어요. 다시 시도해 주세요')
@@ -627,30 +628,11 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
     )
 
     setMovedPerformanceTaskIds((prev) => (prev.includes(taskId) ? prev : [...prev, taskId]))
-
-    queryClient.invalidateQueries({
-      queryKey: homeQueryKeys.all,
-    })
-    queryClient.invalidateQueries({
-      queryKey: taskQueryKeys.calendars(workspaceId),
-    })
   }
 
   /* 성과 변환 클릭 시 성과 미리보기 패널을 변환 중 상태로 오픈 */
   const handleSavePerformance = async (values: { summary: string; insight: string }) => {
     await performancePreview.saveResult(values)
-
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: performanceQueryKeys.workspace(activeWorkspaceId),
-      }),
-      queryClient.invalidateQueries({
-        queryKey: dailyEntryQueryKeys.workspace(activeWorkspaceId),
-      }),
-      queryClient.invalidateQueries({
-        queryKey: homeQueryKeys.all,
-      }),
-    ])
   }
 
   const handleUpdatePerformance = async (values: { summary: string; insight: string }) => {

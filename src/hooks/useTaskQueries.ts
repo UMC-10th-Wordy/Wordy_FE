@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { getTasksCalendar, moveTaskToTomorrow, getTasks, taskQueryKeys } from '@/api/task/task'
+import { homeQueryKeys } from '@/api/home/home'
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import { mapTaskDtoToTask } from '@/utils/taskMapper'
 
@@ -9,6 +10,7 @@ interface MoveTaskToTomorrowVariables {
 }
 
 export const useMoveTaskToTomorrow = () => {
+  const queryClient = useQueryClient()
   const workspaceId = useActiveWorkspaceId()
 
   return useMutation({
@@ -16,6 +18,11 @@ export const useMoveTaskToTomorrow = () => {
       moveTaskToTomorrow(workspaceId, taskId, {
         taskDate,
       }),
+
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      void queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars(workspaceId) })
+    },
   })
 }
 
