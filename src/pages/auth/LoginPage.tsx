@@ -135,7 +135,11 @@ export const LoginPage = () => {
               onChange={(e) => setRememberMe(e.target.checked)}
             />
             {/* TODO: 비밀번호 찾기 페이지 연결 */}
-            <TextButton variant="text_only" size="small">
+            <TextButton
+              variant="text_only"
+              size="small"
+              onClick={() => addToast('아직 지원하지 않는 기능이에요')}
+            >
               비밀번호 찾기
             </TextButton>
           </div>
