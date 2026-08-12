@@ -12,6 +12,7 @@ import { useOutsideClick } from '@/hooks/useOutsideClick'
 import { useVerticalDragReorder, type VerticalDragOverInfo } from '@/hooks/useVerticalDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
 import { getTags } from '@/api/tag/tag'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import { getTagKey, mapTagDtoToTaskTag } from '@/utils/tagMapper'
 import type { TaskTag } from '@/types/todo'
 
@@ -63,11 +64,13 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
   const [showModal, setShowModal] = useState<'existing' | 'new' | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const workspaceId = useActiveWorkspaceId()
 
   useEffect(() => {
     if (tags !== undefined) return
+    if (!workspaceId) return
     let cancelled = false
-    getTags()
+    getTags(workspaceId)
       .then((dtos) => {
         if (!cancelled) setTagOptions(dtos.map(mapTagDtoToTaskTag))
       })
@@ -75,7 +78,7 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
     return () => {
       cancelled = true
     }
-  }, [tags])
+  }, [tags, workspaceId])
 
   const effectiveTags = tags ?? tagOptions
   const updateTags = (updater: (prev: TaskTag[]) => TaskTag[]) => {

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { getTasksCalendar, moveTaskToTomorrow, getTasks, taskQueryKeys } from '@/api/task/task'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import { mapTaskDtoToTask } from '@/utils/taskMapper'
 
 interface MoveTaskToTomorrowVariables {
@@ -8,18 +9,22 @@ interface MoveTaskToTomorrowVariables {
 }
 
 export const useMoveTaskToTomorrow = () => {
+  const workspaceId = useActiveWorkspaceId()
+
   return useMutation({
     mutationFn: ({ taskId, taskDate }: MoveTaskToTomorrowVariables) =>
-      moveTaskToTomorrow(taskId, {
+      moveTaskToTomorrow(workspaceId, taskId, {
         taskDate,
       }),
   })
 }
 
 export const useGetTasksByDate = (date: string) => {
+  const workspaceId = useActiveWorkspaceId()
+
   return useSuspenseQuery({
-    queryKey: taskQueryKeys.list(date),
-    queryFn: () => getTasks(date),
+    queryKey: taskQueryKeys.list(workspaceId, date),
+    queryFn: () => getTasks(workspaceId, date),
     select: (dtos) => dtos.map(mapTaskDtoToTask),
   })
 }
@@ -30,8 +35,11 @@ export const useGetTasksCalendar = (
   startDate: string,
   endDate: string,
 ) => {
+  const workspaceId = useActiveWorkspaceId()
+
   return useQuery({
-    queryKey: taskQueryKeys.calendar(year, month),
-    queryFn: () => getTasksCalendar(startDate, endDate),
+    queryKey: taskQueryKeys.calendar(workspaceId, year, month),
+    queryFn: () => getTasksCalendar(workspaceId, startDate, endDate),
+    enabled: Boolean(workspaceId),
   })
 }
