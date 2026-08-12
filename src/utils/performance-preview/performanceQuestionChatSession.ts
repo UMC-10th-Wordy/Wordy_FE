@@ -38,13 +38,18 @@ const isPerformanceQuestionChatSession = (
   )
 }
 
-const getPerformanceQuestionChatSessionKey = (entryDate: string) =>
-  `performance-question-chat-session:${entryDate}`
+const getPerformanceQuestionChatSessionKey = (workspaceId: string, entryDate: string) =>
+  `performance-question-chat-session:${workspaceId}:${entryDate}`
 
 export const getPerformanceQuestionChatSession = (
+  workspaceId: string,
   entryDate: string,
 ): PerformanceQuestionChatSession | null => {
-  const key = getPerformanceQuestionChatSessionKey(entryDate)
+  if (!workspaceId) {
+    return null
+  }
+
+  const key = getPerformanceQuestionChatSessionKey(workspaceId, entryDate)
 
   try {
     const storedSession = sessionStorage.getItem(key)
@@ -73,19 +78,31 @@ export const getPerformanceQuestionChatSession = (
 }
 
 export const setPerformanceQuestionChatSession = (
+  workspaceId: string,
   entryDate: string,
   session: PerformanceQuestionChatSession,
 ) => {
+  if (!workspaceId) {
+    return
+  }
+
   try {
-    sessionStorage.setItem(getPerformanceQuestionChatSessionKey(entryDate), JSON.stringify(session))
+    sessionStorage.setItem(
+      getPerformanceQuestionChatSessionKey(workspaceId, entryDate),
+      JSON.stringify(session),
+    )
   } catch {
     return
   }
 }
 
-export const clearPerformanceQuestionChatSession = (entryDate: string) => {
+export const clearPerformanceQuestionChatSession = (workspaceId: string, entryDate: string) => {
+  if (!workspaceId) {
+    return
+  }
+
   try {
-    sessionStorage.removeItem(getPerformanceQuestionChatSessionKey(entryDate))
+    sessionStorage.removeItem(getPerformanceQuestionChatSessionKey(workspaceId, entryDate))
   } catch {
     return
   }

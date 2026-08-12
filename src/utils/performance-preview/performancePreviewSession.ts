@@ -18,13 +18,18 @@ export interface PerformancePreviewSession {
   sourceTasks: Task[]
 }
 
-const getPerformancePreviewSessionKey = (entryDate: string) =>
-  `performance-preview-session:${entryDate}`
+const getPerformancePreviewSessionKey = (workspaceId: string, entryDate: string) =>
+  `performance-preview-session:${workspaceId}:${entryDate}`
 
 export const getPerformancePreviewSession = (
+  workspaceId: string,
   entryDate: string,
 ): PerformancePreviewSession | null => {
-  const key = getPerformancePreviewSessionKey(entryDate)
+  if (!workspaceId) {
+    return null
+  }
+
+  const key = getPerformancePreviewSessionKey(workspaceId, entryDate)
 
   try {
     const storedSession = sessionStorage.getItem(key)
@@ -46,19 +51,31 @@ export const getPerformancePreviewSession = (
 }
 
 export const setPerformancePreviewSession = (
+  workspaceId: string,
   entryDate: string,
   session: PerformancePreviewSession,
 ) => {
+  if (!workspaceId) {
+    return
+  }
+
   try {
-    sessionStorage.setItem(getPerformancePreviewSessionKey(entryDate), JSON.stringify(session))
+    sessionStorage.setItem(
+      getPerformancePreviewSessionKey(workspaceId, entryDate),
+      JSON.stringify(session),
+    )
   } catch {
     return
   }
 }
 
-export const clearPerformancePreviewSession = (entryDate: string) => {
+export const clearPerformancePreviewSession = (workspaceId: string, entryDate: string) => {
+  if (!workspaceId) {
+    return
+  }
+
   try {
-    sessionStorage.removeItem(getPerformancePreviewSessionKey(entryDate))
+    sessionStorage.removeItem(getPerformancePreviewSessionKey(workspaceId, entryDate))
   } catch {
     return
   }

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import { useCreateDailyEntry } from '@/hooks/useDailyEntryQueries'
 import {
   useCompletePerformancePreview,
@@ -41,7 +42,11 @@ interface StartPerformancePreviewParams {
 }
 
 export const usePerformancePreview = (entryDate: string) => {
-  const [initialSession] = useState(() => getPerformancePreviewSession(entryDate))
+  const activeWorkspaceId = useActiveWorkspaceId()
+
+  const [initialSession] = useState(() =>
+    getPerformancePreviewSession(activeWorkspaceId, entryDate),
+  )
 
   const [status, setStatus] = useState<PerformancePreviewStatus>(
     () => initialSession?.status ?? 'empty',
@@ -114,7 +119,7 @@ export const usePerformancePreview = (entryDate: string) => {
     profile,
     performanceRequest,
   }: StartPerformancePreviewParams) => {
-    clearPerformancePreviewSession(entryDate)
+    clearPerformancePreviewSession(activeWorkspaceId, entryDate)
 
     setIsSaved(false)
     setStatus('converting')
@@ -151,7 +156,7 @@ export const usePerformancePreview = (entryDate: string) => {
         setQuestionContext(nextQuestionContext)
         setStatus('questioning')
 
-        setPerformancePreviewSession(entryDate, {
+        setPerformancePreviewSession(activeWorkspaceId, entryDate, {
           status: 'questioning',
           reflectionSnapshotId: previewResponse.reflectionSnapshotId,
           questionContext: nextQuestionContext,
@@ -164,7 +169,7 @@ export const usePerformancePreview = (entryDate: string) => {
       if (previewResponse.status === 'PROCESSING') {
         setStatus('converting')
 
-        setPerformancePreviewSession(entryDate, {
+        setPerformancePreviewSession(activeWorkspaceId, entryDate, {
           status: 'converting',
           reflectionSnapshotId: previewResponse.reflectionSnapshotId,
           questionContext: null,
@@ -190,7 +195,7 @@ export const usePerformancePreview = (entryDate: string) => {
 
       setStatus('converting')
 
-      setPerformancePreviewSession(entryDate, {
+      setPerformancePreviewSession(activeWorkspaceId, entryDate, {
         status: 'converting',
         reflectionSnapshotId: questionContext.reflectionSnapshotId,
         questionContext: null,
@@ -210,7 +215,7 @@ export const usePerformancePreview = (entryDate: string) => {
         if (completedResponse.status === 'PROCESSING') {
           setStatus('converting')
 
-          setPerformancePreviewSession(entryDate, {
+          setPerformancePreviewSession(activeWorkspaceId, entryDate, {
             status: 'converting',
             reflectionSnapshotId: completedResponse.reflectionSnapshotId,
             questionContext: null,
@@ -227,7 +232,13 @@ export const usePerformancePreview = (entryDate: string) => {
         throw error
       }
     },
-    [completePerformancePreviewMutation, entryDate, questionContext, sourceTasks],
+    [
+      activeWorkspaceId,
+      completePerformancePreviewMutation,
+      entryDate,
+      questionContext,
+      sourceTasks,
+    ],
   )
 
   const saveResult = async (values: { summary: string; insight: string }) => {
@@ -257,7 +268,7 @@ export const usePerformancePreview = (entryDate: string) => {
     setStatus('success')
 
     clearPerformancePreviewDraft(reflectionSnapshotId)
-    clearPerformancePreviewSession(entryDate)
+    clearPerformancePreviewSession(activeWorkspaceId, entryDate)
 
     return response
   }
@@ -269,28 +280,31 @@ export const usePerformancePreview = (entryDate: string) => {
     setReflectionSnapshotId(null)
     setQuestionContext(null)
     setSourceTasks([])
-    clearPerformancePreviewSession(entryDate)
+    clearPerformancePreviewSession(activeWorkspaceId, entryDate)
   }
 
-  const restorePreview = (nextEntryDate: string) => {
-    const session = getPerformancePreviewSession(nextEntryDate)
+  const restorePreview = useCallback(
+    (nextEntryDate: string) => {
+      const session = getPerformancePreviewSession(activeWorkspaceId, nextEntryDate)
 
-    setIsSaved(false)
-    setResult(null)
+      setIsSaved(false)
+      setResult(null)
 
-    if (!session) {
-      setStatus('empty')
-      setReflectionSnapshotId(null)
-      setQuestionContext(null)
-      setSourceTasks([])
-      return
-    }
+      if (!session) {
+        setStatus('empty')
+        setReflectionSnapshotId(null)
+        setQuestionContext(null)
+        setSourceTasks([])
+        return
+      }
 
-    setStatus(session.status)
-    setReflectionSnapshotId(session.reflectionSnapshotId)
-    setQuestionContext(session.questionContext)
-    setSourceTasks(session.sourceTasks)
-  }
+      setStatus(session.status)
+      setReflectionSnapshotId(session.reflectionSnapshotId)
+      setQuestionContext(session.questionContext)
+      setSourceTasks(session.sourceTasks)
+    },
+    [activeWorkspaceId],
+  )
 
   return {
     status: resolvedStatus,
