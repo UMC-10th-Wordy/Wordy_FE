@@ -8,9 +8,16 @@ export interface ScrollbarProps {
   className?: string
   scrollbarClassName?: string
   inline?: boolean
+  resetKey?: string | number
 }
 
-export function Scrollbar({ children, className, scrollbarClassName, inline }: ScrollbarProps) {
+export function Scrollbar({
+  children,
+  className,
+  scrollbarClassName,
+  inline,
+  resetKey,
+}: ScrollbarProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
@@ -62,6 +69,11 @@ export function Scrollbar({ children, className, scrollbarClassName, inline }: S
       mo.disconnect()
     }
   }, [updateThumb])
+
+  useEffect(() => {
+    if (resetKey === undefined) return
+    contentRef.current?.scrollTo({ top: 0 })
+  }, [resetKey])
 
   const scrollBy = useCallback((amount: number) => {
     contentRef.current?.scrollBy({ top: amount })
