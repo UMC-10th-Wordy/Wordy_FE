@@ -78,7 +78,7 @@ export const TagSearchAccordion = ({ result, keyword, onDetailClick }: TagSearch
               {result.diaries.map((diary) => {
                 const dateLabel = formatDiaryDate(diary.entryDate)
                 return (
-                  <article key={`${diary.id}-${diary.title}`} className="w-full py-(--scale-8)">
+                  <article key={diary.taskId} className="w-full py-(--scale-8)">
                     <time
                       dateTime={diary.entryDate}
                       className="[font-size:var(--font-size-body-3)] leading-(--line-height-body) font-[var(--font-weight-medium)] text-(--color-text-tertiary)"
