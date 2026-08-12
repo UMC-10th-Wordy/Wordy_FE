@@ -10,6 +10,8 @@ import { IconButton } from '@/components/common/Button/IconButton'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { Input1 } from '@/components/common/Input/Input1'
 import { SearchInput } from '@/components/common/SearchInput/SearchInput'
+import { ToastContainer } from '@/components/common/Toast/ToastContainer'
+import { useToast } from '@/hooks/useToast'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 import CalendarIcon from '@/assets/icons/calendar.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
@@ -97,6 +99,7 @@ export default function TagSettingsModal({
   const { data: profile, isLoading: isProfileLoading } = useGetProfile()
   const workspaceId = useActiveWorkspaceId()
   const queryClient = useQueryClient()
+  const { toasts, addToast } = useToast()
   const overlayMouseDownRef = useRef(false)
 
   // 기존 태그 탭
@@ -287,7 +290,7 @@ export default function TagSettingsModal({
       void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
       void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all(workspaceId) })
     } catch {
-      return
+      addToast('태그 수정에 실패했어요. 다시 시도해 주세요.')
     }
   }
 
@@ -321,7 +324,7 @@ export default function TagSettingsModal({
       })
       setNewKpis(kpiRecommendations)
     } catch {
-      return
+      addToast('KPI 추천에 실패했어요. 다시 시도해 주세요.')
     } finally {
       setIsAiGenerating(false)
     }
@@ -340,7 +343,7 @@ export default function TagSettingsModal({
       })
       setEditDraft((d) => ({ ...d, kpis: kpiRecommendations }))
     } catch {
-      return
+      addToast('KPI 추천에 실패했어요. 다시 시도해 주세요.')
     } finally {
       setIsEditAiGenerating(false)
     }
@@ -384,7 +387,7 @@ export default function TagSettingsModal({
       void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
       void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all(workspaceId) })
     } catch {
-      return
+      addToast('태그 추가에 실패했어요. 다시 시도해 주세요.')
     }
   }
 
@@ -1161,11 +1164,12 @@ export default function TagSettingsModal({
               void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
               void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all(workspaceId) })
             } catch {
-              return
+              addToast('태그 삭제에 실패했어요. 다시 시도해 주세요.')
             }
           }}
         />
       )}
+      <ToastContainer toasts={toasts} />
     </>
   )
 }

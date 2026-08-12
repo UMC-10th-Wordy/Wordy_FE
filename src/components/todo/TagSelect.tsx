@@ -62,6 +62,7 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
   const [isOpen, setIsOpen] = useState(false)
   const [tagOptions, setTagOptions] = useState<TaskTag[]>([])
   const [tagOptionsWorkspaceId, setTagOptionsWorkspaceId] = useState<string | null>(null)
+  const [tagOptionsLoadFailedFor, setTagOptionsLoadFailedFor] = useState<string | null>(null)
   const [showModal, setShowModal] = useState<'existing' | 'new' | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
@@ -76,15 +77,19 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
         if (!cancelled) {
           setTagOptions(dtos.map(mapTagDtoToTaskTag))
           setTagOptionsWorkspaceId(workspaceId)
+          setTagOptionsLoadFailedFor(null)
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) setTagOptionsLoadFailedFor(workspaceId)
+      })
     return () => {
       cancelled = true
     }
   }, [tags, workspaceId])
 
   const effectiveTags = tags ?? (tagOptionsWorkspaceId === workspaceId ? tagOptions : [])
+  const tagOptionsLoadFailed = tags === undefined && tagOptionsLoadFailedFor === workspaceId
   const updateTags = (updater: (prev: TaskTag[]) => TaskTag[]) => {
     if (tags !== undefined) {
       onTagsChange?.(updater(tags))
@@ -224,7 +229,9 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
 
           {effectiveTags.length === 0 ? (
             <p className="flex h-14 w-full items-center justify-center text-center [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-normal text-(--color-text-secondary)">
-              프로젝트 태그를 추가해 주세요
+              {tagOptionsLoadFailed
+                ? '태그 목록을 불러오지 못했어요'
+                : '프로젝트 태그를 추가해 주세요'}
             </p>
           ) : (
             (() => {

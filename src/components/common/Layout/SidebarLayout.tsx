@@ -114,6 +114,7 @@ export function SidebarLayout() {
       onSettled: () => {
         clearAuthTokens()
         queryClient.clear()
+        setSelectedWorkspaceId(null)
         navigate('/login')
       },
     })
@@ -126,6 +127,7 @@ export function SidebarLayout() {
         alert('비밀번호가 변경되었어요. 다시 로그인해 주세요.')
         clearAuthTokens()
         queryClient.clear()
+        setSelectedWorkspaceId(null)
         navigate('/login')
       },
       onError: (error) => {
@@ -145,6 +147,7 @@ export function SidebarLayout() {
       onSuccess: () => {
         clearAuthTokens()
         queryClient.clear()
+        setSelectedWorkspaceId(null)
         navigate('/landing')
       },
       onError: (error) => {
