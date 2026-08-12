@@ -229,6 +229,10 @@ export const DashboardPage = () => {
       .then((res) => {
         setDetail(res)
         setGeneration('complete')
+        const refreshBaseDate = `${weekStartDate.getFullYear()}-${String(weekStartDate.getMonth() + 1).padStart(2, '0')}-${String(weekStartDate.getDate()).padStart(2, '0')}`
+        getDashboardEligibility(workspaceId, refreshBaseDate).then((r) => {
+          setWeekRange({ start: r.weekStart, end: r.weekEnd })
+        })
       })
       .catch((error) => {
         console.error('대시보드 생성 실패:', error)
@@ -392,7 +396,7 @@ export const DashboardPage = () => {
                 <TagWorkflowSection tags={tags} />
                 <WeeklyHighlights items={highlights} />
                 <WeeklyRetrospective
-                  key={detail?.dashboardId}
+                  key={weekStartDate.getTime()}
                   dashboardId={detail?.dashboardId}
                   workspaceId={workspaceId}
                   initialReflection={(() => {

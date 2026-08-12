@@ -13,6 +13,7 @@ import {
   updateReflection,
 } from '@/api/dashboard/dashboard'
 import { saveDraft, getDraft } from '@/api/dashboard/dashboard'
+
 interface PlanRow {
   id: string
   content: string
@@ -107,6 +108,7 @@ interface WeeklyRetrospectiveProps {
   }
   onSaved?: () => void
 }
+
 export const WeeklyRetrospective = ({
   period = 'weekly',
   dashboardId,
@@ -117,56 +119,75 @@ export const WeeklyRetrospective = ({
   const texts = TEXTS[period]
 
   const [answers, setAnswers] = useState<Record<QuestionKey, string>>({
-    work: initialReflection?.workSummary ?? '',
-    resource: initialReflection?.resourcesUsed ?? '',
-    learning: initialReflection?.learning ?? '',
+    work: '',
+    resource: '',
+    learning: '',
   })
 
   const [plans, setPlans] = useState<PlanRow[]>([])
-
-  useEffect(() => {
-    if (!workspaceId) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPlans([])
-    let cancelled = false
-    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId).then(
-      (draft) => {
-        if (cancelled || !draft) return
-        if (!initialReflection) {
-          setAnswers({
-            work: draft.workSummary,
-            resource: draft.resourcesUsed,
-            learning: draft.learning,
-          })
-        }
-        setPlans(
-          draft.taskPlans.map((tp, i) => ({
-            id: `draft-${i}`,
-            content: tp.content,
-            schedule: tp.expectedTime,
-          })),
-        )
-      },
-    )
-    return () => {
-      cancelled = true
-    }
-  }, [workspaceId, period, dashboardId])
-
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
   )
-  const [reflectionId, setReflectionId] = useState<string | null>(
-    initialReflection?.reflectionId ?? null,
-  )
+  const [reflectionId, setReflectionId] = useState<string | null>(null)
+  const [savedAt, setSavedAt] = useState<string | null>(null)
+
+  // dashboardId나 initialReflection이 바뀌면 화면 무조건 강제 리셋
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAnswers({
+      work: initialReflection?.workSummary ?? '',
+      resource: initialReflection?.resourcesUsed ?? '',
+      learning: initialReflection?.learning ?? '',
+    })
+    setPlans([])
+    setEditing(null)
+    setReflectionId(initialReflection?.reflectionId ?? null)
+    setSavedAt(null)
+
+    if (!workspaceId || !dashboardId) return
+
+    let cancelled = false
+    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId)
+      .then((draft) => {
+        if (cancelled || !draft) return
+
+        // draft 내용이 들어올 때만 업데이트
+        if (!initialReflection && (draft.workSummary || draft.resourcesUsed || draft.learning)) {
+          setAnswers({
+            work: draft.workSummary ?? '',
+            resource: draft.resourcesUsed ?? '',
+            learning: draft.learning ?? '',
+          })
+        }
+        if (draft.taskPlans && draft.taskPlans.length > 0) {
+          setPlans(
+            draft.taskPlans.map((tp, i) => ({
+              id: `draft-${i}`,
+              content: tp.content,
+              schedule: tp.expectedTime,
+            })),
+          )
+        }
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [
+    workspaceId,
+    period,
+    dashboardId,
+    initialReflection?.reflectionId,
+    initialReflection?.workSummary,
+  ])
 
   const resolvedReflectionId = useMemo(() => {
     if (initialReflection?.reflectionId) return initialReflection.reflectionId
     return reflectionId
-  }, [initialReflection?.reflectionId, reflectionId])
+  }, [dashboardId, initialReflection?.reflectionId, reflectionId])
 
   const [isSaving, setIsSaving] = useState(false)
-  const [savedAt, setSavedAt] = useState<string | null>(null)
   const { toasts, addToast } = useToast()
 
   const handleAnswerChange = (key: QuestionKey, value: string) => {
@@ -211,7 +232,7 @@ export const WeeklyRetrospective = ({
   const handleSave = () => {
     if (isSaving) return
     if (!dashboardId) {
-      addToast(texts.toastSaved) // 월간 등 미연동 구간은 기존 동작 유지
+      addToast(texts.toastSaved)
       return
     }
     setIsSaving(true)
