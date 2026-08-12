@@ -9,8 +9,8 @@ export interface DiaryEntry {
 export interface EligibilityEntryDto {
   dailyEntryId: string
   entryDate: string
+  converted?: boolean
 }
-
 export interface EligibilityDto {
   eligible: boolean
   journalDays: number

@@ -97,7 +97,7 @@ export const DashboardPage = () => {
         const mapped = res.entries.map((e) => ({
           id: e.dailyEntryId,
           label: formatEntryLabel(e.entryDate),
-          converted: undefined, // TODO: 서버 변환 여부 필드 확정 시 e.필드명 연결
+          converted: e.converted,
           date: e.entryDate,
         }))
         setEntries(mapped)
@@ -396,7 +396,7 @@ export const DashboardPage = () => {
                 <TagWorkflowSection tags={tags} />
                 <WeeklyHighlights items={highlights} />
                 <WeeklyRetrospective
-                  key={weekStartDate.getTime()}
+                  key={detail?.dashboardId ?? weekStartDate.getTime()}
                   dashboardId={detail?.dashboardId}
                   workspaceId={workspaceId}
                   initialReflection={(() => {
