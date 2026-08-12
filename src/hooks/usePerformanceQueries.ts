@@ -81,7 +81,7 @@ export const useSavePerformance = () => {
           queryKey: dailyEntryQueryKeys.workspace(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: homeQueryKeys.all,
+          queryKey: homeQueryKeys.all(activeWorkspaceId),
         }),
       ])
     },

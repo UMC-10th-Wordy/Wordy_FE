@@ -392,7 +392,9 @@ export function SidebarLayout() {
               })
 
               await queryClient.invalidateQueries({ queryKey: userQueryKeys.profile() })
-              await queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+              await queryClient.invalidateQueries({
+                queryKey: homeQueryKeys.all(activeWorkspaceId),
+              })
               setModal(null)
             } catch {
               alert(

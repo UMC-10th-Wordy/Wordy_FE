@@ -4,6 +4,7 @@ import { useGetHome } from '@/hooks/useHomeQueries'
 import { getDailyEntryByDate } from '@/api/daily-entry/dailyEntry'
 import { useToast } from '@/hooks/useToast'
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
+import { LoadingState } from '@/components/common/AsyncState/AsyncState'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import { HomeBanner } from '@/components/home/HomeBanner/HomeBanner'
@@ -24,6 +25,16 @@ import ArrowRightIcon from '@/assets/icons/Property 1=top_right.svg?react'
 export type HomePageProps = HTMLAttributes<HTMLDivElement>
 
 export function HomePage({ className, ...rest }: HomePageProps) {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
+  if (!activeWorkspaceId) {
+    return <LoadingState message="불러오는 중입니다" className="h-full w-full" />
+  }
+
+  return <HomePageContent className={className} {...rest} />
+}
+
+function HomePageContent({ className, ...rest }: HomePageProps) {
   const navigate = useNavigate()
   const activeWorkspaceId = useActiveWorkspaceId()
   const { data } = useGetHome()

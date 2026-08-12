@@ -15,6 +15,7 @@ import CameraBadgeIcon from '@/assets/icons/camera-badge.svg?react'
 import { useNavigate } from 'react-router-dom'
 import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
 import { homeQueryKeys } from '@/api/home/home'
+import { fetchDefaultWorkspaceId } from '@/api/workspace/workspace'
 import { useGetProfile } from '@/hooks/useUserQueries'
 
 const NICKNAME_INVALID_CHARS_REGEX = /[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9\s]/g
@@ -85,7 +86,15 @@ export const ProfileSetupPage = () => {
         { throwOnError: true },
       )
       // 홈 화면 캐시도 함께 무효화해야 이동 직후 이름이 정상 반영됨
-      await queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      // 프로필 등록 자체는 이미 성공했으므로 이 부분 실패는 무시(다음 방문 시 갱신됨)
+      try {
+        const workspaceId = await fetchDefaultWorkspaceId(queryClient)
+        if (workspaceId) {
+          await queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
+        }
+      } catch {
+        // 홈 캐시 갱신 실패는 무시
+      }
     } catch {
       alert('프로필 등록에 실패했어요. 다시 시도해 주세요.')
     } finally {
