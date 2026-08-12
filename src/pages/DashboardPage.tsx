@@ -83,11 +83,15 @@ export const DashboardPage = () => {
   const [monthlyDetail, setMonthlyDetail] = useState<DashboardDetailDto | null>(null)
 
   useEffect(() => {
+    if (!workspaceId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDetail(null)
+    setGeneration('idle')
     let cancelled = false
     const baseDate = `${weekStartDate.getFullYear()}-${String(weekStartDate.getMonth() + 1).padStart(2, '0')}-${String(weekStartDate.getDate()).padStart(2, '0')}`
     const viewedEndDate = getTeamWeekEnd(weekStartDate)
     const viewedEnd = `${viewedEndDate.getFullYear()}-${String(viewedEndDate.getMonth() + 1).padStart(2, '0')}-${String(viewedEndDate.getDate()).padStart(2, '0')}`
-    getDashboardEligibility(baseDate)
+    getDashboardEligibility(workspaceId, baseDate)
       .then((res) => {
         if (cancelled) return
         const mapped = res.entries.map((e) => ({
@@ -120,6 +124,10 @@ export const DashboardPage = () => {
   }, [workspaceId, weekStartDate])
 
   useEffect(() => {
+    if (!workspaceId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMonthlyDetail(null)
+    setMonthlyGeneration('idle')
     let cancelled = false
     getMonthlyEligibility(workspaceId, monthBaseDate)
       .then((res) => {
@@ -142,11 +150,10 @@ export const DashboardPage = () => {
         })
       })
       .catch(() => {})
-      .catch(() => {})
     return () => {
       cancelled = true
     }
-  }, [workspaceId, monthOffset, monthBaseDate])
+  }, [workspaceId, monthBaseDate])
 
   const totalDays = entries.length
 

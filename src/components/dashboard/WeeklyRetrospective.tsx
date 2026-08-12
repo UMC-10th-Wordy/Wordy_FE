@@ -125,6 +125,9 @@ export const WeeklyRetrospective = ({
   const [plans, setPlans] = useState<PlanRow[]>([])
 
   useEffect(() => {
+    if (!workspaceId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPlans([])
     let cancelled = false
     getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId).then(
       (draft) => {
@@ -148,7 +151,7 @@ export const WeeklyRetrospective = ({
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [workspaceId, period, dashboardId])
 
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
