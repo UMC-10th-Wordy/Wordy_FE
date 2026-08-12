@@ -1,6 +1,10 @@
 import type { CreateTagPayload, TagDto } from '@/types/tag'
 import { ApiError, request } from '@/lib/httpClient'
 
+export const tagQueryKeys = {
+  all: (workspaceId: string) => ['tags', workspaceId] as const,
+}
+
 function withWorkspace(workspaceId: string, path: string): string {
   return `/workspaces/${encodeURIComponent(workspaceId)}${path}`
 }
