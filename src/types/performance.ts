@@ -48,6 +48,7 @@ export interface CreatePerformancePreviewPayload {
 
 export interface PerformanceSupplementQuestion {
   aiQuestionId: string
+  taskId: string
   question: string
   reason: string
 }
