@@ -33,9 +33,6 @@ const EmailVerificationPage = lazy(() =>
     default: m.EmailVerificationPage,
   })),
 )
-const MailNoticePage = lazy(() =>
-  import('@/pages/auth/MailNoticePage').then((m) => ({ default: m.MailNoticePage })),
-)
 const ProfileSetupPage = lazy(() =>
   import('@/pages/auth/ProfileSetupPage').then((m) => ({ default: m.ProfileSetupPage })),
 )
@@ -111,7 +108,6 @@ export const router = createBrowserRouter([
         ],
       },
       { path: '/verify-email', element: <EmailVerificationPage /> },
-      { path: '/mail-notice', element: <MailNoticePage /> },
       { path: '/social-signup', element: <SocialSignupPage /> },
       { path: '/oauth/callback', element: <GoogleCallbackPage /> },
     ],
