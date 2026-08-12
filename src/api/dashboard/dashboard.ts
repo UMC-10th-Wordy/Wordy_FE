@@ -25,27 +25,34 @@ const USE_MOCK_DASHBOARD = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_
 let weeklyDetailMock: DashboardDetailDto = structuredClone(INITIAL_DASHBOARD_DETAIL_MOCK)
 let monthlyDetailMock: DashboardDetailDto = structuredClone(INITIAL_MONTHLY_DASHBOARD_DETAIL_MOCK)
 
-/* GET /dashboards/eligibility — 주간 대시보드 생성 조건 조회 */
-export async function getDashboardEligibility(baseDate?: string): Promise<EligibilityDto> {
+/* GET /workspaces/{workspaceId}/dashboards/eligibility — 주간 대시보드 생성 조건 조회 */
+export async function getDashboardEligibility(
+  workspaceId: string,
+  baseDate?: string,
+): Promise<EligibilityDto> {
   if (USE_MOCK_DASHBOARD) return INITIAL_ELIGIBILITY_MOCK
   const query = baseDate ? `?baseDate=${baseDate}` : ''
-  return request<EligibilityDto>(`/dashboards/eligibility${query}`)
+  return request<EligibilityDto>(`/workspaces/${workspaceId}/dashboards/eligibility${query}`)
 }
 
-/* GET /dashboards — 주간 대시보드 목록 조회 */
-export async function getDashboards(): Promise<DashboardListItemDto[]> {
+/* GET /workspaces/{workspaceId}/dashboards — 주간 대시보드 목록 조회 */
+export async function getDashboards(workspaceId: string): Promise<DashboardListItemDto[]> {
   if (USE_MOCK_DASHBOARD) return INITIAL_DASHBOARD_LIST_MOCK
-  return request<DashboardListItemDto[]>('/dashboards')
+  return request<DashboardListItemDto[]>(`/workspaces/${workspaceId}/dashboards`)
 }
 
-/* GET /dashboards/{dashboardId} — 주간 대시보드 상세 조회 (미존재 시 ApiError throw) */
-export async function getDashboardDetail(dashboardId: string): Promise<DashboardDetailDto> {
+/* GET /workspaces/{workspaceId}/dashboards/{dashboardId} — 주간 대시보드 상세 조회 */
+export async function getDashboardDetail(
+  workspaceId: string,
+  dashboardId: string,
+): Promise<DashboardDetailDto> {
   if (USE_MOCK_DASHBOARD) return weeklyDetailMock
-  return request<DashboardDetailDto>(`/dashboards/${dashboardId}`)
+  return request<DashboardDetailDto>(`/workspaces/${workspaceId}/dashboards/${dashboardId}`)
 }
 
-/* POST /dashboards/{dashboardId}/reflection — 주간회고 작성 */
+/* POST /workspaces/{workspaceId}/dashboards/{dashboardId}/reflection — 주간회고 작성 */
 export async function createReflection(
+  workspaceId: string,
   dashboardId: string,
   payload: CreateReflectionPayload,
 ): Promise<string> {
@@ -59,14 +66,15 @@ export async function createReflection(
     }
     return weeklyReflectionId
   }
-  return request<string>(`/dashboards/${dashboardId}/reflection`, {
+  return request<string>(`/workspaces/${workspaceId}/dashboards/${dashboardId}/reflection`, {
     method: 'POST',
     body: JSON.stringify(payload),
   })
 }
 
-/* PATCH /dashboards/{dashboardId}/reflection/{reflectionId} — 주간회고 수정 */
+/* PATCH /workspaces/{workspaceId}/dashboards/{dashboardId}/reflection/{reflectionId} — 주간회고 수정 */
 export async function updateReflection(
+  workspaceId: string,
   dashboardId: string,
   reflectionId: string,
   payload: UpdateReflectionPayload,
@@ -80,33 +88,45 @@ export async function updateReflection(
     }
     return reflectionId
   }
-  return request<string>(`/dashboards/${dashboardId}/reflection/${reflectionId}`, {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  })
+  return request<string>(
+    `/workspaces/${workspaceId}/dashboards/${dashboardId}/reflection/${reflectionId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    },
+  )
 }
 
-/* GET /dashboards/monthly/eligibility — 월간 대시보드 생성 조건 조회 */
-export async function getMonthlyEligibility(baseDate?: string): Promise<MonthlyEligibilityDto> {
+/* GET /workspaces/{workspaceId}/dashboards/monthly/eligibility — 월간 대시보드 생성 조건 조회 */
+export async function getMonthlyEligibility(
+  workspaceId: string,
+  baseDate?: string,
+): Promise<MonthlyEligibilityDto> {
   if (USE_MOCK_DASHBOARD) return MONTHLY_ELIGIBILITY_MOCK
   const query = baseDate ? `?baseDate=${baseDate}` : ''
-  return request<MonthlyEligibilityDto>(`/dashboards/monthly/eligibility${query}`)
+  return request<MonthlyEligibilityDto>(
+    `/workspaces/${workspaceId}/dashboards/monthly/eligibility${query}`,
+  )
 }
 
-/* GET /dashboards/monthly — 월간 대시보드 목록 조회 (경로 스웨거 표기 백엔드 확인 중) */
-export async function getMonthlyDashboards(): Promise<DashboardListItemDto[]> {
+/* GET /workspaces/{workspaceId}/dashboards/monthly — 월간 대시보드 목록 조회 */
+export async function getMonthlyDashboards(workspaceId: string): Promise<DashboardListItemDto[]> {
   if (USE_MOCK_DASHBOARD) return INITIAL_MONTHLY_DASHBOARD_LIST_MOCK
-  return request<DashboardListItemDto[]>('/dashboards/monthly')
+  return request<DashboardListItemDto[]>(`/workspaces/${workspaceId}/dashboards/monthly`)
 }
 
-/* GET /dashboards/monthly/{dashboardId} — 월간 대시보드 상세 조회 */
-export async function getMonthlyDashboardDetail(dashboardId: string): Promise<DashboardDetailDto> {
+/* GET /workspaces/{workspaceId}/dashboards/monthly/{dashboardId} — 월간 대시보드 상세 조회 */
+export async function getMonthlyDashboardDetail(
+  workspaceId: string,
+  dashboardId: string,
+): Promise<DashboardDetailDto> {
   if (USE_MOCK_DASHBOARD) return monthlyDetailMock
-  return request<DashboardDetailDto>(`/dashboards/monthly/${dashboardId}`)
+  return request<DashboardDetailDto>(`/workspaces/${workspaceId}/dashboards/monthly/${dashboardId}`)
 }
 
-/* POST /dashboards/monthly/{dashboardId}/reflection — 월간 회고 작성 (수정 API 명세 부재) */
+/* POST /workspaces/{workspaceId}/dashboards/monthly/{dashboardId}/reflection — 월간 회고 작성 */
 export async function createMonthlyReflection(
+  workspaceId: string,
   dashboardId: string,
   payload: CreateReflectionPayload,
 ): Promise<MonthlyReflectionResultDto> {
@@ -119,13 +139,18 @@ export async function createMonthlyReflection(
     }
     return { weeklyReflectionId, ...payload, createdAt }
   }
-  return request<MonthlyReflectionResultDto>(`/dashboards/monthly/${dashboardId}/reflection`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  })
+  return request<MonthlyReflectionResultDto>(
+    `/workspaces/${workspaceId}/dashboards/monthly/${dashboardId}/reflection`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  )
 }
 
+/* POST /workspaces/{workspaceId}/dashboards/drafts — 회고 draft 임시저장 */
 export async function saveDraft(
+  workspaceId: string,
   type: 'WEEKLY' | 'MONTHLY',
   dashboardId: string | undefined,
   payload: {
@@ -136,40 +161,44 @@ export async function saveDraft(
   },
 ): Promise<DraftDto> {
   const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
-  return request<DraftDto>(`/dashboards/drafts${query}`, {
+  return request<DraftDto>(`/workspaces/${workspaceId}/dashboards/drafts${query}`, {
     method: 'POST',
     body: JSON.stringify(payload),
   })
 }
 
+/* GET /workspaces/{workspaceId}/dashboards/drafts — 회고 draft 조회(복원) */
 export async function getDraft(
+  workspaceId: string,
   type: 'WEEKLY' | 'MONTHLY',
   dashboardId: string | undefined,
 ): Promise<DraftDto | null> {
   try {
     const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
-    return await request<DraftDto>(`/dashboards/drafts${query}`)
+    return await request<DraftDto>(`/workspaces/${workspaceId}/dashboards/drafts${query}`)
   } catch {
     return null
   }
 }
 
-/* POST /ai/dashboard/weekly — 주간 대시보드 AI 생성. LLM 호출로 처리 시간이 길어 타임아웃 연장 */
+/* POST /ai/workspaces/{workspaceId}/dashboard/weekly — 주간 대시보드 AI 생성 */
 export async function createDashboard(
+  workspaceId: string,
   payload: CreateDashboardPayload,
 ): Promise<AiDashboardResultDto> {
-  return request<AiDashboardResultDto>('/ai/dashboard/weekly', {
+  return request<AiDashboardResultDto>(`/ai/workspaces/${workspaceId}/dashboard/weekly`, {
     method: 'POST',
     body: JSON.stringify(payload),
     signal: AbortSignal.timeout(120_000),
   })
 }
 
-/* POST /ai/dashboard/monthly — 월간 대시보드 AI 생성 */
+/* POST /ai/workspaces/{workspaceId}/dashboard/monthly — 월간 대시보드 AI 생성 */
 export async function createMonthlyDashboard(
+  workspaceId: string,
   payload: CreateDashboardPayload,
 ): Promise<AiDashboardResultDto> {
-  return request<AiDashboardResultDto>('/ai/dashboard/monthly', {
+  return request<AiDashboardResultDto>(`/ai/workspaces/${workspaceId}/dashboard/monthly`, {
     method: 'POST',
     body: JSON.stringify(payload),
     signal: AbortSignal.timeout(120_000),
