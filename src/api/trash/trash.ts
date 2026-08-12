@@ -1,5 +1,6 @@
 import { request } from '@/lib/httpClient'
 
+import type { DailyEntryDetailResult } from '@/types/diaryDetail'
 import type {
   DeleteDailyEntryPermanentlyResult,
   RestoreDailyEntryResult,
@@ -25,6 +26,15 @@ export const getTrashDailyEntries = async ({
   })
 }
 
+export const getTrashDailyEntryDetail = async (
+  dailyEntryId: string,
+): Promise<DailyEntryDetailResult> => {
+  return request<DailyEntryDetailResult>(
+    `/trash/daily-entries/${encodeURIComponent(dailyEntryId)}`,
+    { method: 'GET' },
+  )
+}
+
 export const restoreDailyEntry = async (dailyEntryId: string): Promise<RestoreDailyEntryResult> => {
   return request<RestoreDailyEntryResult>(
     `/trash/daily-entries/${encodeURIComponent(dailyEntryId)}/restore`,
@@ -45,4 +55,8 @@ export const trashQueryKeys = {
   all: ['trash'] as const,
 
   lists: () => [...trashQueryKeys.all, 'list'] as const,
+
+  details: () => [...trashQueryKeys.all, 'detail'] as const,
+
+  detail: (dailyEntryId: string) => [...trashQueryKeys.details(), dailyEntryId] as const,
 }
