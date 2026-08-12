@@ -98,6 +98,7 @@ type QuestionKey = 'work' | 'resource' | 'learning'
 interface WeeklyRetrospectiveProps {
   period?: RetrospectivePeriod
   dashboardId?: string
+  workspaceId: string
   initialReflection?: {
     reflectionId: string
     workSummary: string
@@ -109,6 +110,7 @@ interface WeeklyRetrospectiveProps {
 export const WeeklyRetrospective = ({
   period = 'weekly',
   dashboardId,
+  workspaceId,
   initialReflection,
   onSaved,
 }: WeeklyRetrospectiveProps) => {
@@ -123,28 +125,33 @@ export const WeeklyRetrospective = ({
   const [plans, setPlans] = useState<PlanRow[]>([])
 
   useEffect(() => {
+    if (!workspaceId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPlans([])
     let cancelled = false
-    getDraft(period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId).then((draft) => {
-      if (cancelled || !draft) return
-      if (!initialReflection) {
-        setAnswers({
-          work: draft.workSummary,
-          resource: draft.resourcesUsed,
-          learning: draft.learning,
-        })
-      }
-      setPlans(
-        draft.taskPlans.map((tp, i) => ({
-          id: `draft-${i}`,
-          content: tp.content,
-          schedule: tp.expectedTime,
-        })),
-      )
-    })
+    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId).then(
+      (draft) => {
+        if (cancelled || !draft) return
+        if (!initialReflection) {
+          setAnswers({
+            work: draft.workSummary,
+            resource: draft.resourcesUsed,
+            learning: draft.learning,
+          })
+        }
+        setPlans(
+          draft.taskPlans.map((tp, i) => ({
+            id: `draft-${i}`,
+            content: tp.content,
+            schedule: tp.expectedTime,
+          })),
+        )
+      },
+    )
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [workspaceId, period, dashboardId])
 
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
@@ -152,6 +159,7 @@ export const WeeklyRetrospective = ({
   const [reflectionId, setReflectionId] = useState<string | null>(
     initialReflection?.reflectionId ?? null,
   )
+
   const resolvedReflectionId = useMemo(() => {
     if (initialReflection?.reflectionId) return initialReflection.reflectionId
     return reflectionId
@@ -187,7 +195,7 @@ export const WeeklyRetrospective = ({
   const handleDeleteRow = (id: string) => setPlans((prev) => prev.filter((p) => p.id !== id))
 
   const handleTempSave = () => {
-    saveDraft(period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId, {
+    saveDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId, {
       workSummary: answers.work,
       resourcesUsed: answers.resource,
       learning: answers.learning,
@@ -209,18 +217,18 @@ export const WeeklyRetrospective = ({
     setIsSaving(true)
     const request =
       period === 'monthly'
-        ? createMonthlyReflection(dashboardId, {
+        ? createMonthlyReflection(workspaceId, dashboardId, {
             workSummary: answers.work,
             resourcesUsed: answers.resource,
             learning: answers.learning,
           }).then((res) => res.weeklyReflectionId)
         : resolvedReflectionId
-          ? updateReflection(dashboardId, resolvedReflectionId, {
+          ? updateReflection(workspaceId, dashboardId, resolvedReflectionId, {
               workSummary: answers.work,
               resourcesUsed: answers.resource,
               learning: answers.learning,
             })
-          : createReflection(dashboardId, {
+          : createReflection(workspaceId, dashboardId, {
               workSummary: answers.work,
               resourcesUsed: answers.resource,
               learning: answers.learning,

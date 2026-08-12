@@ -11,6 +11,7 @@ interface DiaryChecklistPanelProps {
   selectedIds: string[]
   onToggle: (id: string) => void
   disabled?: boolean
+  periodLabel?: string
 }
 
 export const DiaryChecklistPanel = ({
@@ -19,6 +20,7 @@ export const DiaryChecklistPanel = ({
   selectedIds,
   onToggle,
   disabled = false,
+  periodLabel,
 }: DiaryChecklistPanelProps) => {
   const isEmpty = entries.length === 0
 
@@ -43,7 +45,7 @@ export const DiaryChecklistPanel = ({
             className="rounded-full bg-(--color-button-default) p-[3px] text-(--color-text-inverse)"
           />
           <p className="[font-size:var(--font-size-body-2)] leading-[1.6] text-center text-(--color-text-tertiary)">
-            이번 주에 변환한 업무 일지가 없어요
+            {periodLabel ?? '이번 주'}에 변환한 업무 일지가 없어요
           </p>
         </div>
       ) : (

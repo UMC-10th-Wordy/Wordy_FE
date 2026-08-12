@@ -12,12 +12,14 @@ interface MonthlyWeekListPanelProps {
   weeks: WeeklyBoardStatus[]
   totalWeeks: number
   onGoWeekly: (weekId: string) => void
+  periodLabel?: string
 }
 
 export const MonthlyWeekListPanel = ({
   weeks,
   totalWeeks,
   onGoWeekly,
+  periodLabel,
 }: MonthlyWeekListPanelProps) => {
   const isEmpty = weeks.length === 0
 
@@ -39,7 +41,7 @@ export const MonthlyWeekListPanel = ({
             className="rounded-full bg-(--color-button-default) p-1 text-(--color-text-inverse)"
           />
           <p className="[font-size:var(--font-size-body-2)] leading-[1.6] text-center text-(--color-text-tertiary)">
-            이번 달에 생성한 주간 대시보드가 없어요
+            {periodLabel ?? '이번 달'}에 생성한 주간 대시보드가 없어요
           </p>
         </div>
       ) : (
