@@ -56,10 +56,14 @@ export const LoginPage = () => {
             })
             const workspaceId = getDefaultWorkspaceId(workspaces)
             await Promise.all([
-              queryClient.prefetchQuery({
-                queryKey: homeQueryKeys.all(workspaceId),
-                queryFn: () => getHome(workspaceId),
-              }),
+              ...(workspaceId
+                ? [
+                    queryClient.prefetchQuery({
+                      queryKey: homeQueryKeys.all(workspaceId),
+                      queryFn: () => getHome(workspaceId),
+                    }),
+                  ]
+                : []),
               import('@/pages/HomePage'),
             ])
             markAuthenticated()
