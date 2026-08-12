@@ -99,6 +99,7 @@ export const SignupPage = () => {
 
             <Input1
               type="email"
+              autoComplete="off"
               label={
                 <span>
                   이메일 <span className="text-(--color-text-error)">*</span>
@@ -113,6 +114,7 @@ export const SignupPage = () => {
 
             <Input1
               type="password"
+              autoComplete="new-password"
               label={
                 <span>
                   비밀번호 <span className="text-(--color-text-error)">*</span>
@@ -128,6 +130,7 @@ export const SignupPage = () => {
 
             <Input1
               type="password"
+              autoComplete="new-password"
               label={
                 <span>
                   비밀번호 확인 <span className="text-(--color-text-error)">*</span>
