@@ -69,13 +69,13 @@ export const DiarySearchPage = () => {
   }
 
   return (
-    <main className="flex h-full min-h-0 min-w-[900px] flex-col bg-(--color-bg-default)">
+    <main className="flex h-full min-h-0 w-full min-w-0 flex-col bg-(--color-bg-default)">
       <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-[60px]">
         <DiarySearchBackButton onClick={handleBack} />
 
         <div className="mt-(--scale-48) flex min-h-0 flex-1 flex-col items-center">
           <div
-            className="relative z-50 w-[580px]"
+            className="relative z-50 w-full max-w-145"
             onMouseDownCapture={(event) => {
               const target = event.target as HTMLElement
 
@@ -114,7 +114,6 @@ export const DiarySearchPage = () => {
                 '[&>div:nth-child(2)]:top-[calc(100%+12px)]',
                 '[&>div:nth-child(2)]:left-1/2',
                 '[&>div:nth-child(2)]:z-50',
-                '[&>div:nth-child(2)]:w-[580px]',
                 '[&>div:nth-child(2)]:-translate-x-1/2',
                 !showRecentDropdown && '[&>div:nth-child(2)]:hidden',
               ]
