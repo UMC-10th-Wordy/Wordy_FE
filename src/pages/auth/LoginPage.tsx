@@ -97,6 +97,7 @@ export const LoginPage = () => {
           <Input1
             type="email"
             aria-label="이메일"
+            autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="이메일을 입력해주세요"
@@ -105,6 +106,7 @@ export const LoginPage = () => {
           <Input1
             type="password"
             aria-label="비밀번호"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="비밀번호를 입력해주세요"
