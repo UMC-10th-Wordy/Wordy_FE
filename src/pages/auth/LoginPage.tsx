@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Input1 } from '@/components/common/Input/Input1'
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
@@ -6,7 +6,7 @@ import { TextButton } from '@/components/common/Button/TextButton'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import LogoIcon from '@/assets/icons/logo.svg?react'
 import GoogleIcon from '@/assets/icons/google.svg?react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { GOOGLE_AUTH_URL } from '@/api/auth/auth'
 import { getHome, homeQueryKeys } from '@/api/home/home'
 import { fetchDefaultWorkspaceId } from '@/api/workspace/workspace'
@@ -18,6 +18,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const LoginPage = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const queryClient = useQueryClient()
   const { toasts, addToast } = useToast()
   const { mutate: login, isPending } = useLogin()
@@ -25,6 +26,13 @@ export const LoginPage = () => {
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    const state = location.state as { error?: string } | null
+    if (state?.error) {
+      addToast(state.error)
+    }
+  }, [location.state, addToast])
 
   const emailError = !email
     ? '이메일을 입력해주세요.'
