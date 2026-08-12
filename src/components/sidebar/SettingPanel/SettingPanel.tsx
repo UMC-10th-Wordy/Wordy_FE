@@ -9,8 +9,7 @@ import { Toggle } from '@/components/common/Toggle/Toggle'
 import { TextButton } from '@/components/common/Button/TextButton'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
-import { JobDropdown } from '../JobDropdown/JobDropdown'
-import { CareerDropdown } from '../CareerDropdown/CareerDropdown'
+import { OptionDropdown } from '../OptionDropdown/OptionDropdown'
 import { SettingAccordion } from '../SettingAccordion/SettingAccordion'
 import XMarkIcon from '@/assets/icons/x-mark.svg?react'
 import CameraIcon from '@/assets/icons/camera.svg?react'
@@ -533,7 +532,8 @@ export function SettingPanel({
         jobRect &&
         createPortal(
           <div ref={jobDropdownRef}>
-            <JobDropdown
+            <OptionDropdown
+              fixedHeight
               style={{
                 position: 'fixed',
                 top: jobRect.bottom + 8,
@@ -556,7 +556,7 @@ export function SettingPanel({
         careerRect &&
         createPortal(
           <div ref={careerDropdownRef}>
-            <CareerDropdown
+            <OptionDropdown
               style={{
                 position: 'fixed',
                 top: careerRect.bottom + 8,
