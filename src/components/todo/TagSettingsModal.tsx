@@ -284,7 +284,7 @@ export default function TagSettingsModal({
       setDetailByKey((prev) => ({ ...prev, [editingKey]: updated }))
       setEditingKey(null)
       setExpandedKey(null)
-      void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
       void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all(workspaceId) })
     } catch {
       return
@@ -381,7 +381,7 @@ export default function TagSettingsModal({
       )
       onAddTag(mapTagDtoToTaskTag(created))
       onClose()
-      void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
       void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all(workspaceId) })
     } catch {
       return
@@ -1158,7 +1158,7 @@ export default function TagSettingsModal({
               if (selectedTag && getTagKey(selectedTag) === deletingKey) setSelectedTag(null)
               if (expandedKey === deletingKey) setExpandedKey(null)
               setDeletingKey(null)
-              void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+              void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
               void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all(workspaceId) })
             } catch {
               return
