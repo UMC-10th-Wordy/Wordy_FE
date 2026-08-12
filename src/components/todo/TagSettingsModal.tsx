@@ -27,6 +27,7 @@ import { createTag, deleteTag, getTagDetail, updateTag } from '@/api/tag/tag'
 import { getTagKey, mapDraftToCreatePayload, mapTagDtoToTaskTag } from '@/utils/tagMapper'
 import { getKpiRecommendations } from '@/api/ai/ai'
 import { useGetProfile } from '@/hooks/useUserQueries'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 
 type Tab = 'existing' | 'new'
 
@@ -91,6 +92,7 @@ export default function TagSettingsModal({
   const [tab, setTab] = useState<Tab>(initialTab)
   const containerRef = useModalFocus<HTMLDivElement>()
   const { data: profile, isLoading: isProfileLoading } = useGetProfile()
+  const workspaceId = useActiveWorkspaceId()
   const overlayMouseDownRef = useRef(false)
 
   // 기존 태그 탭
@@ -226,7 +228,7 @@ export default function TagSettingsModal({
     setExpandedKey(isExpanding ? key : null)
     setSelectedTag(isExpanding ? tag : null)
     if (isExpanding && tag.id) {
-      getTagDetail(tag.id)
+      getTagDetail(workspaceId, tag.id)
         .then((dto) => {
           if (dto) setDetailByKey((prev) => ({ ...prev, [key]: mapTagDtoToTaskTag(dto) }))
         })
@@ -259,6 +261,7 @@ export default function TagSettingsModal({
     if (!original?.id) return
     try {
       const updatedDto = await updateTag(
+        workspaceId,
         original.id,
         mapDraftToCreatePayload({
           label: editDraft.label.trim(),
@@ -358,6 +361,7 @@ export default function TagSettingsModal({
     if (!canAddNewTag) return
     try {
       const created = await createTag(
+        workspaceId,
         mapDraftToCreatePayload({
           label: newLabel.trim(),
           color: newColor,
@@ -1141,7 +1145,7 @@ export default function TagSettingsModal({
           onConfirm={async () => {
             try {
               const target = tags.find((t) => getTagKey(t) === deletingKey)
-              if (target?.id) await deleteTag(target.id)
+              if (target?.id) await deleteTag(workspaceId, target.id)
               onDeleteTag(deletingKey)
               if (selectedTag && getTagKey(selectedTag) === deletingKey) setSelectedTag(null)
               if (expandedKey === deletingKey) setExpandedKey(null)

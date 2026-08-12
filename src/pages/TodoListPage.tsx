@@ -54,10 +54,11 @@ import {
 } from '@/utils/taskMapper'
 import { getTagDetail } from '@/api/tag/tag'
 import { useGetProfile } from '@/hooks/useUserQueries'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
+import { LoadingState } from '@/components/common/AsyncState/AsyncState'
 import { usePerformancePreview } from '@/hooks/usePerformancePreview'
 import { usePerformanceQuestionChat } from '@/hooks/usePerformanceQuestionChat'
 import { useGetPerformancesByDate, useUpdatePerformance } from '@/hooks/usePerformanceQueries'
-import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import {
   mapPerformanceDetailResult,
   mapPerformancePreviewRequest,
@@ -98,6 +99,16 @@ const parseGrowthInsights = (insight: string): string[] => {
 }
 
 export default function TodoListPage() {
+  const workspaceId = useActiveWorkspaceId()
+
+  if (!workspaceId) {
+    return <LoadingState message="불러오는 중입니다" className="h-screen w-full" />
+  }
+
+  return <TodoListPageContent key={workspaceId} workspaceId={workspaceId} />
+}
+
+function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [movedPerformanceTaskIds, setMovedPerformanceTaskIds] = useState<string[]>([])
@@ -228,6 +239,7 @@ export default function TodoListPage() {
   const handleAddTask = async (values: TaskDraftValues) => {
     try {
       const created = await createTask(
+        workspaceId,
         mapDraftToCreateTaskPayload({
           title: values.title,
           priority: values.priority,
@@ -238,8 +250,9 @@ export default function TodoListPage() {
         }),
       )
       setTasks((prev) => [...prev, mapTaskDtoToTask(created)])
-      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(currentDateKey), (prev) =>
-        prev ? [...prev, created] : [created],
+      queryClient.setQueryData<TaskDto[]>(
+        taskQueryKeys.list(workspaceId, currentDateKey),
+        (prev) => (prev ? [...prev, created] : [created]),
       )
 
       void Promise.all([
@@ -259,7 +272,7 @@ export default function TodoListPage() {
           queryKey: homeQueryKeys.all,
         }),
         queryClient.invalidateQueries({
-          queryKey: taskQueryKeys.calendars(),
+          queryKey: taskQueryKeys.calendars(workspaceId),
         }),
       ])
 
@@ -273,9 +286,9 @@ export default function TodoListPage() {
     const target = tasks.find((task) => task.id === id)
     if (!target) return
     try {
-      await deleteTask(id)
+      await deleteTask(workspaceId, id)
       setTasks((prev) => prev.filter((task) => task.id !== id))
-      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(workspaceId, target.date), (prev) =>
         prev ? prev.filter((task) => task.taskId !== id) : prev,
       )
       void Promise.all([
@@ -295,7 +308,7 @@ export default function TodoListPage() {
           queryKey: homeQueryKeys.all,
         }),
         queryClient.invalidateQueries({
-          queryKey: taskQueryKeys.calendars(),
+          queryKey: taskQueryKeys.calendars(workspaceId),
         }),
       ])
     } catch {
@@ -308,6 +321,7 @@ export default function TodoListPage() {
     if (!target) return
     try {
       const updated = await updateTask(
+        workspaceId,
         id,
         mapDraftToUpdateTaskPayload({
           title: values.title,
@@ -333,7 +347,7 @@ export default function TodoListPage() {
             : task,
         ),
       )
-      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(workspaceId, target.date), (prev) =>
         prev
           ? prev.map((task) =>
               task.taskId === id ? { ...updated, taskResult: task.taskResult } : task,
@@ -384,7 +398,7 @@ export default function TodoListPage() {
       .filter((file): file is File => Boolean(file))
 
     try {
-      const saved = await saveTaskResult(id, {
+      const saved = await saveTaskResult(workspaceId, id, {
         content: values.result,
         removedAttachmentIds,
         files,
@@ -423,7 +437,7 @@ export default function TodoListPage() {
       return next
     })
     if (isExpanding) {
-      getTaskDetail(id)
+      getTaskDetail(workspaceId, id)
         .then((dto) => {
           if (!dto) return
           const mapped = mapTaskDtoToTask(dto)
@@ -457,8 +471,9 @@ export default function TodoListPage() {
 
     pendingToggleIds.current.add(id)
     try {
-      await queryClient.cancelQueries({ queryKey: taskQueryKeys.list(target.date) })
+      await queryClient.cancelQueries({ queryKey: taskQueryKeys.list(workspaceId, target.date) })
       const updated = await updateTask(
+        workspaceId,
         id,
         mapDraftToUpdateTaskPayload({
           title: target.title,
@@ -484,7 +499,7 @@ export default function TodoListPage() {
             : task,
         ),
       )
-      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(target.date), (prev) =>
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(workspaceId, target.date), (prev) =>
         prev
           ? prev.map((task) =>
               task.taskId === id ? { ...updated, taskResult: task.taskResult } : task,
@@ -492,7 +507,7 @@ export default function TodoListPage() {
           : prev,
       )
       queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
-      queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars() })
+      queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars(workspaceId) })
       addToast(nextCompleted ? '완료 업무로 이동되었어요' : '미완료 업무로 이동되었어요')
     } catch {
       addToast('업무 상태 변경에 실패했어요. 다시 시도해 주세요')
@@ -534,25 +549,28 @@ export default function TodoListPage() {
 
     const tasksForDay = next.filter((task) => task.date === currentDateKey)
     const reorderPayload = mapTasksToReorderPayload(tasksForDay)
-    reorderTasks(reorderPayload)
+    reorderTasks(workspaceId, reorderPayload)
       .then(() => {
-        queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(currentDateKey), (prev) => {
-          if (!prev) return prev
-          const orderIndex = new Map(
-            reorderPayload.tasks.map((item, index) => [item.taskId, index]),
-          )
-          const priorityById = new Map(
-            reorderPayload.tasks.map((item) => [item.taskId, item.priority]),
-          )
-          return prev
-            .map((dto) =>
-              priorityById.has(dto.taskId)
-                ? { ...dto, priority: priorityById.get(dto.taskId)! }
-                : dto,
+        queryClient.setQueryData<TaskDto[]>(
+          taskQueryKeys.list(workspaceId, currentDateKey),
+          (prev) => {
+            if (!prev) return prev
+            const orderIndex = new Map(
+              reorderPayload.tasks.map((item, index) => [item.taskId, index]),
             )
-            .slice()
-            .sort((a, b) => (orderIndex.get(a.taskId) ?? 0) - (orderIndex.get(b.taskId) ?? 0))
-        })
+            const priorityById = new Map(
+              reorderPayload.tasks.map((item) => [item.taskId, item.priority]),
+            )
+            return prev
+              .map((dto) =>
+                priorityById.has(dto.taskId)
+                  ? { ...dto, priority: priorityById.get(dto.taskId)! }
+                  : dto,
+              )
+              .slice()
+              .sort((a, b) => (orderIndex.get(a.taskId) ?? 0) - (orderIndex.get(b.taskId) ?? 0))
+          },
+        )
       })
       .catch(() => {
         addToast('업무 순서 변경에 실패했어요. 다시 시도해 주세요')
@@ -614,7 +632,7 @@ export default function TodoListPage() {
       queryKey: homeQueryKeys.all,
     })
     queryClient.invalidateQueries({
-      queryKey: taskQueryKeys.calendars(),
+      queryKey: taskQueryKeys.calendars(workspaceId),
     })
   }
 
@@ -758,7 +776,9 @@ export default function TodoListPage() {
     const projectTagId = tasksForDate.find((task) => task.tag?.id)?.tag?.id
 
     try {
-      const projectTagDetail = projectTagId ? await getTagDetail(projectTagId) : undefined
+      const projectTagDetail = projectTagId
+        ? await getTagDetail(workspaceId, projectTagId)
+        : undefined
 
       if (projectTagId && !projectTagDetail) {
         performancePreview.failPreview()
