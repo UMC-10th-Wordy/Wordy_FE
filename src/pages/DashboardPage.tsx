@@ -12,6 +12,7 @@ import {
 import ArrowLeftIcon from '@/assets/icons/arrow-left.svg?react'
 import { useToast } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
+import { LoadingState } from '@/components/common/AsyncState/AsyncState'
 import { WeeklyStatusCard } from '@/components/dashboard/WeeklyStatusCard'
 import { DiaryChecklistPanel } from '@/components/dashboard/DiaryChecklistPanel'
 import { WeeklySummaryInsight } from '@/components/dashboard/WeeklySummaryInsight'
@@ -50,6 +51,8 @@ export const DashboardPage = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [generation, setGeneration] = useState<'idle' | 'generating' | 'complete'>('idle')
   const [detail, setDetail] = useState<DashboardDetailDto | null>(null)
+  const [isWeeklyLoading, setIsWeeklyLoading] = useState(true)
+  const [isMonthlyLoading, setIsMonthlyLoading] = useState(true)
 
   const getTeamWeekStart = (date: Date) => {
     const sunday = new Date(date)
@@ -87,6 +90,7 @@ export const DashboardPage = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDetail(null)
     setGeneration('idle')
+    setIsWeeklyLoading(true)
     let cancelled = false
     const baseDate = `${weekStartDate.getFullYear()}-${String(weekStartDate.getMonth() + 1).padStart(2, '0')}-${String(weekStartDate.getDate()).padStart(2, '0')}`
     const viewedEndDate = getTeamWeekEnd(weekStartDate)
@@ -103,6 +107,7 @@ export const DashboardPage = () => {
         setEntries(mapped)
         setRequiredCount(res.requiredDays)
         setWeekRange({ start: res.weekStart, end: res.weekEnd })
+        setIsWeeklyLoading(false)
         getDashboards(workspaceId)
           .then((list) => {
             const saved = list.find((d) => d.startDate === res.weekStart)
@@ -117,26 +122,38 @@ export const DashboardPage = () => {
           .catch(() => {})
         setSelectedIds(mapped.map((e) => e.id)) // 기본: 전체 선택
       })
-      .catch((error) => console.error('생성 조건 조회 실패:', error))
+      .catch((error) => {
+        if (cancelled) return
+        console.error('생성 조건 조회 실패:', error)
+        setIsWeeklyLoading(false)
+        addToast('생성 조건을 불러오지 못했어요. 다시 시도해 주세요')
+      })
     return () => {
       cancelled = true
     }
-  }, [workspaceId, weekStartDate])
+  }, [workspaceId, weekStartDate, addToast])
 
   useEffect(() => {
     if (!workspaceId) return
+    if (activeTab !== 'monthly') return
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMonthlyDetail(null)
     setMonthlyGeneration('idle')
+    setIsMonthlyLoading(true)
     let cancelled = false
     getMonthlyEligibility(workspaceId, monthBaseDate)
       .then((res) => {
-        if (!cancelled) setMonthlyEligibility(res)
+        if (!cancelled) {
+          setMonthlyEligibility(res)
+          setIsMonthlyLoading(false)
+        }
       })
       .catch((error) => {
         if (!cancelled) {
           console.error('월간 생성 조건 조회 실패:', error)
           setMonthlyEligibility(null)
+          setIsMonthlyLoading(false)
+          addToast('생성 조건을 불러오지 못했어요. 다시 시도해 주세요')
         }
       })
     getMonthlyDashboards(workspaceId)
@@ -153,7 +170,7 @@ export const DashboardPage = () => {
     return () => {
       cancelled = true
     }
-  }, [workspaceId, monthBaseDate])
+  }, [workspaceId, monthBaseDate, activeTab, addToast])
 
   const totalDays = entries.length
 
@@ -299,14 +316,20 @@ export const DashboardPage = () => {
     if (!detail) return
     void getDashboardDetail(workspaceId, detail.dashboardId)
       .then((res) => setDetail(res))
-      .catch((error) => console.error('상세 재조회 실패:', error))
+      .catch((error) => {
+        console.error('상세 재조회 실패:', error)
+        addToast('최신 내용을 불러오지 못했어요. 다시 시도해 주세요')
+      })
   }
 
   const refreshMonthlyDetail = () => {
     if (!monthlyDetail) return
     void getMonthlyDashboardDetail(workspaceId, monthlyDetail.dashboardId)
       .then((res) => setMonthlyDetail(res))
-      .catch((error) => console.error('월간 상세 재조회 실패:', error))
+      .catch((error) => {
+        console.error('월간 상세 재조회 실패:', error)
+        addToast('최신 내용을 불러오지 못했어요. 다시 시도해 주세요')
+      })
   }
 
   const handleGoWeekly = (weekId: string) => {
@@ -386,7 +409,9 @@ export const DashboardPage = () => {
           </div>
 
           <div className="flex gap-5">
-            {status === 'complete' ? (
+            {isWeeklyLoading ? (
+              <LoadingState message="주간 데이터를 불러오는 중이에요" className="flex-1 py-20" />
+            ) : status === 'complete' ? (
               <div className="flex flex-1 flex-col gap-7">
                 <WeeklySummaryInsight stats={stats} aiSummary={aiSummary} />
                 <TagWorkflowSection tags={tags} />
@@ -461,15 +486,19 @@ export const DashboardPage = () => {
           </div>
 
           <div className="flex gap-5">
-            <MonthlyDashboard
-              generation={monthlyGeneration}
-              workspaceId={workspaceId}
-              onGenerate={handleMonthlyGenerate}
-              onGoWeekly={handleGoWeekly}
-              eligibility={monthlyEligibility}
-              detail={monthlyDetail}
-              onReflectionSaved={refreshMonthlyDetail}
-            />
+            {isMonthlyLoading ? (
+              <LoadingState message="월간 데이터를 불러오는 중이에요" className="flex-1 py-20" />
+            ) : (
+              <MonthlyDashboard
+                generation={monthlyGeneration}
+                workspaceId={workspaceId}
+                onGenerate={handleMonthlyGenerate}
+                onGoWeekly={handleGoWeekly}
+                eligibility={monthlyEligibility}
+                detail={monthlyDetail}
+                onReflectionSaved={refreshMonthlyDetail}
+              />
+            )}
           </div>
         </>
       )}
