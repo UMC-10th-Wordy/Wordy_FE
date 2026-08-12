@@ -1,8 +1,8 @@
 import { TextButton } from '@/components/common/Button/TextButton'
 import LogoIcon from '@/assets/icons/logo.svg?react'
 
-// 메일 수신 화면 (사용자가 받는 인증 메일 본문 UI)
-// TODO(#35): 실제 메일 발송 템플릿 적용 방식은 백엔드와 협의 필요
+// 실제 인증 메일 발송은 백엔드가 처리하며, 이 컴포넌트는 그 메일 HTML 템플릿 제작을 위해
+// 백엔드에 전달한 참고용 마크업이라 앱 라우트에서는 제거했지만 파일은 남겨둠
 export const MailNoticePage = () => {
   const handleVerify = () => {
     // TODO(#35): API 연동 시 인증 처리 링크로 교체

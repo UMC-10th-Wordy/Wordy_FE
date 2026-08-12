@@ -25,9 +25,15 @@ export const EmailVerificationPage = () => {
     if (isSuccess && data) {
       setAuthTokens(data.accessToken, data.refreshToken)
       // 메일 속 링크는 새 탭으로 열리는 경우가 많아, 원래 탭(대기 화면)에도
-      // 인증 완료를 알려서 자동으로 다음 화면으로 넘어가게 함
+      // 인증 완료를 알려서 자동으로 다음 화면으로 넘어가게 함. 대기 탭이 자신이
+      // 기다리던 이메일인지 확인할 수 있도록 email도 함께 보냄(다른 계정의 인증
+      // 완료를 이 탭이 그대로 받아 로그인해버리는 것을 방지)
       const channel = new BroadcastChannel('email-verification')
-      channel.postMessage({ accessToken: data.accessToken, refreshToken: data.refreshToken })
+      channel.postMessage({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        email: data.email,
+      })
       channel.close()
     }
     if (isError) {
@@ -35,15 +41,19 @@ export const EmailVerificationPage = () => {
     }
   }, [isSuccess, isError, data, error])
 
+  const pendingEmail = location.state?.email
   useEffect(() => {
-    if (token) return
+    if (token || !pendingEmail) return
     const channel = new BroadcastChannel('email-verification')
-    channel.onmessage = (event: MessageEvent<{ accessToken: string; refreshToken: string }>) => {
+    channel.onmessage = (
+      event: MessageEvent<{ accessToken: string; refreshToken: string; email: string }>,
+    ) => {
+      if (event.data.email !== pendingEmail) return
       setAuthTokens(event.data.accessToken, event.data.refreshToken)
       navigate('/profile-setup')
     }
     return () => channel.close()
-  }, [token, navigate])
+  }, [token, pendingEmail, navigate])
 
   const status: VerificationStatus = !token
     ? 'request'
