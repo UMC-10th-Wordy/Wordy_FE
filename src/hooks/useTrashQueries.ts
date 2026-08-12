@@ -50,7 +50,7 @@ export const useRestoreDailyEntry = () => {
         queryClient.resetQueries({
           queryKey: dailyEntryQueryKeys.detail(activeWorkspaceId, dailyEntryId),
         }),
-        queryClient.invalidateQueries({ queryKey: homeQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(activeWorkspaceId) }),
       ])
     },
   })

@@ -114,7 +114,7 @@ export const useCreateDailyEntry = () => {
           queryKey: dailyEntryQueryKeys.workspace(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: homeQueryKeys.all,
+          queryKey: homeQueryKeys.all(activeWorkspaceId),
         }),
       ])
     },
@@ -153,7 +153,7 @@ export const useDeleteDailyEntry = () => {
           queryKey: dailyEntryQueryKeys.searches(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: homeQueryKeys.all,
+          queryKey: homeQueryKeys.all(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
           queryKey: trashQueryKeys.lists(),

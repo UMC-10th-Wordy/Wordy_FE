@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
 import { homeQueryKeys } from '@/api/home/home'
 import { useGetProfile } from '@/hooks/useUserQueries'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 
 const NICKNAME_INVALID_CHARS_REGEX = /[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9\s]/g
 const sanitizeNickname = (value: string) => value.replace(NICKNAME_INVALID_CHARS_REGEX, '')
@@ -24,6 +25,7 @@ export const ProfileSetupPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data: profileData, isLoading: isProfileLoading } = useGetProfile({ retry: false })
+  const workspaceId = useActiveWorkspaceId()
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [photoFile, setPhotoFile] = useState<File | null>(null)
@@ -85,7 +87,7 @@ export const ProfileSetupPage = () => {
         { throwOnError: true },
       )
       // 홈 화면 캐시도 함께 무효화해야 이동 직후 이름이 정상 반영됨
-      await queryClient.invalidateQueries({ queryKey: homeQueryKeys.all })
+      await queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
     } catch {
       alert('프로필 등록에 실패했어요. 다시 시도해 주세요.')
     } finally {

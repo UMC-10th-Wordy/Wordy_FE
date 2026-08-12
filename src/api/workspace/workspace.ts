@@ -45,3 +45,6 @@ export const workspaceQueryKeys = {
 
   lists: () => [...workspaceQueryKeys.all, 'list'] as const,
 }
+
+export const getDefaultWorkspaceId = (workspaces: WorkspaceListResult): string =>
+  workspaces.find((w) => w.isDefault)?.workspaceId ?? workspaces[0]?.workspaceId ?? ''

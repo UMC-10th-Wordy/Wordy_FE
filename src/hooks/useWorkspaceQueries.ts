@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createWorkspace,
   deleteWorkspace,
+  getDefaultWorkspaceId,
   getWorkspaces,
   updateWorkspace,
   workspaceQueryKeys,
@@ -19,8 +20,7 @@ export const useGetWorkspaces = () => {
 export const useActiveWorkspaceId = () => {
   const { data: workspacesData } = useGetWorkspaces()
   const { selectedWorkspaceId } = useWorkspaceStore()
-  const defaultWorkspaceId =
-    workspacesData?.find((w) => w.isDefault)?.workspaceId ?? workspacesData?.[0]?.workspaceId ?? ''
+  const defaultWorkspaceId = getDefaultWorkspaceId(workspacesData ?? [])
 
   return selectedWorkspaceId ?? defaultWorkspaceId
 }

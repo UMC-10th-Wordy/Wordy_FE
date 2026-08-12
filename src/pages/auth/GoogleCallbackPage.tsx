@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useGoogleCallback } from '@/hooks/useAuthQueries'
 import { getHome, homeQueryKeys } from '@/api/home/home'
+import { getDefaultWorkspaceId, getWorkspaces, workspaceQueryKeys } from '@/api/workspace/workspace'
 import { clearAuthTokens, markAuthenticated, storeAuthTokens } from '@/lib/httpClient'
 
 export const GoogleCallbackPage = () => {
@@ -31,10 +32,18 @@ export const GoogleCallbackPage = () => {
       // GuestRoute가 그 즉시 반응해서 홈으로 리다이렉트되며 Suspense가 깜빡이는 것을 막음
       storeAuthTokens(data.accessToken, data.refreshToken)
       // 홈 데이터와 홈 페이지 청크를 함께 미리 받아둬서 이동 직후 로딩 표시가 뜨지 않게 함
-      Promise.all([
-        queryClient.prefetchQuery({ queryKey: homeQueryKeys.all, queryFn: getHome }),
-        import('@/pages/HomePage'),
-      ])
+      queryClient
+        .fetchQuery({ queryKey: workspaceQueryKeys.lists(), queryFn: getWorkspaces })
+        .then((workspaces) => {
+          const workspaceId = getDefaultWorkspaceId(workspaces)
+          return Promise.all([
+            queryClient.prefetchQuery({
+              queryKey: homeQueryKeys.all(workspaceId),
+              queryFn: () => getHome(workspaceId),
+            }),
+            import('@/pages/HomePage'),
+          ])
+        })
         .then(() => {
           markAuthenticated()
           navigate('/', { replace: true })
