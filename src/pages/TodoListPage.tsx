@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import TaskForm from '@/components/todo/TaskForm'
 import TodoTabs from '@/components/todo/TodoTabs'
@@ -98,19 +99,37 @@ const parseGrowthInsights = (insight: string): string[] => {
     .filter(Boolean)
 }
 
+const DATE_PARAM_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+
+const parseDateParam = (value: string | null): Date | null => {
+  if (!value || !DATE_PARAM_PATTERN.test(value)) return null
+  const parsed = new Date(`${value}T00:00:00`)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
 export default function TodoListPage() {
   const workspaceId = useActiveWorkspaceId()
+  const [searchParams] = useSearchParams()
+  const dateParam = searchParams.get('date')
 
   if (!workspaceId) {
     return <LoadingState message="불러오는 중입니다" className="h-screen w-full" />
   }
 
-  return <TodoListPageContent key={workspaceId} workspaceId={workspaceId} />
+  return (
+    <TodoListPageContent key={workspaceId} workspaceId={workspaceId} initialDateParam={dateParam} />
+  )
 }
 
 const TWO_COLUMN_MIN_VIEWPORT_WIDTH = 1500
 
-function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
+function TodoListPageContent({
+  workspaceId,
+  initialDateParam,
+}: {
+  workspaceId: string
+  initialDateParam: string | null
+}) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [isViewportNarrow, setIsViewportNarrow] = useState(
     () => window.innerWidth < TWO_COLUMN_MIN_VIEWPORT_WIDTH,
@@ -122,10 +141,12 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
     window.addEventListener('resize', updateIsViewportNarrow)
     return () => window.removeEventListener('resize', updateIsViewportNarrow)
   }, [])
-  const [currentDate, setCurrentDate] = useState(() => new Date())
+  const [currentDate, setCurrentDate] = useState(
+    () => parseDateParam(initialDateParam) ?? new Date(),
+  )
   const [movedPerformanceTaskIds, setMovedPerformanceTaskIds] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<TodoFilter>(() =>
-    readStoredActiveTab(toDateKey(new Date())),
+    readStoredActiveTab(toDateKey(parseDateParam(initialDateParam) ?? new Date())),
   )
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
   const [tasks, setTasks] = useState<Task[]>([])
