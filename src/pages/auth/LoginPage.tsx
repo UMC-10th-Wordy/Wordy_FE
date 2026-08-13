@@ -30,8 +30,9 @@ export const LoginPage = () => {
     const state = location.state as { error?: string } | null
     if (state?.error) {
       addToast(state.error)
+      navigate(location.pathname, { replace: true, state: null })
     }
-  }, [location.state, addToast])
+  }, [location.state, location.pathname, addToast, navigate])
 
   const emailError = !email
     ? '이메일을 입력해주세요.'

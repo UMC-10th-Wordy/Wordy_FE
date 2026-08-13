@@ -188,7 +188,7 @@ src/
 
 ### 성과 리포트
 
-```
+```text
 Weekly 탭
   ├─ 주간 요약 인사이트 → 주간 회고 작성 → 다음주 계획 작성
   ├─ 핵심 지표 진행 현황
@@ -253,11 +253,11 @@ Monthly 탭
 
 ### 일지 히스토리
 
-<img src="docs/images/06-diary-list.png" width="800" />
+<img src="docs/images/06-diary-list.png" width="800" alt="일지 히스토리 화면" />
 
 ### 성과 리포트
 
-<img src="docs/images/07-dashboard.png" width="800" />
+<img src="docs/images/07-dashboard.png" width="800" alt="성과 리포트 화면" />
 
 ## 협업 규칙
 

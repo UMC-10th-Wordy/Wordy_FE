@@ -60,7 +60,7 @@ export function ConfirmDialog({
       <div
         ref={dialogRef}
         role="alertdialog"
-        aria-modal="true"
+        aria-modal={isViewport}
         aria-labelledby={titleId}
         tabIndex={-1}
         className="relative z-10 flex flex-col gap-5 items-center justify-center px-8 py-5 bg-(--color-bg-default) rounded-(--scale-12) drop-shadow-[0px_1px_7.5px_rgba(0,0,0,0.1)]"

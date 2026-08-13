@@ -17,7 +17,8 @@ import { postProfile, postProfileImage, userQueryKeys } from '@/api/user/user'
 import { homeQueryKeys } from '@/api/home/home'
 import { fetchDefaultWorkspaceId } from '@/api/workspace/workspace'
 import { useGetProfile } from '@/hooks/useUserQueries'
-import { LoadingState } from '@/components/common/AsyncState/AsyncState'
+import { ErrorState, LoadingState } from '@/components/common/AsyncState/AsyncState'
+import { ApiError } from '@/lib/httpClient'
 
 const NICKNAME_INVALID_CHARS_REGEX = /[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9\s]/g
 const sanitizeNickname = (value: string) => value.replace(NICKNAME_INVALID_CHARS_REGEX, '')
@@ -25,7 +26,14 @@ const sanitizeNickname = (value: string) => value.replace(NICKNAME_INVALID_CHARS
 export const ProfileSetupPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { data: profileData, isLoading: isProfileLoading } = useGetProfile({ retry: false })
+  const {
+    data: profileData,
+    isLoading: isProfileLoading,
+    isError: isProfileError,
+    error: profileError,
+    refetch: refetchProfile,
+  } = useGetProfile({ retry: false })
+  const isProfileNotFound = profileError instanceof ApiError && profileError.status === 404
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
   const [photoFile, setPhotoFile] = useState<File | null>(null)
@@ -105,6 +113,16 @@ export const ProfileSetupPage = () => {
 
   if (isProfileLoading) {
     return <LoadingState message="불러오는 중이에요" className="h-screen" />
+  }
+
+  if (isProfileError && !isProfileNotFound) {
+    return (
+      <ErrorState
+        message="프로필 정보를 불러오지 못했어요"
+        className="h-screen"
+        onRetry={() => void refetchProfile()}
+      />
+    )
   }
 
   if (profileData?.userName) {
