@@ -8,8 +8,8 @@ export interface DiaryEntry {
 export interface EligibilityEntryDto {
   dailyEntryId: string
   entryDate: string
+  converted?: boolean
 }
-
 export interface EligibilityDto {
   eligible: boolean
   journalDays: number
@@ -68,6 +68,11 @@ export interface PerformanceDto {
   dailyEntryId?: string
 }
 
+export interface FocusedTagDto {
+  tagId: string
+  tagName: string
+}
+
 export interface DashboardDetailDto {
   dashboardId: string
   startDate: string
@@ -81,6 +86,8 @@ export interface DashboardDetailDto {
   tagAnalyses: TagAnalysisDto[]
   weeklyReflections: WeeklyReflectionDto[]
   performances: PerformanceDto[]
+  keyAchievement?: string
+  focusedTags?: FocusedTagDto[]
 }
 
 export interface CreateDashboardPayload {
@@ -123,30 +130,6 @@ export interface MonthlyReflectionResultDto {
   learning: string
   createdAt: string
 }
-export interface MonthlyWeeklyDashboardDto {
-  dashboardId: string
-  startDate: string
-  endDate: string
-  summary: string
-}
-
-export interface MonthlyEligibilityDto {
-  eligible: boolean
-  weeklyDashboardCount: number
-  requiredCount: number
-  monthStart: string
-  monthEnd: string
-  weeklyDashboards: MonthlyWeeklyDashboardDto[]
-}
-
-export interface MonthlyReflectionResultDto {
-  weeklyReflectionId: string
-  workSummary: string
-  resourcesUsed: string
-  learning: string
-  createdAt: string
-}
-
 export interface AiTagAnalysisDto {
   tagName: string
   objective: string

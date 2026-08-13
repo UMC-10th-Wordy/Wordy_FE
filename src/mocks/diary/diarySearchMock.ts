@@ -3,6 +3,7 @@ import type { DiarySearchDiary, DiarySearchTagResult } from '@/types/diarySearch
 export const MOCK_DIARY_SEARCH_RESULTS: DiarySearchDiary[] = [
   {
     id: '2026-06-21',
+    taskId: 'task-search-2026-06-21',
     entryDate: '2026-06-21',
     title: 'Product Strategy Alignment 회의 준비',
     tag: {
@@ -12,6 +13,7 @@ export const MOCK_DIARY_SEARCH_RESULTS: DiarySearchDiary[] = [
   },
   {
     id: '2026-06-20',
+    taskId: 'task-search-2026-06-20',
     entryDate: '2026-06-20',
     title:
       'Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비',
@@ -22,11 +24,13 @@ export const MOCK_DIARY_SEARCH_RESULTS: DiarySearchDiary[] = [
   },
   {
     id: '2026-06-19',
+    taskId: 'task-search-2026-06-19',
     entryDate: '2026-06-19',
     title: 'Product Strategy Alignment 회의 준비',
   },
   {
     id: '2026-06-03',
+    taskId: 'task-search-2026-06-03',
     entryDate: '2026-06-03',
     title: 'Product Strategy Alignment 회의 준비',
     tag: {
@@ -36,6 +40,7 @@ export const MOCK_DIARY_SEARCH_RESULTS: DiarySearchDiary[] = [
   },
   {
     id: '2026-02-21',
+    taskId: 'task-search-2026-02-21',
     entryDate: '2026-02-21',
     title: 'Product Strategy Alignment 회의 준비',
     tag: {
@@ -45,11 +50,13 @@ export const MOCK_DIARY_SEARCH_RESULTS: DiarySearchDiary[] = [
   },
   {
     id: '2026-01-21',
+    taskId: 'task-search-2026-01-21',
     entryDate: '2026-01-21',
     title: 'Product Strategy Alignment 회의 준비',
   },
   {
     id: '2026-01-20',
+    taskId: 'task-search-2026-01-20',
     entryDate: '2026-01-20',
     title: '주간 회의 내용 정리 및 다음 업무 계획 수립',
   },
@@ -62,6 +69,7 @@ export const MOCK_TAG_SEARCH_RESULTS: DiarySearchTagResult[] = [
     diaries: [
       {
         id: '2026-06-21',
+        taskId: 'task-tag-search-2026-06-21',
         entryDate: '2026-06-21',
         title: 'Product Strategy Alignment 회의 준비',
         tag: {
@@ -71,6 +79,7 @@ export const MOCK_TAG_SEARCH_RESULTS: DiarySearchTagResult[] = [
       },
       {
         id: '2026-06-20',
+        taskId: 'task-tag-search-2026-06-20',
         entryDate: '2026-06-20',
         title:
           'Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비 Product Strategy Alignment 회의 준비',
@@ -87,6 +96,7 @@ export const MOCK_TAG_SEARCH_RESULTS: DiarySearchTagResult[] = [
     diaries: [
       {
         id: '2026-06-18',
+        taskId: 'task-tag-search-2026-06-18',
         entryDate: '2026-06-18',
         title: '프로젝트 정기 회의록 작성',
         tag: {
@@ -102,6 +112,7 @@ export const MOCK_TAG_SEARCH_RESULTS: DiarySearchTagResult[] = [
     diaries: [
       {
         id: '2026-06-15',
+        taskId: 'task-tag-search-2026-06-15',
         entryDate: '2026-06-15',
         title: '고객 요청사항 확인을 위한 회의 진행',
         tag: {

@@ -12,6 +12,7 @@ export interface DiarySearchProjectTag {
 
 export interface DiarySearchDiary {
   id: string
+  taskId: string
   entryDate: string
   title: string
   tag?: DiarySearchProjectTag
@@ -44,6 +45,7 @@ export interface DailyEntrySearchParams {
 /* 업무 일지 탭 결과 */
 export interface DailyEntrySearchItem {
   dailyEntryId: string
+  taskId: string
   workspaceId: string
   entryDate: string
   tags: DailyEntryTag[]
@@ -53,6 +55,7 @@ export interface DailyEntrySearchItem {
 /* 프로젝트 태그 탭 내부 일지 */
 export interface DailyEntryTagSearchDiary {
   dailyEntryId: string
+  taskId: string
   workspaceId: string
   entryDate: string
   title: string

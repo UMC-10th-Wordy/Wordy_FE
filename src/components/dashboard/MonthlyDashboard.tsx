@@ -127,10 +127,20 @@ export const MonthlyDashboard = ({
       source: p.items[0]?.output ?? '업무 일지',
       dailyEntryId: p.dailyEntryId ?? p.items[0]?.dailyEntryId,
     }))
+    const focusAreas = detail.focusedTags?.map((ft, i) => ({
+      label: ft.tagName,
+      color: TAG_FALLBACK_COLORS[i % TAG_FALLBACK_COLORS.length],
+    }))
 
     return (
       <div className="flex flex-1 flex-col gap-7">
-        <WeeklySummaryInsight title="월간 요약 인사이트" stats={stats} aiSummary={detail.summary} />
+        <WeeklySummaryInsight
+          title="월간 요약 인사이트"
+          stats={stats}
+          aiSummary={detail.summary}
+          monthlyHighlight={detail.keyAchievement}
+          focusAreas={focusAreas}
+        />
         <TagWorkflowSection tags={tags} period="monthly" />
         <WeeklyHighlights
           items={highlights}

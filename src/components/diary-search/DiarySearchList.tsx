@@ -25,7 +25,7 @@ export const DiarySearchList = ({
       <div className="mt-(--scale-12) flex flex-col gap-(--scale-32)">
         {diaries.map((diary) => (
           <DiarySearchItem
-            key={`${diary.id}-${diary.title}`}
+            key={diary.taskId}
             diary={diary}
             keyword={keyword}
             onDetailClick={onDetailClick}
