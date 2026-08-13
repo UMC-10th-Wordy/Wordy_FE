@@ -24,7 +24,7 @@ const normalizeSubmittedAnswers = (
 ): PerformanceSupplementAnswer[] =>
   answers.map((answer) => ({
     ...answer,
-    status: answer.status ?? (answer.answer ? 'ANSWERED' : 'SKIPPED'),
+    status: answer.status ?? (answer.answer.trim() ? 'ANSWERED' : 'SKIPPED'),
   }))
 
 export type PerformanceQuestionMessage = PerformanceQuestionChatMessage
