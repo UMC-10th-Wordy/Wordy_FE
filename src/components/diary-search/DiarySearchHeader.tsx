@@ -19,7 +19,7 @@ export const DiarySearchHeader = ({
   const count = isDiaryTab ? diaryCount : projectTagCount
 
   return (
-    <div className="flex w-full max-w-200 items-center justify-between">
+    <div className="flex w-full items-center justify-between">
       <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-[var(--font-weight-semibold)] text-(--color-text-default)">
         총{' '}
         <span className="text-(--color-text-brand)">
