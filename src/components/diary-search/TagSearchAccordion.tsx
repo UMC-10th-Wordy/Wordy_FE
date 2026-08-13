@@ -40,17 +40,12 @@ export const TagSearchAccordion = ({ result, keyword, onDetailClick }: TagSearch
             <IconButton
               variant="text_neutral"
               size="small"
+              iconClassName="size-(--scale-24)"
               icon={
                 expanded ? (
-                  <DirectionTopIcon
-                    aria-hidden
-                    className="size-(--scale-24) text-(--color-icon-secondary)"
-                  />
+                  <DirectionTopIcon aria-hidden className="text-(--color-icon-secondary)" />
                 ) : (
-                  <DirectionBottomIcon
-                    aria-hidden
-                    className="size-(--scale-24) text-(--color-icon-secondary)"
-                  />
+                  <DirectionBottomIcon aria-hidden className="text-(--color-icon-secondary)" />
                 )
               }
               onClick={() => setExpanded((previousExpanded) => !previousExpanded)}
@@ -101,10 +96,11 @@ export const TagSearchAccordion = ({ result, keyword, onDetailClick }: TagSearch
                         <IconButton
                           variant="text_neutral"
                           size="small"
+                          iconClassName="size-(--scale-24)"
                           icon={
                             <DirectionRightIcon
                               aria-hidden
-                              className="size-(--scale-24) text-(--color-icon-secondary)"
+                              className="text-(--color-icon-secondary)"
                             />
                           }
                           onClick={() => onDetailClick(diary.id)}

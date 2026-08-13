@@ -58,7 +58,8 @@ export const DiaryMonthlyEntry = ({ entry }: DiaryMonthlyEntryProps) => {
       <IconButton
         variant="text_neutral"
         size="small"
-        icon={<img src={directionRightIcon} alt="" aria-hidden="true" className="size-6" />}
+        iconClassName="size-6"
+        icon={<img src={directionRightIcon} alt="" aria-hidden="true" />}
         aria-label={`${entry.date} 업무 일지 자세히 보기`}
         className="absolute top-(--scale-8) right-0"
         onClick={handleEntryClick}

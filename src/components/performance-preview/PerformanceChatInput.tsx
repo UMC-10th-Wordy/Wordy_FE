@@ -146,12 +146,8 @@ export const PerformanceChatInput = ({
         type="button"
         variant="fill"
         size="large"
-        icon={
-          <SendIcon
-            aria-hidden
-            className="size-(--scale-40) [&_*]:fill-current [&_*]:stroke-current"
-          />
-        }
+        iconClassName="size-(--scale-40)"
+        icon={<SendIcon aria-hidden className="[&_*]:fill-current [&_*]:stroke-current" />}
         aria-label="답변 전송"
         disabled={isSubmitDisabled}
         onClick={handleSubmitAnswer}

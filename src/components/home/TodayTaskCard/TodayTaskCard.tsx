@@ -76,7 +76,8 @@ export function TodayTaskCard({
         <IconButton
           variant="icon_only"
           size="medium"
-          icon={<ArrowRightIcon className="size-8" />}
+          iconClassName="size-8"
+          icon={<ArrowRightIcon />}
           onClick={onNavigate}
           aria-label="오늘의 업무 이동"
         />

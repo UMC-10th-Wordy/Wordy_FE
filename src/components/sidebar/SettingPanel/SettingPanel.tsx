@@ -214,7 +214,8 @@ export function SettingPanel({
                     <IconButton
                       variant="text_neutral"
                       size="small"
-                      icon={<ArrowLeftIcon className="size-6" />}
+                      iconClassName="size-6"
+                      icon={<ArrowLeftIcon />}
                       onClick={() => setInnerView('main')}
                       aria-label="돌아가기"
                     />
@@ -225,7 +226,8 @@ export function SettingPanel({
                   <IconButton
                     variant="text_neutral"
                     size="medium"
-                    icon={<XMarkIcon width={32} height={32} />}
+                    iconClassName="size-8"
+                    icon={<XMarkIcon />}
                     onClick={onClose}
                     aria-label="닫기"
                   />
@@ -295,7 +297,8 @@ export function SettingPanel({
                   <IconButton
                     variant="text_neutral"
                     size="medium"
-                    icon={<XMarkIcon width={32} height={32} />}
+                    iconClassName="size-8"
+                    icon={<XMarkIcon />}
                     onClick={onClose}
                     aria-label="닫기"
                   />
@@ -373,7 +376,8 @@ export function SettingPanel({
                             <IconButton
                               variant="text_neutral"
                               size="small"
-                              icon={<EditIcon className="size-6" />}
+                              iconClassName="size-6"
+                              icon={<EditIcon />}
                               aria-label="닉네임 수정"
                               onClick={() => setIsEditingName(true)}
                             />
@@ -429,6 +433,7 @@ export function SettingPanel({
                         <SettingAccordion
                           label={job || '선택'}
                           className="w-full"
+                          isOpen={openDropdown === 'job'}
                           aria-expanded={openDropdown === 'job'}
                           onClick={() => setOpenDropdown((v) => (v === 'job' ? null : 'job'))}
                         />
@@ -443,6 +448,7 @@ export function SettingPanel({
                         <SettingAccordion
                           label={career || '선택'}
                           className="w-full"
+                          isOpen={openDropdown === 'career'}
                           aria-expanded={openDropdown === 'career'}
                           onClick={() => setOpenDropdown((v) => (v === 'career' ? null : 'career'))}
                         />
@@ -483,7 +489,8 @@ export function SettingPanel({
                   <IconButton
                     variant="text_neutral"
                     size="medium"
-                    icon={<XMarkIcon width={32} height={32} />}
+                    iconClassName="size-8"
+                    icon={<XMarkIcon />}
                     onClick={onClose}
                     aria-label="닫기"
                   />

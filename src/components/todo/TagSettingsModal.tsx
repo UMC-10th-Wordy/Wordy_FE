@@ -434,7 +434,8 @@ export default function TagSettingsModal({
             onClick={onClose}
             variant="icon_neutral"
             size="small"
-            icon={<XMarkIcon aria-hidden className="size-6" />}
+            iconClassName="size-6"
+            icon={<XMarkIcon aria-hidden />}
           />
         </div>
 

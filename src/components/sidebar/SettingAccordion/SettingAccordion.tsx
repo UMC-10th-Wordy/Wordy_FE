@@ -3,9 +3,15 @@ import DirectionBottomIcon from '@/assets/icons/Direction=bottom.svg?react'
 
 export interface SettingAccordionProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label: ReactNode
+  isOpen?: boolean
 }
 
-export function SettingAccordion({ label, className, ...rest }: SettingAccordionProps) {
+export function SettingAccordion({
+  label,
+  isOpen = false,
+  className,
+  ...rest
+}: SettingAccordionProps) {
   return (
     <button
       type="button"
@@ -27,7 +33,10 @@ export function SettingAccordion({ label, className, ...rest }: SettingAccordion
       <DirectionBottomIcon
         width={24}
         height={24}
-        className="shrink-0 text-(--color-icon-secondary)"
+        className={[
+          'shrink-0 text-(--color-icon-secondary) transition-transform duration-150',
+          isOpen ? 'rotate-180' : '',
+        ].join(' ')}
       />
     </button>
   )

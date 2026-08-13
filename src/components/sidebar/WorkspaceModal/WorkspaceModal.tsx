@@ -75,7 +75,8 @@ export function WorkspaceModal({
           <IconButton
             variant="text_neutral"
             size="medium"
-            icon={<XMarkIcon width={32} height={32} />}
+            iconClassName="size-8"
+            icon={<XMarkIcon />}
             onClick={onClose}
             aria-label="닫기"
           />

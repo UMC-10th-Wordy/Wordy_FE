@@ -140,7 +140,8 @@ function HomePageContent({ className, ...rest }: HomePageProps) {
               <IconButton
                 variant="icon_only"
                 size="medium"
-                icon={<ArrowRightIcon className="size-8" />}
+                iconClassName="size-8"
+                icon={<ArrowRightIcon />}
                 aria-label="최근 기록 더보기"
                 onClick={() => navigate('/records')}
               />

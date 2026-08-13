@@ -114,7 +114,8 @@ export default function TagDatePicker({ anchorRef, value, onChange, onClose }: T
             size="small"
             aria-label="이전 달"
             onClick={() => setViewDate(new Date(year, month - 1, 1))}
-            icon={<ArrowLeftIcon aria-hidden className="size-6" />}
+            iconClassName="size-6"
+            icon={<ArrowLeftIcon aria-hidden />}
           />
           <IconButton
             type="button"
@@ -122,7 +123,8 @@ export default function TagDatePicker({ anchorRef, value, onChange, onClose }: T
             size="small"
             aria-label="다음 달"
             onClick={() => setViewDate(new Date(year, month + 1, 1))}
-            icon={<ArrowRightIcon aria-hidden className="size-6" />}
+            iconClassName="size-6"
+            icon={<ArrowRightIcon aria-hidden />}
           />
         </div>
       </div>

@@ -36,7 +36,8 @@ export function PlanPage() {
         <IconButton
           variant="text_neutral"
           size="large"
-          icon={<ArrowLeftIcon className="size-10" />}
+          iconClassName="size-10"
+          icon={<ArrowLeftIcon />}
           onClick={() => navigate('/')}
           aria-label="뒤로 가기"
         />

@@ -83,7 +83,8 @@ export function TaskCardView({
             size="small"
             aria-label="수정"
             onClick={onStartEdit}
-            icon={<EditIcon aria-hidden className="size-6" />}
+            iconClassName="size-6"
+            icon={<EditIcon aria-hidden />}
           />
           <IconButton
             type="button"
@@ -91,7 +92,8 @@ export function TaskCardView({
             size="small"
             aria-label="삭제"
             onClick={onDeleteClick}
-            icon={<TrashIcon aria-hidden className="size-6" />}
+            iconClassName="size-6"
+            icon={<TrashIcon aria-hidden />}
           />
           <IconButton
             type="button"
@@ -100,13 +102,8 @@ export function TaskCardView({
             aria-label={isExpanded ? '접기' : '펼치기'}
             aria-expanded={isExpanded}
             onClick={onToggleExpanded}
-            icon={
-              isExpanded ? (
-                <ChevronUpIcon aria-hidden className="size-6" />
-              ) : (
-                <ChevronDownIcon aria-hidden className="size-6" />
-              )
-            }
+            iconClassName="size-6"
+            icon={isExpanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
           />
         </div>
       </div>

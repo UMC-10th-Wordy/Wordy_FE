@@ -48,13 +48,8 @@ export function SidebarCollapsedHover({
         <IconButton
           variant="text_neutral"
           size="small"
-          icon={
-            logoHovered ? (
-              <SidebarToggleIcon className="size-6" />
-            ) : (
-              <LogoSmallIcon className="size-8" />
-            )
-          }
+          iconClassName={logoHovered ? 'size-6' : 'size-8'}
+          icon={logoHovered ? <SidebarToggleIcon /> : <LogoSmallIcon />}
           onClick={onExpand}
           onMouseEnter={() => setLogoHovered(true)}
           onMouseLeave={() => setLogoHovered(false)}

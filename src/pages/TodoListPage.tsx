@@ -849,7 +849,8 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
                     aria-label="업무 추가"
                     aria-expanded={isTaskFormOpen}
                     onClick={() => setIsTaskFormOpen((prev) => !prev)}
-                    icon={<PlusIcon aria-hidden className="size-8 text-(--color-icon-brand)" />}
+                    iconClassName="size-8"
+                    icon={<PlusIcon aria-hidden className="text-(--color-icon-brand)" />}
                   />
                 </div>
                 <TodoTabs activeTab={activeTab} counts={filterCounts} onChange={setActiveTab} />
