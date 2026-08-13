@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconButton } from '@/components/common/Button/IconButton'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
+import { LoadingState } from '@/components/common/AsyncState/AsyncState'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import { useToast } from '@/hooks/useToast'
 import { TrashMoreMenu } from '@/components/sidebar/TrashMoreMenu/TrashMoreMenu'
@@ -10,6 +11,7 @@ import {
   useGetTrashDailyEntries,
   useRestoreDailyEntry,
 } from '@/hooks/useTrashQueries'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import ArrowLeftIcon from '@/assets/icons/Direction=left.svg?react'
 import MeatballIcon from '@/assets/icons/meatball.svg?react'
 import ArrowRightIcon from '@/assets/icons/Direction=right.svg?react'
@@ -30,6 +32,16 @@ const formatDeletedAt = (deletedAt: string) => {
 type ConfirmState = { type: 'delete'; itemId: string } | null
 
 export function TrashPage() {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
+  if (!activeWorkspaceId) {
+    return <LoadingState message="불러오는 중입니다" className="h-full w-full" />
+  }
+
+  return <TrashPageContent />
+}
+
+function TrashPageContent() {
   const navigate = useNavigate()
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetTrashDailyEntries()
   const items = data.pages.flatMap((page) => page.items)
@@ -103,9 +115,10 @@ export function TrashPage() {
       <div className="flex gap-2 items-center shrink-0">
         <IconButton
           variant="text_neutral"
-          size={items.length === 0 ? 'medium' : 'large'}
-          icon={<ArrowLeftIcon className={items.length === 0 ? 'size-8' : 'size-10'} />}
-          onClick={() => navigate('/')}
+          size="large"
+          iconClassName="size-(--scale-40)"
+          icon={<ArrowLeftIcon />}
+          onClick={() => navigate(-1)}
           aria-label="뒤로 가기"
         />
         <span className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-medium text-(--color-text-secondary) whitespace-nowrap">
@@ -148,7 +161,8 @@ export function TrashPage() {
                   <IconButton
                     variant="text_neutral"
                     size="small"
-                    icon={<MeatballIcon className="size-6" />}
+                    iconClassName="size-6"
+                    icon={<MeatballIcon />}
                     onClick={() =>
                       setOpenMenuId(openMenuId === item.dailyEntryId ? null : item.dailyEntryId)
                     }
@@ -175,7 +189,8 @@ export function TrashPage() {
                         <IconButton
                           variant="text_neutral"
                           size="medium"
-                          icon={<ArrowRightIcon className="size-8" />}
+                          iconClassName="size-8"
+                          icon={<ArrowRightIcon />}
                           onClick={() => navigate(`/trash/${item.dailyEntryId}`)}
                           aria-label="일지 더보기"
                         />
