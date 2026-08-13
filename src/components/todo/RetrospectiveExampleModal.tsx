@@ -58,7 +58,8 @@ export function RetrospectiveExampleModal({ onClose }: RetrospectiveExampleModal
             size="small"
             aria-label="닫기"
             onClick={onClose}
-            icon={<XMarkIcon aria-hidden className="size-6" />}
+            iconClassName="size-6"
+            icon={<XMarkIcon aria-hidden />}
           />
         </div>
 

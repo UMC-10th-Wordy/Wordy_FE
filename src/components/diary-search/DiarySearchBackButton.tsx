@@ -11,12 +11,8 @@ export const DiarySearchBackButton = ({ onClick }: DiarySearchBackButtonProps) =
       <IconButton
         variant="text_neutral"
         size="large"
-        icon={
-          <DirectionLeftIcon
-            aria-hidden
-            className="size-(--scale-40) text-(--color-icon-secondary)"
-          />
-        }
+        iconClassName="size-(--scale-40)"
+        icon={<DirectionLeftIcon aria-hidden className="text-(--color-icon-secondary)" />}
         onClick={onClick}
         aria-label="뒤로 가기"
       />

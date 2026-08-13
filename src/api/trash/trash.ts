@@ -12,41 +12,50 @@ export interface GetTrashDailyEntriesParams {
   size: number
 }
 
-export const getTrashDailyEntries = async ({
-  page,
-  size,
-}: GetTrashDailyEntriesParams): Promise<TrashDailyEntriesResult> => {
+const getTrashDailyEntriesPath = (workspaceId: string) =>
+  `/workspaces/${encodeURIComponent(workspaceId)}/trash/daily-entries`
+
+export const getTrashDailyEntries = async (
+  workspaceId: string,
+  { page, size }: GetTrashDailyEntriesParams,
+): Promise<TrashDailyEntriesResult> => {
   const searchParams = new URLSearchParams({
     page: String(page),
     size: String(size),
   })
 
-  return request<TrashDailyEntriesResult>(`/trash/daily-entries?${searchParams.toString()}`, {
-    method: 'GET',
-  })
-}
-
-export const getTrashDailyEntryDetail = async (
-  dailyEntryId: string,
-): Promise<DailyEntryDetailResult> => {
-  return request<DailyEntryDetailResult>(
-    `/trash/daily-entries/${encodeURIComponent(dailyEntryId)}`,
+  return request<TrashDailyEntriesResult>(
+    `${getTrashDailyEntriesPath(workspaceId)}?${searchParams.toString()}`,
     { method: 'GET' },
   )
 }
 
-export const restoreDailyEntry = async (dailyEntryId: string): Promise<RestoreDailyEntryResult> => {
+export const getTrashDailyEntryDetail = async (
+  workspaceId: string,
+  dailyEntryId: string,
+): Promise<DailyEntryDetailResult> => {
+  return request<DailyEntryDetailResult>(
+    `${getTrashDailyEntriesPath(workspaceId)}/${encodeURIComponent(dailyEntryId)}`,
+    { method: 'GET' },
+  )
+}
+
+export const restoreDailyEntry = async (
+  workspaceId: string,
+  dailyEntryId: string,
+): Promise<RestoreDailyEntryResult> => {
   return request<RestoreDailyEntryResult>(
-    `/trash/daily-entries/${encodeURIComponent(dailyEntryId)}/restore`,
+    `${getTrashDailyEntriesPath(workspaceId)}/${encodeURIComponent(dailyEntryId)}/restore`,
     { method: 'PATCH' },
   )
 }
 
 export const deleteDailyEntryPermanently = async (
+  workspaceId: string,
   dailyEntryId: string,
 ): Promise<DeleteDailyEntryPermanentlyResult> => {
   return request<DeleteDailyEntryPermanentlyResult>(
-    `/trash/daily-entries/${encodeURIComponent(dailyEntryId)}`,
+    `${getTrashDailyEntriesPath(workspaceId)}/${encodeURIComponent(dailyEntryId)}`,
     { method: 'DELETE' },
   )
 }
@@ -54,9 +63,12 @@ export const deleteDailyEntryPermanently = async (
 export const trashQueryKeys = {
   all: ['trash'] as const,
 
-  lists: () => [...trashQueryKeys.all, 'list'] as const,
+  workspace: (workspaceId: string) => [...trashQueryKeys.all, workspaceId] as const,
 
-  details: () => [...trashQueryKeys.all, 'detail'] as const,
+  lists: (workspaceId: string) => [...trashQueryKeys.workspace(workspaceId), 'list'] as const,
 
-  detail: (dailyEntryId: string) => [...trashQueryKeys.details(), dailyEntryId] as const,
+  details: (workspaceId: string) => [...trashQueryKeys.workspace(workspaceId), 'detail'] as const,
+
+  detail: (workspaceId: string, dailyEntryId: string) =>
+    [...trashQueryKeys.details(workspaceId), dailyEntryId] as const,
 }

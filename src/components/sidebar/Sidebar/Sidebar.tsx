@@ -101,7 +101,8 @@ export function Sidebar({
               <IconButton
                 variant="text_neutral"
                 size="small"
-                icon={<SidebarIcon className="size-6" />}
+                iconClassName="size-6"
+                icon={<SidebarIcon />}
                 onClick={() => onChangeStatus?.('closed')}
                 aria-label="사이드바 접기"
               />

@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query'
 
 import { dailyEntryQueryKeys } from '@/api/daily-entry/dailyEntry'
+import { dashboardQueryKeys } from '@/api/dashboard/dashboard'
 import { homeQueryKeys } from '@/api/home/home'
 import {
   deleteDailyEntryPermanently,
@@ -20,18 +21,23 @@ import { mapDailyEntryDetail } from '@/utils/diary-list/diaryListMapper'
 const TRASH_PAGE_SIZE = 10
 
 export const useGetTrashDailyEntries = () => {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
   return useSuspenseInfiniteQuery({
-    queryKey: trashQueryKeys.lists(),
-    queryFn: ({ pageParam }) => getTrashDailyEntries({ page: pageParam, size: TRASH_PAGE_SIZE }),
+    queryKey: trashQueryKeys.lists(activeWorkspaceId),
+    queryFn: ({ pageParam }) =>
+      getTrashDailyEntries(activeWorkspaceId, { page: pageParam, size: TRASH_PAGE_SIZE }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => (lastPage.hasNext ? lastPage.page + 1 : undefined),
   })
 }
 
 export const useGetTrashDailyEntryDetail = (dailyEntryId: string) => {
+  const activeWorkspaceId = useActiveWorkspaceId()
+
   return useSuspenseQuery({
-    queryKey: trashQueryKeys.detail(dailyEntryId),
-    queryFn: () => getTrashDailyEntryDetail(dailyEntryId),
+    queryKey: trashQueryKeys.detail(activeWorkspaceId, dailyEntryId),
+    queryFn: () => getTrashDailyEntryDetail(activeWorkspaceId, dailyEntryId),
     select: mapDailyEntryDetail,
   })
 }
@@ -41,16 +47,19 @@ export const useRestoreDailyEntry = () => {
   const activeWorkspaceId = useActiveWorkspaceId()
 
   return useMutation({
-    mutationFn: restoreDailyEntry,
+    mutationFn: (dailyEntryId: string) => restoreDailyEntry(activeWorkspaceId, dailyEntryId),
 
     onSuccess: (_data, dailyEntryId) => {
       void Promise.all([
-        queryClient.invalidateQueries({ queryKey: trashQueryKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: trashQueryKeys.lists(activeWorkspaceId) }),
         queryClient.invalidateQueries({ queryKey: dailyEntryQueryKeys.all }),
         queryClient.resetQueries({
           queryKey: dailyEntryQueryKeys.detail(activeWorkspaceId, dailyEntryId),
         }),
         queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(activeWorkspaceId) }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardQueryKeys.workspace(activeWorkspaceId),
+        }),
       ])
     },
   })
@@ -58,12 +67,14 @@ export const useRestoreDailyEntry = () => {
 
 export const useDeleteDailyEntryPermanently = () => {
   const queryClient = useQueryClient()
+  const activeWorkspaceId = useActiveWorkspaceId()
 
   return useMutation({
-    mutationFn: deleteDailyEntryPermanently,
+    mutationFn: (dailyEntryId: string) =>
+      deleteDailyEntryPermanently(activeWorkspaceId, dailyEntryId),
 
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: trashQueryKeys.lists() })
+      void queryClient.invalidateQueries({ queryKey: trashQueryKeys.lists(activeWorkspaceId) })
     },
   })
 }

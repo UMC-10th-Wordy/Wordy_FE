@@ -38,12 +38,8 @@ export const DiarySearchItem = ({ diary, keyword, onDetailClick }: DiarySearchIt
           <IconButton
             variant="text_neutral"
             size="small"
-            icon={
-              <DirectionRightIcon
-                aria-hidden
-                className="size-(--scale-24) text-(--color-icon-secondary)"
-              />
-            }
+            iconClassName="size-(--scale-24)"
+            icon={<DirectionRightIcon aria-hidden className="text-(--color-icon-secondary)" />}
             onClick={() => onDetailClick(diary.id)}
             aria-label={`${dateLabel} 업무 일지 자세히 보기`}
           />

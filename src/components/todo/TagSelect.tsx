@@ -194,7 +194,8 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
                   setIsOpen(false)
                   setShowModal('new')
                 }}
-                icon={<PlusIcon aria-hidden className="size-6" />}
+                iconClassName="size-6"
+                icon={<PlusIcon aria-hidden />}
               />
               <IconButton
                 type="button"
@@ -205,7 +206,8 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
                   setIsOpen(false)
                   setShowModal('existing')
                 }}
-                icon={<SettingIcon aria-hidden className="size-6" />}
+                iconClassName="size-6"
+                icon={<SettingIcon aria-hidden />}
               />
             </div>
           </div>

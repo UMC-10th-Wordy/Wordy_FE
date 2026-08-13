@@ -17,6 +17,7 @@ import {
   getMonthlyDailyEntriesByYearMonth,
   searchDailyEntries,
 } from '@/api/daily-entry/dailyEntry'
+import { dashboardQueryKeys } from '@/api/dashboard/dashboard'
 import { homeQueryKeys } from '@/api/home/home'
 import { trashQueryKeys } from '@/api/trash/trash'
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
@@ -116,6 +117,9 @@ export const useCreateDailyEntry = () => {
         queryClient.invalidateQueries({
           queryKey: homeQueryKeys.all(activeWorkspaceId),
         }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardQueryKeys.workspace(activeWorkspaceId),
+        }),
       ])
     },
   })
@@ -156,7 +160,10 @@ export const useDeleteDailyEntry = () => {
           queryKey: homeQueryKeys.all(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: trashQueryKeys.lists(),
+          queryKey: trashQueryKeys.lists(activeWorkspaceId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardQueryKeys.workspace(activeWorkspaceId),
         }),
       ])
     },

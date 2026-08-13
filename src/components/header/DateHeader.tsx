@@ -61,7 +61,8 @@ export default function DateHeader({
           size="small"
           aria-label="이전 날짜"
           onClick={onPrevDay}
-          icon={<ArrowLeftIcon aria-hidden className="size-6" />}
+          iconClassName="size-6"
+          icon={<ArrowLeftIcon aria-hidden />}
         />
         <TextButton type="button" variant="text_neutral" size="medium" onClick={onToday}>
           오늘
@@ -72,7 +73,8 @@ export default function DateHeader({
           size="small"
           aria-label="다음 날짜"
           onClick={onNextDay}
-          icon={<ArrowRightIcon aria-hidden className="size-6" />}
+          iconClassName="size-6"
+          icon={<ArrowRightIcon aria-hidden />}
         />
         <div ref={calendarRef} className="relative">
           <IconButton
@@ -82,7 +84,8 @@ export default function DateHeader({
             aria-label="캘린더 열기"
             aria-expanded={isCalendarOpen}
             onClick={() => setIsCalendarOpen((prev) => !prev)}
-            icon={<CalendarIcon aria-hidden className="size-6" />}
+            iconClassName="size-6"
+            icon={<CalendarIcon aria-hidden />}
           />
           {isCalendarOpen && (
             <CalendarModal

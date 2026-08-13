@@ -82,14 +82,23 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   variant?: IconButtonVariant
   size?: IconButtonSize
   icon: ReactNode
+  /** 지정 시 size 프리셋의 아이콘 크기 대신 이 크기를 사용해요 (예: 'size-10') */
+  iconClassName?: string
 }
 
-export function IconButton({ variant, size, icon, className, ...rest }: IconButtonProps) {
+export function IconButton({
+  variant,
+  size,
+  icon,
+  className,
+  iconClassName,
+  ...rest
+}: IconButtonProps) {
   const resolvedSize = size ?? 'medium'
 
   return (
     <button type="button" className={iconButton({ variant, size, className })} {...rest}>
-      <ButtonIcon icon={icon} size={resolvedSize} />
+      <ButtonIcon icon={icon} size={resolvedSize} className={iconClassName} />
     </button>
   )
 }

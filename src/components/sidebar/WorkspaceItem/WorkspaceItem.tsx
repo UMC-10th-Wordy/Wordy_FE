@@ -49,7 +49,8 @@ export function WorkspaceItem({
         <IconButton
           variant="text_neutral"
           size="small"
-          icon={<EditIcon width={24} height={24} />}
+          iconClassName="size-6"
+          icon={<EditIcon />}
           onClick={(e) => {
             e.stopPropagation()
             onEdit?.()
@@ -59,7 +60,8 @@ export function WorkspaceItem({
         <IconButton
           variant="text_neutral"
           size="small"
-          icon={<TrashIcon width={24} height={24} />}
+          iconClassName="size-6"
+          icon={<TrashIcon />}
           disabled={!onDelete}
           onClick={(e) => {
             e.stopPropagation()

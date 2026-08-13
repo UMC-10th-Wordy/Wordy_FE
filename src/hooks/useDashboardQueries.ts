@@ -50,7 +50,7 @@ export const useCreateWeeklyDashboard = (workspaceId: string) => {
       return created
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.weeklyList(workspaceId) })
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.workspace(workspaceId) })
     },
   })
 }
@@ -93,7 +93,7 @@ export const useCreateMonthlyDashboard = (workspaceId: string) => {
       return created
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.monthlyList(workspaceId) })
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.workspace(workspaceId) })
     },
   })
 }

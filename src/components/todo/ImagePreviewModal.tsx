@@ -77,7 +77,8 @@ export function ImagePreviewModal({ name, url, onClose }: ImagePreviewModalProps
             className="!size-[52px] !rounded-md"
             aria-label="닫기"
             onClick={onClose}
-            icon={<XMarkIcon aria-hidden className="size-7" />}
+            iconClassName="size-7"
+            icon={<XMarkIcon aria-hidden />}
           />
           <IconButton
             type="button"
@@ -86,7 +87,8 @@ export function ImagePreviewModal({ name, url, onClose }: ImagePreviewModalProps
             className="!size-[52px] !rounded-md"
             aria-label="다운로드"
             onClick={() => downloadFile(url, name)}
-            icon={<DownloadIcon aria-hidden className="size-7 shrink-0" />}
+            iconClassName="size-7 shrink-0"
+            icon={<DownloadIcon aria-hidden />}
           />
         </div>
 

@@ -26,12 +26,12 @@ export const DiaryMonthlyAccordion = ({ record, isOpen, onToggle }: DiaryMonthly
           <IconButton
             variant="text_neutral"
             size="medium"
+            iconClassName="size-(--scale-32)"
             icon={
               <img
                 src={isOpen ? directionTopIcon : directionBottomIcon}
                 alt=""
                 aria-hidden="true"
-                className="size-(--scale-32)"
               />
             }
             aria-label={

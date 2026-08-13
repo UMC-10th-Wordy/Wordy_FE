@@ -338,10 +338,6 @@ export function SidebarLayout() {
             <ProfileModal
               triggerRef={profileTriggerRef}
               email={profile.email}
-              onTrash={() => {
-                setModal(null)
-                navigate('/trash')
-              }}
               onPlan={() => {
                 setModal(null)
                 navigate('/plan')

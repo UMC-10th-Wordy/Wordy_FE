@@ -22,7 +22,7 @@ export const DiaryDetailHeader = ({
           type="button"
           variant="text_neutral"
           size="small"
-          className="[&>span]:!size-(--scale-32) [&_svg]:!size-(--scale-32)"
+          iconClassName="size-(--scale-32)"
           aria-label="월별 기록으로 돌아가기"
           onClick={onBack}
           icon={<LeftIcon aria-hidden className="text-(--color-icon-default)" />}
@@ -40,9 +40,8 @@ export const DiaryDetailHeader = ({
           size="small"
           aria-label="업무 일지 삭제"
           onClick={onDelete}
-          icon={
-            <TrashIcon aria-hidden className="size-(--scale-24) text-(--color-icon-secondary)" />
-          }
+          iconClassName="size-(--scale-24)"
+          icon={<TrashIcon aria-hidden className="text-(--color-icon-secondary)" />}
         />
       )}
     </header>
