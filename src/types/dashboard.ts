@@ -84,7 +84,14 @@ export interface DashboardDetailDto {
   journalDays: number
   performanceCount: number
   tagCount: number
-  insights: { journalDays: number; performanceCount: number; tagCount: number }[]
+  insights?: {
+    dashboardInsightId?: string
+    dashboardId?: string
+    journalDays: number
+    performanceCount: number
+    tagCount: number
+    completionRate: number
+  }[]
   kpis: DashboardKpiDto[]
   tagAnalyses: TagAnalysisDto[]
   weeklyReflections: WeeklyReflectionDto[]
