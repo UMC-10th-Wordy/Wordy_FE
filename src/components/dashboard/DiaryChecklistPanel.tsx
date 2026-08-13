@@ -23,11 +23,10 @@ export const DiaryChecklistPanel = ({
   periodLabel,
 }: DiaryChecklistPanelProps) => {
   const isEmpty = entries.length === 0
-
   const navigate = useNavigate()
 
   return (
-    <aside className="flex h-[748px] min-w-0 max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-[#DDDDFF] shadow-[0px_1px_5px_0px_#0000001A] bg-(--color-bg-default) p-6">
+    <aside className="flex h-[748px] min-w-0 max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-(--color-border-brand-subtle) shadow-[0px_1px_5px_0px_#0000001A] bg-(--color-bg-default) p-6">
       <div className="flex items-baseline gap-2">
         <h2 className="[font-size:var(--font-size-body-2)] font-bold text-(--color-text-default)">
           생성에 사용할 업무 일지
@@ -60,33 +59,29 @@ export const DiaryChecklistPanel = ({
                     type="button"
                     onClick={() => onToggle(entry.id)}
                     aria-pressed={checked}
-                    disabled={disabled || unconverted}
+                    disabled={disabled}
                     className="flex min-w-0 flex-1 items-center gap-2.5 disabled:cursor-not-allowed"
                   >
                     <span
                       className={[
                         'flex size-6 shrink-0 items-center justify-center rounded-md border transition-colors',
-                        unconverted
-                          ? 'border-(--color-border-disabled) bg-(--color-bg-secondary)'
-                          : disabled
-                            ? checked
-                              ? 'border-transparent bg-(--color-icon-tertiary)'
-                              : 'border-(--color-border-disabled) bg-(--color-bg-secondary)'
-                            : checked
-                              ? 'border-(--color-button-default) bg-(--color-button-default)'
-                              : 'border-(--color-border-subtle) bg-(--color-bg-default)',
+                        disabled
+                          ? checked
+                            ? 'border-transparent bg-(--color-icon-tertiary)'
+                            : 'border-(--color-border-disabled) bg-(--color-bg-secondary)'
+                          : checked
+                            ? 'border-(--color-button-default) bg-(--color-button-default)'
+                            : 'border-(--color-border-subtle) bg-(--color-bg-default)',
                       ].join(' ')}
                     >
-                      {checked && !unconverted && (
+                      {checked && (
                         <CheckIcon width={16} height={16} className="text-(--color-text-inverse)" />
                       )}
                     </span>
                     <span
                       className={[
                         '[font-size:var(--font-size-body-2)] leading-[1.6] font-medium',
-                        disabled || unconverted
-                          ? 'text-(--color-text-disabled)'
-                          : 'text-(--color-text-secondary)',
+                        disabled ? 'text-(--color-text-disabled)' : 'text-(--color-text-secondary)',
                       ].join(' ')}
                     >
                       {entry.label}

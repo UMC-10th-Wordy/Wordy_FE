@@ -4,7 +4,7 @@ interface DiaryRetrospectiveProps {
 
 export const DiaryRetrospective = ({ content }: DiaryRetrospectiveProps) => {
   return (
-    <section className="flex w-full flex-col gap-(--scale-12) pb-[60px]">
+    <section className="flex w-full flex-col gap-(--scale-12) pb-15">
       <p className="[font-size:var(--font-size-body-1)] leading-(--line-height-body) font-[var(--font-weight-semibold)] text-(--color-text-default)">
         오늘의 회고
       </p>

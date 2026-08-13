@@ -29,7 +29,7 @@ export const WeeklySummaryInsight = ({
   focusAreas,
 }: WeeklySummaryInsightProps) => {
   return (
-    <section className="flex flex-col gap-6 rounded-2xl border border-[#DDDDFF] bg-(--color-bg-default) p-7 shadow-[0px_1px_5px_0px_#0000001A]">
+    <section className="flex flex-col gap-6 rounded-2xl border border-(--color-border-brand-subtle) bg-(--color-bg-default) p-7 shadow-[0px_1px_5px_0px_#0000001A]">
       <h2 className="[font-size:var(--font-size-body-1)] leading-[1.6] font-semibold text-(--color-text-default)">
         {title}
       </h2>
@@ -41,14 +41,15 @@ export const WeeklySummaryInsight = ({
             key={stat.label}
             className="flex flex-1 flex-col items-center gap-2 rounded-xl bg-(--color-bg-secondary) py-6"
           >
-            <span className="[font-size:var(--font-size-body-2) font-semibold] text-(--color-text-secondary)">
+            <span className="[font-size:var(--font-size-body-2)] font-semibold text-(--color-text-secondary)">
+              {' '}
               {stat.label}
             </span>
             <p className="text-(--color-text-default)">
               <span className="[font-size:var(--font-size-heading-3)] font-semibold tabular-nums">
                 {stat.value}
               </span>
-              <span className="[font-size:var(--font-size-body-3) text-default] text-(--color-text-tertiary)">
+              <span className="[font-size:var(--font-size-body-3)] text-(--color-text-default)">
                 {' '}
                 {stat.unit}
               </span>

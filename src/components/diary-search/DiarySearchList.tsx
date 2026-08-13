@@ -19,7 +19,7 @@ export const DiarySearchList = ({
   onDetailClick,
 }: DiarySearchListProps) => {
   return (
-    <section className="mt-(--scale-12) w-[800px] pb-(--scale-40)">
+    <section className="mt-(--scale-12) w-full max-w-200 pb-(--scale-40)">
       <DiarySearchSort value={sort} onChange={onSortChange} />
 
       <div className="mt-(--scale-12) flex flex-col gap-(--scale-32)">

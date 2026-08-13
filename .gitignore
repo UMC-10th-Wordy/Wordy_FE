@@ -41,3 +41,6 @@ docs/*
 .env*
 # 비밀값 없이 데모 목데이터 플래그만 담고 있어 커밋 필요 (pnpm dev:demo가 참조)
 !.env.demo
+
+# 백엔드 메일 템플릿 참고용 마크업 (로컬 전용, git 미추적)
+src/pages/auth/MailNoticePage.tsx

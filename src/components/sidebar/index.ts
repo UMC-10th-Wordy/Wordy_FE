@@ -30,11 +30,8 @@ export type { SidebarMenuProps, SidebarMenuItem } from './SidebarMenu/SidebarMen
 export { TrashMoreMenu } from './TrashMoreMenu/TrashMoreMenu'
 export type { TrashMoreMenuProps } from './TrashMoreMenu/TrashMoreMenu'
 
-export { JobDropdown } from './JobDropdown/JobDropdown'
-export type { JobDropdownProps } from './JobDropdown/JobDropdown'
-
-export { CareerDropdown } from './CareerDropdown/CareerDropdown'
-export type { CareerDropdownProps } from './CareerDropdown/CareerDropdown'
+export { OptionDropdown } from './OptionDropdown/OptionDropdown'
+export type { OptionDropdownProps } from './OptionDropdown/OptionDropdown'
 
 export { NotificationModal } from './NotificationModal/NotificationModal'
 export type { NotificationModalProps } from './NotificationModal/NotificationModal'

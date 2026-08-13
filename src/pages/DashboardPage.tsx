@@ -1,17 +1,8 @@
-import { useEffect, useState } from 'react'
-import {
-  createDashboard,
-  createMonthlyDashboard,
-  getDashboardDetail,
-  getDashboardEligibility,
-  getMonthlyDashboardDetail,
-  getMonthlyEligibility,
-  getDashboards,
-  getMonthlyDashboards,
-} from '@/api/dashboard/dashboard'
+import { useEffect, useMemo, useState } from 'react'
 import ArrowLeftIcon from '@/assets/icons/arrow-left.svg?react'
 import { useToast } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
+import { ErrorState, LoadingState } from '@/components/common/AsyncState/AsyncState'
 import { WeeklyStatusCard } from '@/components/dashboard/WeeklyStatusCard'
 import { DiaryChecklistPanel } from '@/components/dashboard/DiaryChecklistPanel'
 import { WeeklySummaryInsight } from '@/components/dashboard/WeeklySummaryInsight'
@@ -19,17 +10,21 @@ import { TagWorkflowSection } from '@/components/dashboard/TagWorkflowSection'
 import { WeeklyHighlights } from '@/components/dashboard/WeeklyHighlights'
 import { WeeklyRetrospective } from '@/components/dashboard/WeeklyRetrospective'
 import { MonthlyDashboard } from '@/components/dashboard/MonthlyDashboard'
-import type { MonthlyGeneration } from '@/components/dashboard/MonthlyDashboard'
 import type { TagWorkflow } from '@/components/dashboard/TagWorkflowSection'
-import type {
-  DashboardDetailDto,
-  DiaryEntry,
-  WeeklyDashboardStatus,
-  MonthlyEligibilityDto,
-} from '@/types/dashboard'
+import type { WeeklyDashboardStatus } from '@/types/dashboard'
 import type { ProjectTagColor } from '@/components/todo/ProjectTag'
 import { hexToTagColor } from '@/utils/tagMapper'
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
+import {
+  useCreateMonthlyDashboard,
+  useCreateWeeklyDashboard,
+  useMonthlyDashboardDetail,
+  useMonthlyDashboards,
+  useMonthlyEligibility,
+  useWeeklyDashboardDetail,
+  useWeeklyDashboards,
+  useWeeklyEligibility,
+} from '@/hooks/useDashboardQueries'
 
 // 서버 entryDate(YYYY-MM-DD) → 화면 라벨(YYYY년 M월 D일 X요일)
 const formatEntryLabel = (dateStr: string) => {
@@ -40,33 +35,36 @@ const formatEntryLabel = (dateStr: string) => {
 
 const TAG_FALLBACK_COLORS: ProjectTagColor[] = ['green', 'pink', 'blue', 'orange']
 
+const getTeamWeekStart = (date: Date) => {
+  const sunday = new Date(date)
+  sunday.setDate(sunday.getDate() - sunday.getDay())
+  const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
+  return sunday < monthStart ? monthStart : sunday
+}
+const getTeamWeekEnd = (start: Date) => {
+  const saturday = new Date(start)
+  saturday.setDate(saturday.getDate() + (6 - saturday.getDay()))
+  const lastDay = new Date(start.getFullYear(), start.getMonth() + 1, 0)
+  return saturday > lastDay ? lastDay : saturday
+}
+const toDateString = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
 export const DashboardPage = () => {
   const workspaceId = useActiveWorkspaceId()
   const { toasts, addToast } = useToast()
   const [activeTab, setActiveTab] = useState<'weekly' | 'monthly'>('weekly')
-  const [entries, setEntries] = useState<DiaryEntry[]>([])
-  const [requiredCount, setRequiredCount] = useState(3)
-  const [weekRange, setWeekRange] = useState({ start: '', end: '' })
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [generation, setGeneration] = useState<'idle' | 'generating' | 'complete'>('idle')
-  const [detail, setDetail] = useState<DashboardDetailDto | null>(null)
-
-  const getTeamWeekStart = (date: Date) => {
-    const sunday = new Date(date)
-    sunday.setDate(sunday.getDate() - sunday.getDay())
-    const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
-    return sunday < monthStart ? monthStart : sunday
-  }
-  const getTeamWeekEnd = (start: Date) => {
-    const saturday = new Date(start)
-    saturday.setDate(saturday.getDate() + (6 - saturday.getDay()))
-    const lastDay = new Date(start.getFullYear(), start.getMonth() + 1, 0)
-    return saturday > lastDay ? lastDay : saturday
-  }
+  // 백엔드가 주/월 대시보드를 "주어진 기간의 것 조회, 없으면 생성" 형태로 제공하지 않아
+  // 이번 세션에서 새로 생성한 대시보드 id를 별도로 들고 있다가 상세 조회에 우선 사용함
+  const [createdWeeklyDashboardId, setCreatedWeeklyDashboardId] = useState<string | undefined>()
+  const [createdMonthlyDashboardId, setCreatedMonthlyDashboardId] = useState<string | undefined>()
 
   const [weekStartDate, setWeekStartDate] = useState(() => getTeamWeekStart(new Date()))
   const weekLabel = `${weekStartDate.getFullYear()}년 ${weekStartDate.getMonth() + 1}월 ${Math.ceil((weekStartDate.getDate() + new Date(weekStartDate.getFullYear(), weekStartDate.getMonth(), 1).getDay()) / 7)}주차`
-  // TODO: 월간 API 명세 확정 시 월 이동 데이터 갱신 연결. 현재는 라벨만 이동
+  const baseDate = toDateString(weekStartDate)
+  const viewedEnd = toDateString(getTeamWeekEnd(weekStartDate))
+
   const [monthOffset, setMonthOffset] = useState(0)
   const [monthAnchor] = useState(() => {
     const now = new Date()
@@ -77,83 +75,102 @@ export const DashboardPage = () => {
   const monthBaseDate = `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, '0')}-01`
   const monthLabel = `${selectedMonth.getFullYear()}년 ${selectedMonth.getMonth() + 1}월`
 
-  // 월간 생성 상태 — 탭 전환 시 유실되지 않도록 부모에서 소유
-  const [monthlyGeneration, setMonthlyGeneration] = useState<MonthlyGeneration>('idle')
-  const [monthlyEligibility, setMonthlyEligibility] = useState<MonthlyEligibilityDto | null>(null)
-  const [monthlyDetail, setMonthlyDetail] = useState<DashboardDetailDto | null>(null)
+  const weeklyEligibilityQuery = useWeeklyEligibility(workspaceId, baseDate)
+  const weeklyListQuery = useWeeklyDashboards(workspaceId, true)
+  const savedWeeklyDashboardId = useMemo(() => {
+    const eligibility = weeklyEligibilityQuery.data
+    const list = weeklyListQuery.data
+    if (!eligibility || !list) return undefined
+    // 서버가 요청과 다른 주를 반환하면(현 BaseDate 버그) 복원하지 않음 — 보는 주와 응답 주가 겹칠 때만 복원
+    if (eligibility.weekStart !== baseDate || eligibility.weekEnd !== viewedEnd) return undefined
+    return list.find((d) => d.startDate === eligibility.weekStart)?.dashboardId
+  }, [weeklyEligibilityQuery.data, weeklyListQuery.data, baseDate, viewedEnd])
+  const weeklyDetailQuery = useWeeklyDashboardDetail(
+    workspaceId,
+    createdWeeklyDashboardId ?? savedWeeklyDashboardId,
+  )
+  const createWeeklyMutation = useCreateWeeklyDashboard(workspaceId)
+
+  const monthlyEligibilityQuery = useMonthlyEligibility(
+    workspaceId,
+    monthBaseDate,
+    activeTab === 'monthly',
+  )
+  const monthlyListQuery = useMonthlyDashboards(workspaceId, activeTab === 'monthly')
+  const savedMonthlyDashboardId = useMemo(() => {
+    const list = monthlyListQuery.data
+    if (!list) return undefined
+    return list.find((d) => d.startDate.slice(0, 7) === monthBaseDate.slice(0, 7))?.dashboardId
+  }, [monthlyListQuery.data, monthBaseDate])
+  const monthlyDetailQuery = useMonthlyDashboardDetail(
+    workspaceId,
+    createdMonthlyDashboardId ?? savedMonthlyDashboardId,
+  )
+  const createMonthlyMutation = useCreateMonthlyDashboard(workspaceId)
 
   useEffect(() => {
-    if (!workspaceId) return
+    if (!weeklyEligibilityQuery.data) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setDetail(null)
-    setGeneration('idle')
-    let cancelled = false
-    const baseDate = `${weekStartDate.getFullYear()}-${String(weekStartDate.getMonth() + 1).padStart(2, '0')}-${String(weekStartDate.getDate()).padStart(2, '0')}`
-    const viewedEndDate = getTeamWeekEnd(weekStartDate)
-    const viewedEnd = `${viewedEndDate.getFullYear()}-${String(viewedEndDate.getMonth() + 1).padStart(2, '0')}-${String(viewedEndDate.getDate()).padStart(2, '0')}`
-    getDashboardEligibility(workspaceId, baseDate)
-      .then((res) => {
-        if (cancelled) return
-        const mapped = res.entries.map((e) => ({
-          id: e.dailyEntryId,
-          label: formatEntryLabel(e.entryDate),
-          converted: undefined, // TODO: 서버 변환 여부 필드 확정 시 e.필드명 연결
-          date: e.entryDate,
-        }))
-        setEntries(mapped)
-        setRequiredCount(res.requiredDays)
-        setWeekRange({ start: res.weekStart, end: res.weekEnd })
-        getDashboards(workspaceId)
-          .then((list) => {
-            const saved = list.find((d) => d.startDate === res.weekStart)
-            // 서버가 요청과 다른 주를 반환하면(현 BaseDate 버그) 복원하지 않음 — 보는 주와 응답 주가 겹칠 때만 복원
-            if (!saved || res.weekStart !== baseDate || res.weekEnd !== viewedEnd) return
-            return getDashboardDetail(workspaceId, saved.dashboardId).then((detailRes) => {
-              if (cancelled) return
-              setDetail(detailRes)
-              setGeneration('complete')
-            })
-          })
-          .catch(() => {})
-        setSelectedIds(mapped.map((e) => e.id)) // 기본: 전체 선택
-      })
-      .catch((error) => console.error('생성 조건 조회 실패:', error))
-    return () => {
-      cancelled = true
-    }
-  }, [workspaceId, weekStartDate])
+    setSelectedIds(weeklyEligibilityQuery.data.entries.map((e) => e.dailyEntryId))
+  }, [weeklyEligibilityQuery.data])
 
   useEffect(() => {
-    if (!workspaceId) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMonthlyDetail(null)
-    setMonthlyGeneration('idle')
-    let cancelled = false
-    getMonthlyEligibility(workspaceId, monthBaseDate)
-      .then((res) => {
-        if (!cancelled) setMonthlyEligibility(res)
-      })
-      .catch((error) => {
-        if (!cancelled) {
-          console.error('월간 생성 조건 조회 실패:', error)
-          setMonthlyEligibility(null)
-        }
-      })
-    getMonthlyDashboards(workspaceId)
-      .then((list) => {
-        const saved = list.find((d) => d.startDate.slice(0, 7) === monthBaseDate.slice(0, 7))
-        if (!saved) return
-        return getMonthlyDashboardDetail(workspaceId, saved.dashboardId).then((detailRes) => {
-          if (cancelled) return
-          setMonthlyDetail(detailRes)
-          setMonthlyGeneration('complete')
-        })
-      })
-      .catch(() => {})
-    return () => {
-      cancelled = true
-    }
-  }, [workspaceId, monthBaseDate])
+    if (!weeklyEligibilityQuery.isError) return
+    console.error('생성 조건 조회 실패:', weeklyEligibilityQuery.error)
+  }, [weeklyEligibilityQuery.isError, weeklyEligibilityQuery.error])
+
+  useEffect(() => {
+    if (!monthlyEligibilityQuery.isError) return
+    console.error('월간 생성 조건 조회 실패:', monthlyEligibilityQuery.error)
+  }, [monthlyEligibilityQuery.isError, monthlyEligibilityQuery.error])
+
+  useEffect(() => {
+    if (!weeklyListQuery.isError) return
+    console.error('주간 대시보드 목록 조회 실패:', weeklyListQuery.error)
+  }, [weeklyListQuery.isError, weeklyListQuery.error])
+
+  useEffect(() => {
+    if (!monthlyListQuery.isError) return
+    console.error('월간 대시보드 목록 조회 실패:', monthlyListQuery.error)
+  }, [monthlyListQuery.isError, monthlyListQuery.error])
+
+  const entries = useMemo(
+    () =>
+      (weeklyEligibilityQuery.data?.entries ?? []).map((e) => ({
+        id: e.dailyEntryId,
+        label: formatEntryLabel(e.entryDate),
+        converted: e.converted,
+        date: e.entryDate,
+      })),
+    [weeklyEligibilityQuery.data],
+  )
+  const requiredCount = weeklyEligibilityQuery.data?.requiredDays ?? 3
+  const weekRange = {
+    start: weeklyEligibilityQuery.data?.weekStart ?? '',
+    end: weeklyEligibilityQuery.data?.weekEnd ?? '',
+  }
+  const isWeeklyLoading = weeklyEligibilityQuery.isLoading
+  const detail = weeklyDetailQuery.data ?? null
+  const isCreatingWeeklyDetail =
+    !!createdWeeklyDashboardId && !weeklyDetailQuery.data && !weeklyDetailQuery.isError
+  const generation: 'idle' | 'generating' | 'complete' =
+    createWeeklyMutation.isPending || isCreatingWeeklyDetail
+      ? 'generating'
+      : detail
+        ? 'complete'
+        : 'idle'
+
+  const monthlyEligibility = monthlyEligibilityQuery.data ?? null
+  const isMonthlyLoading = monthlyEligibilityQuery.isLoading
+  const monthlyDetail = monthlyDetailQuery.data ?? null
+  const isCreatingMonthlyDetail =
+    !!createdMonthlyDashboardId && !monthlyDetailQuery.data && !monthlyDetailQuery.isError
+  const monthlyGeneration: 'idle' | 'generating' | 'complete' =
+    createMonthlyMutation.isPending || isCreatingMonthlyDetail
+      ? 'generating'
+      : monthlyDetail
+        ? 'complete'
+        : 'idle'
 
   const totalDays = entries.length
 
@@ -191,7 +208,7 @@ export const DashboardPage = () => {
         period: `${t.periodStart} - ${t.periodEnd}`,
         achievement: t.achievementStatus,
         kpis: detail.kpis
-          .filter((k) => k.tagId === t.tagId)
+          .filter((k) => k.tagId && t.tagId && k.tagId === t.tagId)
           .map((k) => ({
             title: k.kpiName,
             description: k.progress,
@@ -220,23 +237,16 @@ export const DashboardPage = () => {
       addToast('생성 조건을 불러오지 못했어요. 잠시 후 다시 시도해 주세요')
       return
     }
-    setGeneration('generating')
-    createDashboard(workspaceId, { startDate: weekRange.start, endDate: weekRange.end })
-      .then((created) => {
-        if (!created.dashboardId) {
-          throw new Error('생성 응답에 저장된 대시보드 ID가 없습니다')
-        }
-        return getDashboardDetail(workspaceId, created.dashboardId)
-      })
-      .then((res) => {
-        setDetail(res)
-        setGeneration('complete')
-      })
-      .catch((error) => {
-        console.error('대시보드 생성 실패:', error)
-        addToast('대시보드 생성에 실패했어요. 다시 시도해 주세요')
-        setGeneration('idle')
-      })
+    createWeeklyMutation.mutate(
+      { startDate: weekRange.start, endDate: weekRange.end },
+      {
+        onSuccess: (created) => setCreatedWeeklyDashboardId(created.dashboardId),
+        onError: (error) => {
+          console.error('대시보드 생성 실패:', error)
+          addToast('대시보드 생성에 실패했어요. 다시 시도해 주세요')
+        },
+      },
+    )
   }
 
   const handleMonthlyGenerate = () => {
@@ -245,35 +255,22 @@ export const DashboardPage = () => {
       addToast('아직 생성 조건을 충족하지 못했어요')
       return
     }
-    setMonthlyGeneration('generating')
-    createMonthlyDashboard(workspaceId, {
-      startDate: monthlyEligibility.monthStart,
-      endDate: monthlyEligibility.monthEnd,
-    })
-      .then((created) => {
-        if (!created.dashboardId) {
-          throw new Error('생성 응답에 저장된 대시보드 ID가 없습니다')
-        }
-        return getMonthlyDashboardDetail(workspaceId, created.dashboardId)
-      })
-      .then((res) => {
-        setMonthlyDetail(res)
-        setMonthlyGeneration('complete')
-      })
-      .catch((error) => {
-        console.error('월간 대시보드 생성 실패:', error)
-        addToast('대시보드 생성에 실패했어요. 다시 시도해 주세요')
-        setMonthlyGeneration('idle')
-      })
+    createMonthlyMutation.mutate(
+      { startDate: monthlyEligibility.monthStart, endDate: monthlyEligibility.monthEnd },
+      {
+        onSuccess: (created) => setCreatedMonthlyDashboardId(created.dashboardId),
+        onError: (error) => {
+          console.error('월간 대시보드 생성 실패:', error)
+          addToast('대시보드 생성에 실패했어요. 다시 시도해 주세요')
+        },
+      },
+    )
   }
 
   // 기간 이동 시 이전 기간의 생성 조건 초기화 — 새 조회 완료 전 생성 방지 (리뷰 반영)
   const resetWeeklyCondition = () => {
-    setEntries([])
     setSelectedIds([])
-    setWeekRange({ start: '', end: '' })
-    setDetail(null)
-    setGeneration('idle')
+    setCreatedWeeklyDashboardId(undefined)
   }
 
   const handleWeekMove = (delta: number) => {
@@ -291,24 +288,26 @@ export const DashboardPage = () => {
   // 월 이동 — 이전 월의 상세/생성 상태 무효화 (리뷰 반영)
   const handleMonthMove = (delta: number) => {
     if (monthlyGeneration === 'generating') return
-    setMonthlyEligibility(null)
-    setMonthlyDetail(null)
-    setMonthlyGeneration('idle')
+    setCreatedMonthlyDashboardId(undefined)
     setMonthOffset((v) => v + delta)
   }
 
   const refreshDetail = () => {
-    if (!detail) return
-    void getDashboardDetail(workspaceId, detail.dashboardId)
-      .then((res) => setDetail(res))
-      .catch((error) => console.error('상세 재조회 실패:', error))
+    void weeklyDetailQuery.refetch().then((result) => {
+      if (result.isError) {
+        console.error('상세 재조회 실패:', result.error)
+        addToast('최신 내용을 불러오지 못했어요. 다시 시도해 주세요')
+      }
+    })
   }
 
   const refreshMonthlyDetail = () => {
-    if (!monthlyDetail) return
-    void getMonthlyDashboardDetail(workspaceId, monthlyDetail.dashboardId)
-      .then((res) => setMonthlyDetail(res))
-      .catch((error) => console.error('월간 상세 재조회 실패:', error))
+    void monthlyDetailQuery.refetch().then((result) => {
+      if (result.isError) {
+        console.error('월간 상세 재조회 실패:', result.error)
+        addToast('최신 내용을 불러오지 못했어요. 다시 시도해 주세요')
+      }
+    })
   }
 
   const handleGoWeekly = (weekId: string) => {
@@ -328,7 +327,7 @@ export const DashboardPage = () => {
         : 'insufficient'
 
   return (
-    <div className="flex flex-1 flex-col gap-7 bg-[#FAFAFC] px-(--scale-40) pt-(--scale-40) pb-[60px]">
+    <div className="flex min-h-full flex-col gap-7 bg-(--color-bg-brand-subtle) px-(--scale-40) pt-(--scale-40) pb-15">
       <header className="flex flex-col gap-1">
         <h1 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
           성과 리포트
@@ -367,7 +366,7 @@ export const DashboardPage = () => {
 
       {activeTab === 'weekly' ? (
         <>
-          <div className="flex h-[52px] w-[250px] items-center justify-between gap-1 self-start rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
+          <div className="flex h-[52px] w-[250px] items-center justify-between gap-1 self-start rounded-xl border border-(--color-border-brand-subtle) bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
             <button
               type="button"
               aria-label="이전 주차"
@@ -409,13 +408,25 @@ export const DashboardPage = () => {
           </div>
 
           <div className="flex gap-5">
-            {status === 'complete' ? (
+            {isWeeklyLoading ? (
+              <LoadingState message="주간 데이터를 불러오는 중이에요" className="flex-1 py-20" />
+            ) : status !== 'complete' &&
+              (weeklyEligibilityQuery.isError || weeklyListQuery.isError) ? (
+              <ErrorState
+                message="생성 조건을 불러오지 못했어요"
+                className="flex-1 py-20"
+                onRetry={() => {
+                  void weeklyEligibilityQuery.refetch()
+                  void weeklyListQuery.refetch()
+                }}
+              />
+            ) : status === 'complete' ? (
               <div className="flex flex-1 flex-col gap-7">
                 <WeeklySummaryInsight stats={stats} aiSummary={aiSummary} />
                 <TagWorkflowSection tags={tags} />
                 <WeeklyHighlights items={highlights} />
                 <WeeklyRetrospective
-                  key={detail?.dashboardId}
+                  key={detail?.dashboardId ?? weekStartDate.getTime()}
                   dashboardId={detail?.dashboardId}
                   workspaceId={workspaceId}
                   initialReflection={(() => {
@@ -457,7 +468,7 @@ export const DashboardPage = () => {
         </>
       ) : (
         <>
-          <div className="flex h-[52px] w-[203px] items-center justify-between gap-1 self-start rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
+          <div className="flex h-[52px] w-[203px] items-center justify-between gap-1 self-start rounded-xl border border-(--color-border-brand-subtle) bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
             <button
               type="button"
               aria-label="이전 달"
@@ -498,15 +509,29 @@ export const DashboardPage = () => {
           </div>
 
           <div className="flex gap-5">
-            <MonthlyDashboard
-              generation={monthlyGeneration}
-              workspaceId={workspaceId}
-              onGenerate={handleMonthlyGenerate}
-              onGoWeekly={handleGoWeekly}
-              eligibility={monthlyEligibility}
-              detail={monthlyDetail}
-              onReflectionSaved={refreshMonthlyDetail}
-            />
+            {isMonthlyLoading ? (
+              <LoadingState message="월간 데이터를 불러오는 중이에요" className="flex-1 py-20" />
+            ) : monthlyGeneration !== 'complete' &&
+              (monthlyEligibilityQuery.isError || monthlyListQuery.isError) ? (
+              <ErrorState
+                message="생성 조건을 불러오지 못했어요"
+                className="flex-1 py-20"
+                onRetry={() => {
+                  void monthlyEligibilityQuery.refetch()
+                  void monthlyListQuery.refetch()
+                }}
+              />
+            ) : (
+              <MonthlyDashboard
+                generation={monthlyGeneration}
+                workspaceId={workspaceId}
+                onGenerate={handleMonthlyGenerate}
+                onGoWeekly={handleGoWeekly}
+                eligibility={monthlyEligibility}
+                detail={monthlyDetail}
+                onReflectionSaved={refreshMonthlyDetail}
+              />
+            )}
           </div>
         </>
       )}

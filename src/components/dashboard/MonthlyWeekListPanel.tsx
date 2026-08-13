@@ -26,7 +26,7 @@ export const MonthlyWeekListPanel = ({
   const isEmpty = weeks.length === 0
 
   return (
-    <aside className="flex h-[748px] min-w-0 max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-[#DDDDFF] shadow-[0px_1px_5px_0px_#0000001A] bg-(--color-bg-default) p-6">
+    <aside className="flex h-[748px] min-w-0 max-w-[576px] flex-1 shrink flex-col gap-5 rounded-xl border border-(--color-border-brand-subtle) shadow-[0px_1px_5px_0px_#0000001A] bg-(--color-bg-default) p-6">
       <div className="flex items-baseline gap-2">
         <h2 className="[font-size:var(--font-size-body-2)] font-bold text-(--color-text-default)">
           생성에 사용할 주간 대시보드
@@ -56,7 +56,7 @@ export const MonthlyWeekListPanel = ({
                     'shrink-0 rounded-lg px-2 py-1 [font-size:var(--font-size-caption-1)] font-medium',
                     week.generated
                       ? 'bg-(--color-tag-green-bg) text-(--color-tag-green-text)'
-                      : 'bg-[#FFE9EC] text-(--color-tag-red-text)',
+                      : 'bg-(--color-tag-red-bg) text-(--color-tag-red-text)',
                   ].join(' ')}
                 >
                   {week.generated ? '생성됨' : '생성되지 않음'}

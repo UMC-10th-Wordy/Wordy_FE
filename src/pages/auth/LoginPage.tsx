@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Input1 } from '@/components/common/Input/Input1'
 import { Checkbox } from '@/components/common/Checkbox/Checkbox'
@@ -6,18 +6,18 @@ import { TextButton } from '@/components/common/Button/TextButton'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import LogoIcon from '@/assets/icons/logo.svg?react'
 import GoogleIcon from '@/assets/icons/google.svg?react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { GOOGLE_AUTH_URL } from '@/api/auth/auth'
 import { getHome, homeQueryKeys } from '@/api/home/home'
 import { fetchDefaultWorkspaceId } from '@/api/workspace/workspace'
 import { useLogin } from '@/hooks/useAuthQueries'
 import { useToast } from '@/hooks/useToast'
 import { ApiError, clearAuthTokens, markAuthenticated, storeAuthTokens } from '@/lib/httpClient'
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+import { EMAIL_REGEX } from '@/utils/validation'
 
 export const LoginPage = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const queryClient = useQueryClient()
   const { toasts, addToast } = useToast()
   const { mutate: login, isPending } = useLogin()
@@ -25,6 +25,14 @@ export const LoginPage = () => {
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    const state = location.state as { error?: string } | null
+    if (state?.error) {
+      addToast(state.error)
+      navigate(location.pathname, { replace: true, state: null })
+    }
+  }, [location.state, location.pathname, addToast, navigate])
 
   const emailError = !email
     ? '이메일을 입력해주세요.'
@@ -128,7 +136,11 @@ export const LoginPage = () => {
               onChange={(e) => setRememberMe(e.target.checked)}
             />
             {/* TODO: 비밀번호 찾기 페이지 연결 */}
-            <TextButton variant="text_only" size="small">
+            <TextButton
+              variant="text_only"
+              size="small"
+              onClick={() => addToast('아직 지원하지 않는 기능이에요')}
+            >
               비밀번호 찾기
             </TextButton>
           </div>
@@ -137,7 +149,7 @@ export const LoginPage = () => {
             variant="fill"
             size="large"
             fullWidth
-            disabled={isPending}
+            disabled={(submitted && !isValid) || isPending}
             className="mt-3"
           >
             로그인 하기
