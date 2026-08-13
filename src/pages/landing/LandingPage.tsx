@@ -53,7 +53,6 @@ export function LandingPage() {
 
   const handleNavigate = useCallback(
     (page: LandingPage) => {
-      // TODO: 로그인 상태일 경우 '홈' 클릭 시 /로 이동 (API 연동 후 처리)
       if (page === '홈') scrollToSection(heroRef)
       if (page === '기능 소개') scrollToSection(featureRef)
       if (page === '요금제 안내') scrollToSection(pricingRef)
@@ -106,7 +105,6 @@ export function LandingPage() {
           ].join(', '),
         }}
       >
-        {/* TODO: 로그인 상태 연동 후 isLoggedIn prop 전달 및 로그인 시 로그인 버튼 숨김 처리 (API 연동 후 처리) */}
         <LandingHeader
           currentPage={currentPage}
           onNavigate={handleNavigate}
