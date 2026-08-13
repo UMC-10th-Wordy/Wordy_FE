@@ -124,6 +124,16 @@ export const DashboardPage = () => {
     console.error('월간 생성 조건 조회 실패:', monthlyEligibilityQuery.error)
   }, [monthlyEligibilityQuery.isError, monthlyEligibilityQuery.error])
 
+  useEffect(() => {
+    if (!weeklyListQuery.isError) return
+    console.error('주간 대시보드 목록 조회 실패:', weeklyListQuery.error)
+  }, [weeklyListQuery.isError, weeklyListQuery.error])
+
+  useEffect(() => {
+    if (!monthlyListQuery.isError) return
+    console.error('월간 대시보드 목록 조회 실패:', monthlyListQuery.error)
+  }, [monthlyListQuery.isError, monthlyListQuery.error])
+
   const entries = useMemo(
     () =>
       (weeklyEligibilityQuery.data?.entries ?? []).map((e) => ({
@@ -376,11 +386,15 @@ export const DashboardPage = () => {
           <div className="flex gap-5">
             {isWeeklyLoading ? (
               <LoadingState message="주간 데이터를 불러오는 중이에요" className="flex-1 py-20" />
-            ) : status !== 'complete' && weeklyEligibilityQuery.isError ? (
+            ) : status !== 'complete' &&
+              (weeklyEligibilityQuery.isError || weeklyListQuery.isError) ? (
               <ErrorState
                 message="생성 조건을 불러오지 못했어요"
                 className="flex-1 py-20"
-                onRetry={() => void weeklyEligibilityQuery.refetch()}
+                onRetry={() => {
+                  void weeklyEligibilityQuery.refetch()
+                  void weeklyListQuery.refetch()
+                }}
               />
             ) : status === 'complete' ? (
               <div className="flex flex-1 flex-col gap-7">
@@ -459,11 +473,15 @@ export const DashboardPage = () => {
           <div className="flex gap-5">
             {isMonthlyLoading ? (
               <LoadingState message="월간 데이터를 불러오는 중이에요" className="flex-1 py-20" />
-            ) : monthlyGeneration !== 'complete' && monthlyEligibilityQuery.isError ? (
+            ) : monthlyGeneration !== 'complete' &&
+              (monthlyEligibilityQuery.isError || monthlyListQuery.isError) ? (
               <ErrorState
                 message="생성 조건을 불러오지 못했어요"
                 className="flex-1 py-20"
-                onRetry={() => void monthlyEligibilityQuery.refetch()}
+                onRetry={() => {
+                  void monthlyEligibilityQuery.refetch()
+                  void monthlyListQuery.refetch()
+                }}
               />
             ) : (
               <MonthlyDashboard
