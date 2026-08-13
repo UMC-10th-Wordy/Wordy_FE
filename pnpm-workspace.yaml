@@ -1,9 +1,10 @@
 overrides:
-  fast-uri: '^3.1.4'
+  fast-uri: '^3.1.5'
   tldts: '7.4.9'
   tldts-core: '7.4.9'
   magicast: '0.5.3'
-  postcss: '^8.5.18'
+  postcss: '^8.5.23'
+  js-yaml: '^4.3.1'
 
 allowBuilds:
   msw: false

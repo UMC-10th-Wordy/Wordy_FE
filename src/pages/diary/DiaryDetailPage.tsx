@@ -19,6 +19,7 @@ import TodoTabs from '@/components/todo/TodoTabs'
 
 import { mapPerformanceDetailResult } from '@/utils/performance-preview/performancePreviewMapper'
 
+import type { DiaryDetailContentData } from '@/types/diaryDetail'
 import type { Task, TodoFilter, TodoFilterCounts } from '@/types/todo'
 
 const formatDateLabel = (date: string) => {
@@ -31,8 +32,8 @@ interface DiaryDetailPageProps {
   hideDelete?: boolean
 }
 
-interface DiaryDetailContentProps {
-  diaryId: string
+export interface DiaryDetailContentProps {
+  diary: DiaryDetailContentData
   hideDelete?: boolean
 }
 
@@ -63,10 +64,8 @@ const DiaryPerformancePanel = ({
   )
 }
 
-const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) => {
+export const DiaryDetailContent = ({ diary, hideDelete }: DiaryDetailContentProps) => {
   const navigate = useNavigate()
-
-  const { data: diary } = useGetDailyEntryDetail(diaryId)
 
   const [activeTab, setActiveTab] = useState<TodoFilter>(
     diary.completedCount > 0 ? 'completed' : 'incomplete',
@@ -84,7 +83,7 @@ const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) =>
       return
     }
 
-    deleteDiary(diaryId, {
+    deleteDiary(diary.id, {
       onSuccess: () => {
         setIsDeleteDialogOpen(false)
         navigate('/records', { replace: true })
@@ -173,6 +172,12 @@ const DiaryDetailContent = ({ diaryId, hideDelete }: DiaryDetailContentProps) =>
   )
 }
 
+const DiaryDetailFetcher = ({ diaryId, hideDelete }: { diaryId: string; hideDelete?: boolean }) => {
+  const { data: diary } = useGetDailyEntryDetail(diaryId)
+
+  return <DiaryDetailContent diary={diary} hideDelete={hideDelete} />
+}
+
 export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
   const { diaryId } = useParams<{ diaryId: string }>()
   const activeWorkspaceId = useActiveWorkspaceId()
@@ -185,5 +190,5 @@ export const DiaryDetailPage = ({ hideDelete }: DiaryDetailPageProps) => {
     return <LoadingState message="불러오는 중입니다" className="h-full w-full" />
   }
 
-  return <DiaryDetailContent key={diaryId} diaryId={diaryId} hideDelete={hideDelete} />
+  return <DiaryDetailFetcher key={diaryId} diaryId={diaryId} hideDelete={hideDelete} />
 }

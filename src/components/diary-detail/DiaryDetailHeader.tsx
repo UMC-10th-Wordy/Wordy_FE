@@ -22,9 +22,10 @@ export const DiaryDetailHeader = ({
           type="button"
           variant="text_neutral"
           size="small"
+          className="[&>span]:!size-(--scale-32) [&_svg]:!size-(--scale-32)"
           aria-label="월별 기록으로 돌아가기"
           onClick={onBack}
-          icon={<LeftIcon aria-hidden className="size-(--scale-24) text-(--color-icon-default)" />}
+          icon={<LeftIcon aria-hidden className="text-(--color-icon-default)" />}
         />
 
         <h1 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-heading) font-[var(--font-weight-bold)] text-(--color-text-default)">

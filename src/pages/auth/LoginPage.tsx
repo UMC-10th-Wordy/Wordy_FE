@@ -9,6 +9,7 @@ import GoogleIcon from '@/assets/icons/google.svg?react'
 import { useNavigate } from 'react-router-dom'
 import { GOOGLE_AUTH_URL } from '@/api/auth/auth'
 import { getHome, homeQueryKeys } from '@/api/home/home'
+import { fetchDefaultWorkspaceId } from '@/api/workspace/workspace'
 import { useLogin } from '@/hooks/useAuthQueries'
 import { useToast } from '@/hooks/useToast'
 import { ApiError, clearAuthTokens, markAuthenticated, storeAuthTokens } from '@/lib/httpClient'
@@ -49,8 +50,16 @@ export const LoginPage = () => {
           storeAuthTokens(data.accessToken, data.refreshToken)
           // 홈 데이터와 홈 페이지 청크를 함께 미리 받아둬서 이동 직후 로딩 표시가 뜨지 않게 함
           try {
+            const workspaceId = await fetchDefaultWorkspaceId(queryClient)
             await Promise.all([
-              queryClient.prefetchQuery({ queryKey: homeQueryKeys.all, queryFn: getHome }),
+              ...(workspaceId
+                ? [
+                    queryClient.prefetchQuery({
+                      queryKey: homeQueryKeys.all(workspaceId),
+                      queryFn: () => getHome(workspaceId),
+                    }),
+                  ]
+                : []),
               import('@/pages/HomePage'),
             ])
             markAuthenticated()
@@ -97,6 +106,7 @@ export const LoginPage = () => {
           <Input1
             type="email"
             aria-label="이메일"
+            autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="이메일을 입력해주세요"
@@ -105,6 +115,7 @@ export const LoginPage = () => {
           <Input1
             type="password"
             aria-label="비밀번호"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="비밀번호를 입력해주세요"

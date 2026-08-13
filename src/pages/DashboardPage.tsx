@@ -340,7 +340,7 @@ export const DashboardPage = () => {
         </p>
       </header>
 
-      <nav className="-mx-10 flex gap-3 border-b border-(--color-border-subtle) px-10">
+      <nav className="flex gap-3 border-b border-(--color-border-subtle)">
         <button
           type="button"
           onClick={() => setActiveTab('weekly')}

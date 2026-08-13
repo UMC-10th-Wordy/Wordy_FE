@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import { PillTabs } from '@/components/todo/PillTabs'
 import { useModalFocus } from '@/hooks/useModalFocus'
@@ -26,6 +27,8 @@ import type { TaskTag } from '@/types/todo'
 import { createTag, deleteTag, getTagDetail, updateTag } from '@/api/tag/tag'
 import { getTagKey, mapDraftToCreatePayload, mapTagDtoToTaskTag } from '@/utils/tagMapper'
 import { getKpiRecommendations } from '@/api/ai/ai'
+import { homeQueryKeys } from '@/api/home/home'
+import { taskQueryKeys } from '@/api/task/task'
 import { useGetProfile } from '@/hooks/useUserQueries'
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 
@@ -93,6 +96,7 @@ export default function TagSettingsModal({
   const containerRef = useModalFocus<HTMLDivElement>()
   const { data: profile, isLoading: isProfileLoading } = useGetProfile()
   const workspaceId = useActiveWorkspaceId()
+  const queryClient = useQueryClient()
   const overlayMouseDownRef = useRef(false)
 
   // 기존 태그 탭
@@ -280,6 +284,8 @@ export default function TagSettingsModal({
       setDetailByKey((prev) => ({ ...prev, [editingKey]: updated }))
       setEditingKey(null)
       setExpandedKey(null)
+      void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
+      void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all(workspaceId) })
     } catch {
       return
     }
@@ -375,6 +381,8 @@ export default function TagSettingsModal({
       )
       onAddTag(mapTagDtoToTaskTag(created))
       onClose()
+      void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
+      void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all(workspaceId) })
     } catch {
       return
     }
@@ -1150,6 +1158,8 @@ export default function TagSettingsModal({
               if (selectedTag && getTagKey(selectedTag) === deletingKey) setSelectedTag(null)
               if (expandedKey === deletingKey) setExpandedKey(null)
               setDeletingKey(null)
+              void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
+              void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all(workspaceId) })
             } catch {
               return
             }

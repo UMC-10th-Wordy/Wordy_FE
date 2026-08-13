@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
+
 import {
   clearPerformanceQuestionChatSession,
   getPerformanceQuestionChatSession,
@@ -33,8 +35,11 @@ export const usePerformanceQuestionChat = ({
   questions,
   onFinish,
 }: UsePerformanceQuestionChatParams) => {
-  const [initialSession] = useState(() => getPerformanceQuestionChatSession(entryDate))
+  const activeWorkspaceId = useActiveWorkspaceId()
 
+  const [initialSession] = useState(() =>
+    getPerformanceQuestionChatSession(activeWorkspaceId, entryDate),
+  )
   const [messages, setMessages] = useState<PerformanceQuestionMessage[]>(
     () => initialSession?.messages ?? [],
   )
@@ -85,13 +90,13 @@ export const usePerformanceQuestionChat = ({
       const targetEntryDate = activeEntryDateRef.current
 
       const finishTimer = setTimeout(() => {
-        clearPerformanceQuestionChatSession(targetEntryDate)
+        clearPerformanceQuestionChatSession(activeWorkspaceId, targetEntryDate)
         onFinish(answers)
       }, RETURN_TO_CONVERTING_DELAY_MS)
 
       timersRef.current.push(finishTimer)
     },
-    [onFinish],
+    [activeWorkspaceId, onFinish],
   )
 
   const showQuestion = useCallback(
@@ -241,15 +246,15 @@ export const usePerformanceQuestionChat = ({
     hasStartedRef.current = false
     messageIdRef.current = 0
 
-    clearPerformanceQuestionChatSession(activeEntryDateRef.current)
-  }, [clearTimers])
+    clearPerformanceQuestionChatSession(activeWorkspaceId, activeEntryDateRef.current)
+  }, [activeWorkspaceId, clearTimers])
 
   const restoreQuestionChat = useCallback(
     (nextEntryDate: string) => {
       clearTimers()
       activeEntryDateRef.current = nextEntryDate
 
-      const session = getPerformanceQuestionChatSession(nextEntryDate)
+      const session = getPerformanceQuestionChatSession(activeWorkspaceId, nextEntryDate)
 
       if (!session) {
         initialSessionRestoredRef.current = false
@@ -294,7 +299,7 @@ export const usePerformanceQuestionChat = ({
         showQuestion(session.submittedAnswers.length, session.submittedAnswers)
       }
     },
-    [clearTimers, finishQuestioning, showQuestion],
+    [activeWorkspaceId, clearTimers, finishQuestioning, showQuestion],
   )
 
   useEffect(() => {
@@ -302,7 +307,7 @@ export const usePerformanceQuestionChat = ({
       return
     }
 
-    setPerformanceQuestionChatSession(activeEntryDateRef.current, {
+    setPerformanceQuestionChatSession(activeWorkspaceId, activeEntryDateRef.current, {
       messages,
       answer,
       submittedAnswers,
@@ -311,6 +316,7 @@ export const usePerformanceQuestionChat = ({
       isFinished,
     })
   }, [
+    activeWorkspaceId,
     answer,
     currentQuestionIndex,
     isActive,
@@ -326,7 +332,7 @@ export const usePerformanceQuestionChat = ({
     }
 
     const timer = setTimeout(() => {
-      const currentSession = getPerformanceQuestionChatSession(entryDate)
+      const currentSession = getPerformanceQuestionChatSession(activeWorkspaceId, entryDate)
 
       if (currentSession && !initialSessionRestoredRef.current) {
         initialSessionRestoredRef.current = true
@@ -354,7 +360,15 @@ export const usePerformanceQuestionChat = ({
     return () => {
       clearTimeout(timer)
     }
-  }, [entryDate, finishQuestioning, isActive, questions.length, showQuestion, startQuestioning])
+  }, [
+    activeWorkspaceId,
+    entryDate,
+    finishQuestioning,
+    isActive,
+    questions.length,
+    showQuestion,
+    startQuestioning,
+  ])
 
   useEffect(() => {
     return () => {
