@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-query'
 
 import { dailyEntryQueryKeys } from '@/api/daily-entry/dailyEntry'
+import { dashboardQueryKeys } from '@/api/dashboard/dashboard'
 import { homeQueryKeys } from '@/api/home/home'
 import {
   deleteDailyEntryPermanently,
@@ -56,6 +57,9 @@ export const useRestoreDailyEntry = () => {
           queryKey: dailyEntryQueryKeys.detail(activeWorkspaceId, dailyEntryId),
         }),
         queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(activeWorkspaceId) }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardQueryKeys.workspace(activeWorkspaceId),
+        }),
       ])
     },
   })
