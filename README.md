@@ -118,12 +118,12 @@ pnpm test
 
 ## 팀원 및 역할 분담
 
-| 이름        | UI 담당                                       | API 담당                                           |
-| ----------- | --------------------------------------------- | -------------------------------------------------- |
-| 예원 (조이) | 공용 컴포넌트, 홈, 랜딩페이지, 태그 관리 모달 | Users, Home, Auth, Workspace, Trash, Notifications |
-| 채연 (길동) | 업무일지 작성 (카드 · 체크리스트 · 드래그 등) | Tags, Tasks, Task Results                          |
-| 보미 (보리) | 성과 미리보기, 일지 히스토리                  | Daily Entries, Performance                         |
-| 서윤 (마리) | 로그인/회원가입, 대시보드 (주간 · 월간)       | Dashboard (주간·월간), DashboardDraft              |
+| 이름        | UI 담당                                                                                  | API 담당                                           |
+| ----------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| 예원 (조이) | 공용 컴포넌트, 홈, 랜딩페이지, 태그 관리 모달, 사이드바(워크스페이스 스위처·설정·알림함) | Users, Home, Auth, Workspace, Trash, Notifications |
+| 채연 (길동) | 업무일지 작성 (카드 · 체크리스트 · 드래그 등)                                            | Tags, Tasks, Task Results                          |
+| 보미 (보리) | 성과 미리보기, 일지 히스토리                                                             | Daily Entries, Performance                         |
+| 서윤 (마리) | 로그인/회원가입, 대시보드 (주간 · 월간)                                                  | Dashboard (주간·월간), DashboardDraft              |
 
 > AI 도메인은 전채연·김보미·김서윤이 공동 담당했습니다.
 
@@ -139,7 +139,6 @@ src/
 ├── constants/       # 여러 도메인에서 공유하는 상수
 ├── hooks/           # 커스텀 훅
 ├── lib/             # 외부 라이브러리 설정 (TanStack Query 등)
-├── mocks/           # Mock 데이터
 ├── pages/           # 라우트 단위 페이지
 ├── router/          # 라우트 설정
 ├── store/           # 전역 상태 (zustand)
@@ -162,7 +161,6 @@ src/
 | API 파일 (fetch 함수 + queryKeys)        | camelCase 도메인명, `api/<domain>/`에 위치, 역할 접미사 없음                  | `api/user/user.ts`, `api/task/task.ts`                               |
 | TanStack Query 훅 파일                   | `use<Domain>Queries` 형태, `hooks/`에 flat 배치                               | `useUserQueries.ts`, `useDailyEntryQueries.ts`                       |
 | 타입 파일                                | camelCase 도메인명, 도메인 모델과 DTO를 한 파일에 병합                        | `user.ts`, `diaryDetail.ts`                                          |
-| Mock 파일                                | 대상 도메인/API명 + `Mock` 접미사                                             | `taskApiMock.ts`, `homeMock.ts`                                      |
 
 ## 화면 목록 및 플로우
 
@@ -184,6 +182,7 @@ src/
 
 일지 히스토리
   └─ 저장된 일지 확인 (달별) → 상세 진입 → 삭제하기
+       └─ 휴지통 (목록 상단 버튼으로 진입) → 복원하기 / 영구 삭제
 ```
 
 ### 성과 리포트
@@ -212,7 +211,6 @@ Monthly 탭
   │    ├─ 프로필 (닉네임, 프로필 사진, 직무, 재직 연차, 비밀번호 변경, 탈퇴)
   │    └─ 알림 수신 설정 (마케팅 이메일 수신, 마케팅 인앱 알림, 성과 리포트 생성 완료/유도 알림)
   ├─ 플랜 및 결제 (Pro 플랜은 COMING SOON)
-  ├─ 휴지통 → 복원하기 / 영구 삭제
   └─ 로그아웃
 
 알림함
