@@ -3,7 +3,7 @@ import type { MouseEvent } from 'react'
 import { TaskCardEditForm } from './TaskCardEditForm'
 import { TaskResultWriteForm } from './TaskResultWriteForm'
 import { TaskCardView } from './TaskCardView'
-import { DeleteConfirmDialog } from './DeleteConfirmDialog'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
 import type {
   Task,
   TaskDraftValues,
@@ -267,7 +267,15 @@ export default function TaskCard({
       )}
 
       {isDeleteConfirmOpen && (
-        <DeleteConfirmDialog
+        <ConfirmDialog
+          scope="local"
+          message={
+            <>
+              이 업무를 삭제할까요?
+              <br />
+              삭제하면 되돌릴 수 없어요
+            </>
+          }
           onCancel={() => setIsDeleteConfirmOpen(false)}
           onConfirm={() => {
             setIsDeleteConfirmOpen(false)

@@ -8,9 +8,11 @@ import { useGetPerformanceDetail } from '@/hooks/usePerformanceQueries'
 import { Scrollbar } from '@/components/common/Scrollbar/Scrollbar'
 
 import { LoadingState } from '@/components/common/AsyncState/AsyncState'
+import { ToastContainer } from '@/components/common/Toast/ToastContainer'
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
+import { useToast } from '@/hooks/useToast'
 
-import { DeleteDiaryDialog } from '@/components/diary-detail/DeleteDiaryDialog'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog/ConfirmDialog'
 import { DiaryDetailHeader } from '@/components/diary-detail/DiaryDetailHeader'
 import { DiaryRetrospective } from '@/components/diary-detail/DiaryRetrospective'
 import { ReadOnlyTaskCard } from '@/components/diary-detail/ReadOnlyTaskCard'
@@ -71,6 +73,7 @@ export const DiaryDetailContent = ({ diary, hideDelete }: DiaryDetailContentProp
     diary.completedCount > 0 ? 'completed' : 'incomplete',
   )
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const { toasts, addToast } = useToast()
 
   const { mutate: deleteDiary, isPending: isDeletePending } = useDeleteDailyEntry()
 
@@ -90,6 +93,7 @@ export const DiaryDetailContent = ({ diary, hideDelete }: DiaryDetailContentProp
       },
       onError: (error) => {
         console.error('업무 일지 삭제에 실패했습니다.', error)
+        addToast('일지 삭제에 실패했어요. 다시 시도해 주세요.')
       },
     })
   }
@@ -108,7 +112,7 @@ export const DiaryDetailContent = ({ diary, hideDelete }: DiaryDetailContentProp
     <div className="grid h-full min-h-0 min-w-0 flex-1 grid-cols-2 overflow-hidden bg-(--color-bg-default)">
       <main className="flex h-full min-h-0 min-w-0 w-full overflow-x-clip border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default)">
         <Scrollbar scrollbarClassName="py-2 pr-1">
-          <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-[60px]">
+          <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-15">
             <DiaryDetailHeader
               dateLabel={formatDateLabel(diary.date)}
               onBack={handleBack}
@@ -159,7 +163,8 @@ export const DiaryDetailContent = ({ diary, hideDelete }: DiaryDetailContentProp
       </div>
 
       {isDeleteDialogOpen && (
-        <DeleteDiaryDialog
+        <ConfirmDialog
+          message="이 날의 업무 일지를 삭제할까요?"
           onCancel={() => {
             if (!isDeletePending) {
               setIsDeleteDialogOpen(false)
@@ -168,6 +173,8 @@ export const DiaryDetailContent = ({ diary, hideDelete }: DiaryDetailContentProp
           onConfirm={handleDeleteDiary}
         />
       )}
+
+      <ToastContainer toasts={toasts} align="left" />
     </div>
   )
 }

@@ -33,9 +33,6 @@ const EmailVerificationPage = lazy(() =>
     default: m.EmailVerificationPage,
   })),
 )
-const MailNoticePage = lazy(() =>
-  import('@/pages/auth/MailNoticePage').then((m) => ({ default: m.MailNoticePage })),
-)
 const ProfileSetupPage = lazy(() =>
   import('@/pages/auth/ProfileSetupPage').then((m) => ({ default: m.ProfileSetupPage })),
 )
@@ -100,18 +97,17 @@ export const router = createBrowserRouter([
         ],
       },
       { path: '/landing-preview', element: <LandingPreview /> },
-      { path: '/records/search', element: <DiarySearchPage /> },
       {
         element: <ProtectedRoute />,
         children: [
+          { path: '/records/search', element: <DiarySearchPage /> },
           { path: '/trash', element: <TrashPage /> },
           { path: '/trash/:diaryId', element: <TrashDiaryDetailPage /> },
+          { path: '/plan', element: <PlanPage /> },
+          { path: '/profile-setup', element: <ProfileSetupPage /> },
         ],
       },
-      { path: '/plan', element: <PlanPage /> },
       { path: '/verify-email', element: <EmailVerificationPage /> },
-      { path: '/mail-notice', element: <MailNoticePage /> },
-      { path: '/profile-setup', element: <ProfileSetupPage /> },
       { path: '/social-signup', element: <SocialSignupPage /> },
       { path: '/oauth/callback', element: <GoogleCallbackPage /> },
     ],
