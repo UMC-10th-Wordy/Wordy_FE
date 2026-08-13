@@ -12,11 +12,14 @@ import { setAuthTokens } from '@/lib/httpClient'
 
 type VerificationStatus = 'request' | 'loading' | 'success' | 'fail'
 
+const PENDING_EMAIL_KEY = 'pendingVerificationEmail'
+
 export const EmailVerificationPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   const token = params.get('token')
+  const locationEmail = location.state?.email as string | undefined
 
   const { isPending, isSuccess, isError, data, error } = useVerifyEmail(token)
   const { toasts, addToast } = useToast()
@@ -24,6 +27,7 @@ export const EmailVerificationPage = () => {
   useEffect(() => {
     if (isSuccess && data) {
       setAuthTokens(data.accessToken, data.refreshToken)
+      sessionStorage.removeItem(PENDING_EMAIL_KEY)
       // 메일 속 링크는 새 탭으로 열리는 경우가 많아, 원래 탭(대기 화면)에도
       // 인증 완료를 알려서 자동으로 다음 화면으로 넘어가게 함. 대기 탭이 자신이
       // 기다리던 이메일인지 확인할 수 있도록 email도 함께 보냄(다른 계정의 인증
@@ -41,7 +45,10 @@ export const EmailVerificationPage = () => {
     }
   }, [isSuccess, isError, data, error])
 
-  const pendingEmail = location.state?.email
+  useEffect(() => {
+    if (locationEmail) sessionStorage.setItem(PENDING_EMAIL_KEY, locationEmail)
+  }, [locationEmail])
+  const pendingEmail = locationEmail ?? sessionStorage.getItem(PENDING_EMAIL_KEY) ?? undefined
   useEffect(() => {
     if (token || !pendingEmail) return
     const channel = new BroadcastChannel('email-verification')
@@ -65,8 +72,8 @@ export const EmailVerificationPage = () => {
           ? 'loading'
           : 'request'
 
-  // TODO(#45): API 연동 시 서버 세션 기반으로 교체
-  const email: string = location.state?.email ?? 'sample.email@naver.com'
+  // TODO(#45): 백엔드 세션 API 추가되면 교체. 현재는 sessionStorage로 새로고침에는 대응하나, 다른 기기/브라우저에서는 유지 안 됨
+  const email: string = pendingEmail ?? 'sample.email@naver.com'
   const handleResend = () => {
     // TODO(#35): 백엔드에 인증 메일 재전송 API 추가되면 연동
     addToast('아직 지원하지 않는 기능이에요')
@@ -165,7 +172,6 @@ export const EmailVerificationPage = () => {
         footer={
           <div className="flex items-center justify-center gap-2 [font-size:var(--font-size-body-3)] text-(--color-text-tertiary)">
             <span>이메일이 잘못되었나요?</span>
-            {/* TODO(#35): 회원가입 페이지로 돌아가기 라우팅 연결 */}
             <TextButton variant="text_only" size="small" onClick={() => navigate('/signup')}>
               이메일 주소 바꾸기
             </TextButton>
