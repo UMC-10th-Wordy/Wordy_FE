@@ -4,7 +4,6 @@ import type { ButtonHTMLAttributes, Ref } from 'react'
 const sidebarWorkspace = cva([
   'flex items-center justify-between pl-5 pr-2 py-2 w-full',
   'transition-colors duration-100 ease-out cursor-pointer',
-  'hover:bg-(--color-sidebar-neutral-hover)',
   'focus-visible:bg-(--color-sidebar-neutral-focused)',
 ])
 
@@ -27,7 +26,9 @@ export function SidebarWorkspace({
       ref={ref}
       className={[
         sidebarWorkspace({ className }),
-        isOpen ? 'bg-(--color-sidebar-neutral-focused)' : '',
+        isOpen
+          ? 'bg-(--color-sidebar-neutral-focused)'
+          : 'hover:bg-(--color-sidebar-neutral-hover)',
       ].join(' ')}
       {...rest}
     >
@@ -41,10 +42,13 @@ export function SidebarWorkspace({
           viewBox="0 0 32 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={['transition-transform duration-150', isOpen ? 'rotate-180' : ''].join(' ')}
+          className={[
+            'text-(--color-icon-secondary) transition-transform duration-150',
+            isOpen ? 'rotate-180' : '',
+          ].join(' ')}
         >
           <path
-            d="M8 12L16 20L24 12"
+            d="M10 13.5L16 18.5L22 13.5"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
