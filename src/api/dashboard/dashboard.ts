@@ -1,4 +1,4 @@
-import { request } from '@/lib/httpClient'
+import { ApiError, request } from '@/lib/httpClient'
 import type {
   AiDashboardResultDto,
   CreateDashboardPayload,
@@ -145,8 +145,9 @@ export async function getDraft(
   try {
     const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
     return await request<DraftDto>(`/workspaces/${workspaceId}/dashboards/drafts${query}`)
-  } catch {
-    return null
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null
+    throw error
   }
 }
 
