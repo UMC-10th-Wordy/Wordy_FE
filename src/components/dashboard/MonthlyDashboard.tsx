@@ -93,12 +93,7 @@ export const MonthlyDashboard = ({
       {
         label: '업무 완료율',
         value: String(
-          detail.performances.length
-            ? Math.round(
-                detail.performances.reduce((sum, p) => sum + (p.achievementRate ?? 0), 0) /
-                  detail.performances.length,
-              )
-            : 0,
+          Math.round(detail.completionRate ?? detail.insights?.[0]?.completionRate ?? 0),
         ),
         unit: '%',
       },
