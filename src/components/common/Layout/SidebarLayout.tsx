@@ -308,9 +308,10 @@ export function SidebarLayout() {
                 })
               }}
               onSelectWorkspace={(id) => {
+                const isWorkspaceChanged = id !== selectedWorkspaceId
                 setSelectedWorkspaceId(id)
                 setModal(null)
-                if (location.pathname.startsWith('/records/')) {
+                if (isWorkspaceChanged && location.pathname.startsWith('/records/')) {
                   navigate('/records')
                 }
               }}
