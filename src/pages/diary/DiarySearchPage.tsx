@@ -70,7 +70,7 @@ export const DiarySearchPage = () => {
 
   return (
     <main className="flex h-full min-h-0 w-full min-w-0 flex-col bg-(--color-bg-default)">
-      <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-[60px]">
+      <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-15">
         <DiarySearchBackButton onClick={handleBack} />
 
         <div className="mt-(--scale-48) flex min-h-0 flex-1 flex-col items-center">

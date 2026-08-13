@@ -11,7 +11,7 @@ export const DiarySearchEmptyState = ({ type }: DiarySearchEmptyStateProps) => {
     type === 'diary' ? '관련된 업무 일지를 찾을 수 없어요' : '관련된 프로젝트 태그를 찾을 수 없어요'
 
   return (
-    <section className="flex min-h-0 w-full max-w-200 flex-1 items-center justify-center pb-[60px]">
+    <section className="flex min-h-0 w-full max-w-200 flex-1 items-center justify-center pb-15">
       <div className="flex flex-col items-center gap-(--scale-12)">
         <img
           src={DiarySearchEmptyIllustration}

@@ -17,7 +17,7 @@ interface ConversionNoticeSectionProps {
 /* 업무일지 -> 성과 변환 전 주의 사항 안내 + 변환 버튼 */
 export function ConversionNoticeSection({ isEnabled, onConvert }: ConversionNoticeSectionProps) {
   return (
-    <section className="flex w-full flex-col items-center gap-5 pb-[60px]">
+    <section className="flex w-full flex-col items-center gap-5 pb-15">
       <div className="flex w-full flex-col gap-1">
         <div className="flex items-center gap-1">
           <ErrorIcon aria-hidden className="size-5 shrink-0 text-(--color-icon-error)" />

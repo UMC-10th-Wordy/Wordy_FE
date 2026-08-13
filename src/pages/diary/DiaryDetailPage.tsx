@@ -112,7 +112,7 @@ export const DiaryDetailContent = ({ diary, hideDelete }: DiaryDetailContentProp
     <div className="grid h-full min-h-0 min-w-0 flex-1 grid-cols-2 overflow-hidden bg-(--color-bg-default)">
       <main className="flex h-full min-h-0 min-w-0 w-full overflow-x-clip border-x-[0.5px] border-(--color-border-brand-subtle) bg-(--color-bg-default)">
         <Scrollbar scrollbarClassName="py-2 pr-1">
-          <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-[60px]">
+          <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-15">
             <DiaryDetailHeader
               dateLabel={formatDateLabel(diary.date)}
               onBack={handleBack}

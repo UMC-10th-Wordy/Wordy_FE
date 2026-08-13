@@ -314,7 +314,7 @@ export const DashboardPage = () => {
         : 'insufficient'
 
   return (
-    <div className="flex flex-1 flex-col gap-7 bg-(--color-bg-brand-subtle) px-(--scale-40) pt-(--scale-40) pb-[60px]">
+    <div className="flex flex-1 flex-col gap-7 bg-(--color-bg-brand-subtle) px-(--scale-40) pt-(--scale-40) pb-15">
       <header className="flex flex-col gap-1">
         <h1 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
           성과 리포트

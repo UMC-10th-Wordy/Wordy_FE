@@ -11,7 +11,7 @@ const DiaryListContent = () => {
 
   return (
     <main className="relative z-0 h-full min-w-0 w-full flex-1 bg-(--color-bg-default)">
-      <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-[60px]">
+      <div className="flex min-h-full w-full flex-col px-(--scale-40) pt-(--scale-40) pb-15">
         <DiaryListHeader />
 
         <DiarySummarySection summary={summary} />
