@@ -198,7 +198,8 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
 
   const { data: performanceList } = useGetPerformancesByDate(currentDateKey)
 
-  const { data: fetchedDailyEntry } = useGetDailyEntryByDate(currentDateKey)
+  const { data: fetchedDailyEntry, isPending: isDailyEntryPending } =
+    useGetDailyEntryByDate(currentDateKey)
 
   const savedPerformanceDetail =
     performanceList?.exists && performanceList.performance ? performanceList.performance : null
@@ -218,6 +219,7 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
     currentDateKey in retrospectiveByDate || fetchedDailyEntry !== undefined
   const isRetrospectiveButtonVisible =
     hasResolvedRetrospective && !isRetrospectiveFocused && retrospective.trim().length === 0
+  const isRetrospectiveLoading = isDailyEntryPending && !(currentDateKey in retrospectiveByDate)
 
   const savedPerformanceResult = savedPerformanceDetail
     ? mapPerformanceDetailResult(savedPerformanceDetail, tasksForDate)
@@ -943,15 +945,19 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
                   이렇게 작성해 보세요
                 </TextButton>
               </div>
-              <Input2
-                id="today-retrospective-input"
-                value={retrospective}
-                onChange={(event) => handleRetrospectiveChange(event.target.value)}
-                onFocus={() => setIsRetrospectiveFocused(true)}
-                onBlur={handleRetrospectiveBlur}
-                placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."
-                className="w-full !min-h-[200px]"
-              />
+              {isRetrospectiveLoading ? (
+                <LoadingState message="회고를 불러오는 중입니다" className="h-[200px] w-full" />
+              ) : (
+                <Input2
+                  id="today-retrospective-input"
+                  value={retrospective}
+                  onChange={(event) => handleRetrospectiveChange(event.target.value)}
+                  onFocus={() => setIsRetrospectiveFocused(true)}
+                  onBlur={handleRetrospectiveBlur}
+                  placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."
+                  className="w-full !min-h-[200px]"
+                />
+              )}
             </section>
 
             <ConversionNoticeSection
