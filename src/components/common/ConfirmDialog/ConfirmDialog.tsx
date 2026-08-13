@@ -1,10 +1,13 @@
-import { useEffect, useId } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { TextButton } from '@/components/common/Button/TextButton'
 import ErrorIcon from '@/assets/icons/error.svg?react'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import { useModalFocus } from '@/hooks/useModalFocus'
+
+/* 중첩된 다이얼로그 중 가장 나중에 마운트된(최상단) 것만 Enter를 처리하도록 하는 스택 */
+const confirmStack: string[] = []
 
 export interface ConfirmDialogProps {
   message: ReactNode
@@ -25,18 +28,34 @@ export function ConfirmDialog({
   scope = 'viewport',
 }: ConfirmDialogProps) {
   const titleId = useId()
+  const id = useId()
   const dialogRef = useModalFocus<HTMLDivElement>()
   const isViewport = scope === 'viewport'
+  const onConfirmRef = useRef(onConfirm)
+
+  useEffect(() => {
+    onConfirmRef.current = onConfirm
+  })
 
   useEscapeKey(() => onCancel?.())
 
   useEffect(() => {
+    confirmStack.push(id)
+    return () => {
+      const index = confirmStack.indexOf(id)
+      if (index !== -1) confirmStack.splice(index, 1)
+    }
+  }, [id])
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') onConfirm?.()
+      if (e.key !== 'Enter') return
+      if (confirmStack[confirmStack.length - 1] !== id) return
+      onConfirmRef.current?.()
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onConfirm])
+  }, [id])
 
   const content = (
     <div
