@@ -1,12 +1,4 @@
-import { request } from '@/lib/httpClient'
-import {
-  INITIAL_ELIGIBILITY_MOCK,
-  INITIAL_DASHBOARD_LIST_MOCK,
-  INITIAL_DASHBOARD_DETAIL_MOCK,
-  INITIAL_MONTHLY_DASHBOARD_DETAIL_MOCK,
-  INITIAL_MONTHLY_DASHBOARD_LIST_MOCK,
-  MONTHLY_ELIGIBILITY_MOCK,
-} from '@/mocks/dashboard/dashboardApiMock'
+import { ApiError, request } from '@/lib/httpClient'
 import type {
   AiDashboardResultDto,
   CreateDashboardPayload,
@@ -20,24 +12,17 @@ import type {
   DraftDto,
 } from '@/types/dashboard'
 
-const USE_MOCK_DASHBOARD = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_DASHBOARD === 'true'
-
-let weeklyDetailMock: DashboardDetailDto = structuredClone(INITIAL_DASHBOARD_DETAIL_MOCK)
-let monthlyDetailMock: DashboardDetailDto = structuredClone(INITIAL_MONTHLY_DASHBOARD_DETAIL_MOCK)
-
 /* GET /workspaces/{workspaceId}/dashboards/eligibility — 주간 대시보드 생성 조건 조회 */
 export async function getDashboardEligibility(
   workspaceId: string,
   baseDate?: string,
 ): Promise<EligibilityDto> {
-  if (USE_MOCK_DASHBOARD) return INITIAL_ELIGIBILITY_MOCK
   const query = baseDate ? `?baseDate=${baseDate}` : ''
   return request<EligibilityDto>(`/workspaces/${workspaceId}/dashboards/eligibility${query}`)
 }
 
 /* GET /workspaces/{workspaceId}/dashboards — 주간 대시보드 목록 조회 */
 export async function getDashboards(workspaceId: string): Promise<DashboardListItemDto[]> {
-  if (USE_MOCK_DASHBOARD) return INITIAL_DASHBOARD_LIST_MOCK
   return request<DashboardListItemDto[]>(`/workspaces/${workspaceId}/dashboards`)
 }
 
@@ -46,7 +31,6 @@ export async function getDashboardDetail(
   workspaceId: string,
   dashboardId: string,
 ): Promise<DashboardDetailDto> {
-  if (USE_MOCK_DASHBOARD) return weeklyDetailMock
   return request<DashboardDetailDto>(`/workspaces/${workspaceId}/dashboards/${dashboardId}`)
 }
 
@@ -56,16 +40,6 @@ export async function createReflection(
   dashboardId: string,
   payload: CreateReflectionPayload,
 ): Promise<string> {
-  if (USE_MOCK_DASHBOARD) {
-    const weeklyReflectionId = `mock-reflection-${Date.now()}`
-    weeklyDetailMock = {
-      ...weeklyDetailMock,
-      weeklyReflections: [
-        { weeklyReflectionId, dashboardId, createdAt: new Date().toISOString(), ...payload },
-      ],
-    }
-    return weeklyReflectionId
-  }
   return request<string>(`/workspaces/${workspaceId}/dashboards/${dashboardId}/reflection`, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -79,15 +53,6 @@ export async function updateReflection(
   reflectionId: string,
   payload: UpdateReflectionPayload,
 ): Promise<string> {
-  if (USE_MOCK_DASHBOARD) {
-    weeklyDetailMock = {
-      ...weeklyDetailMock,
-      weeklyReflections: weeklyDetailMock.weeklyReflections.map((r) =>
-        r.weeklyReflectionId === reflectionId ? { ...r, ...payload } : r,
-      ),
-    }
-    return reflectionId
-  }
   return request<string>(
     `/workspaces/${workspaceId}/dashboards/${dashboardId}/reflection/${reflectionId}`,
     {
@@ -102,17 +67,15 @@ export async function getMonthlyEligibility(
   workspaceId: string,
   baseDate?: string,
 ): Promise<MonthlyEligibilityDto> {
-  if (USE_MOCK_DASHBOARD) return MONTHLY_ELIGIBILITY_MOCK
   const query = baseDate ? `?baseDate=${baseDate}` : ''
   return request<MonthlyEligibilityDto>(
     `/workspaces/${workspaceId}/dashboards/monthly/eligibility${query}`,
   )
 }
 
-/* GET /workspaces/{workspaceId}/dashboards/monthly — 월간 대시보드 목록 조회 */
+/* GET /workspaces/{workspaceId}/dashboards/monthly/list — 월간 대시보드 목록 조회 */
 export async function getMonthlyDashboards(workspaceId: string): Promise<DashboardListItemDto[]> {
-  if (USE_MOCK_DASHBOARD) return INITIAL_MONTHLY_DASHBOARD_LIST_MOCK
-  return request<DashboardListItemDto[]>(`/workspaces/${workspaceId}/dashboards/monthly`)
+  return request<DashboardListItemDto[]>(`/workspaces/${workspaceId}/dashboards/monthly/list`)
 }
 
 /* GET /workspaces/{workspaceId}/dashboards/monthly/{dashboardId} — 월간 대시보드 상세 조회 */
@@ -120,7 +83,6 @@ export async function getMonthlyDashboardDetail(
   workspaceId: string,
   dashboardId: string,
 ): Promise<DashboardDetailDto> {
-  if (USE_MOCK_DASHBOARD) return monthlyDetailMock
   return request<DashboardDetailDto>(`/workspaces/${workspaceId}/dashboards/monthly/${dashboardId}`)
 }
 
@@ -130,19 +92,26 @@ export async function createMonthlyReflection(
   dashboardId: string,
   payload: CreateReflectionPayload,
 ): Promise<MonthlyReflectionResultDto> {
-  if (USE_MOCK_DASHBOARD) {
-    const weeklyReflectionId = `mock-reflection-${Date.now()}`
-    const createdAt = new Date().toISOString()
-    monthlyDetailMock = {
-      ...monthlyDetailMock,
-      weeklyReflections: [{ weeklyReflectionId, dashboardId, createdAt, ...payload }],
-    }
-    return { weeklyReflectionId, ...payload, createdAt }
-  }
   return request<MonthlyReflectionResultDto>(
     `/workspaces/${workspaceId}/dashboards/monthly/${dashboardId}/reflection`,
     {
       method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  )
+}
+
+/* PATCH /workspaces/{workspaceId}/dashboards/monthly/{dashboardId}/reflection/{reflectionId} — 월간 회고 수정 */
+export async function updateMonthlyReflection(
+  workspaceId: string,
+  dashboardId: string,
+  reflectionId: string,
+  payload: UpdateReflectionPayload,
+): Promise<void> {
+  await request<void>(
+    `/workspaces/${workspaceId}/dashboards/monthly/${dashboardId}/reflection/${reflectionId}`,
+    {
+      method: 'PATCH',
       body: JSON.stringify(payload),
     },
   )
@@ -176,8 +145,9 @@ export async function getDraft(
   try {
     const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
     return await request<DraftDto>(`/workspaces/${workspaceId}/dashboards/drafts${query}`)
-  } catch {
-    return null
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null
+    throw error
   }
 }
 
@@ -203,4 +173,28 @@ export async function createMonthlyDashboard(
     body: JSON.stringify(payload),
     signal: AbortSignal.timeout(120_000),
   })
+}
+
+export const dashboardQueryKeys = {
+  all: ['dashboards'] as const,
+
+  workspace: (workspaceId: string) => [...dashboardQueryKeys.all, workspaceId] as const,
+
+  weeklyEligibility: (workspaceId: string, baseDate: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'weekly-eligibility', baseDate] as const,
+
+  weeklyList: (workspaceId: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'weekly-list'] as const,
+
+  weeklyDetail: (workspaceId: string, dashboardId: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'weekly-detail', dashboardId] as const,
+
+  monthlyEligibility: (workspaceId: string, baseDate: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'monthly-eligibility', baseDate] as const,
+
+  monthlyList: (workspaceId: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'monthly-list'] as const,
+
+  monthlyDetail: (workspaceId: string, dashboardId: string) =>
+    [...dashboardQueryKeys.workspace(workspaceId), 'monthly-detail', dashboardId] as const,
 }

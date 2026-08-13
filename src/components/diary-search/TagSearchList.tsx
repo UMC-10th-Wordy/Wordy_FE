@@ -10,7 +10,7 @@ interface TagSearchListProps {
 
 export const TagSearchList = ({ results, keyword, onDetailClick }: TagSearchListProps) => {
   return (
-    <section className="mt-(--scale-12) w-[800px] pt-(--scale-32) pb-(--scale-40)">
+    <section className="mt-(--scale-12) w-full max-w-200 pt-(--scale-32) pb-(--scale-40)">
       <div className="flex flex-col gap-(--scale-20)">
         {results.map((result) => (
           <TagSearchAccordion

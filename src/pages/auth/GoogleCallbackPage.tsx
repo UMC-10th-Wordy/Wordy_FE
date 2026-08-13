@@ -16,11 +16,17 @@ export const GoogleCallbackPage = () => {
 
   useEffect(() => {
     if (!code) {
-      navigate('/login', { replace: true })
+      navigate('/login', {
+        replace: true,
+        state: { error: '구글 로그인에 실패했어요. 다시 시도해 주세요.' },
+      })
       return
     }
     if (isError) {
-      navigate('/login', { replace: true })
+      navigate('/login', {
+        replace: true,
+        state: { error: '구글 로그인에 실패했어요. 다시 시도해 주세요.' },
+      })
     }
   }, [code, isError, navigate])
 
@@ -52,7 +58,10 @@ export const GoogleCallbackPage = () => {
         })
         .catch(() => {
           clearAuthTokens()
-          navigate('/login', { replace: true })
+          navigate('/login', {
+            replace: true,
+            state: { error: '로그인 처리 중 오류가 발생했어요. 다시 시도해 주세요.' },
+          })
         })
     } else {
       navigate('/social-signup', {

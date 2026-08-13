@@ -39,7 +39,7 @@ export const DiaryListHeader = () => {
       </div>
 
       <div
-        className="w-[580px] shrink-0"
+        className="min-w-0 max-w-145 flex-1"
         onMouseDownCapture={(event) => {
           const target = event.target as HTMLElement
 
@@ -65,7 +65,7 @@ export const DiaryListHeader = () => {
           onClearAll={clearRecentKeywords}
           placeholder={isSearchFocused ? '' : '업무 내용 또는 키워드를 검색해 보세요'}
           aria-label="업무 일지 검색"
-          className="w-full [&>div:nth-child(2)]:top-[calc(100%+12px)] [&>div:nth-child(2)]:left-1/2 [&>div:nth-child(2)]:z-50 [&>div:nth-child(2)]:w-[580px] [&>div:nth-child(2)]:-translate-x-1/2"
+          className="w-full [&>div:nth-child(2)]:top-[calc(100%+12px)] [&>div:nth-child(2)]:left-1/2 [&>div:nth-child(2)]:z-50 [&>div:nth-child(2)]:-translate-x-1/2"
         />
       </div>
     </header>

@@ -108,8 +108,20 @@ export default function TodoListPage() {
   return <TodoListPageContent key={workspaceId} workspaceId={workspaceId} />
 }
 
+const TWO_COLUMN_MIN_VIEWPORT_WIDTH = 1500
+
 function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [isViewportNarrow, setIsViewportNarrow] = useState(
+    () => window.innerWidth < TWO_COLUMN_MIN_VIEWPORT_WIDTH,
+  )
+
+  useEffect(() => {
+    const updateIsViewportNarrow = () =>
+      setIsViewportNarrow(window.innerWidth < TWO_COLUMN_MIN_VIEWPORT_WIDTH)
+    window.addEventListener('resize', updateIsViewportNarrow)
+    return () => window.removeEventListener('resize', updateIsViewportNarrow)
+  }, [])
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const [movedPerformanceTaskIds, setMovedPerformanceTaskIds] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<TodoFilter>(() =>
@@ -862,7 +874,7 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
                           aria-hidden
                           className="size-8 shrink-0 text-(--color-icon-brand)"
                         />
-                        <p className="w-[504px] text-center [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
+                        <p className="w-full max-w-126 text-center [font-size:var(--font-size-body-2)] leading-(--line-height-body) font-normal text-(--color-text-tertiary)">
                           {!hasAnyTaskEverToday
                             ? '오늘의 업무를 시작해 볼까요?'
                             : activeTab === 'incomplete'
@@ -878,7 +890,7 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
                         title="Must do"
                         description="반드시 오늘 끝낼 거예요"
                         sectionTasks={mustDoTasks}
-                        isNarrow={isPreviewOpen}
+                        isNarrow={isPreviewOpen || isViewportNarrow}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
                         isTaskExpanded={isTaskExpanded}
@@ -893,7 +905,7 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
                         title="Should do"
                         description="가능하면 오늘 완료할 거예요"
                         sectionTasks={shouldDoTasks}
-                        isNarrow={isPreviewOpen}
+                        isNarrow={isPreviewOpen || isViewportNarrow}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
                         isTaskExpanded={isTaskExpanded}
@@ -908,7 +920,7 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
                         title="Could do"
                         description="여유가 있으면 진행할 거예요"
                         sectionTasks={couldDoTasks}
-                        isNarrow={isPreviewOpen}
+                        isNarrow={isPreviewOpen || isViewportNarrow}
                         draggingTask={draggingTask}
                         startDrag={startDrag}
                         isTaskExpanded={isTaskExpanded}

@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import ChevronUpIcon from '@/assets/icons/Direction=top.svg?react'
 import ChevronDownIcon from '@/assets/icons/Direction=bottom.svg?react'
 import MoveIcon from '@/assets/icons/move.svg?react'
@@ -11,9 +12,10 @@ import TagSettingsModal from './TagSettingsModal'
 import { useOutsideClick } from '@/hooks/useOutsideClick'
 import { useVerticalDragReorder, type VerticalDragOverInfo } from '@/hooks/useVerticalDragReorder'
 import { useFlipAnimation } from '@/hooks/useFlipAnimation'
-import { getTags } from '@/api/tag/tag'
+import { tagQueryKeys } from '@/api/tag/tag'
+import { useGetTags } from '@/hooks/useTagQueries'
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
-import { getTagKey, mapTagDtoToTaskTag } from '@/utils/tagMapper'
+import { getTagKey } from '@/utils/tagMapper'
 import type { TaskTag } from '@/types/todo'
 
 const SCROLL_THRESHOLD = 10
@@ -60,36 +62,22 @@ interface TagSelectProps {
 
 export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [tagOptions, setTagOptions] = useState<TaskTag[]>([])
-  const [tagOptionsWorkspaceId, setTagOptionsWorkspaceId] = useState<string | null>(null)
   const [showModal, setShowModal] = useState<'existing' | 'new' | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const workspaceId = useActiveWorkspaceId()
+  const queryClient = useQueryClient()
+  const tagsQuery = useGetTags(tags === undefined)
 
-  useEffect(() => {
-    if (tags !== undefined) return
-    if (!workspaceId) return
-    let cancelled = false
-    getTags(workspaceId)
-      .then((dtos) => {
-        if (!cancelled) {
-          setTagOptions(dtos.map(mapTagDtoToTaskTag))
-          setTagOptionsWorkspaceId(workspaceId)
-        }
-      })
-      .catch(() => {})
-    return () => {
-      cancelled = true
-    }
-  }, [tags, workspaceId])
-
-  const effectiveTags = tags ?? (tagOptionsWorkspaceId === workspaceId ? tagOptions : [])
+  const effectiveTags = tags ?? tagsQuery.data ?? []
+  const tagOptionsLoadFailed = tags === undefined && tagsQuery.isError
   const updateTags = (updater: (prev: TaskTag[]) => TaskTag[]) => {
     if (tags !== undefined) {
       onTagsChange?.(updater(tags))
     } else {
-      setTagOptions(updater)
+      queryClient.setQueryData<TaskTag[]>(tagQueryKeys.all(workspaceId), (prev) =>
+        updater(prev ?? []),
+      )
     }
   }
 
@@ -224,7 +212,9 @@ export default function TagSelect({ value, onChange, tags, onTagsChange }: TagSe
 
           {effectiveTags.length === 0 ? (
             <p className="flex h-14 w-full items-center justify-center text-center [font-size:var(--font-size-body-3)] leading-(--line-height-body) font-normal text-(--color-text-secondary)">
-              프로젝트 태그를 추가해 주세요
+              {tagOptionsLoadFailed
+                ? '태그 목록을 불러오지 못했어요'
+                : '프로젝트 태그를 추가해 주세요'}
             </p>
           ) : (
             (() => {

@@ -66,7 +66,11 @@ export const SocialSignupPage = () => {
           </p>
         </div>
 
-        <TermsSection terms={terms} onChange={setTerms} />
+        <TermsSection
+          terms={terms}
+          onChange={setTerms}
+          onShowDetail={() => addToast('아직 지원하지 않는 기능이에요')}
+        />
 
         <TextButton
           variant="fill"
