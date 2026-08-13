@@ -101,7 +101,7 @@ interface WeeklyRetrospectiveProps {
   period?: RetrospectivePeriod
   dashboardId?: string
   workspaceId: string
-  periodStart: string
+  baseDate: string
   initialReflection?: {
     reflectionId: string
     workSummary: string
@@ -115,7 +115,7 @@ export const WeeklyRetrospective = ({
   period = 'weekly',
   dashboardId,
   workspaceId,
-  periodStart,
+  baseDate,
   initialReflection,
   onSaved,
 }: WeeklyRetrospectiveProps) => {
@@ -151,7 +151,7 @@ export const WeeklyRetrospective = ({
     if (!workspaceId || !dashboardId) return
 
     let cancelled = false
-    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', periodStart, dashboardId)
+    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', baseDate, dashboardId)
       .then((draft) => {
         if (cancelled || !draft) return
 
@@ -181,7 +181,7 @@ export const WeeklyRetrospective = ({
   }, [
     workspaceId,
     period,
-    periodStart,
+    baseDate,
     dashboardId,
     initialReflection?.reflectionId,
     initialReflection?.workSummary,
@@ -225,7 +225,7 @@ export const WeeklyRetrospective = ({
   const handleDeleteRow = (id: string) => setPlans((prev) => prev.filter((p) => p.id !== id))
 
   const handleTempSave = () => {
-    saveDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', periodStart, dashboardId, {
+    saveDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', baseDate, dashboardId, {
       workSummary: answers.work,
       resourcesUsed: answers.resource,
       learning: answers.learning,

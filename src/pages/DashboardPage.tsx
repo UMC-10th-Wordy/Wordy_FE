@@ -429,7 +429,7 @@ export const DashboardPage = () => {
                   key={detail?.dashboardId ?? weekStartDate.getTime()}
                   dashboardId={detail?.dashboardId}
                   workspaceId={workspaceId}
-                  periodStart={baseDate}
+                  baseDate={baseDate}
                   initialReflection={(() => {
                     const list = detail?.weeklyReflections
                     if (!list?.length) return undefined
