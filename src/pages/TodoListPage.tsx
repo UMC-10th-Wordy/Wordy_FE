@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import TaskForm from '@/components/todo/TaskForm'
 import TodoTabs from '@/components/todo/TodoTabs'
@@ -98,19 +99,45 @@ const parseGrowthInsights = (insight: string): string[] => {
     .filter(Boolean)
 }
 
+const DATE_PARAM_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+
+const parseDateParam = (value: string | null): Date | null => {
+  if (!value || !DATE_PARAM_PATTERN.test(value)) return null
+  const [year, month, day] = value.split('-').map(Number)
+  const parsed = new Date(year, month - 1, day)
+  if (
+    parsed.getFullYear() !== year ||
+    parsed.getMonth() !== month - 1 ||
+    parsed.getDate() !== day
+  ) {
+    return null
+  }
+  return parsed
+}
+
 export default function TodoListPage() {
   const workspaceId = useActiveWorkspaceId()
+  const [searchParams] = useSearchParams()
+  const dateParam = searchParams.get('date')
 
   if (!workspaceId) {
     return <LoadingState message="불러오는 중입니다" className="h-screen w-full" />
   }
 
-  return <TodoListPageContent key={workspaceId} workspaceId={workspaceId} />
+  return (
+    <TodoListPageContent key={workspaceId} workspaceId={workspaceId} initialDateParam={dateParam} />
+  )
 }
 
 const TWO_COLUMN_MIN_VIEWPORT_WIDTH = 1500
 
-function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
+function TodoListPageContent({
+  workspaceId,
+  initialDateParam,
+}: {
+  workspaceId: string
+  initialDateParam: string | null
+}) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [isViewportNarrow, setIsViewportNarrow] = useState(
     () => window.innerWidth < TWO_COLUMN_MIN_VIEWPORT_WIDTH,
@@ -122,10 +149,12 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
     window.addEventListener('resize', updateIsViewportNarrow)
     return () => window.removeEventListener('resize', updateIsViewportNarrow)
   }, [])
-  const [currentDate, setCurrentDate] = useState(() => new Date())
+  const [currentDate, setCurrentDate] = useState(
+    () => parseDateParam(initialDateParam) ?? new Date(),
+  )
   const [movedPerformanceTaskIds, setMovedPerformanceTaskIds] = useState<string[]>([])
   const [activeTab, setActiveTab] = useState<TodoFilter>(() =>
-    readStoredActiveTab(toDateKey(new Date())),
+    readStoredActiveTab(toDateKey(parseDateParam(initialDateParam) ?? new Date())),
   )
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false)
   const [tasks, setTasks] = useState<Task[]>([])
@@ -198,7 +227,8 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
 
   const { data: performanceList } = useGetPerformancesByDate(currentDateKey)
 
-  const { data: fetchedDailyEntry } = useGetDailyEntryByDate(currentDateKey)
+  const { data: fetchedDailyEntry, isPending: isDailyEntryPending } =
+    useGetDailyEntryByDate(currentDateKey)
 
   const savedPerformanceDetail =
     performanceList?.exists && performanceList.performance ? performanceList.performance : null
@@ -218,6 +248,7 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
     currentDateKey in retrospectiveByDate || fetchedDailyEntry !== undefined
   const isRetrospectiveButtonVisible =
     hasResolvedRetrospective && !isRetrospectiveFocused && retrospective.trim().length === 0
+  const isRetrospectiveLoading = isDailyEntryPending && !(currentDateKey in retrospectiveByDate)
 
   const savedPerformanceResult = savedPerformanceDetail
     ? mapPerformanceDetailResult(savedPerformanceDetail, tasksForDate)
@@ -616,6 +647,17 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
     setCurrentDate(date)
   }
 
+  const previousDateParamRef = useRef(initialDateParam)
+
+  useEffect(() => {
+    if (previousDateParamRef.current === initialDateParam) return
+    previousDateParamRef.current = initialDateParam
+    const parsed = parseDateParam(initialDateParam)
+    if (!parsed) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    handleChangeDate(parsed)
+  }, [initialDateParam, handleChangeDate])
+
   const shiftDate = (days: number) => {
     const next = new Date(currentDate)
     next.setDate(next.getDate() + days)
@@ -958,15 +1000,19 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
                   이렇게 작성해 보세요
                 </TextButton>
               </div>
-              <Input2
-                id="today-retrospective-input"
-                value={retrospective}
-                onChange={(event) => handleRetrospectiveChange(event.target.value)}
-                onFocus={() => setIsRetrospectiveFocused(true)}
-                onBlur={handleRetrospectiveBlur}
-                placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."
-                className="w-full !min-h-[200px]"
-              />
+              {isRetrospectiveLoading ? (
+                <LoadingState message="회고를 불러오는 중입니다" className="h-[200px] w-full" />
+              ) : (
+                <Input2
+                  id="today-retrospective-input"
+                  value={retrospective}
+                  onChange={(event) => handleRetrospectiveChange(event.target.value)}
+                  onFocus={() => setIsRetrospectiveFocused(true)}
+                  onBlur={handleRetrospectiveBlur}
+                  placeholder="오늘 업무에서 잘했던 점, 배웠던 점, 아쉬운 점 등을 자유롭게 작성해 주세요."
+                  className="w-full !min-h-[200px]"
+                />
+              )}
             </section>
 
             <ConversionNoticeSection
