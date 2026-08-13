@@ -156,7 +156,7 @@ export const useDeleteDailyEntry = () => {
           queryKey: homeQueryKeys.all(activeWorkspaceId),
         }),
         queryClient.invalidateQueries({
-          queryKey: trashQueryKeys.lists(),
+          queryKey: trashQueryKeys.lists(activeWorkspaceId),
         }),
       ])
     },
