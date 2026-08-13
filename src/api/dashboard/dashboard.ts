@@ -73,9 +73,9 @@ export async function getMonthlyEligibility(
   )
 }
 
-/* GET /workspaces/{workspaceId}/dashboards/monthly — 월간 대시보드 목록 조회 */
+/* GET /workspaces/{workspaceId}/dashboards/monthly/list — 월간 대시보드 목록 조회 */
 export async function getMonthlyDashboards(workspaceId: string): Promise<DashboardListItemDto[]> {
-  return request<DashboardListItemDto[]>(`/workspaces/${workspaceId}/dashboards/monthly`)
+  return request<DashboardListItemDto[]>(`/workspaces/${workspaceId}/dashboards/monthly/list`)
 }
 
 /* GET /workspaces/{workspaceId}/dashboards/monthly/{dashboardId} — 월간 대시보드 상세 조회 */
