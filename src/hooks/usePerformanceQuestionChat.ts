@@ -11,8 +11,21 @@ import {
 import type { PerformanceQuestionChatMessage } from '@/utils/performance-preview/performanceQuestionChatSession'
 import type {
   PerformanceSupplementAnswer,
+  PerformanceSupplementAnswerStatus,
   PerformanceSupplementQuestion,
 } from '@/types/performance'
+
+type StoredPerformanceSupplementAnswer = Omit<PerformanceSupplementAnswer, 'status'> & {
+  status?: PerformanceSupplementAnswerStatus
+}
+
+const normalizeSubmittedAnswers = (
+  answers: StoredPerformanceSupplementAnswer[],
+): PerformanceSupplementAnswer[] =>
+  answers.map((answer) => ({
+    ...answer,
+    status: answer.status ?? (answer.answer.trim() ? 'ANSWERED' : 'SKIPPED'),
+  }))
 
 export type PerformanceQuestionMessage = PerformanceQuestionChatMessage
 
@@ -44,8 +57,8 @@ export const usePerformanceQuestionChat = ({
     () => initialSession?.messages ?? [],
   )
   const [answer, setAnswer] = useState(() => initialSession?.answer ?? '')
-  const [submittedAnswers, setSubmittedAnswers] = useState<PerformanceSupplementAnswer[]>(
-    () => initialSession?.submittedAnswers ?? [],
+  const [submittedAnswers, setSubmittedAnswers] = useState<PerformanceSupplementAnswer[]>(() =>
+    initialSession ? normalizeSubmittedAnswers(initialSession.submittedAnswers) : [],
   )
   const [isWordyTyping, setIsWordyTyping] = useState(false)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(
@@ -177,6 +190,7 @@ export const usePerformanceQuestionChat = ({
         aiQuestionId: currentQuestion.aiQuestionId,
         question: currentQuestion.question,
         answer: trimmedAnswer,
+        status: 'ANSWERED',
       },
     ]
 
@@ -214,6 +228,7 @@ export const usePerformanceQuestionChat = ({
         aiQuestionId: currentQuestion.aiQuestionId,
         question: currentQuestion.question,
         answer: '',
+        status: 'SKIPPED',
       },
     ]
 
@@ -273,11 +288,13 @@ export const usePerformanceQuestionChat = ({
         return
       }
 
+      const normalizedAnswers = normalizeSubmittedAnswers(session.submittedAnswers)
+
       initialSessionRestoredRef.current = true
 
       setMessages(session.messages)
       setAnswer(session.answer)
-      setSubmittedAnswers(session.submittedAnswers)
+      setSubmittedAnswers(normalizedAnswers)
       setIsWordyTyping(false)
       setCurrentQuestionIndex(session.currentQuestionIndex)
       setLatestQuestionMessageId(session.latestQuestionMessageId)
@@ -291,12 +308,12 @@ export const usePerformanceQuestionChat = ({
       )
 
       if (session.isFinished) {
-        finishQuestioning(session.submittedAnswers)
+        finishQuestioning(normalizedAnswers)
         return
       }
 
       if (session.latestQuestionMessageId === null) {
-        showQuestion(session.submittedAnswers.length, session.submittedAnswers)
+        showQuestion(normalizedAnswers.length, normalizedAnswers)
       }
     },
     [activeWorkspaceId, clearTimers, finishQuestioning, showQuestion],
@@ -338,13 +355,15 @@ export const usePerformanceQuestionChat = ({
         initialSessionRestoredRef.current = true
         activeEntryDateRef.current = entryDate
 
+        const normalizedAnswers = normalizeSubmittedAnswers(currentSession.submittedAnswers)
+
         if (currentSession.isFinished) {
-          finishQuestioning(currentSession.submittedAnswers)
+          finishQuestioning(normalizedAnswers)
           return
         }
 
         if (currentSession.latestQuestionMessageId === null) {
-          showQuestion(currentSession.submittedAnswers.length, currentSession.submittedAnswers)
+          showQuestion(normalizedAnswers.length, normalizedAnswers)
         }
 
         return

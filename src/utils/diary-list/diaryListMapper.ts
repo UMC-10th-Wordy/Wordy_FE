@@ -106,6 +106,7 @@ const mapDiarySearchDiary = (
 
   return {
     id: entry.dailyEntryId,
+    taskId: entry.taskId,
     entryDate: entry.entryDate,
     title: entry.title,
     tag: representativeTag ? mapDiarySearchProjectTag(representativeTag) : undefined,
@@ -123,6 +124,7 @@ const mapDiarySearchTagResult = (result: DailyEntryTagSearchItem): DiarySearchTa
     color: hexToTagColor(result.color),
     diaries: result.diaries.map((diary) => ({
       id: diary.dailyEntryId,
+      taskId: diary.taskId,
       entryDate: diary.entryDate,
       title: diary.title,
       tag,

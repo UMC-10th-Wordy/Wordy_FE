@@ -394,6 +394,7 @@ export const MONTHLY_DAILY_ENTRY_RESPONSE_MOCK_MAP: Record<
 export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   {
     dailyEntryId: 'daily-entry-2026-06-21',
+    taskId: 'task-search-2026-06-21',
     workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-21',
     tags: [
@@ -406,6 +407,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-long-title-2026-06-20',
+    taskId: 'task-search-2026-06-20',
     workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-20',
     tags: [
@@ -419,6 +421,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-06-19',
+    taskId: 'task-search-2026-06-19',
     workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-19',
     tags: [],
@@ -426,6 +429,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-06-18',
+    taskId: 'task-search-2026-06-18',
     workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-18',
     tags: [
@@ -438,6 +442,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-06-15',
+    taskId: 'task-search-2026-06-15',
     workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-15',
     tags: [
@@ -450,6 +455,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-06-03',
+    taskId: 'task-search-2026-06-03',
     workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-06-03',
     tags: [
@@ -462,6 +468,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-02-21',
+    taskId: 'task-search-2026-02-21',
     workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-02-21',
     tags: [
@@ -474,6 +481,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-01-21',
+    taskId: 'task-search-2026-01-21',
     workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-01-21',
     tags: [],
@@ -481,6 +489,7 @@ export const DAILY_ENTRY_SEARCH_ITEMS_MOCK: DailyEntrySearchItem[] = [
   },
   {
     dailyEntryId: 'daily-entry-2026-01-20',
+    taskId: 'task-search-2026-01-20',
     workspaceId: MOCK_WORKSPACE_ID,
     entryDate: '2026-01-20',
     tags: [],
