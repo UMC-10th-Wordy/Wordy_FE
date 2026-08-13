@@ -12,6 +12,7 @@ export interface TermsState {
 interface TermsSectionProps {
   terms: TermsState
   onChange: (terms: TermsState) => void
+  onShowDetail: () => void
 }
 
 const TERM_ITEMS: {
@@ -59,7 +60,7 @@ export const isRequiredTermsChecked = (terms: TermsState) =>
 export const termsToAgreements = (terms: TermsState): SignupAgreement[] =>
   TERM_ITEMS.map((item) => ({ type: item.agreementType, isAgreed: terms[item.key] }))
 
-export const TermsSection = ({ terms, onChange }: TermsSectionProps) => {
+export const TermsSection = ({ terms, onChange, onShowDetail }: TermsSectionProps) => {
   const allChecked = Object.values(terms).every(Boolean)
 
   const handleAllChange = (checked: boolean) => {
@@ -103,8 +104,7 @@ export const TermsSection = ({ terms, onChange }: TermsSectionProps) => {
                 onChange={(e) => handleItemChange(key, e.target.checked)}
               />
               {hasDetail && (
-                // TODO(#18): 약관 전문 모달/페이지 연결
-                <TextButton variant="text_only" size="small">
+                <TextButton variant="text_only" size="small" onClick={onShowDetail}>
                   전체보기
                 </TextButton>
               )}

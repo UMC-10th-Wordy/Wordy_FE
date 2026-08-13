@@ -137,8 +137,11 @@ export const EmailVerificationPage = () => {
           footer={
             <div className="flex items-center justify-center gap-2 [font-size:var(--font-size-body-3)] text-(--color-text-tertiary)">
               <span>제대로 인증되지 않나요?</span>
-              {/* TODO(#35): 문의하기 연결 */}
-              <TextButton variant="text_only" size="small">
+              <TextButton
+                variant="text_only"
+                size="small"
+                onClick={() => addToast('아직 지원하지 않는 기능이에요')}
+              >
                 문의하기
               </TextButton>
             </div>
