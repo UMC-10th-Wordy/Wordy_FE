@@ -65,7 +65,6 @@ export const DashboardPage = () => {
   const baseDate = toDateString(weekStartDate)
   const viewedEnd = toDateString(getTeamWeekEnd(weekStartDate))
 
-  // TODO: 월간 API 명세 확정 시 월 이동 데이터 갱신 연결. 현재는 라벨만 이동
   const [monthOffset, setMonthOffset] = useState(0)
   const [monthAnchor] = useState(() => {
     const now = new Date()
