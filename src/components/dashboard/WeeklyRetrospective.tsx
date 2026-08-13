@@ -214,6 +214,8 @@ export const WeeklyRetrospective = ({
     dashboardId,
     initialReflection?.reflectionId,
     initialReflection?.workSummary,
+    initialReflection?.resourcesUsed,
+    initialReflection?.learning,
   ])
 
   const resolvedReflectionId = useMemo(() => {
