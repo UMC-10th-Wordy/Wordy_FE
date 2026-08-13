@@ -190,12 +190,14 @@ export const DashboardPage = () => {
         taskCount: `${t.taskCount ?? 0}건`,
         period: `${t.periodStart} - ${t.periodEnd}`,
         achievement: t.achievementStatus,
-        kpis: detail.kpis.map((k) => ({
-          title: k.kpiName,
-          description: k.progress,
-          highlights: [],
-          files: [],
-        })),
+        kpis: detail.kpis
+          .filter((k) => k.tagId === t.tagId)
+          .map((k) => ({
+            title: k.kpiName,
+            description: k.progress,
+            highlights: [],
+            files: [],
+          })),
       }))
     : []
   const highlights = detail
@@ -336,9 +338,10 @@ export const DashboardPage = () => {
         </p>
       </header>
 
-      <nav className="flex gap-3 border-b border-(--color-border-subtle)">
+      <nav className="flex w-full gap-3 border-b border-(--color-border-subtle)">
         <button
           type="button"
+          disabled={generation === 'generating' || monthlyGeneration === 'generating'}
           onClick={() => setActiveTab('weekly')}
           className={
             activeTab === 'weekly'
@@ -350,6 +353,7 @@ export const DashboardPage = () => {
         </button>
         <button
           type="button"
+          disabled={generation === 'generating' || monthlyGeneration === 'generating'}
           onClick={() => setActiveTab('monthly')}
           className={
             activeTab === 'monthly'
@@ -364,10 +368,25 @@ export const DashboardPage = () => {
       {activeTab === 'weekly' ? (
         <>
           <div className="flex h-[52px] w-[250px] items-center justify-between gap-1 self-start rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
-            <button type="button" aria-label="이전 주차" onClick={() => handleWeekMove(-1)}>
-              <ArrowLeftIcon width={24} height={24} className="text-(--color-icon-secondary)" />
+            <button
+              type="button"
+              aria-label="이전 주차"
+              disabled={generation === 'generating'}
+              onClick={() => handleWeekMove(-1)}
+            >
+              <ArrowLeftIcon
+                width={24}
+                height={24}
+                className={
+                  generation === 'generating'
+                    ? 'text-(--color-icon-disabled)'
+                    : 'text-(--color-icon-secondary)'
+                }
+              />
             </button>
-            <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)">
+            <span
+              className={`[font-size:var(--font-size-body-2)] leading-[1.6] font-medium ${generation === 'generating' ? 'text-(--color-text-disabled)' : 'text-(--color-text-secondary)'}`}
+            >
               {weekLabel}
             </span>
             <button
@@ -380,7 +399,11 @@ export const DashboardPage = () => {
               <ArrowLeftIcon
                 width={24}
                 height={24}
-                className="rotate-180 text-(--color-icon-secondary)"
+                className={
+                  generation === 'generating'
+                    ? 'rotate-180 text-(--color-icon-disabled)'
+                    : 'rotate-180 text-(--color-icon-secondary)'
+                }
               />
             </button>
           </div>
@@ -425,7 +448,7 @@ export const DashboardPage = () => {
                   totalDays={totalDays}
                   selectedIds={selectedIds}
                   onToggle={handleToggle}
-                  disabled={status === 'generating'}
+                  disabled={status === 'generating' || monthlyGeneration === 'generating'}
                   periodLabel={weekLabel.replace(/^\d+년\s*/, '')}
                 />
               </>
@@ -441,9 +464,19 @@ export const DashboardPage = () => {
               disabled={monthlyGeneration === 'generating'}
               onClick={() => handleMonthMove(-1)}
             >
-              <ArrowLeftIcon width={24} height={24} className="text-(--color-icon-secondary)" />
+              <ArrowLeftIcon
+                width={24}
+                height={24}
+                className={
+                  monthlyGeneration === 'generating'
+                    ? 'text-(--color-icon-disabled)'
+                    : 'text-(--color-icon-secondary)'
+                }
+              />
             </button>
-            <span className="[font-size:var(--font-size-body-2)] leading-[1.6] font-medium text-(--color-text-secondary)">
+            <span
+              className={`[font-size:var(--font-size-body-2)] leading-[1.6] font-medium ${monthlyGeneration === 'generating' ? 'text-(--color-text-disabled)' : 'text-(--color-text-secondary)'}`}
+            >
               {monthLabel}
             </span>
             <button
@@ -455,7 +488,11 @@ export const DashboardPage = () => {
               <ArrowLeftIcon
                 width={24}
                 height={24}
-                className="rotate-180 text-(--color-icon-secondary)"
+                className={
+                  monthlyGeneration === 'generating'
+                    ? 'rotate-180 text-(--color-icon-disabled)'
+                    : 'rotate-180 text-(--color-icon-secondary)'
+                }
               />
             </button>
           </div>

@@ -95,8 +95,9 @@ export const DiaryChecklistPanel = ({
                   {unconverted && entry.date && (
                     <button
                       type="button"
-                      onClick={() => navigate(`/today?date=${entry.date}`)}
-                      className="flex shrink-0 items-center gap-1 [font-size:var(--font-size-body-4)] leading-[1.6] font-medium text-(--color-button-default)"
+                      onClick={() => !disabled && navigate(`/today?date=${entry.date}`)}
+                      disabled={disabled}
+                      className={`flex shrink-0 items-center gap-1 [font-size:var(--font-size-body-4)] leading-[1.6] font-medium ${disabled ? 'text-(--color-text-disabled)' : 'text-(--color-button-default)'}`}
                     >
                       성과 생성하기
                       <ArrowLeftIcon

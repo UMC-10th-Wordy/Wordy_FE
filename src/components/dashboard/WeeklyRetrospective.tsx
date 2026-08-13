@@ -269,7 +269,7 @@ export const WeeklyRetrospective = ({
         <div key={q.key} className="flex flex-col gap-3">
           <p
             id={`retro-label-${period}-${q.key}`}
-            className="[font-size:var(--font-size-body-3)] font-bold text-(--color-text-default)"
+            className="[font-size:var(--font-size-body-2)] font-semibold text-(--color-text-default)"
           >
             <span className="mr-2 text-(--color-text-brand)">{String(i + 1).padStart(2, '0')}</span>
             {q.label}
@@ -286,12 +286,12 @@ export const WeeklyRetrospective = ({
       ))}
 
       <div className="flex flex-col gap-3">
-        <p className="[font-size:var(--font-size-body-3)] font-bold text-(--color-text-default)">
+        <p className="[font-size:var(--font-size-body-2)] font-semibold text-(--color-text-default)">
           <span className="mr-2 text-(--color-text-brand)">04</span>
           {texts.planLabel}
         </p>
 
-        <div className="grid grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 rounded-md bg-(--color-bg-brand-light) py-3 pl-5 [font-size:var(--font-size-body-4)] font-medium text-(--color-text-default)">
+        <div className="grid grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 rounded-md bg-(--color-bg-brand-light) py-3 pl-5 [font-size:var(--font-size-body-2)] font-medium text-(--color-text-default)">
           <span>업무 내용</span>
           <span>예상 시점</span>
           <span />

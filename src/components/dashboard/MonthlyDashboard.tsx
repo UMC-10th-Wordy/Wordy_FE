@@ -115,12 +115,14 @@ export const MonthlyDashboard = ({
       taskCount: `${t.taskCount ?? 0}건`,
       period: `${t.periodStart} - ${t.periodEnd}`,
       achievement: t.achievementStatus,
-      kpis: detail.kpis.map((k) => ({
-        title: k.kpiName,
-        description: k.progress,
-        highlights: [],
-        files: [],
-      })),
+      kpis: detail.kpis
+        .filter((k) => k.tagId === t.tagId)
+        .map((k) => ({
+          title: k.kpiName,
+          description: k.progress,
+          highlights: [],
+          files: [],
+        })),
     }))
     const highlights = detail.performances.map((p) => ({
       text: p.summary,
@@ -175,6 +177,7 @@ export const MonthlyDashboard = ({
         weeks={weeks}
         totalWeeks={weeks.length}
         onGoWeekly={onGoWeekly}
+        disabled={generation === 'generating'}
         periodLabel={eligibility ? `${Number(eligibility.monthStart.slice(5, 7))}월` : undefined}
       />
     </>

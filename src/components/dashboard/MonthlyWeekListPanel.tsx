@@ -13,6 +13,7 @@ interface MonthlyWeekListPanelProps {
   totalWeeks: number
   onGoWeekly: (weekId: string) => void
   periodLabel?: string
+  disabled?: boolean
 }
 
 export const MonthlyWeekListPanel = ({
@@ -20,6 +21,7 @@ export const MonthlyWeekListPanel = ({
   totalWeeks,
   onGoWeekly,
   periodLabel,
+  disabled,
 }: MonthlyWeekListPanelProps) => {
   const isEmpty = weeks.length === 0
 
@@ -69,7 +71,8 @@ export const MonthlyWeekListPanel = ({
                   <button
                     type="button"
                     onClick={() => onGoWeekly(week.id)}
-                    className="ml-auto shrink-0 [font-size:var(--font-size-body-4)] text-(--color-text-brand)"
+                    disabled={disabled}
+                    className={`ml-auto shrink-0 [font-size:var(--font-size-body-4)] ${disabled ? 'text-(--color-text-disabled)' : 'text-(--color-text-brand)'}`}
                   >
                     생성하기 &gt;
                   </button>
