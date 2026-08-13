@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import ArrowLeftIcon from '@/assets/icons/arrow-left.svg?react'
 import { useToast } from '@/hooks/useToast'
 import { ToastContainer } from '@/components/common/Toast/ToastContainer'
-import { LoadingState } from '@/components/common/AsyncState/AsyncState'
+import { ErrorState, LoadingState } from '@/components/common/AsyncState/AsyncState'
 import { WeeklyStatusCard } from '@/components/dashboard/WeeklyStatusCard'
 import { DiaryChecklistPanel } from '@/components/dashboard/DiaryChecklistPanel'
 import { WeeklySummaryInsight } from '@/components/dashboard/WeeklySummaryInsight'
@@ -118,14 +118,12 @@ export const DashboardPage = () => {
   useEffect(() => {
     if (!weeklyEligibilityQuery.isError) return
     console.error('생성 조건 조회 실패:', weeklyEligibilityQuery.error)
-    addToast('생성 조건을 불러오지 못했어요. 다시 시도해 주세요')
-  }, [weeklyEligibilityQuery.isError, weeklyEligibilityQuery.error, addToast])
+  }, [weeklyEligibilityQuery.isError, weeklyEligibilityQuery.error])
 
   useEffect(() => {
     if (!monthlyEligibilityQuery.isError) return
     console.error('월간 생성 조건 조회 실패:', monthlyEligibilityQuery.error)
-    addToast('생성 조건을 불러오지 못했어요. 다시 시도해 주세요')
-  }, [monthlyEligibilityQuery.isError, monthlyEligibilityQuery.error, addToast])
+  }, [monthlyEligibilityQuery.isError, monthlyEligibilityQuery.error])
 
   const entries = useMemo(
     () =>
@@ -379,6 +377,12 @@ export const DashboardPage = () => {
           <div className="flex gap-5">
             {isWeeklyLoading ? (
               <LoadingState message="주간 데이터를 불러오는 중이에요" className="flex-1 py-20" />
+            ) : status !== 'complete' && weeklyEligibilityQuery.isError ? (
+              <ErrorState
+                message="생성 조건을 불러오지 못했어요"
+                className="flex-1 py-20"
+                onRetry={() => void weeklyEligibilityQuery.refetch()}
+              />
             ) : status === 'complete' ? (
               <div className="flex flex-1 flex-col gap-7">
                 <WeeklySummaryInsight stats={stats} aiSummary={aiSummary} />
@@ -456,6 +460,12 @@ export const DashboardPage = () => {
           <div className="flex gap-5">
             {isMonthlyLoading ? (
               <LoadingState message="월간 데이터를 불러오는 중이에요" className="flex-1 py-20" />
+            ) : monthlyGeneration !== 'complete' && monthlyEligibilityQuery.isError ? (
+              <ErrorState
+                message="생성 조건을 불러오지 못했어요"
+                className="flex-1 py-20"
+                onRetry={() => void monthlyEligibilityQuery.refetch()}
+              />
             ) : (
               <MonthlyDashboard
                 generation={monthlyGeneration}
