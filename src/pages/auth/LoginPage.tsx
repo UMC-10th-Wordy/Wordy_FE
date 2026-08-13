@@ -149,7 +149,7 @@ export const LoginPage = () => {
             variant="fill"
             size="large"
             fullWidth
-            disabled={isPending}
+            disabled={(submitted && !isValid) || isPending}
             className="mt-3"
           >
             로그인 하기
