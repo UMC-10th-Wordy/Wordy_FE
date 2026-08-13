@@ -124,14 +124,15 @@ export const WeeklyRetrospective = ({
   })
 
   const [plans, setPlans] = useState<PlanRow[]>([])
+  const { toasts, addToast } = useToast()
 
   useEffect(() => {
     if (!workspaceId) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlans([])
     let cancelled = false
-    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId).then(
-      (draft) => {
+    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId)
+      .then((draft) => {
         if (cancelled || !draft) return
         if (!initialReflection) {
           setAnswers({
@@ -147,12 +148,14 @@ export const WeeklyRetrospective = ({
             schedule: tp.expectedTime,
           })),
         )
-      },
-    )
+      })
+      .catch(() => {
+        if (!cancelled) addToast('임시 저장된 내용을 불러오지 못했어요')
+      })
     return () => {
       cancelled = true
     }
-  }, [workspaceId, period, dashboardId])
+  }, [workspaceId, period, dashboardId, addToast])
 
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
@@ -171,7 +174,6 @@ export const WeeklyRetrospective = ({
   // 백엔드가 회고 조회/생성 응답에 id를 내려주지 않아 재저장 시 수정 대신 중복 생성되는 것을 막기 위해,
   // 이미 저장된 회고(initialReflection)이거나 이번 세션에서 저장에 성공하면 폼을 잠금
   const [locked, setLocked] = useState(Boolean(initialReflection))
-  const { toasts, addToast } = useToast()
 
   const handleAnswerChange = (key: QuestionKey, value: string) => {
     if (value.length > 800) return
