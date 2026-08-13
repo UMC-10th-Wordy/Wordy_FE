@@ -92,6 +92,7 @@ export interface DashboardDetailDto {
     tagCount: number
     completionRate: number
   }[]
+  completionRate?: number
   kpis: DashboardKpiDto[]
   tagAnalyses: TagAnalysisDto[]
   weeklyReflections: WeeklyReflectionDto[]

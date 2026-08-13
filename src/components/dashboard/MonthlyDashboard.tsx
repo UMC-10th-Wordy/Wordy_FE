@@ -92,7 +92,9 @@ export const MonthlyDashboard = ({
       { label: '일지 기록', value: String(detail.journalDays), unit: '일' },
       {
         label: '업무 완료율',
-        value: String(Math.round(detail.insights?.[0]?.completionRate ?? 0)),
+        value: String(
+          Math.round(detail.completionRate ?? detail.insights?.[0]?.completionRate ?? 0),
+        ),
         unit: '%',
       },
       { label: '사용된 프로젝트 태그', value: String(detail.tagCount), unit: '개' },
