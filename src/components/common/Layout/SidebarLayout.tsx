@@ -310,6 +310,9 @@ export function SidebarLayout() {
               onSelectWorkspace={(id) => {
                 setSelectedWorkspaceId(id)
                 setModal(null)
+                if (location.pathname.startsWith('/records/')) {
+                  navigate('/records')
+                }
               }}
               onClose={() => setModal(null)}
             />
