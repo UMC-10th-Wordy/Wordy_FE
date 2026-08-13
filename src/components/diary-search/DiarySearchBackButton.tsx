@@ -3,22 +3,16 @@ import { IconButton } from '@/components/common/Button/IconButton'
 
 interface DiarySearchBackButtonProps {
   onClick: () => void
-  iconSize?: string
-  iconColor?: string
 }
 
-export const DiarySearchBackButton = ({
-  onClick,
-  iconSize = 'size-(--scale-40)',
-  iconColor = 'text-(--color-icon-secondary)',
-}: DiarySearchBackButtonProps) => {
+export const DiarySearchBackButton = ({ onClick }: DiarySearchBackButtonProps) => {
   return (
     <div className="flex items-center gap-(--scale-8)">
       <IconButton
         variant="text_neutral"
         size="large"
-        iconClassName={iconSize}
-        icon={<DirectionLeftIcon aria-hidden className={iconColor} />}
+        iconClassName="size-(--scale-40)"
+        icon={<DirectionLeftIcon aria-hidden className="text-(--color-icon-secondary)" />}
         onClick={onClick}
         aria-label="뒤로 가기"
       />

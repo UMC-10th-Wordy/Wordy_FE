@@ -5,7 +5,7 @@ import { TextButton } from '@/components/common/Button/TextButton'
 import { SearchInput } from '@/components/common/SearchInput/SearchInput'
 import { useRecentSearchKeywords } from '@/hooks/useRecentSearchKeywords'
 
-import directionRightIcon from '@/assets/icons/Direction=right.svg'
+import DirectionRightIcon from '@/assets/icons/Direction=right.svg?react'
 
 export const DiaryListHeader = () => {
   const navigate = useNavigate()
@@ -45,7 +45,7 @@ export const DiaryListHeader = () => {
         <TextButton
           variant="text_neutral"
           size="medium"
-          iconRight={<img src={directionRightIcon} alt="" aria-hidden="true" />}
+          iconRight={<DirectionRightIcon aria-hidden />}
           onClick={() => navigate('/trash')}
         >
           휴지통
