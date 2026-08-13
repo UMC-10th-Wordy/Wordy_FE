@@ -123,30 +123,6 @@ export interface MonthlyReflectionResultDto {
   learning: string
   createdAt: string
 }
-export interface MonthlyWeeklyDashboardDto {
-  dashboardId: string
-  startDate: string
-  endDate: string
-  summary: string
-}
-
-export interface MonthlyEligibilityDto {
-  eligible: boolean
-  weeklyDashboardCount: number
-  requiredCount: number
-  monthStart: string
-  monthEnd: string
-  weeklyDashboards: MonthlyWeeklyDashboardDto[]
-}
-
-export interface MonthlyReflectionResultDto {
-  weeklyReflectionId: string
-  workSummary: string
-  resourcesUsed: string
-  learning: string
-  createdAt: string
-}
-
 export interface AiTagAnalysisDto {
   tagName: string
   objective: string
