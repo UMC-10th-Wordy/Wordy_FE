@@ -139,6 +139,7 @@ export const DashboardPage = () => {
       (weeklyEligibilityQuery.data?.entries ?? []).map((e) => ({
         id: e.dailyEntryId,
         label: formatEntryLabel(e.entryDate),
+        converted: e.converted,
         date: e.entryDate,
       })),
     [weeklyEligibilityQuery.data],
@@ -402,7 +403,7 @@ export const DashboardPage = () => {
                 <TagWorkflowSection tags={tags} />
                 <WeeklyHighlights items={highlights} />
                 <WeeklyRetrospective
-                  key={detail?.dashboardId}
+                  key={detail?.dashboardId ?? weekStartDate.getTime()}
                   dashboardId={detail?.dashboardId}
                   workspaceId={workspaceId}
                   initialReflection={(() => {
