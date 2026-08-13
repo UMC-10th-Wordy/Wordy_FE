@@ -101,6 +101,7 @@ interface WeeklyRetrospectiveProps {
   period?: RetrospectivePeriod
   dashboardId?: string
   workspaceId: string
+  baseDate: string
   initialReflection?: {
     reflectionId: string
     workSummary: string
@@ -114,6 +115,7 @@ export const WeeklyRetrospective = ({
   period = 'weekly',
   dashboardId,
   workspaceId,
+  baseDate,
   initialReflection,
   onSaved,
 }: WeeklyRetrospectiveProps) => {
@@ -127,38 +129,6 @@ export const WeeklyRetrospective = ({
 
   const [plans, setPlans] = useState<PlanRow[]>([])
   const { toasts, addToast } = useToast()
-
-  useEffect(() => {
-    if (!workspaceId) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPlans([])
-    let cancelled = false
-    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId)
-      .then((draft) => {
-        if (cancelled || !draft) return
-        if (!initialReflection) {
-          setAnswers({
-            work: draft.workSummary,
-            resource: draft.resourcesUsed,
-            learning: draft.learning,
-          })
-        }
-        setPlans(
-          draft.taskPlans.map((tp, i) => ({
-            id: `draft-${i}`,
-            content: tp.content,
-            schedule: tp.expectedTime,
-          })),
-        )
-      })
-      .catch(() => {
-        if (!cancelled) addToast('임시 저장된 내용을 불러오지 못했어요')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [workspaceId, period, dashboardId, addToast])
-
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
   )
@@ -181,7 +151,7 @@ export const WeeklyRetrospective = ({
     if (!workspaceId || !dashboardId) return
 
     let cancelled = false
-    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId)
+    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', baseDate, dashboardId)
       .then((draft) => {
         if (cancelled || !draft) return
 
@@ -211,6 +181,7 @@ export const WeeklyRetrospective = ({
   }, [
     workspaceId,
     period,
+    baseDate,
     dashboardId,
     initialReflection?.reflectionId,
     initialReflection?.workSummary,
@@ -254,7 +225,7 @@ export const WeeklyRetrospective = ({
   const handleDeleteRow = (id: string) => setPlans((prev) => prev.filter((p) => p.id !== id))
 
   const handleTempSave = () => {
-    saveDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId, {
+    saveDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', baseDate, dashboardId, {
       workSummary: answers.work,
       resourcesUsed: answers.resource,
       learning: answers.learning,
@@ -335,7 +306,7 @@ export const WeeklyRetrospective = ({
         <div key={q.key} className="flex flex-col gap-3">
           <p
             id={`retro-label-${period}-${q.key}`}
-            className="[font-size:var(--font-size-body-3)] font-bold text-(--color-text-default)"
+            className="[font-size:var(--font-size-body-2)] font-semibold text-(--color-text-default)"
           >
             <span className="mr-2 text-(--color-text-brand)">{String(i + 1).padStart(2, '0')}</span>
             {q.label}
@@ -353,12 +324,12 @@ export const WeeklyRetrospective = ({
       ))}
 
       <div className="flex flex-col gap-3">
-        <p className="[font-size:var(--font-size-body-3)] font-bold text-(--color-text-default)">
+        <p className="[font-size:var(--font-size-body-2)] font-semibold text-(--color-text-default)">
           <span className="mr-2 text-(--color-text-brand)">04</span>
           {texts.planLabel}
         </p>
 
-        <div className="grid grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 rounded-md bg-(--color-bg-brand-light) py-3 pl-5 [font-size:var(--font-size-body-4)] font-medium text-(--color-text-default)">
+        <div className="grid grid-cols-[1.4fr_1fr_92px] items-center gap-x-4 rounded-md bg-(--color-bg-brand-light) py-3 pl-5 [font-size:var(--font-size-body-2)] font-medium text-(--color-text-default)">
           <span>업무 내용</span>
           <span>예상 시점</span>
           <span />

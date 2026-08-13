@@ -3,6 +3,7 @@ export type WeeklyDashboardStatus = 'insufficient' | 'ready' | 'generating' | 'c
 export interface DiaryEntry {
   id: string
   label: string
+  converted?: boolean
   date?: string
 }
 export interface EligibilityEntryDto {
@@ -30,6 +31,8 @@ export interface DashboardListItemDto {
 export interface DashboardKpiDto {
   kpiName: string
   progress: string
+  tagId?: string
+  relatedAchievement?: string
 }
 
 export interface TagAnalysisDto {
