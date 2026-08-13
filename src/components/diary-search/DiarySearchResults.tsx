@@ -34,7 +34,7 @@ export const DiarySearchResults = ({ keyword, onDetailClick }: DiarySearchResult
 
   return (
     <>
-      <div className="mt-(--scale-48)">
+      <div className="mt-(--scale-48) w-full max-w-200">
         <DiarySearchHeader
           activeTab={activeTab}
           diaryCount={searchResult.diaryCount}
