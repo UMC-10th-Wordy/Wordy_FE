@@ -132,7 +132,6 @@ export const DashboardPage = () => {
       (weeklyEligibilityQuery.data?.entries ?? []).map((e) => ({
         id: e.dailyEntryId,
         label: formatEntryLabel(e.entryDate),
-        converted: undefined, // TODO: 서버 변환 여부 필드 확정 시 e.필드명 연결
         date: e.entryDate,
       })),
     [weeklyEligibilityQuery.data],
@@ -318,7 +317,7 @@ export const DashboardPage = () => {
         : 'insufficient'
 
   return (
-    <div className="flex flex-1 flex-col gap-7 bg-[#FAFAFC] px-(--scale-40) pt-(--scale-40) pb-[60px]">
+    <div className="flex flex-1 flex-col gap-7 bg-(--color-bg-brand-subtle) px-(--scale-40) pt-(--scale-40) pb-[60px]">
       <header className="flex flex-col gap-1">
         <h1 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
           성과 리포트
@@ -355,7 +354,7 @@ export const DashboardPage = () => {
 
       {activeTab === 'weekly' ? (
         <>
-          <div className="flex h-[52px] w-[250px] items-center justify-between gap-1 self-start rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
+          <div className="flex h-[52px] w-[250px] items-center justify-between gap-1 self-start rounded-xl border border-(--color-border-brand-subtle) bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
             <button type="button" aria-label="이전 주차" onClick={() => handleWeekMove(-1)}>
               <ArrowLeftIcon width={24} height={24} className="text-(--color-icon-secondary)" />
             </button>
@@ -428,7 +427,7 @@ export const DashboardPage = () => {
         </>
       ) : (
         <>
-          <div className="flex h-[52px] w-[203px] items-center justify-between gap-1 self-start rounded-xl border border-[#DDDDFF] bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
+          <div className="flex h-[52px] w-[203px] items-center justify-between gap-1 self-start rounded-xl border border-(--color-border-brand-subtle) bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">
             <button
               type="button"
               aria-label="이전 달"

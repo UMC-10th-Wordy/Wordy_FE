@@ -266,7 +266,7 @@ export const WeeklyRetrospective = ({
     : 0
 
   return (
-    <section className="flex flex-col gap-6 rounded-2xl border bg-(--color-bg-default) p-7 border-[#DDDDFF] shadow-[0px_1px_5px_0px_#0000001A]">
+    <section className="flex flex-col gap-6 rounded-2xl border bg-(--color-bg-default) p-7 border-(--color-border-brand-subtle) shadow-[0px_1px_5px_0px_#0000001A]">
       <div className="flex flex-col gap-1">
         <h2 className="[font-size:var(--font-size-body-1)] leading-[1.6] font-semibold text-(--color-text-default)">
           {texts.title}
