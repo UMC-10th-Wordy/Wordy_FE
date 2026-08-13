@@ -59,13 +59,13 @@ export const DiaryChecklistPanel = ({
                     type="button"
                     onClick={() => onToggle(entry.id)}
                     aria-pressed={checked}
-                    disabled={disabled}
+                    disabled={disabled || unconverted}
                     className="flex min-w-0 flex-1 items-center gap-2.5 disabled:cursor-not-allowed"
                   >
                     <span
                       className={[
                         'flex size-6 shrink-0 items-center justify-center rounded-md border transition-colors',
-                        disabled
+                        disabled || unconverted
                           ? checked
                             ? 'border-transparent bg-(--color-icon-tertiary)'
                             : 'border-(--color-border-disabled) bg-(--color-bg-secondary)'
@@ -74,14 +74,16 @@ export const DiaryChecklistPanel = ({
                             : 'border-(--color-border-subtle) bg-(--color-bg-default)',
                       ].join(' ')}
                     >
-                      {checked && (
+                      {checked && !unconverted && (
                         <CheckIcon width={16} height={16} className="text-(--color-text-inverse)" />
                       )}
                     </span>
                     <span
                       className={[
                         '[font-size:var(--font-size-body-2)] leading-[1.6] font-medium',
-                        disabled ? 'text-(--color-text-disabled)' : 'text-(--color-text-secondary)',
+                        disabled || unconverted
+                          ? 'text-(--color-text-disabled)'
+                          : 'text-(--color-text-secondary)',
                       ].join(' ')}
                     >
                       {entry.label}

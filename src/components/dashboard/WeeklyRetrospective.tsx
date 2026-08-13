@@ -101,6 +101,7 @@ interface WeeklyRetrospectiveProps {
   period?: RetrospectivePeriod
   dashboardId?: string
   workspaceId: string
+  periodStart: string
   initialReflection?: {
     reflectionId: string
     workSummary: string
@@ -114,6 +115,7 @@ export const WeeklyRetrospective = ({
   period = 'weekly',
   dashboardId,
   workspaceId,
+  periodStart,
   initialReflection,
   onSaved,
 }: WeeklyRetrospectiveProps) => {
@@ -127,38 +129,6 @@ export const WeeklyRetrospective = ({
 
   const [plans, setPlans] = useState<PlanRow[]>([])
   const { toasts, addToast } = useToast()
-
-  useEffect(() => {
-    if (!workspaceId) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPlans([])
-    let cancelled = false
-    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId)
-      .then((draft) => {
-        if (cancelled || !draft) return
-        if (!initialReflection) {
-          setAnswers({
-            work: draft.workSummary,
-            resource: draft.resourcesUsed,
-            learning: draft.learning,
-          })
-        }
-        setPlans(
-          draft.taskPlans.map((tp, i) => ({
-            id: `draft-${i}`,
-            content: tp.content,
-            schedule: tp.expectedTime,
-          })),
-        )
-      })
-      .catch(() => {
-        if (!cancelled) addToast('임시 저장된 내용을 불러오지 못했어요')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [workspaceId, period, dashboardId, addToast])
-
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
   )
@@ -181,7 +151,7 @@ export const WeeklyRetrospective = ({
     if (!workspaceId || !dashboardId) return
 
     let cancelled = false
-    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId)
+    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', periodStart, dashboardId)
       .then((draft) => {
         if (cancelled || !draft) return
 
@@ -211,6 +181,7 @@ export const WeeklyRetrospective = ({
   }, [
     workspaceId,
     period,
+    periodStart,
     dashboardId,
     initialReflection?.reflectionId,
     initialReflection?.workSummary,
@@ -254,7 +225,7 @@ export const WeeklyRetrospective = ({
   const handleDeleteRow = (id: string) => setPlans((prev) => prev.filter((p) => p.id !== id))
 
   const handleTempSave = () => {
-    saveDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId, {
+    saveDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', periodStart, dashboardId, {
       workSummary: answers.work,
       resourcesUsed: answers.resource,
       learning: answers.learning,

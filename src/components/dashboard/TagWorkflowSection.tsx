@@ -73,7 +73,7 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
                   : 'border-(--color-border-subtle) bg-(--color-chip-default) text-(--color-text-secondary)',
               ].join(' ')}
             >
-              {tag.name}
+              {tag.name} ({tag.count})
             </button>
           )
         })}

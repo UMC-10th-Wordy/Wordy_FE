@@ -121,6 +121,7 @@ export async function updateMonthlyReflection(
 export async function saveDraft(
   workspaceId: string,
   type: 'WEEKLY' | 'MONTHLY',
+  periodStart: string,
   dashboardId: string | undefined,
   payload: {
     workSummary: string
@@ -129,7 +130,9 @@ export async function saveDraft(
     taskPlans: { content: string; expectedTime: string }[]
   },
 ): Promise<DraftDto> {
-  const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
+  const query = dashboardId
+    ? `?type=${type}&periodStart=${periodStart}&dashboardId=${dashboardId}`
+    : `?type=${type}&periodStart=${periodStart}`
   return request<DraftDto>(`/workspaces/${workspaceId}/dashboards/drafts${query}`, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -140,10 +143,13 @@ export async function saveDraft(
 export async function getDraft(
   workspaceId: string,
   type: 'WEEKLY' | 'MONTHLY',
+  periodStart: string,
   dashboardId: string | undefined,
 ): Promise<DraftDto | null> {
   try {
-    const query = dashboardId ? `?type=${type}&dashboardId=${dashboardId}` : `?type=${type}`
+    const query = dashboardId
+      ? `?type=${type}&periodStart=${periodStart}&dashboardId=${dashboardId}`
+      : `?type=${type}&periodStart=${periodStart}`
     return await request<DraftDto>(`/workspaces/${workspaceId}/dashboards/drafts${query}`)
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) return null

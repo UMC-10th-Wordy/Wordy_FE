@@ -155,6 +155,7 @@ export const MonthlyDashboard = ({
           period="monthly"
           workspaceId={workspaceId}
           dashboardId={detail.dashboardId}
+          periodStart={eligibility?.monthStart ?? ''}
           initialReflection={(() => {
             const list = detail.weeklyReflections
             if (!list?.length) return undefined
