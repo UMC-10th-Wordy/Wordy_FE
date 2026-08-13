@@ -71,10 +71,5 @@
     "*.{js,json,css,md}": [
       "prettier --write"
     ]
-  },
-  "pnpm": {
-    "overrides": {
-      "brace-expansion": ">=5.0.9"
-    }
   }
 }
