@@ -4,7 +4,7 @@ export const DiarySearchSkeleton = () => {
   return (
     <section
       aria-label="검색 결과 불러오는 중"
-      className="mt-(--scale-48) flex w-[800px] flex-col gap-(--scale-32) pb-(--scale-48)"
+      className="mt-(--scale-48) flex w-full max-w-200 flex-col gap-(--scale-32) pb-(--scale-48)"
     >
       {Array.from({ length: SKELETON_ITEM_COUNT }, (_, index) => (
         <div key={index} className="py-(--scale-8)">

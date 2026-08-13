@@ -45,7 +45,7 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
   if (!selected) return null
 
   return (
-    <section className="flex flex-col gap-6 rounded-2xl border border-[#DDDDFF] bg-(--color-bg-default) p-7 shadow-[0px_1px_5px_0px_#0000001A]">
+    <section className="flex flex-col gap-6 rounded-2xl border border-(--color-border-brand-subtle) bg-(--color-bg-default) p-7 shadow-[0px_1px_5px_0px_#0000001A]">
       <div className="flex flex-col gap-1">
         <h2 className="[font-size:var(--font-size-body-1)] leading-[1.6] font-semibold text-(--color-text-default)">
           태그별 업무 흐름 추적
@@ -69,8 +69,8 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
               className={[
                 'flex h-[45px] items-center gap-1 rounded-full whitespace-nowrap border px-4 py-2 [font-size:var(--font-size-body-4)] transition-colors duration-100 ease-out',
                 active
-                  ? 'border-[#5D5DF1] bg-[#DDDDFF] font-semibold text-(--color-text-brand)'
-                  : 'border-(--color-border-subtle) bg-[#FAFAFA] text-(--color-text-secondary)',
+                  ? 'border-(--color-border-brand) bg-(--color-chip-focused) font-semibold text-(--color-text-brand)'
+                  : 'border-(--color-border-subtle) bg-(--color-chip-default) text-(--color-text-secondary)',
               ].join(' ')}
             >
               {tag.name} ({tag.count})

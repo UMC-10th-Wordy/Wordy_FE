@@ -126,7 +126,7 @@ export const PerformanceChatInput = ({
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             lineHeight: '21px',
-            caretColor: '#5D5DF1',
+            caretColor: 'var(--color-text-brand)',
             paddingTop:
               inputHeight === CHAT_INPUT_LAYER_MIN_HEIGHT
                 ? CHAT_INPUT_TEXTAREA_DEFAULT_PADDING

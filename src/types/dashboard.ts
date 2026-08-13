@@ -3,7 +3,6 @@ export type WeeklyDashboardStatus = 'insufficient' | 'ready' | 'generating' | 'c
 export interface DiaryEntry {
   id: string
   label: string
-  converted?: boolean
   date?: string
 }
 export interface EligibilityEntryDto {

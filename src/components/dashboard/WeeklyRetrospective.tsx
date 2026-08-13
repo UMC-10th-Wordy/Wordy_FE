@@ -10,6 +10,7 @@ import PlusIcon from '@/assets/icons/plus.svg?react'
 import {
   createMonthlyReflection,
   createReflection,
+  updateMonthlyReflection,
   updateReflection,
 } from '@/api/dashboard/dashboard'
 import { saveDraft, getDraft } from '@/api/dashboard/dashboard'
@@ -125,6 +126,39 @@ export const WeeklyRetrospective = ({
   })
 
   const [plans, setPlans] = useState<PlanRow[]>([])
+  const { toasts, addToast } = useToast()
+
+  useEffect(() => {
+    if (!workspaceId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPlans([])
+    let cancelled = false
+    getDraft(workspaceId, period === 'monthly' ? 'MONTHLY' : 'WEEKLY', dashboardId)
+      .then((draft) => {
+        if (cancelled || !draft) return
+        if (!initialReflection) {
+          setAnswers({
+            work: draft.workSummary,
+            resource: draft.resourcesUsed,
+            learning: draft.learning,
+          })
+        }
+        setPlans(
+          draft.taskPlans.map((tp, i) => ({
+            id: `draft-${i}`,
+            content: tp.content,
+            schedule: tp.expectedTime,
+          })),
+        )
+      })
+      .catch(() => {
+        if (!cancelled) addToast('임시 저장된 내용을 불러오지 못했어요')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [workspaceId, period, dashboardId, addToast])
+
   const [editing, setEditing] = useState<{ id: string; content: string; schedule: string } | null>(
     null,
   )
@@ -188,7 +222,9 @@ export const WeeklyRetrospective = ({
   }, [dashboardId, initialReflection?.reflectionId, reflectionId])
 
   const [isSaving, setIsSaving] = useState(false)
-  const { toasts, addToast } = useToast()
+  // 백엔드가 회고 조회/생성 응답에 id를 내려주지 않아 재저장 시 수정 대신 중복 생성되는 것을 막기 위해,
+  // 이미 저장된 회고(initialReflection)이거나 이번 세션에서 저장에 성공하면 폼을 잠금
+  const [locked, setLocked] = useState(Boolean(initialReflection))
 
   const handleAnswerChange = (key: QuestionKey, value: string) => {
     if (value.length > 800) return
@@ -238,11 +274,17 @@ export const WeeklyRetrospective = ({
     setIsSaving(true)
     const request =
       period === 'monthly'
-        ? createMonthlyReflection(workspaceId, dashboardId, {
-            workSummary: answers.work,
-            resourcesUsed: answers.resource,
-            learning: answers.learning,
-          }).then((res) => res.weeklyReflectionId)
+        ? resolvedReflectionId
+          ? updateMonthlyReflection(workspaceId, dashboardId, resolvedReflectionId, {
+              workSummary: answers.work,
+              resourcesUsed: answers.resource,
+              learning: answers.learning,
+            }).then(() => resolvedReflectionId)
+          : createMonthlyReflection(workspaceId, dashboardId, {
+              workSummary: answers.work,
+              resourcesUsed: answers.resource,
+              learning: answers.learning,
+            }).then((res) => res.weeklyReflectionId)
         : resolvedReflectionId
           ? updateReflection(workspaceId, dashboardId, resolvedReflectionId, {
               workSummary: answers.work,
@@ -257,6 +299,7 @@ export const WeeklyRetrospective = ({
     request
       .then((id) => {
         setReflectionId((prev) => prev ?? id)
+        setLocked(true)
         addToast(texts.toastSaved)
         onSaved?.()
       })
@@ -267,7 +310,7 @@ export const WeeklyRetrospective = ({
       .finally(() => setIsSaving(false))
   }
   const hasContent = Object.values(answers).some((v) => v.trim()) || plans.length > 0
-  const canSave = hasContent && !editing
+  const canSave = hasContent && !editing && !locked
 
   const editingIndex = editing
     ? plans.findIndex((p) => p.id === editing.id) === -1
@@ -276,7 +319,7 @@ export const WeeklyRetrospective = ({
     : 0
 
   return (
-    <section className="flex flex-col gap-6 rounded-2xl border bg-(--color-bg-default) p-7 border-[#DDDDFF] shadow-[0px_1px_5px_0px_#0000001A]">
+    <section className="flex flex-col gap-6 rounded-2xl border bg-(--color-bg-default) p-7 border-(--color-border-brand-subtle) shadow-[0px_1px_5px_0px_#0000001A]">
       <div className="flex flex-col gap-1">
         <h2 className="[font-size:var(--font-size-body-1)] leading-[1.6] font-semibold text-(--color-text-default)">
           {texts.title}
@@ -302,6 +345,7 @@ export const WeeklyRetrospective = ({
             placeholder={q.placeholder}
             value={answers[q.key]}
             onChange={(e) => handleAnswerChange(q.key, e.target.value)}
+            disabled={locked}
           />
         </div>
       ))}
@@ -422,10 +466,16 @@ export const WeeklyRetrospective = ({
           <ToastContainer toasts={toasts} align="left" />
         </div>
         <div className="flex items-end gap-4">
-          {savedAt && (
+          {locked ? (
             <span className="[font-size:var(--font-size-body-2)] leading-[1.6] text-(--color-text-tertiary)">
-              임시 저장됨: {savedAt}
+              이미 저장한 회고예요. 수정 기능은 아직 지원하지 않아요
             </span>
+          ) : (
+            savedAt && (
+              <span className="[font-size:var(--font-size-body-2)] leading-[1.6] text-(--color-text-tertiary)">
+                임시 저장됨: {savedAt}
+              </span>
+            )
           )}
           <TextButton
             variant="stroke"
