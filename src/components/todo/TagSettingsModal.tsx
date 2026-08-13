@@ -96,7 +96,18 @@ export default function TagSettingsModal({
 }: TagSettingsModalProps) {
   const [tab, setTab] = useState<Tab>(initialTab)
   const containerRef = useModalFocus<HTMLDivElement>()
-  const { data: profile, isLoading: isProfileLoading } = useGetProfile()
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    isError: isProfileError,
+    error: profileError,
+  } = useGetProfile()
+
+  useEffect(() => {
+    if (!isProfileError) return
+    console.error('프로필 조회 실패:', profileError)
+  }, [isProfileError, profileError])
+
   const workspaceId = useActiveWorkspaceId()
   const queryClient = useQueryClient()
   const { toasts, addToast } = useToast()
