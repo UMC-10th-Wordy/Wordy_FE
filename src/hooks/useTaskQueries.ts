@@ -22,6 +22,7 @@ export const useMoveTaskToTomorrow = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
       void queryClient.invalidateQueries({ queryKey: taskQueryKeys.calendars(workspaceId) })
+      void queryClient.invalidateQueries({ queryKey: taskQueryKeys.lists(workspaceId) })
     },
   })
 }

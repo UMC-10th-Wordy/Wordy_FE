@@ -429,6 +429,11 @@ function TodoListPageContent({ workspaceId }: { workspaceId: string }) {
             : task,
         ),
       )
+      queryClient.setQueryData<TaskDto[]>(taskQueryKeys.list(workspaceId, target.date), (prev) =>
+        prev
+          ? prev.map((task) => (task.taskId === id ? { ...task, taskResult: saved } : task))
+          : prev,
+      )
       queryClient.invalidateQueries({ queryKey: homeQueryKeys.all(workspaceId) })
     } catch {
       addToast('업무 결과 저장에 실패했어요. 다시 시도해 주세요')
