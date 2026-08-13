@@ -68,6 +68,11 @@ export interface PerformanceDto {
   dailyEntryId?: string
 }
 
+export interface FocusedTagDto {
+  tagId: string
+  tagName: string
+}
+
 export interface DashboardDetailDto {
   dashboardId: string
   startDate: string
@@ -81,6 +86,8 @@ export interface DashboardDetailDto {
   tagAnalyses: TagAnalysisDto[]
   weeklyReflections: WeeklyReflectionDto[]
   performances: PerformanceDto[]
+  keyAchievement?: string
+  focusedTags?: FocusedTagDto[]
 }
 
 export interface CreateDashboardPayload {
