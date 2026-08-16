@@ -96,47 +96,51 @@ export const TagWorkflowSection = ({ tags, period = 'weekly' }: TagWorkflowSecti
           </div>
 
           <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2">
-            <div>
-              <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
-                목적
-              </p>
-              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
-                {selected.purpose}
-              </p>
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
+                  목적
+                </p>
+                <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
+                  {selected.purpose}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-x-5">
+                <div>
+                  <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
+                    관련 업무 수
+                  </p>
+                  <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
+                    {selected.taskCount}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
+                    기록 기간
+                  </p>
+                  <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
+                    {selected.period}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
-                기대 성과
-              </p>
-              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
-                {selected.expectedResult}
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-3">
-            <div>
-              <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
-                관련 업무 수
-              </p>
-              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
-                {selected.taskCount}
-              </p>
-            </div>
-            <div>
-              <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
-                기록 기간
-              </p>
-              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
-                {selected.period}
-              </p>
-            </div>
-            <div>
-              <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
-                달성 현황
-              </p>
-              <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
-                {selected.achievement}
-              </p>
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
+                  기대 성과
+                </p>
+                <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
+                  {selected.expectedResult}
+                </p>
+              </div>
+              <div>
+                <p className="mb-1 [font-size:var(--font-size-body-2)] leading-[1.6] font-semibold text-(--color-text-tertiary)">
+                  달성 현황
+                </p>
+                <p className="min-w-0 [overflow-wrap:anywhere] [font-size:var(--font-size-body-1)] text-(--color-text-default)">
+                  {selected.achievement}
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -242,8 +242,8 @@ export const DashboardPage = () => {
       {
         onSuccess: (created) => setCreatedWeeklyDashboardId(created.dashboardId),
         onError: (error) => {
-          console.error('대시보드 생성 실패:', error)
-          addToast('대시보드 생성에 실패했어요. 다시 시도해 주세요')
+          console.error('리포트 생성 실패:', error)
+          addToast('리포트 생성에 실패했어요. 다시 시도해 주세요')
         },
       },
     )
@@ -260,8 +260,8 @@ export const DashboardPage = () => {
       {
         onSuccess: (created) => setCreatedMonthlyDashboardId(created.dashboardId),
         onError: (error) => {
-          console.error('월간 대시보드 생성 실패:', error)
-          addToast('대시보드 생성에 실패했어요. 다시 시도해 주세요')
+          console.error('월간 리포트 생성 실패:', error)
+          addToast('리포트 생성에 실패했어요. 다시 시도해 주세요')
         },
       },
     )
@@ -328,7 +328,7 @@ export const DashboardPage = () => {
 
   return (
     <div className="flex min-h-full flex-col gap-7 bg-(--color-bg-brand-subtle) px-(--scale-40) pt-(--scale-40) pb-15">
-      <header className="flex flex-col gap-1">
+      <header className="flex flex-col gap-1 rounded-t-xl bg-(--color-bg-default) -mx-(--scale-40) -mt-(--scale-40) px-(--scale-40) pt-(--scale-40) pb-4">
         <h1 className="[font-size:var(--font-size-heading-4)] leading-(--line-height-body) font-[var(--font-weight-bold)] text-(--color-text-default)">
           성과 리포트
         </h1>
@@ -336,8 +336,8 @@ export const DashboardPage = () => {
           나의 업무 성과를 분석해 볼까요?
         </p>
       </header>
-
-      <nav className="flex w-full gap-3 border-b border-(--color-border-subtle)">
+      <nav className="-mx-(--scale-40) flex gap-3 border-b border-(--color-border-subtle) px-(--scale-40)">
+        {' '}
         <button
           type="button"
           disabled={generation === 'generating' || monthlyGeneration === 'generating'}
@@ -363,7 +363,6 @@ export const DashboardPage = () => {
           월간
         </button>
       </nav>
-
       {activeTab === 'weekly' ? (
         <>
           <div className="flex h-[52px] w-[250px] items-center justify-between gap-1 self-start rounded-xl border border-(--color-border-brand-subtle) bg-(--color-bg-default) px-2 py-1 shadow-[0px_1px_5px_0px_#0000001A]">

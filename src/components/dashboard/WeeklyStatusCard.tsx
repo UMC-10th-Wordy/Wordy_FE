@@ -27,12 +27,12 @@ export const WeeklyStatusCard = ({
           <WordySleepingIcon width={220} height={220} className="shrink-0" />
           <div className="flex flex-col items-center gap-2 text-center">
             <h2 className="[font-size:var(--font-size-heading-4)] font-bold text-(--color-text-default)">
-              {`${periodLabel ?? '이번 주'}의 대시보드를 아직 생성할 수 없어요`}
+              {`${periodLabel ?? '이번 주'}의 리포트를 아직 생성할 수 없어요`}
             </h2>
             <p className="[font-size:var(--font-size-body-3)] text-(--color-text-secondary)">
               조금만 더 기록해 볼까요?
               <br />
-              주간 대시보드는 변환된 업무 일지가{' '}
+              주간 리포트는 변환된 업무 일지가{' '}
               <span className="font-semibold text-(--color-text-brand)">
                 {requiredCount}개 이상 모이면
               </span>{' '}
@@ -49,7 +49,7 @@ export const WeeklyStatusCard = ({
             iconLeft={<GenerateIcon width={20} height={20} />}
             className="w-full max-w-100"
           >
-            주간 대시보드 생성하기
+            주간 리포트 생성하기
           </TextButton>
         </div>
       )}
@@ -59,7 +59,7 @@ export const WeeklyStatusCard = ({
           <WordyReadyIcon width={220} height={220} className="shrink-0" />
           <div className="flex flex-col items-center gap-2 text-center">
             <h2 className="[font-size:var(--font-size-heading-4)] font-bold text-(--color-text-default)">
-              이번 주의 대시보드를 생성할 준비가 되었어요
+              이번 주의 리포트를 생성할 준비가 되었어요
             </h2>
             <p className="[font-size:var(--font-size-body-3)] text-(--color-text-secondary)">
               저장된{' '}
@@ -76,7 +76,7 @@ export const WeeklyStatusCard = ({
             onClick={onGenerate}
             className="w-full max-w-100"
           >
-            주간 대시보드 생성하기
+            주간 리포트 생성하기
           </TextButton>
         </div>
       )}
