@@ -336,8 +336,7 @@ export const DashboardPage = () => {
           나의 업무 성과를 분석해 볼까요?
         </p>
       </header>
-      <nav className="-mx-(--scale-40) flex gap-3 border-b border-(--color-border-subtle) px-(--scale-40)">
-        {' '}
+      <nav className="-mx-(--scale-40) flex gap-3 border-b border-(--color-border-subtle) bg-(--color-bg-default) px-(--scale-40)">
         <button
           type="button"
           disabled={generation === 'generating' || monthlyGeneration === 'generating'}
