@@ -26,14 +26,14 @@ export const MonthlyStatusCard = ({
           <WordySleepingIcon width={220} height={220} className="shrink-0" />
           <div className="flex flex-col items-center gap-2 text-center">
             <h2 className="[font-size:var(--font-size-heading-4)] font-bold text-(--color-text-default)">
-              {`${periodLabel ?? '이번 달'}의 대시보드를 아직 생성할 수 없어요`}
+              {`${periodLabel ?? '이번 달'}의 리포트를 아직 생성할 수 없어요`}
             </h2>
             <p className="[font-size:var(--font-size-body-3)] text-(--color-text-secondary)">
-              주간 대시보드를 더 변환해 주세요!
+              주간 리포트를 더 변환해 주세요!
               <br />
-              월간 대시보드는{' '}
+              월간 리포트는{' '}
               <span className="font-semibold text-(--color-text-brand)">
-                최소 {requiredCount}개의 주간 대시보드 내용을 바탕으로
+                최소 {requiredCount}개의 주간 리포트 내용을 바탕으로
               </span>{' '}
               생성돼요.
             </p>
@@ -45,7 +45,7 @@ export const MonthlyStatusCard = ({
             iconLeft={<GenerateIcon width={20} height={20} />}
             className="w-full max-w-100"
           >
-            월간 대시보드 생성하기
+            월간 리포트 생성하기
           </TextButton>
         </div>
       )}
@@ -55,12 +55,12 @@ export const MonthlyStatusCard = ({
           <WordyReadyIcon width={220} height={220} className="shrink-0" />
           <div className="flex flex-col items-center gap-2 text-center">
             <h2 className="[font-size:var(--font-size-heading-4)] font-bold text-(--color-text-default)">
-              이번 달의 대시보드를 생성할 준비가 되었어요
+              이번 달의 리포트를 생성할 준비가 되었어요
             </h2>
             <p className="[font-size:var(--font-size-body-3)] text-(--color-text-secondary)">
               저장된{' '}
               <span className="font-semibold text-(--color-text-brand) tabular-nums">
-                대시보드 {generatedCount}개
+                리포트 {generatedCount}개
               </span>
               를 바탕으로 이번 달의 업무 및 KPI 추적 결과를 정리해드릴게요
             </p>
@@ -72,7 +72,7 @@ export const MonthlyStatusCard = ({
             onClick={onGenerate}
             className="w-full max-w-100"
           >
-            월간 대시보드 생성하기
+            월간 리포트 생성하기
           </TextButton>
         </div>
       )}
