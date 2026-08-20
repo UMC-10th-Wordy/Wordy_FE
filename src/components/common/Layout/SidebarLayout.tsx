@@ -328,7 +328,7 @@ export function SidebarLayout() {
                 onClick: () => {
                   setModal(null)
                   readNotification(item.notificationId)
-                  navigate(PAGE_ROUTES['성과 리포트'])
+                  navigate(item.redirectUrl)
                 },
               }))}
               onClose={() => setModal(null)}
