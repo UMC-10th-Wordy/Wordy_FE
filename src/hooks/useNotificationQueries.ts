@@ -10,6 +10,7 @@ import {
 import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
 import type { NotificationListResult, NotificationSettingKey } from '@/types/notification'
 
+// 서버가 허용하는 size 최댓값. 사이드바 배지 카운트는 totalCount를 쓰므로 이 값과 무관하게 정확함
 const UNREAD_NOTIFICATION_LIST_SIZE = 50
 
 export const useGetNotifications = () => {
