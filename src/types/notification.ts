@@ -1,7 +1,9 @@
 import type { DiaryListApiResponse } from '@/types/diaryList'
 
 /* 알림 목록 조회 */
-// GET /notifications
+// GET /workspaces/{workspaceId}/notifications
+
+export type NotificationStatusFilter = 'all' | 'read' | 'unread'
 
 export interface NotificationResult {
   notificationId: string
@@ -13,10 +15,19 @@ export interface NotificationResult {
   createdAt: string
 }
 
-export type NotificationsResponse = DiaryListApiResponse<NotificationResult[]>
+export interface NotificationListResult {
+  items: NotificationResult[]
+  page: number
+  size: number
+  totalCount: number
+  totalPages: number
+  hasNext: boolean
+}
+
+export type NotificationsResponse = DiaryListApiResponse<NotificationListResult>
 
 /* 알림 읽음 처리 */
-// PATCH /notifications/{notificationId}/read
+// PATCH /workspaces/{workspaceId}/notifications/{notificationId}/read
 
 export interface ReadNotificationResult {
   notificationId: string

@@ -7,12 +7,20 @@ import {
   readNotification,
   updateNotificationSetting,
 } from '@/api/notification/notification'
-import type { NotificationResult, NotificationSettingKey } from '@/types/notification'
+import { useActiveWorkspaceId } from '@/hooks/useWorkspaceQueries'
+import type { NotificationListResult, NotificationSettingKey } from '@/types/notification'
+
+// 서버가 허용하는 size 최댓값. 사이드바 배지 카운트는 totalCount를 쓰므로 이 값과 무관하게 정확함
+const UNREAD_NOTIFICATION_LIST_SIZE = 50
 
 export const useGetNotifications = () => {
+  const workspaceId = useActiveWorkspaceId()
+
   return useQuery({
-    queryKey: notificationQueryKeys.lists(),
-    queryFn: getNotifications,
+    queryKey: notificationQueryKeys.lists(workspaceId),
+    queryFn: () =>
+      getNotifications(workspaceId, { status: 'unread', size: UNREAD_NOTIFICATION_LIST_SIZE }),
+    enabled: Boolean(workspaceId),
     staleTime: 0,
     refetchOnWindowFocus: true,
     refetchInterval: 10 * 60 * 1000,
@@ -21,36 +29,43 @@ export const useGetNotifications = () => {
 
 export const useReadNotification = () => {
   const queryClient = useQueryClient()
+  const workspaceId = useActiveWorkspaceId()
 
   return useMutation({
-    mutationFn: readNotification,
+    mutationFn: (notificationId: string) => readNotification(workspaceId, notificationId),
 
     onMutate: async (notificationId) => {
-      await queryClient.cancelQueries({ queryKey: notificationQueryKeys.lists() })
+      await queryClient.cancelQueries({ queryKey: notificationQueryKeys.lists(workspaceId) })
 
-      const previousItem = queryClient
-        .getQueryData<NotificationResult[]>(notificationQueryKeys.lists())
-        ?.find((item) => item.notificationId === notificationId)
-
-      queryClient.setQueryData<NotificationResult[]>(notificationQueryKeys.lists(), (old) =>
-        old?.map((item) =>
-          item.notificationId === notificationId ? { ...item, isRead: true } : item,
-        ),
+      const previousData = queryClient.getQueryData<NotificationListResult>(
+        notificationQueryKeys.lists(workspaceId),
       )
 
-      return { previousItem }
+      queryClient.setQueryData<NotificationListResult>(
+        notificationQueryKeys.lists(workspaceId),
+        (old) => {
+          if (!old) return old
+          if (!old.items.some((item) => item.notificationId === notificationId)) return old
+
+          return {
+            ...old,
+            items: old.items.filter((item) => item.notificationId !== notificationId),
+            totalCount: Math.max(old.totalCount - 1, 0),
+          }
+        },
+      )
+
+      return { previousData }
     },
 
-    onError: (_error, notificationId, context) => {
-      if (!context?.previousItem) return
+    onError: (_error, _notificationId, context) => {
+      if (!context?.previousData) return
 
-      queryClient.setQueryData<NotificationResult[]>(notificationQueryKeys.lists(), (old) =>
-        old?.map((item) => (item.notificationId === notificationId ? context.previousItem! : item)),
-      )
+      queryClient.setQueryData(notificationQueryKeys.lists(workspaceId), context.previousData)
     },
 
     onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.lists() })
+      void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.lists(workspaceId) })
     },
   })
 }
