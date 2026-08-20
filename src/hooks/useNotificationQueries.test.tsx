@@ -88,6 +88,26 @@ describe('useReadNotification', () => {
     expect(readNotification).toHaveBeenCalledWith('workspace-1', 'n1')
   })
 
+  it('캐시에 없는 알림이면 totalCount를 낮추지 않는다', async () => {
+    vi.mocked(readNotification).mockResolvedValue({
+      notificationId: 'stale-id',
+      isRead: true,
+      redirectUrl: '/a',
+    })
+    const { queryClient, wrapper } = setup()
+
+    const { result } = renderHook(() => useReadNotification(), { wrapper })
+    result.current.mutate('stale-id')
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+
+    const data = queryClient.getQueryData<NotificationListResult>(
+      notificationQueryKeys.lists('workspace-1'),
+    )
+    expect(data?.items.map((item) => item.notificationId)).toEqual(['n1', 'n2'])
+    expect(data?.totalCount).toBe(2)
+  })
+
   it('실패 시 원래 목록으로 롤백한다', async () => {
     vi.mocked(readNotification).mockRejectedValue(new Error('network error'))
     const { queryClient, wrapper } = setup()

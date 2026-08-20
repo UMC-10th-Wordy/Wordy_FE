@@ -43,12 +43,16 @@ export const useReadNotification = () => {
 
       queryClient.setQueryData<NotificationListResult>(
         notificationQueryKeys.lists(workspaceId),
-        (old) =>
-          old && {
+        (old) => {
+          if (!old) return old
+          if (!old.items.some((item) => item.notificationId === notificationId)) return old
+
+          return {
             ...old,
             items: old.items.filter((item) => item.notificationId !== notificationId),
             totalCount: Math.max(old.totalCount - 1, 0),
-          },
+          }
+        },
       )
 
       return { previousData }
