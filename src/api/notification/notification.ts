@@ -1,4 +1,4 @@
-import { request } from '@/lib/httpClient'
+import { request, withWorkspace } from '@/lib/httpClient'
 
 import type {
   NotificationListResult,
@@ -8,10 +8,6 @@ import type {
   ReadNotificationResult,
   UpdateNotificationSettingResult,
 } from '@/types/notification'
-
-function withWorkspace(workspaceId: string, path: string): string {
-  return `/workspaces/${encodeURIComponent(workspaceId)}${path}`
-}
 
 export const getNotifications = async (
   workspaceId: string,

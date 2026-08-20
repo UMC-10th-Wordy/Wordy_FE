@@ -85,6 +85,9 @@ const refreshAccessToken = (): Promise<boolean> => {
   return refreshPromise
 }
 
+export const withWorkspace = (workspaceId: string, path: string): string =>
+  `/workspaces/${encodeURIComponent(workspaceId)}${path}`
+
 export const request = async <T>(
   path: string,
   options: RequestInit = {},

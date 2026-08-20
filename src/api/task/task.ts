@@ -9,7 +9,7 @@ import type {
   UpdateTaskPayload,
   MoveTaskToTomorrowPayload,
 } from '@/types/task'
-import { ApiError, request } from '@/lib/httpClient'
+import { ApiError, request, withWorkspace } from '@/lib/httpClient'
 
 export const taskQueryKeys = {
   all: (workspaceId: string) => ['tasks', workspaceId] as const,
@@ -18,10 +18,6 @@ export const taskQueryKeys = {
   calendars: (workspaceId: string) => [...taskQueryKeys.all(workspaceId), 'calendar'] as const,
   calendar: (workspaceId: string, year: number, month: number) =>
     [...taskQueryKeys.calendars(workspaceId), year, month] as const,
-}
-
-function withWorkspace(workspaceId: string, path: string): string {
-  return `/workspaces/${encodeURIComponent(workspaceId)}${path}`
 }
 
 export const moveTaskToTomorrow = async (
