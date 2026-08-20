@@ -180,10 +180,8 @@ export function SidebarLayout() {
   const { data: notificationSettingsData } = useGetNotificationSettings()
   const { mutate: updateNotificationSetting } = useUpdateNotificationSetting()
 
-  const notificationItems = (Array.isArray(notificationsData) ? notificationsData : []).filter(
-    (item) => !item.isRead,
-  )
-  const unreadNotificationCount = notificationItems.length
+  const notificationItems = notificationsData?.items ?? []
+  const unreadNotificationCount = notificationsData?.totalCount ?? 0
   const notificationSettings: NotificationSettings = notificationSettingsData
     ? {
         emailMarketing: notificationSettingsData.emailMarketing,
